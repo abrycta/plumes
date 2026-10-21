@@ -46,3 +46,11 @@ Not yet run: crawl parse rates (4, 5, 17), sizes (8), Render/Neon/edge (13–15)
 | 21 | Landsat 8 C2 L2 surface temperature of the crater lake before draining | 29.9 °C on 2019-02-05 (least-cloudy 2019 scene) | **Pass**: the lake-temperature series is feasible |
 | 20 | WorldPop 2020 within 14 km of Taal (`WorldPop/GP/100m/pop`) | about 318,000 | Differs from OCHA's about 459,000 (vintage and method); state both, as planned |
 | 20 | Community asset `projects/sat-io/open-datasets/WORLDPOP/pop` | Release R2025A, constrained, 100 m, annual from 2015 | Identified; use it for 2021+ |
+
+### Run 1, continued (NASA, after Kurt approved the GES DISC application)
+
+| # | Measurement | Result | Verdict |
+|---|---|---|---|
+| 23 | MSVOLSO2L4 v4 (2026-05-13 file, 193,575 bytes, bearer token) | 18 Philippine eruptions: Mayon 1984; Kanlaon 1985, 2016, 2024, 2025 (×2), 2026; Pinatubo 1991 (×3, 15,000 kt on 15 June, plume 25 km); Bulusan 2006–2025 (×7); **Taal 2020-01-12: 170 kt SO₂, observed plume 17 km, VEI 4** | **Pass**: feeds the eruptions band with SO₂ mass and plume height |
+| 22 | OMSO2e via OPeNDAP (DAP4 CSV, 9×9 cells around Taal, 2020-01-13) | HTTP 200, 1,855 bytes, no download; **all cells are fill values** that day (likely OMI row-anomaly gaps) | **Pass for access**; the OMI track needs the same coverage display as TROPOMI, and its usable days must be counted in the backfill |
+| 19 | FIRMS area API | Not run: MAP_KEY not yet in the Keychain | Pending |
