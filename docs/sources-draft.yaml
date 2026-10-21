@@ -16,6 +16,10 @@
 # or too big to archive, >= 2 automatic links; `update-input` = read by the pipeline's own client (crawled pages,
 # hand-downloaded files adopted as private archive releases, authenticated downloads). Rasters are never archived.
 # PHIVOLCS: public pages only, every figure cited with its link, no bulk file published, no email (Q5 = ii).
+# PROPOSAL (2026-10-21, OPEN-QUESTIONS Q30, not decided): Kurt asked for 20 sources in total, query-in-place where possible.
+# The proposed 20 (21 entries: USGS ComCat is one source split in two for the 20,000-event cap) carry the comment
+# `# proposed_keep: true` under their id. The schema allows no extra fields, so the mark is a comment; nothing else is
+# deleted or changed. The access-method changes for the kept entries are in NO-DOWNLOAD-ALTERNATIVES.md.
 version: 1
 project: plumes
 
@@ -39,6 +43,7 @@ sources:
   # =================================================================== CORE RECORD (M1)
   # ------------------------------------------------------------------ eruption history (Smithsonian GVP, WFS)
   - id: gvp-volcanoes-ph
+    # proposed_keep: true   # source 1 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] Smithsonian Global Volcanism Program, Volcanoes of the World: Holocene volcanoes with Country = Philippines
       (23 rows on 2026-10-21) as CSV from the GVP GeoServer WFS. Supplies GVP numbers, coordinates, elevation,
@@ -77,6 +82,7 @@ sources:
     archived: { enabled: true, retention: all, max_age_days: 400 }
 
   - id: gvp-eruptions-ph
+    # proposed_keep: true   # source 2 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] Smithsonian GVP Holocene eruptions for the Philippine volcano numbers (271000-274999; 233 rows on
       2026-10-21): VEI, start and end dates with explicit uncertainty fields and modifiers, evidence method.
@@ -139,6 +145,7 @@ sources:
 
   # ------------------------------------------------------------------ earthquakes: USGS ComCat (public domain)
   - id: usgs-comcat-ph-1900-2009
+    # proposed_keep: true   # source 5 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] USGS ComCat events in the Philippine box (4-22 N, 116-128 E) 1900-01-01 to 2009-12-31 as FDSN CSV
       (15,738 events on 2026-10-21; the service caps a query at 20,000). Pre-1970 rows are mostly ISC-GEM imports.
@@ -167,6 +174,7 @@ sources:
     archived: { enabled: true, retention: all }
 
   - id: usgs-comcat-ph-2010
+    # proposed_keep: true   # source 5 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] USGS ComCat events in the Philippine box from 2010-01-01 to the fetch date as FDSN CSV (11,594 events on
       2026-10-21). Split from the 1900-2009 file so both stay under the 20,000-event cap; a yearly split is
@@ -197,6 +205,7 @@ sources:
 
   # ------------------------------------------------------------------ boundaries and codes (shared with Lights and Replay)
   - id: cod-ab-phl-gdb
+    # proposed_keep: true   # source 14 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] OCHA/NAMRIA/PSA Common Operational Dataset, Philippines administrative boundaries levels 0-4 (v03, file
       geodatabase, about 361 MB; HDX resources modified 2026-05-28). Used for "LGUs within N km" and the map
@@ -253,6 +262,7 @@ sources:
 
   # ------------------------------------------------------------------ PHIVOLCS pages (crawled by the pipeline; DATA-PLAN.md §3, Q5 = ii)
   - id: phivolcs-bulletins
+    # proposed_keep: true   # source 3 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] DOST-PHIVOLCS daily volcano bulletins and eruption bulletins on the WordPress site: HTML prose from
       2017-09-02 (category listing paginates to page 1,498 on 2026-10-21); 2025+ "Summary of 24Hr Observation"
@@ -280,6 +290,7 @@ sources:
     archived: { enabled: false }            # raw bundles are adopted per crawl by the pipeline (not fetched by the kit)
 
   - id: phivolcs-lava-bulletins
+    # proposed_keep: true   # source 4 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] DOST-PHIVOLCS LAVA portal 24-hour volcano bulletins, structured HTML by id
       (/bulletin/activity-{tvo,mvo,kvo,bvo}?bid=N&lang=en; id 1000 = 2022-04-02, id 16917 = 2026-10-21; ids are not
@@ -328,6 +339,7 @@ sources:
 
   # ------------------------------------------------------------------ satellite rasters on Earth Engine (never downloaded or archived)
   - id: s5p-offl-so2
+    # proposed_keep: true   # source 6 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] Copernicus / ESA Sentinel-5P TROPOMI offline L3 SO2 (COPERNICUS/S5P/OFFL/L3_SO2), 2018-12-05 onward,
       1,113 m, one image per orbit; bands SO2_column_number_density (ground-level a priori),
@@ -351,6 +363,7 @@ sources:
     archived: { enabled: false }
 
   - id: firms-modis
+    # proposed_keep: true   # source 8 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] NASA FIRMS (LANCE) MODIS active fire and thermal anomalies on Earth Engine (collection FIRMS, 1 km daily,
       2000-11-01 onward; bands T21, confidence). Counted per volcano ring and day as "thermal detections (includes
@@ -375,6 +388,7 @@ sources:
     archived: { enabled: false }
 
   - id: modis-mod14a1
+    # proposed_keep: true   # source 9 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: "[M1] NASA LP DAAC MODIS Terra thermal anomalies and fire daily L3 1 km (MODIS/061/MOD14A1), 2000-02-24 onward; FireMask classes 7-9 and MaxFRP, reduced per ring in Earth Engine. Terra's end of science is expected in 2027. Format: EE. Size: per-volcano daily rows only. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: NASA LP DAAC, no restrictions on subsequent use, sale, or redistribution"
@@ -392,6 +406,7 @@ sources:
     archived: { enabled: false }
 
   - id: viirs-vnp14a1
+    # proposed_keep: true   # source 10 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: "[M1] NASA LP DAAC VIIRS S-NPP thermal anomalies and fire daily L3 1 km (NASA/VIIRS/002/VNP14A1), 2012-01-19 onward, reduced per ring in Earth Engine. S-NPP deliveries end 2026-11-02; NOAA-20 (VJ114A1) is the continuity series and is checked by the spike. Format: EE. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: NASA open data (LP DAAC); cite when publishing"
@@ -409,6 +424,7 @@ sources:
     archived: { enabled: false }
 
   - id: worldpop-100m
+    # proposed_keep: true   # source 13 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: "[M1] WorldPop (University of Southampton) 100 m population counts (WorldPop/GP/100m/pop on Earth Engine, 2000-2020; the Global 2 R2024B/R2025A PHL GeoTIFFs for 2021 onward), reduced to population within 5/10/15/30 km rings and the PDZ per volcano, once per year. Format: EE. Size: 24 x rings x years rows. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: CC BY 4.0"
@@ -460,6 +476,7 @@ sources:
     archived: { enabled: false }
 
   - id: copernicus-dem-glo30
+    # proposed_keep: true   # source 15 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: "[M1] Copernicus DEM GLO-30 (COPERNICUS/DEM/GLO30_2024_1 on Earth Engine; the older GLO30 asset is superseded), 30 m, for hillshade, ring terrain and profiles. Format: EE; hillshade tiles for the map. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open-with-conditions: Copernicus DEM free licence with the mandatory notice; (c) DLR e.V. 2010-2014 and (c) Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved"
@@ -504,6 +521,7 @@ sources:
     archived: { enabled: false }
 
   - id: s5p-offl-aer-ai
+    # proposed_keep: true   # source 7 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: "[M2] Copernicus / ESA Sentinel-5P TROPOMI UV aerosol index (COPERNICUS/S5P/OFFL/L3_AER_AI), 2018-07-04 onward, 1,113 m; band absorbing_aerosol_index. Reduced per volcano box and day in Earth Engine for the plume track (ash and aerosol). Format: EE. Size: per-volcano daily rows. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: Copernicus Sentinel Data Legal Notice"
@@ -538,6 +556,7 @@ sources:
     archived: { enabled: false }
 
   - id: vaac-tokyo-advisories
+    # proposed_keep: true   # source 11 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] Japan Meteorological Agency, Tokyo VAAC volcanic ash advisories (the Philippines north of 10 N is in
       Tokyo's area, not Darwin's: ICAO FASID Table MET 3B; Taal, Mayon, Kanlaon and Bulusan are Tokyo's). Access:
@@ -609,6 +628,7 @@ sources:
     archived: { enabled: false }
 
   - id: era5-pressure-levels
+    # proposed_keep: true   # source 17 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] ECMWF / Copernicus Climate Change Service ERA5 hourly winds on pressure levels (u and v at 250, 300, 500
       and 700 hPa) over each volcano for story days: why the plume and vog went where they did. Read as small windows
@@ -683,6 +703,7 @@ sources:
     archived: { enabled: false }
 
   - id: s2-sr-harmonized
+    # proposed_keep: true   # source 16 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: "[M1] Copernicus / ESA Sentinel-2 L2A surface reflectance (COPERNICUS/S2_SR_HARMONIZED), 2017-03-28 onward, 10 m (B4, B8): least-cloudy composites for the before/after strip (getThumbURL at 1024 px, four dates per story), crater-lake area and NDVI loss within 10 km. Format: EE; PNG thumbnails about 300 kB each [U]. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: Copernicus Sentinel Data Legal Notice"
@@ -816,6 +837,7 @@ sources:
     archived: { enabled: false }
 
   - id: gpm-imerg-v07
+    # proposed_keep: true   # source 20 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: "[M2] NASA GPM IMERG V07 precipitation (NASA/GPM_L3/IMERG_V07 on Earth Engine: half-hourly, 0.1 degree, 1998 onward; GES DISC daily files as the second route), reduced to daily rainfall per volcano box: the lahar-context rainfall track. Format: EE; NetCDF (12 MB per global day) at GES DISC. Size: per-volcano daily rows, tens of kB. Auth: Earth Engine service account (GES DISC needs the Earthdata login)."
     kind: remote-dataset
     licence: "open: CC0 ('All NASA-produced data from the GPM mission is made freely available for the public to use.')"
@@ -834,6 +856,7 @@ sources:
 
   # =================================================================== PASS 3: PEOPLE AND IMPACT
   - id: dswd-dromic-reports
+    # proposed_keep: true   # source 12 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M1] DSWD Disaster Response Operations Monitoring and Information Center situation reports: people in
       evacuation centres and affected families per day during an event (Taal 2020: 70 reports, 2020-01-13 to
@@ -1379,6 +1402,7 @@ sources:
 
   # =================================================================== PASS 6: SOCIETY, RESPONSE AND THE OTHER PROJECTS
   - id: black-marble-vnp46a2
+    # proposed_keep: true   # source 18 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M3] NASA Black Marble daily nighttime lights (VNP46A2, Collection 2, 15 arc-second tiles h29v07 h29v08 h30v06
       h30v07 h30v08), the power-cut and recovery track after an eruption; the yearly VNP46A4 is Lights' input
@@ -1401,6 +1425,7 @@ sources:
     archived: { enabled: false }
 
   - id: lights-poverty-estimates
+    # proposed_keep: true   # source 19 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
     description: >-
       [M3] Own data: the Lights project's published per-LGU poverty estimates and night-light features (CC BY 4.0
       with Lights' attribution block), read from the Lights data version by LGU PSGC for the "Who lives nearby"

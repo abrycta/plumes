@@ -25,7 +25,7 @@ Status: 2026-10-21. **Q1–Q18 are answered** (see [DECISIONS.md](DECISIONS.md);
 | Q17 | **Milestone-1 scope** | as ARCHITECTURE-OPTIONS.md §6; or a narrower M1 of Taal and Kanlaon only | **The §6 scope**: the per-volcano machinery costs the same for 4 or 24 once the pipeline exists |
 | Q18 | **Spike** | one day before building (SPIKE-PLAN.md); or start building | **Yes, one day**; the EE export path and the PHIVOLCS crawl are the two things that must be measured |
 
-## 2. Open: Q19–Q29 (raised 2026-10-21 by the source canvas and the decided architecture)
+## 2. Open: Q19–Q30 (raised 2026-10-21 by the source canvas, the decided architecture and the 20-source proposal)
 
 Each has a recommendation; "yes to the recommendations" is enough. Nothing below is decided or built.
 
@@ -42,10 +42,11 @@ Each has a recommendation; "yes to the recommendations" is enough. Nothing below
 | Q27 | **Hand-collected sources** (sites that block scripts: PSA census and PSGC xlsx, DOH registry, NDRRMC PDFs, Slab2, GEBCO box, EMSR418 packages, the GVP terms page) | Kurt downloads once per vintage following a checklist in the repo and the pipeline adopts the files as archive releases (Lights' PSA pattern); or those sources are skipped | **The checklist and adopt path**; none of them is at M1 except re-reading the GVP terms page |
 | Q28 | **Registrations for later milestones** (free; Kurt's actions): FIRMS MAP_KEY (M1); OpenAQ key (M2); ReliefWeb appname and OpenAlex key (M3); ECMWF ADS/EWDS, Copernicus Marine, IOC, DAHITI, USGS EROS (M4); a second Earth Engine service account (Q22) | create all now, or only M1's | **Only M1's now** (FIRMS MAP_KEY as `firms-map-key` in the Keychain); the rest when their milestone starts |
 | Q29 | **Stories at M1** | Taal January 2020 only; or Taal 2020 plus Kanlaon 2024 (the §6 demo's second half) | **Taal 2020 at M1, Kanlaon 2024 at M1.1** on the same machinery; the demo's Kanlaon half uses the volcano page, not a story |
+| Q30 | **Twenty sources, queried in place** (Kurt, 2026-10-21: "alternative databases that do not require downloads", then "20 sources in total") | (a) the 20 in [NO-DOWNLOAD-ALTERNATIVES.md](NO-DOWNLOAD-ALTERNATIVES.md) (21 registry entries marked `# proposed_keep: true`): GVP ×2, PHIVOLCS WordPress and LAVA, USGS, S5P SO₂ and aerosol index, FIRMS, MOD14A1, VNP14A1, Tokyo VAAC, DROMIC, WorldPop, COD-AB by range read, Copernicus DEM, Sentinel-2, ERA5, GPM, Black Marble on Earth Engine, Lights poverty; (b) the same with MIROVA instead of GPM (volcano-tuned radiative power, one 99 MB file a year); (c) keep the 86-entry plan | **(a), with Black Marble and the Lights poverty join at M1.1.** The Taal 2020 story and the map work end to end; only the three crawlers and the DROMIC reports still fetch documents (no API exists for them); the archive falls from about 0.9 GB to under 100 MB, the Earth Engine roadmap from about 25 to about 8–10 EECU-hours, and the only registration left is the FIRMS MAP_KEY. If accepted, Q23–Q28 are re-read against the 20 (Q24, Q26, Q27 and most of Q25 and Q28 fall away) |
 
 ## Actions for Kurt
 
-1. Answer Q19–Q29 (the recommendations are fine as defaults).
+1. Answer Q19–Q30 (the recommendations are fine as defaults); Q30 (the 20 sources) first, because it changes Q23–Q28.
 2. Request a free FIRMS MAP_KEY at `https://firms.modaps.eosdis.nasa.gov/api/map_key/` (email) and save it in the Keychain as `firms-map-key`.
 3. Re-read by hand the terms pages that blocked scripts on 2026-10-21 (LICENCES.md, last section), starting with the Smithsonian GVP terms (https://www.si.edu/termsofuse, https://volcano.si.edu/gvp_termsofuse.cfm), because GVP is at M1.
 4. When the repo exists: add the `lgu-lights` Earth Engine key (or the second service account's key, Q22) and the FIRMS MAP_KEY as GitHub secrets; create the Neon project and the Render service only after spike items 13–15.
