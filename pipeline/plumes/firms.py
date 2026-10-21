@@ -15,6 +15,7 @@ import datetime as dt
 import io
 import os
 import sys
+import time
 
 from plumes.crawl.records import Records, now, sha256
 from plumes.http import Polite
@@ -40,7 +41,7 @@ def rows_of(text: str) -> list[dict]:
     return list(csv.DictReader([head, *lines]))
 
 
-def crawl(products: list[str], start: str | None = None) -> dict:
+def crawl(products: list[str], start: str | None = None, end: str | None = None) -> dict:
     key = os.environ.get("FIRMS_MAP_KEY") or sys.exit("FIRMS_MAP_KEY is not set")
     stats = {}
     with Polite(min_interval=1.0) as c:
@@ -48,12 +49,21 @@ def crawl(products: list[str], start: str | None = None) -> dict:
         for product in products:
             log = Records(OUT / product / "windows.jsonl")
             done = log.done("date")
-            d, end = dt.date.fromisoformat(start or START[product]), dt.date.fromisoformat(avail[product])
+            # windows stay on the product's 5-day grid, so parallel ranges never overlap or leave gaps
+            d0 = dt.date.fromisoformat(START[product])
+            d = d0 if not start else d0 + dt.timedelta(days=-(-(dt.date.fromisoformat(start) - d0).days // 5) * 5)
+            last = dt.date.fromisoformat(avail[product])
+            end_ = min(last, dt.date.fromisoformat(end)) if end else last
             n = 0
-            while d <= end:
+            while d <= end_:
                 ds = d.isoformat()
                 if ds not in done:
                     r = c.get(API.format(key=key, product=product, date=ds))
+                    for _ in range(3):  # FIRMS weighs transactions by size: wait out the 10-minute window and retry
+                        if "transaction limit" not in r.text[:200]:
+                            break
+                        time.sleep(600)
+                        r = c.get(API.format(key=key, product=product, date=ds))
                     if r.status_code != 200 or "Invalid" in r.text[:200]:
                         log.add({"date": ds, "status": r.status_code, "fetched": now(), "error": r.text[:200].replace(key, "<MAP_KEY>")})
                     else:
@@ -77,5 +87,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--product", action="append")
     ap.add_argument("--start")
+    ap.add_argument("--end")
     a = ap.parse_args()
-    print(crawl(a.product or ["MODIS_SP", "VIIRS_SNPP_SP"], a.start))
+    print(crawl(a.product or ["MODIS_SP", "VIIRS_SNPP_SP"], a.start, a.end))

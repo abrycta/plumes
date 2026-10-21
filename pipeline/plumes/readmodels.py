@@ -84,7 +84,8 @@ def gvp_date(r, pre="StartDate") -> str | None:
 
 
 def load_bulletins() -> dict[str, dict[str, list]]:
-    """volcano -> date -> schema row. One row a day: LAVA when it exists, else the latest WordPress bulletin that day."""
+    """volcano -> date -> schema row. One row a day, all fields from one page (each value cites its own page): LAVA when it
+    exists, else the latest WordPress page that day reporting an alert level, else the latest page that day."""
     out: dict[str, dict[str, tuple]] = collections.defaultdict(dict)
     for r in Records(RAW / "phivolcs-bulletins" / "pages.jsonl").latest().values():
         if r.get("status") != 200:
@@ -92,7 +93,7 @@ def load_bulletins() -> dict[str, dict[str, list]]:
         p = parse_wp(r["url"], r["entry"])
         if not p or not p["volcano"] or not p["date"]:
             continue
-        key = (0, p["hour"] or 0)
+        key = (0, p["alert"] is not None, p["hour"] or 0)  # latest page that reports an alert level, else the latest page
         cur = out[p["volcano"]].get(p["date"])
         if cur is None or key >= cur[0]:
             out[p["volcano"]][p["date"]] = (key, [p["date"], p["alert"], p["eq"], p["tremor"], p["so2"], p["so2_date"], p["plume_m"], p["deform"], p["url"]])
@@ -103,7 +104,7 @@ def load_bulletins() -> dict[str, dict[str, list]]:
         if not p:
             continue
         date = p["date"] or r["date"]
-        key = (1, r["bid"])
+        key = (1, p["alert"] is not None, r["bid"])
         cur = out[r["volcano"]].get(date)
         if cur is None or key >= cur[0]:
             out[r["volcano"]][date] = (key, [date, p["alert"], p["eq"], p["tremor"], p["so2"], p["so2_date"], p["plume_m"], p["deform"],
