@@ -96,7 +96,7 @@ Hexagonal (ports and adapters) Spring Boot service, read-only, over a PostGIS sc
 |---|---|
 | Application core | the event catalogue: volcanoes, eruptions (GVP), bulletins (PHIVOLCS), earthquakes (USGS, PHIVOLCS), thermal detections, SO2 days, episodes; spatial-temporal queries ("events within 30 km of Taal between dates", "what happened in the 14 days before each VEI ≥ 3 eruption since 2000") |
 | Driving adapters | Spring MVC controllers with OpenAPI; a CLI that exports the same JSON the static site uses (contract test: API JSON equals static JSON) |
-| Driven adapters | JdbcClient or MyBatis mappers over PostGIS (Neon free, 1 GB; the catalogue is a few hundred MB [U]) |
+| Driven adapters | JdbcClient or MyBatis mappers over PostGIS (Neon free, 1 GB; the catalogue measured about 220 MB with indexes in spike Run 2) |
 | Deployment | Render free (Singapore), same-origin `/api/*` through a Pages function, edge-cached public reads with long TTLs; the static site must work with the API deleted |
 
 ### 3.2 Why it earns its place
@@ -105,7 +105,7 @@ The domain is dated events in space: joins across catalogues, windows around eru
 
 ### 3.3 Cost and risk
 
-Render free sleeps after 15 minutes; bandwidth overages would bill because a card is on file, so every public read is edge-cached and the API is rate-limited. Neon free's 1 GB holds the catalogue (USGS 27k rows, PHIVOLCS about 150k, thermal detections up to 400k, SO2 days 70k; about 100–300 MB with indexes [U]).
+Render free sleeps after 15 minutes; bandwidth overages would bill because a card is on file, so every public read is edge-cached and the API is rate-limited. Neon free's 1 GB holds the catalogue (USGS 27k rows, thermal detections up to 400k, daily rows 235k, ring bins about 1M: about 220 MB with indexes, measured in spike Run 2; the M1 queries run in under 0.3 ms). Spike Run 2 also measured the JVM at Render free's 0.1 CPU: about 78 s to `/readyz` with CDS, before Render's wake, RSS about 190 MB (DECISIONS.md S7).
 
 ## 4. Option C: Rust core with CLI, WASM and Worker adapters (not recommended here)
 

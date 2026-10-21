@@ -6,3 +6,5 @@ spike/**/out/
 node_modules/
 __pycache__/
 .venv/
+spike/fixtures/raw/
+spike/fixtures/parsed.json
