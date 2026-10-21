@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Akari pre-paint theme: the shared krtmtthw.dev cookie (or localStorage) before first paint. External, so CSP-safe. -->
+    <script src="/theme-init.js" data-shared-cookie-domain="krtmtthw.dev"></script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6f5f1" />
+    <link rel="preload" href="/config.json" as="fetch" crossorigin="anonymous" />
+    <meta name="description" content="A retrospective record of the 24 active Philippine volcanoes since 2000: satellite SO₂, thermal anomalies, earthquakes, eruptions and dated, linked PHIVOLCS bulletins. Not a monitoring or warning service." />
+    <title>Plumes</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Plumes" />
+    <meta property="og:title" content="Plumes: a retrospective record of Philippine volcanoes" />
+    <meta property="og:description" content="Every record of the 24 active Philippine volcanoes on one time axis. A past record only; DOST-PHIVOLCS is the sole authority for alert levels and advisories." />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,245 @@
+[
+ {
+  "id": "gvp-volcanoes-ph",
+  "milestone": "M1",
+  "title": "Smithsonian Global Volcanism Program, Volcanoes of the World",
+  "verdict": "open-with-conditions",
+  "licence": "open-with-conditions: Smithsonian Terms of Use (non-commercial use with citation; the terms pages answered a Cloudflare challenge on 2026-10-21 and are to be re-read by hand, LICENCES.md); WFS GetCapabilities states Fees NONE and AccessConstraints NONE. Derived figures are shown with the citation; no copy is redistributed.",
+  "attribution": "Global Volcanism Program, 2026. [Database] Volcanoes of the World (v. 5.4.0; 7 Aug 2026). Distributed by Smithsonian Institution, compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2026.5.4 (use the current version string), linked to https://volcano.si.edu/",
+  "link": null
+ },
+ {
+  "id": "gvp-eruptions-ph",
+  "milestone": "M1",
+  "title": "Smithsonian GVP Holocene eruptions for the Philippine volcano numbers (271000-274999; 233 rows on 2026-10-21)",
+  "verdict": "open-with-conditions",
+  "licence": "open-with-conditions: Smithsonian Terms of Use (non-commercial use with citation; see gvp-volcanoes-ph)",
+  "attribution": "Global Volcanism Program, 2026. [Database] Volcanoes of the World (v. 5.4.0; 7 Aug 2026). Distributed by Smithsonian Institution, compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2026.5.4",
+  "link": null
+ },
+ {
+  "id": "usgs-comcat-ph-1900-2009",
+  "milestone": "M1",
+  "title": "USGS ComCat events in the Philippine box (4-22 N, 116-128 E) 1900-01-01 to 2009-12-31 as FDSN CSV (15,738 events on 2026-10-21; the service caps a query at 20,0",
+  "verdict": "open",
+  "licence": "open: U.S. public domain (USGS-authored data); credit U.S. Geological Survey",
+  "attribution": "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/",
+  "link": null
+ },
+ {
+  "id": "usgs-comcat-ph-2010",
+  "milestone": "M1",
+  "title": "USGS ComCat events in the Philippine box from 2010-01-01 to the fetch date as FDSN CSV (11,594 events on 2026-10-21)",
+  "verdict": "open",
+  "licence": "open: U.S. public domain (USGS-authored data); credit U.S. Geological Survey",
+  "attribution": "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/",
+  "link": null
+ },
+ {
+  "id": "cod-ab-phl-gdb",
+  "milestone": "M1",
+  "title": "OCHA/NAMRIA/PSA Common Operational Dataset, Philippines administrative boundaries levels 0-4 (v03, file geodatabase, about 361 MB; HDX resources modified 2026-0",
+  "verdict": "open-with-conditions",
+  "licence": "open-with-conditions: Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+  "attribution": "OCHA Philippines, Philippines - Subnational Administrative Boundaries (COD-AB), source NAMRIA and PSA, https://data.humdata.org/dataset/philippines-administrative-levels-0-to-3",
+  "link": "https://data.humdata.org/dataset/caf116df-f984-4deb-85ca-41b349d3f313/resource/3fa0dbcf-e07d-4506-9821-ba15baa6da07/download/phl_admin_boundaries.gdb.zip"
+ },
+ {
+  "id": "phivolcs-bulletins",
+  "milestone": "M1",
+  "title": "DOST-PHIVOLCS daily volcano bulletins and eruption bulletins on the WordPress site",
+  "verdict": "link-only",
+  "licence": "link-only in the canvas sense (cite every figure with its link; no bulk file). No terms stated on the site; work of the Government of the Philippines (RA 8293 s.176.1: no copyright; prior approval needed only for exploitation for profit).",
+  "attribution": "DOST-PHIVOLCS (Philippine Institute of Volcanology and Seismology), volcano bulletins, https://www.phivolcs.dost.gov.ph/",
+  "link": "https://www.phivolcs.dost.gov.ph/category/volcano-bulletin/"
+ },
+ {
+  "id": "phivolcs-lava-bulletins",
+  "milestone": "M1",
+  "title": "DOST-PHIVOLCS LAVA portal 24-hour volcano bulletins, structured HTML by id (/bulletin/activity-{tvo,mvo,kvo,bvo}?bid=N&lang=en; id 1000 = 2022-04-02, id 16917 =",
+  "verdict": "link-only",
+  "licence": "link-only in the canvas sense. The LAVA data policy governs registered downloads, which are not used; public bulletin pages are government works (RA 8293 s.176.1). Displayed with citation; no bulk file.",
+  "attribution": "DOST-PHIVOLCS, Local Active Volcanoes Archive (LAVA), https://wovodat.phivolcs.dost.gov.ph/",
+  "link": "https://wovodat.phivolcs.dost.gov.ph/bulletin/list-of-bulletin"
+ },
+ {
+  "id": "s5p-offl-so2",
+  "milestone": "M1",
+  "title": "Copernicus / ESA Sentinel-5P TROPOMI offline L3 SO2 (COPERNICUS/S5P/OFFL/L3_SO2), 2018-12-05 onward, 1,113 m, one image per orbit; bands SO2_column_number_densi",
+  "verdict": "open",
+  "licence": "open: Copernicus Sentinel Data Legal Notice (free, full and open; reproduction, distribution, adaptation permitted); Earth Engine used under its noncommercial terms",
+  "attribution": "Contains modified Copernicus Sentinel data [Year], processed by ESA; TROPOMI SO2 retrieval Theys et al. 2017 (doi:10.5194/amt-10-119-2017). Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "firms-modis",
+  "milestone": "M1",
+  "title": "NASA FIRMS (LANCE) MODIS active fire and thermal anomalies on Earth Engine (collection FIRMS, 1 km daily, 2000-11-01 onward; bands T21, confidence)",
+  "verdict": "open",
+  "licence": "open: NASA open data (LANCE/FIRMS) provided 'as is'; the LANCE disclaimer is reproduced; the fire products are not validated for detecting volcanoes",
+  "attribution": "We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (https://earthdata.nasa.gov/firms), part of NASA's Earth Science Data and Information System (ESDIS). MODIS Collection 6.1 active fire product (MCD14DL/MCD14ML). Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "modis-mod14a1",
+  "milestone": "M1",
+  "title": "NASA LP DAAC MODIS Terra thermal anomalies and fire daily L3 1 km (MODIS/061/MOD14A1), 2000-02-24 onward; FireMask classes 7-9 and MaxFRP, reduced per ring in E",
+  "verdict": "open",
+  "licence": "open: NASA LP DAAC, no restrictions on subsequent use, sale, or redistribution",
+  "attribution": "Giglio, L., Justice, C. (2021). MODIS/Terra Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V061, NASA EOSDIS LP DAAC, doi:10.5067/MODIS/MOD14A1.061. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "viirs-vnp14a1",
+  "milestone": "M1",
+  "title": "NASA LP DAAC VIIRS S-NPP thermal anomalies and fire daily L3 1 km (NASA/VIIRS/002/VNP14A1), 2012-01-19 onward, reduced per ring in Earth Engine",
+  "verdict": "open",
+  "licence": "open: NASA open data (LP DAAC); cite when publishing",
+  "attribution": "Schroeder, W., Giglio, L. (2018). VIIRS/NPP Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V002, NASA EOSDIS LP DAAC. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "worldpop-100m",
+  "milestone": "M1",
+  "title": "WorldPop (University of Southampton) 100 m population counts (WorldPop/GP/100m/pop on Earth Engine, 2000-2020; Global 2, 2015-2030, from the Earth Engine commun",
+  "verdict": "open",
+  "licence": "open: CC BY 4.0",
+  "attribution": "WorldPop (www.worldpop.org, School of Geography and Environmental Science, University of Southampton) and CIESIN, Columbia University. Processed in Google Earth Engine.",
+  "link": "https://data.worldpop.org/GIS/Population/Global_2015_2030/R2024B/2020/PHL/v1/100m/"
+ },
+ {
+  "id": "copernicus-dem-glo30",
+  "milestone": "M1",
+  "title": "Copernicus DEM GLO-30 (COPERNICUS/DEM/GLO30_2024_1 on Earth Engine; the older GLO30 asset is superseded), 30 m, for hillshade, ring terrain and profiles",
+  "verdict": "open-with-conditions",
+  "licence": "open-with-conditions: Copernicus DEM free licence with the mandatory notice; (c) DLR e.V. 2010-2014 and (c) Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved",
+  "attribution": "Copernicus DEM GLO-30, European Space Agency, doi:10.5270/ESA-c5d3d65. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "s5p-offl-aer-ai",
+  "milestone": "M2",
+  "title": "Copernicus / ESA Sentinel-5P TROPOMI UV aerosol index (COPERNICUS/S5P/OFFL/L3_AER_AI), 2018-07-04 onward, 1,113 m; band absorbing_aerosol_index",
+  "verdict": "open",
+  "licence": "open: Copernicus Sentinel Data Legal Notice",
+  "attribution": "Contains modified Copernicus Sentinel data [Year]. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "vaac-tokyo-advisories",
+  "milestone": "M1",
+  "title": "Japan Meteorological Agency, Tokyo VAAC volcanic ash advisories (the Philippines north of 10 N is in Tokyo's area, not Darwin's",
+  "verdict": "open-with-conditions",
+  "licence": "open-with-conditions: JMA website terms ('The user must cite the source when using the Content.'; compatible with CC BY 4.0)",
+  "attribution": "Source: Japan Meteorological Agency website, Tokyo VAAC volcanic ash advisories (https://ds.data.jma.go.jp/svd/vaac/data/)",
+  "link": "https://ds.data.jma.go.jp/svd/vaac/data/Archives/2020_vaac_list.html"
+ },
+ {
+  "id": "era5-pressure-levels",
+  "milestone": "M1",
+  "title": "ECMWF / Copernicus Climate Change Service ERA5 hourly winds on pressure levels (u and v at 250, 300, 500 and 700 hPa) over each volcano for story days",
+  "verdict": "open",
+  "licence": "open: CC BY 4.0 (CDS licence since 2025-07-02; the ARCO-ERA5 copy under the Copernicus terms; the NSF NCAR copy under UCAR terms, CC BY 4.0)",
+  "attribution": "Contains modified Copernicus Climate Change Service information [Year]. Hersbach, H., et al. (2020) doi:10.1002/qj.3803; ERA5 doi:10.24381/cds.adbb2d47. ARCO-ERA5 (Google Research) when served by it.",
+  "link": "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-pressure-levels"
+ },
+ {
+  "id": "s2-sr-harmonized",
+  "milestone": "M1",
+  "title": "Copernicus / ESA Sentinel-2 L2A surface reflectance (COPERNICUS/S2_SR_HARMONIZED), 2017-03-28 onward, 10 m (B4, B8)",
+  "verdict": "open",
+  "licence": "open: Copernicus Sentinel Data Legal Notice",
+  "attribution": "Contains modified Copernicus Sentinel data [Year]. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "landsat-c2-l2",
+  "milestone": "M1",
+  "title": "USGS Landsat Collection 2 Level-2",
+  "verdict": "open",
+  "licence": "open: U.S. public domain ('There are no restrictions on Landsat data downloaded from the USGS; it can be used or redistributed as desired.')",
+  "attribution": "Landsat image courtesy of the U.S. Geological Survey. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "landsat-surface-temperature",
+  "milestone": "M1",
+  "title": "USGS Landsat Collection 2 Level-2 surface temperature (ST_B10 on Landsat 8/9; ST_B6 on Landsat 5/7 for 2000-2012) (K; scale 0.00341802, offset 149; masked on L2",
+  "verdict": "open",
+  "licence": "open: U.S. public domain",
+  "attribution": "Landsat surface temperature courtesy of the U.S. Geological Survey. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "s1-grd",
+  "milestone": "M1",
+  "title": "Copernicus / ESA Sentinel-1 GRD (COPERNICUS/S1_GRD), 2014-10-03 onward, VV/VH in dB at 10 m",
+  "verdict": "open",
+  "licence": "open: Copernicus Sentinel Data Legal Notice",
+  "attribution": "Contains modified Copernicus Sentinel data [Year]. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "gpm-imerg-v07",
+  "milestone": "M2",
+  "title": "NASA GPM IMERG V07 precipitation (NASA/GPM_L3/IMERG_V07 on Earth Engine",
+  "verdict": "open",
+  "licence": "open: CC0 ('All NASA-produced data from the GPM mission is made freely available for the public to use.')",
+  "attribution": "Huffman, G.J. et al. (2019), GPM IMERG Final Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07, GES DISC, doi:10.5067/GPM/IMERG/3B-HH/07. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "dswd-dromic-reports",
+  "milestone": "M1",
+  "title": "DSWD Disaster Response Operations Monitoring and Information Center situation reports",
+  "verdict": "open",
+  "licence": "open: work of the Government of the Philippines (RA 8293 s.176.1); no site terms stated",
+  "attribution": "DSWD DROMIC Report #N on the Taal Volcano Eruption as of <date>, https://dromic.dswd.gov.ph/",
+  "link": "https://dromic.dswd.gov.ph/taal-volcano-phreatic-eruption-13-jan-2020/"
+ },
+ {
+  "id": "black-marble-vnp46a2",
+  "milestone": "M1.1",
+  "title": "NASA Black Marble daily nighttime lights (VNP46A2, Collection 2, 500 m), the power-cut and recovery track after an eruption and the night-lights link to Lights",
+  "verdict": "open",
+  "licence": "open: NASA open data; no restrictions",
+  "attribution": "Roman, M.O., et al. NASA Black Marble VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 500m Linear Lat Lon Grid, VNP46A2 v002, doi:10.5067/VIIRS/VNP46A2.002. Processed in Google Earth Engine.",
+  "link": null
+ },
+ {
+  "id": "lights-poverty-estimates",
+  "milestone": "M1.1",
+  "title": "Own data",
+  "verdict": "open",
+  "licence": "open: CC BY 4.0 (Lights' published table; ../../lgu-lights/docs/DATA-PLAN.md §5) with its attribution block (PSA, EOG, NASA, WorldPop, GHSL, OCHA)",
+  "attribution": "Lights (lights.krtmtthw.dev), per-LGU poverty estimates, data version <v>; PSA Small Area Estimates; see the Lights attribution block",
+  "link": "https://github.com/abrycta/lgu-lights/releases"
+ },
+ {
+  "id": "nasa-msvolso2l4",
+  "milestone": "M1",
+  "title": "NASA GES DISC MEaSUREs Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4 (MSVOLSO2L4)",
+  "verdict": "open",
+  "licence": "open: NASA full and open (CMR access constraints 'None'; EOSDIS data use guidance)",
+  "attribution": "Carn, S. (2025), Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4, Goddard Earth Science Data and Information Services Center (GES DISC), doi:10.5067/MEASURES/SO2/DATA405",
+  "link": "https://measures.gesdisc.eosdis.nasa.gov/data/SO2/MSVOLSO2L4.4/MSVOLSO2L4_v04-00-2026m0513.txt"
+ },
+ {
+  "id": "omi-omso2e",
+  "milestone": "M1",
+  "title": "NASA GES DISC OMI/Aura Sulfur Dioxide Total Column Daily L3 Best Pixel 0.25 deg (OMSO2e v003), 2004-10-01 onward",
+  "verdict": "open",
+  "licence": "open: NASA EOSDIS data use policy (no restriction; citation requested)",
+  "attribution": "Li, C., Krotkov, N. A., Leonard, P. (2020), OMI/Aura Sulfur Dioxide (SO2) Total Column Daily L3 Best Pixel in 0.25 degree x 0.25 degree V3, GES DISC, doi:10.5067/Aura/OMI/DATA3008 [U: copy the exact citation from the GES DISC page when built]",
+  "link": null
+ },
+ {
+  "id": "open-buildings-temporal",
+  "milestone": "M1.1",
+  "title": "Google Research Open Buildings 2.5D Temporal (GOOGLE/Research/open-buildings-temporal/v1 on Earth Engine), annual 2016-06-30 to 2023-06-30, effective 4 m",
+  "verdict": "open",
+  "licence": "open: CC BY 4.0 (Earth Engine STAC license field)",
+  "attribution": "Google Open Buildings 2.5D Temporal Dataset (Google Research), CC BY 4.0. Processed in Google Earth Engine.",
+  "link": "https://sites.research.google/gr/open-buildings/temporal/"
+ }
+]

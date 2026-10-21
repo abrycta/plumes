@@ -1,0 +1,45 @@
+# Cloudflare Pages response headers. Docs: https://developers.cloudflare.com/pages/configuration/headers/
+# When several rules match, values of the same header are joined with a comma, so Cache-Control is set
+# only on non-overlapping paths below.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # Data: same origin (fixtures, M1), then the published versions on GitHub Pages and the Hugging Face mirror
+  # (resolve URLs redirect to *.hf.co); basemap: OpenFreeMap (style, tiles, glyphs, sprites). Add new hosts to connect-src.
+  Content-Security-Policy: default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://abrycta.github.io https://huggingface.co https://*.hf.co; font-src 'self' data:; connect-src 'self' https://abrycta.github.io https://huggingface.co https://*.huggingface.co https://*.hf.co https://tiles.openfreemap.org; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+
+# Vite emits content-hashed file names here, so they never change in place.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Data versions (v0/, v1/, ...). Published versions are immutable, but M1 serves the contract fixture v0, which is
+# rebuilt in place, so an hour for now; make it immutable when config.json points at published versions.
+/data/v*
+  Cache-Control: public, max-age=3600
+
+# The pointer to the current data version: short cache so a new release shows up quickly.
+/data/latest.json
+  Cache-Control: public, max-age=60, must-revalidate
+
+# Runtime configuration: data hosts change without a rebuild.
+/config.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Bundled coastline (Natural Earth, public domain): the offline basemap and the static map.
+/basemap/*
+  Cache-Control: public, max-age=86400
+
+# Akari's pre-paint theme script (stable name, render-blocking): short TTL so upgrades land quickly.
+/theme-init.js
+  Cache-Control: public, max-age=300
+
+# The HTML entry point must always revalidate so new deploys show up at once.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

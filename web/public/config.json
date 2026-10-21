@@ -1,0 +1,12 @@
+{
+  "siteUrl": "https://plumes.krtmtthw.dev",
+  "data": {
+    "baseUrl": "/data/",
+    "pointer": "latest.json",
+    "fallbackBaseUrls": []
+  },
+  "basemap": {
+    "style": "https://tiles.openfreemap.org/styles/positron",
+    "fallback": "/basemap/coast.geojson"
+  }
+}

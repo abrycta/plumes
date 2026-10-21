@@ -1,0 +1,135 @@
+/* Akari on Tailwind v4, wired as Akari's shadcn.css header prescribes. Akari's fonts.css is loaded
+   separately and non-blocking from main.tsx; MapLibre's CSS loads with the map chunk. */
+@layer theme, base, akari, components, utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@abrycta/akari/css/shadcn.css";
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    line-height: var(--ak-leading-body);
+    overflow-x: clip;
+  }
+  :lang(ja) {
+    line-height: var(--ak-leading-ja);
+    line-break: strict;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Native range input (APG slider semantics for free), styled with tokens. */
+  .range {
+    appearance: none;
+    width: 100%;
+    height: 28px;
+    background: transparent;
+    cursor: pointer;
+  }
+  .range::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--muted);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .range::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--muted);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+  .range::-webkit-slider-thumb {
+    appearance: none;
+    margin-top: -6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 2px solid var(--primary);
+    background: var(--background);
+  }
+  .range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    border: 2px solid var(--primary);
+    background: var(--background);
+  }
+  /* Safety banner: a layout element on every route (RESEARCH.md §9). Token colours only. */
+  .safety-banner {
+    background: color-mix(in oklab, var(--seal) 8%, var(--background));
+    border-bottom: 1px solid color-mix(in oklab, var(--seal) 30%, var(--border));
+  }
+}
+
+/* Volcano markers on the interactive map (HTML markers: real links, keyboard reachable). */
+.volcano-marker {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--foreground);
+  font-size: 12px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.volcano-marker .dot {
+  display: block;
+  /* 12px dot in a 24px target (WCAG 2.2 target size). */
+  margin: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 2px solid var(--background);
+  background: var(--muted-foreground);
+}
+.volcano-marker[data-coverage="deep"] .dot {
+  margin: 3px;
+  width: 18px;
+  height: 18px;
+  background: var(--seal);
+}
+.volcano-marker .name {
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--background) 85%, transparent);
+}
+.volcano-marker[data-coverage="deep"] .name {
+  font-weight: 600;
+}
+.volcano-marker:hover .name,
+.volcano-marker:focus-visible .name {
+  text-decoration: underline;
+}
+
+/* MapLibre controls in Akari colours. Unlayered and scoped to .maplibregl-map so they win over
+   MapLibre's own (unlayered, later-loaded) stylesheet. */
+.maplibregl-map .maplibregl-ctrl-attrib {
+  font-size: 11px;
+}
+.maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-attrib,
+.maplibregl-map .maplibregl-ctrl-attrib.maplibregl-compact-show,
+.maplibregl-map .maplibregl-ctrl-group {
+  background: var(--background);
+  color: var(--foreground);
+}
+.maplibregl-map .maplibregl-ctrl-attrib a {
+  color: inherit;
+}
+.dark .maplibregl-map .maplibregl-ctrl-group button .maplibregl-ctrl-icon,
+.dark .maplibregl-map .maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}

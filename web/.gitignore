@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.npmrc
+*.tsbuildinfo
+test-results/
+playwright-report/
+.wrangler/

@@ -1,0 +1,98 @@
+# Web app: install (private @abrycta/akari from GitHub Packages), typecheck, lint, unit tests, build, end-to-end tests
+# (screens, safety rules, axe in four themes, 390 px, the rule 6b device matrix); then, on main only, deploy web/dist
+# to the Cloudflare Pages project "plumes" (direct upload with wrangler, no Pages CI builds).
+# Until the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repo secrets exist, the deploy job skips with a notice.
+name: Web
+
+on:
+  push:
+    branches: [main]
+    paths: [web/**, contracts/**, docs/sources-draft.yaml, .github/workflows/web.yml]
+  pull_request:
+    paths: [web/**, contracts/**, docs/sources-draft.yaml, .github/workflows/web.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read # @abrycta/akari; the package must grant this repository read access (Package settings)
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+          registry-url: https://npm.pkg.github.com
+          scope: "@abrycta"
+      - run: npm ci
+        env: { NODE_AUTH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+        env: { BUILD_SHA: "${{ github.event.pull_request.head.sha || github.sha }}" }
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with: { name: playwright-report, path: web/playwright-report, retention-days: 7 }
+      - name: Size
+        run: |
+          {
+            echo "### Bundle (gzipped)"
+            for f in dist/assets/*.js dist/assets/*.css; do echo "$(gzip -9c "$f" | wc -c) $(basename "$f")"; done | sort -rn | head -12
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with: { name: web-dist, path: web/dist, retention-days: 3 }
+
+  deploy:
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      deployments: write
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - name: Check Cloudflare secrets
+        id: secrets
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$CF_API_TOKEN" ] && [ -n "$CF_ACCOUNT_ID" ]; then echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice title=Deploy skipped::CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID are not set on this repository."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: steps.secrets.outputs.enabled == 'true'
+        with: { name: web-dist, path: dist }
+      - name: Deploy to Cloudflare Pages (project plumes)
+        id: deploy
+        if: steps.secrets.outputs.enabled == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.151.3"
+          command: pages deploy dist --project-name=plumes --branch=main --commit-hash=${{ github.sha }}
+      - name: Summary
+        if: steps.secrets.outputs.enabled == 'true'
+        env: { URL: "${{ steps.deploy.outputs.deployment-url }}" }
+        run: echo "### Deployed to Cloudflare Pages: $URL (production https://plumes.pages.dev)" >> "$GITHUB_STEP_SUMMARY"
