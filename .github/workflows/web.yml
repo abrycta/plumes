@@ -100,4 +100,5 @@ jobs:
       - name: Summary
         if: steps.secrets.outputs.enabled == 'true'
         env: { URL: "${{ steps.deploy.outputs.deployment-url }}" }
-        run: echo "### Deployed to Cloudflare Pages: $URL (production https://plumes.pages.dev)" >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          echo "### Deployed to Cloudflare Pages: $URL (production https://plumes.pages.dev)" >> "$GITHUB_STEP_SUMMARY"
