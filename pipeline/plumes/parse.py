@@ -19,6 +19,9 @@ VOLCANO_SLUGS = {"taal": "taal", "mayon": "mayon", "kanlaon": "kanlaon", "bulusa
                  "iriga": "iriga", "isarog": "isarog", "makaturing": "makaturing", "leonard": "leonard-kniaseff",
                  "cabalian": "cabalian", "bud-dajo": "bud-dajo"}
 MONTHS = {m: i for i, m in enumerate(["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"], 1)}
+# Filipino month names and typos seen in bulletin slugs
+MONTHS |= {"enero": 1, "pebrero": 2, "marso": 3, "abril": 4, "mayo": 5, "hunyo": 6, "hulyo": 7, "agosto": 8, "setyembre": 9, "septyembre": 9,
+           "oktubre": 10, "nobyembre": 11, "disyembre": 12, "octobber": 10, "febuary": 2, "janurary": 1}
 
 
 def text(html: str) -> str:

@@ -28,6 +28,8 @@ def test_wp_bulusan_2017_and_empty_summary():
 def test_slug_meta_variants():
     assert wp_slug_meta("taal-volcano-bulletin-update-12-january-2020-04-00-pm-2")["date"] == "2020-01-12"
     assert wp_slug_meta("hibok-hibok-volcano-advisory-may-3-2018")["volcano"] == "hibok-hibok"
+    assert wp_slug_meta("taal-volcano-bulletin-26-enero-2020-8-00-am")["date"] == "2020-01-26"
+    assert wp_slug_meta("taal-volcano-bulletin-1-octobber-2019-8-00-a-m")["date"] == "2019-10-01"
 
 
 def test_lava():

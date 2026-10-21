@@ -36,7 +36,9 @@ health:
   issue_title_prefix: "plumes source"
   issue_token_env: ARCHIVE_READ_TOKEN
   token_expiry_warn_days: 30
-  token_expires: "2027-10-31"            # placeholder: set to the ARCHIVE_READ_TOKEN expiry when it is created
+  # No token_expires: ARCHIVE_READ_TOKEN (the same token as Lights', set on abrycta/plumes and abrycta/plumes-archive on
+  # 2026-10-22) was created without an expiry, so the guard reports "no expiry date" and passes. If the token is ever
+  # regenerated with an expiry, set token_expires here.
   user_agent: "plumes-pipeline/0.1 (+https://github.com/abrycta/plumes)"
   heartbeat_days: 14
 
@@ -221,11 +223,11 @@ sources:
       - id: category-listing
         url: "https://www.phivolcs.dost.gov.ph/category/volcano-bulletin/"
         probe_html: true
-        probe_contains: "VOLCANO"
+        probe_contains: "PHIVOLCS"            # the probe reads the first 64 KiB only
       - id: example-bulletin
         url: "https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-14-march-2022-8-00-am/"
         probe_html: true
-        probe_contains: "tonnes/day"
+        probe_contains: "taal-volcano-bulletin-14-march-2022"
     archived: { enabled: false }            # raw bundles are adopted per crawl by the pipeline (not fetched by the kit)
 
   - id: phivolcs-lava-bulletins
@@ -279,6 +281,12 @@ sources:
         url: ee://COPERNICUS/S5P/NRTI/L3_SO2
         probe: https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS/COPERNICUS_S5P_NRTI_L3_SO2.json
         probe_contains: "L3_SO2"
+      - id: cdse-stac                       # independent of Earth Engine: Copernicus Data Space (L2 OFFL granules)
+        url: https://stac.dataspace.copernicus.eu/v1/collections/sentinel-5p-l2-so2-offl
+        probe_contains: "sentinel-5p"
+      - id: nasa-gesdisc                    # independent: NASA GES DISC copy of the TROPOMI L2 SO2 product
+        url: "https://cmr.earthdata.nasa.gov/search/collections.json?short_name=S5P_L2__SO2____HiR&version=2"
+        probe_contains: "S5P_L2__SO2"
     archived: { enabled: false }
 
   - id: firms-modis
@@ -358,7 +366,7 @@ sources:
       - id: worldpop-ftp
         url: https://data.worldpop.org/GIS/Population/Global_2015_2030/R2024B/2020/PHL/v1/100m/
         probe_html: true
-        probe_contains: "phl"
+        probe_contains: "PHL"
     archived: { enabled: false }
 
   - id: copernicus-dem-glo30
@@ -377,6 +385,13 @@ sources:
         url: ee://COPERNICUS/DEM/GLO30
         probe: https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS/COPERNICUS_DEM_GLO30.json
         probe_contains: "GLO30"
+      - id: cdse-stac                       # independent of Earth Engine: Copernicus Data Space COGs
+        url: https://stac.dataspace.copernicus.eu/v1/collections/cop-dem-glo-30-dged-cog
+        probe_contains: "cop-dem"
+      - id: aws-open-data                   # independent: the AWS Registry of Open Data copy
+        url: https://copernicus-dem-30m.s3.amazonaws.com/readme.html
+        probe_html: true
+        probe_contains: "Copernicus"
     archived: { enabled: false }
 
   # =================================================================== PASS 1: THE PLUME AND THE SKY
@@ -399,15 +414,11 @@ sources:
       - id: archive-2020
         url: https://ds.data.jma.go.jp/svd/vaac/data/Archives/2020_vaac_list.html
         probe_html: true
-        probe_contains: "TAAL"
+        probe_contains: "TextData/2020/"
       - id: example-advisory
         url: https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200112_27307000_0001_Text.html
         probe_html: true
         probe_contains: "TOKYO"
-      - id: bom-darwin
-        url: https://www.bom.gov.au/aviation/volcanic-ash/
-        probe_html: true
-        automatic: false                   # link-only: BoM forbids scraping; shown as a link for Mindanao volcanoes
     archived: { enabled: false }
 
   - id: era5-pressure-levels
@@ -479,6 +490,9 @@ sources:
         url: ee://LANDSAT/LE07/C02/T1_L2
         probe: https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LE07_C02_T1_L2.json
         probe_contains: "LE07"
+      - id: usgs-stac                       # independent of Earth Engine: USGS LandsatLook STAC (surface reflectance)
+        url: https://landsatlook.usgs.gov/stac-server/collections/landsat-c2l2-sr
+        probe_contains: "landsat-c2l2-sr"
     archived: { enabled: false }
 
   - id: landsat-surface-temperature
@@ -497,6 +511,9 @@ sources:
         url: ee://LANDSAT/LC09/C02/T1_L2
         probe: https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LC09_C02_T1_L2.json
         probe_contains: "ST_B10"
+      - id: usgs-stac                       # independent of Earth Engine: USGS LandsatLook STAC (surface temperature)
+        url: https://landsatlook.usgs.gov/stac-server/collections/landsat-c2l2-st
+        probe_contains: "landsat-c2l2-st"
     archived: { enabled: false }
 
   - id: s1-grd
@@ -558,7 +575,9 @@ sources:
         probe_contains: "MSVOLSO2L4"
       - id: gesdisc-file
         url: https://measures.gesdisc.eosdis.nasa.gov/data/SO2/MSVOLSO2L4.4/MSVOLSO2L4_v04-00-2026m0513.txt
-        automatic: false                   # 302 to urs.earthdata.nasa.gov without the token
+        automatic: false                   # 302 to urs.earthdata.nasa.gov without the token; read by plumes/nasa.py
+        probe: "https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MSVOLSO2L4&version=4"
+        probe_contains: "MSVOLSO2L4"
     archived: { enabled: false }
 
 
