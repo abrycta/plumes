@@ -23,3 +23,15 @@ Checked before stopping (no secret printed):
 | 23, 24 | MSVOLSO2L4 / MSAQSO2L4 Philippine rows; OMI `OMSO2e` Harmony subset for Taal | not run (Kurt approved the Earthdata reads later the same day, but the spike had already stopped) | the same permission |
 
 No DECISIONS.md addendum (S1…) is written until there are measurements.
+
+## Run 1 (2026-10-21, in Kurt's session, with his approval)
+
+| # | Measurement | Result | Verdict |
+|---|---|---|---|
+| 3 | Taal 2020-01-12 in Sentinel-5P SO₂ (OFFL L3, daily mean within 15 km) | Background about 0.02–0.08 mmol/m² in early January; **6.2 mmol/m² on 13 January (about 80× background) but from only 5 valid pixels**; 14–15 January no valid pixels (ash and cloud) | **Pass**, with the caveat that coverage must be shown beside every value (planned coverage bar confirmed as essential) |
+| 3 | MODIS MOD14A1 MaxFRP within 15 km | Detections on 14, 17, 20 and 22 January 2020 (87–201 MW) | **Pass**: the thermal track shows the eruption |
+| 3 | USGS ComCat within 30 km, 2019-12-01 to 2020-02-15 | 56 events: 35 on 12 January, 15 on 13th, 5 on 14th, 1 on 19th; none before | **Pass** for the spike itself; USGS sees no precursor swarm (PHIVOLCS bulletins carry the local counts) |
+| 1 | Earth Engine cost of the above | One month, two rings, two collections: 2.5 s interactive `getInfo`, negligible EECU | **Pass**: well inside the Plumes cap |
+| 23 | MSVOLSO2L4 read (GES DISC) | **Blocked**: HTTP 403 "EULA Acceptance Failure". Kurt must approve the GES DISC application once in Earthdata (urs.earthdata.nasa.gov, Applications → Authorized Apps, "NASA GESDISC DATA ARCHIVE"). The same approval covers OMSO2e (item 22) | Blocked on Kurt |
+
+Not yet run: crawl parse rates (4, 5, 17), sizes (8), Render/Neon/edge (13–15), ERA5 Zarr (18), Landsat/S1 thumbnails (20, 21), FIRMS API (19, no MAP_KEY).
