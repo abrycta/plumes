@@ -208,7 +208,12 @@ public final class Loader {
 
     /** FIRMS area-API CSV (latitude, longitude, acq_date, instrument/satellite, frp, type). */
     private static void readFirmsCsv(Path p, Version v) throws IOException {
-        List<Map<String, String>> rows = Csv.read(Files.readString(p));
+        // The area API ends each response without a newline, so concatenated responses glue the next header onto
+        // the last row (DECISIONS B5): split on the header and drop its repeats.
+        String text = Files.readString(p);
+        String header = text.lines().findFirst().orElse("");
+        String body = text.substring(header.length()).replace(header, "\n");
+        List<Map<String, String>> rows = Csv.read(header + body);
         String sensorHint = p.getFileName().toString().replaceFirst("^firms_", "").replaceFirst("\\.csv$", "");
         for (Map<String, String> r : rows) {
             String type = r.get("type");

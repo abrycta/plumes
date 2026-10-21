@@ -1,6 +1,6 @@
 name: API
 # The Java read API (api/): tests on every change; on main, the GraalVM native image is built, pushed to the private
-# GHCR package ghcr.io/abrycta/plumes-api and deployed to Render (free plan) by its deploy hook. Nightly: a contract
+# GHCR package ghcr.io/abrycta/plumes-api and deployed to Render (free plan) through the Render API. Nightly: a contract
 # check of the live API through the edge cache (DATA-PLAN §8: one wake a day, no pinger).
 on:
   push:
@@ -78,12 +78,15 @@ jobs:
         run: |
           docker pull -q "$IMAGE:${{ github.sha }}"
           docker image inspect "$IMAGE:${{ github.sha }}" --format 'image {{.Size}} bytes' | tee -a "$GITHUB_STEP_SUMMARY"
-      - name: Deploy to Render (deploy hook pins the image by commit)
-        env: { HOOK: "${{ secrets.RENDER_DEPLOY_HOOK }}" }
+      - name: Deploy to Render (free plan service, pinned to this commit's image)
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE: ${{ vars.RENDER_SERVICE_ID }}
         run: |
-          if [ -z "$HOOK" ]; then echo "::notice::RENDER_DEPLOY_HOOK not set; image pushed only"; exit 0; fi
-          ref=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$IMAGE:${{ github.sha }}")
-          curl -fsS -X POST "$HOOK&imgURL=$ref" -o /dev/null -w "deploy hook HTTP %{http_code}\n"
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$SERVICE" ]; then echo "::notice::Render not configured; image pushed only"; exit 0; fi
+          curl -fsS -X POST "https://api.render.com/v1/services/$SERVICE/deploys" \
+            -H "Authorization: Bearer $RENDER_API_KEY" -H "Content-Type: application/json" \
+            -d "{\"imageUrl\": \"$IMAGE:${{ github.sha }}\"}" -o /dev/null -w "Render deploy HTTP %{http_code}\n"
 
   live-contract:
     # One wake a day: the live volcano list and Taal's file through the edge validate against the read-model schemas.

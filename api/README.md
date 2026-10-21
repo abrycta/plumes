@@ -46,7 +46,7 @@ docker run --rm -e DATABASE_URL=… plumes-api load /data [--usgs comcat.csv]...
 docker run -p 8080:8080 -e DATABASE_URL=… plumes-api
 ```
 
-`ContractIT` loads `contracts/fixtures/data` with the real loader, then checks that the list and Taal's file equal the fixtures and validate against the schemas, and that the spatial queries rebuild the fixture's own daily series from the raw points (USGS within 30 km, VIIRS within 15 km). CI (`.github/workflows/api.yml`) runs it on Java 17 against a PostGIS service container; on main it builds the native image (cached Maven layer), pushes it to GHCR and calls Render's deploy hook; nightly it validates the live list and Taal through the edge.
+`ContractIT` loads `contracts/fixtures/data` with the real loader, then checks that the list and Taal's file equal the fixtures and validate against the schemas, and that the spatial queries rebuild the fixture's own daily series from the raw points (USGS within 30 km, VIIRS within 15 km). CI (`.github/workflows/api.yml`) runs it on Java 17 against a PostGIS service container; on main it builds the native image (cached Maven layer), pushes it to GHCR and deploys it on Render through the Render API (secret `RENDER_API_KEY`, variable `RENDER_SERVICE_ID`); nightly it validates the live list and Taal through the edge.
 
 ## Loading a data version
 
