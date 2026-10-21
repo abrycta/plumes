@@ -214,7 +214,7 @@ dump(V / "layers" / "thermal" / "2020-01.geojson", {"type": "FeatureCollection",
 dump(V / "layers.json", {**HDR, "kind": "layers", "layers": [
     {"id": "thermal-detections", "title": lt("Thermal detections (FIRMS)", "熱異常検知(FIRMS)"), "format": "geojson", "url": "layers/thermal/{month}.geojson",
      "time": {"step": "month", "start": "2000-11", "end": "2026-09", "available": ["2020-01"]},
-     "properties": {"date": "acquisition date", "frp": "MW", "sensor": "FIRMS product", "type": "FIRMS type (2 = active volcano)"},
+     "properties": {"date": "acquisition date", "frp": "MW", "sensor": "FIRMS product", "type": "FIRMS type: 0 vegetation fire, 1 active volcano, 2 other static source, 3 offshore"},
      "sources": ["firms-modis"], "attribution": reg["firms-modis"]["attribution"],
      "note": lt("Fixture holds the Taal box only. Published versions use PMTiles with the same id.", "フィクスチャはタール周辺のみ。公開版は同じIDのPMTiles。")}]})
 

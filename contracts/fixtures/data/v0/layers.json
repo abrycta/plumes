@@ -26,7 +26,7 @@
     "date": "acquisition date",
     "frp": "MW",
     "sensor": "FIRMS product",
-    "type": "FIRMS type (2 = active volcano)"
+    "type": "FIRMS type: 0 vegetation fire, 1 active volcano, 2 other static source, 3 offshore"
    },
    "sources": [
     "firms-modis"
