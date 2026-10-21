@@ -1,0 +1,4 @@
+*
+!api/pom.xml
+!api/src/main/**
+!contracts/openapi.yaml

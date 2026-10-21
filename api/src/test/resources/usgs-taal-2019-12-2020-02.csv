@@ -1,0 +1,57 @@
+time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
+2020-01-12T12:24:20.991Z,14.0279,121.1386,10,4.3,mb,,123,0.209,0.59,us,us60007esq,2020-04-02T21:27:31.040Z,"2 km SW of Malvar, Philippines",earthquake,3.6,1.9,0.119,20,reviewed,us,us
+2020-01-12T12:51:17.903Z,14.0337,121.0471,10,4.3,mb,,157,0.127,1.12,us,us60007ess,2020-04-02T21:27:31.040Z,"3 km WSW of Boot, Philippines",earthquake,5.5,1.9,0.161,11,reviewed,us,us
+2020-01-12T12:54:50.497Z,13.9729,121.0572,10,4.5,mb,,130,0.173,0.55,us,us70006yqp,2020-04-02T21:28:20.040Z,"Mindoro, Philippines",earthquake,10.9,1.9,0.11,24,reviewed,us,us
+2020-01-12T12:58:43.205Z,14.1169,121.1569,10,4.4,mb,,134,0.214,0.88,us,us60007est,2020-04-02T21:27:32.040Z,"1 km ENE of Santo Tomas, Philippines",earthquake,6.5,1.9,0.13,17,reviewed,us,us
+2020-01-12T13:38:25.233Z,13.9978,121.1765,4.45,4.6,mb,,106,0.254,0.73,us,us60007esv,2020-04-02T21:27:32.040Z,"2 km ESE of San Andres, Philippines",earthquake,6.9,6.2,0.129,18,reviewed,us,us
+2020-01-12T13:39:10.451Z,14.01,121.05,10,4.3,mb,,111,0.143,1.05,us,us60007etg,2020-04-02T21:27:33.040Z,"4 km NW of Mahabang Parang, Philippines",earthquake,7.1,1.9,0.133,16,reviewed,us,us
+2020-01-12T13:50:59.808Z,14.0035,121.1586,7.17,4.3,mb,,163,0.236,0.95,us,us60007esw,2020-04-02T21:27:32.040Z,"0 km E of San Andres, Philippines",earthquake,8.4,7.1,0.137,15,reviewed,us,us
+2020-01-12T14:00:27.252Z,14.0322,121.2074,10,4.4,mb,,107,0.271,0.73,us,us60007esy,2020-04-02T21:27:32.040Z,"2 km SW of San Joaquin, Philippines",earthquake,15.1,1.9,0.134,16,reviewed,us,us
+2020-01-12T14:06:30.370Z,14.0439,121.2273,4.87,4.3,mb,,79,0.287,0.44,us,us60007esx,2020-04-02T21:27:32.040Z,"0 km ESE of San Joaquin, Philippines",earthquake,6.1,4.6,0.177,9,reviewed,us,us
+2020-01-12T14:28:58.461Z,13.9776,121.1941,3.18,4.5,mb,,175,0.278,0.53,us,us60007etm,2020-04-02T21:27:34.040Z,"1 km WNW of Talisay, Philippines",earthquake,7.4,6.3,0.124,19,reviewed,us,us
+2020-01-12T14:33:34.246Z,13.9677,121.1204,3.2,4.2,mb,,120,0.222,0.69,us,us60007esz,2020-04-02T21:27:32.040Z,"3 km SW of Bulacnin, Philippines",earthquake,7.4,6.7,0.136,15,reviewed,us,us
+2020-01-12T14:43:44.603Z,14.0384,121.1363,10,4.6,mb,,113,0.203,0.65,us,us60007et0,2020-04-02T21:27:32.040Z,"Luzon, Philippines",earthquake,12.1,1.9,0.091,36,reviewed,us,us
+2020-01-12T15:01:35.371Z,14.0205,121.1716,5.42,4.3,mb,,116,0.242,0.66,us,us60007et3,2020-04-02T21:27:32.040Z,"2 km NE of San Andres, Philippines",earthquake,6.8,5,0.129,17,reviewed,us,us
+2020-01-12T15:09:55.239Z,14.0296,121.1791,5.54,4.4,mb,,130,0.246,0.85,us,us60007et6,2020-04-02T21:27:33.040Z,"2 km SE of Malvar, Philippines",earthquake,6,3.8,0.127,18,reviewed,us,us
+2020-01-12T15:25:01.832Z,13.9366,121.0616,10,4.5,mb,,124,9.408,0.4,us,us60007et5,2020-04-02T21:27:33.040Z,"3 km NNE of Cuenca, Philippines",earthquake,10.7,1.6,0.139,15,reviewed,us,us
+2020-01-12T15:36:15.290Z,13.9528,121.1085,10,4.4,mb,,110,0.223,0.65,us,us60007eti,2020-04-02T21:27:34.040Z,"Mindoro, Philippines",earthquake,5.3,1.9,0.162,11,reviewed,us,us
+2020-01-12T15:47:59.898Z,14.0153,121.0881,10,4.3,mb,,127,0.17,0.85,us,us60007eud,2020-04-02T21:27:35.040Z,"0 km WSW of Balete, Philippines",earthquake,6,1.9,0.142,14,reviewed,us,us
+2020-01-12T15:51:43.190Z,13.9584,121.1282,10,4.4,mb,,117,0.234,0.61,us,us60007ett,2020-04-02T21:27:34.040Z,"3 km NNE of Banaybanay, Philippines",earthquake,10.5,1.9,0.118,21,reviewed,us,us
+2020-01-12T15:56:25.594Z,13.9453,121.1919,10,4.7,mb,,97,0.292,0.69,us,us60007et9,2020-04-02T21:27:33.040Z,"3 km SSW of Talisay, Philippines",earthquake,10.2,1.9,0.084,43,reviewed,us,us
+2020-01-12T16:19:01.456Z,13.9407,121.1787,3.43,4.3,mb,,57,0.284,0.47,us,us60007etb,2020-04-02T21:27:33.040Z,"1 km E of Lipa City, Philippines",earthquake,6.1,5.5,0.125,18,reviewed,us,us
+2020-01-12T17:20:16.003Z,14.0353,121.2239,10,4.4,mb,,179,0.286,0.83,us,us60007ete,2020-04-02T21:27:33.040Z,"1 km SSE of San Joaquin, Philippines",earthquake,8.6,2,0.18,9,reviewed,us,us
+2020-01-12T17:22:10.099Z,13.8823,121.0478,10,4.5,mb,,160,0.243,0.48,us,us60007etf,2020-04-02T21:27:33.040Z,"2 km SSW of Cuenca, Philippines",earthquake,7.5,1.9,0.15,13,reviewed,us,us
+2020-01-12T18:48:03.967Z,14.0784,121.0819,10,4.3,mb,,155,0.142,1.07,us,us60007eth,2020-04-02T21:27:33.040Z,"1 km WSW of Janopol, Philippines",earthquake,5.6,1.9,0.161,11,reviewed,us,us
+2020-01-12T19:11:47.915Z,13.918,121.0868,10,4.5,mb,,155,35.805,1.13,us,us60007etl,2020-04-02T21:27:34.040Z,"1 km N of Balagtasin, Philippines",earthquake,10.3,2,0.144,14,reviewed,us,us
+2020-01-12T19:24:23.153Z,13.8575,120.9879,10,4.5,mb,,213,14.269,0.77,us,us60007etk,2020-04-02T21:27:34.040Z,"0 km NNW of Mozon, Philippines",earthquake,9.5,2,0.135,16,reviewed,us,us
+2020-01-12T20:04:31.477Z,13.9043,121.0972,10,4.3,mb,,158,0.25,1.22,us,us60007etp,2020-04-02T21:27:34.040Z,"0 km ENE of Balagtasin, Philippines",earthquake,9,1.9,0.153,12,reviewed,us,us
+2020-01-12T20:08:38.943Z,13.8451,121.0935,10,4.4,mb,,175,0.297,0.77,us,us60007etn,2020-04-02T21:27:34.040Z,"0 km N of Bukal, Philippines",earthquake,10.4,1.9,0.123,19,reviewed,us,us
+2020-01-12T20:25:57.200Z,13.9068,121.1199,10,4.4,mb,,148,0.263,1.34,us,us60007eue,2020-04-02T21:27:35.040Z,"1 km SSW of Pangao, Philippines",earthquake,8.4,2,0.134,16,reviewed,us,us
+2020-01-12T20:55:44.701Z,14.0405,121.0736,10,4.6,mb,,119,8.221,1.13,us,us60007etr,2020-10-18T02:33:24.735Z,"0 km SW of Boot, Philippines",earthquake,13.6,1.9,0.109,25,reviewed,us,us
+2020-01-12T21:19:28.677Z,13.9376,121.0627,10,4.6,mb,,120,0.204,0.61,us,us60007etu,2020-04-02T21:27:34.040Z,"4 km NNE of Cuenca, Philippines",earthquake,12.3,1.9,0.095,33,reviewed,us,us
+2020-01-12T21:43:26.383Z,14.0034,121.1372,10,4.4,mb,,70,0.218,0.34,us,us60007etx,2020-04-02T21:27:34.040Z,"0 km NE of Malabanan, Philippines",earthquake,4.1,1.9,0.138,15,reviewed,us,us
+2020-01-12T21:54:01.068Z,13.9612,121.1386,10,4.6,mb,,130,0.24,0.7,us,us60007eu9,2020-04-02T21:27:35.040Z,"3 km S of Bulacnin, Philippines",earthquake,10.5,1.9,0.1,30,reviewed,us,us
+2020-01-12T22:13:34.347Z,13.9087,121.0479,10,4.6,mb,,127,0.22,0.46,us,us60007eu7,2020-04-02T21:27:35.040Z,"0 km NNW of Cuenca, Philippines",earthquake,10.2,1.9,0.116,22,reviewed,us,us
+2020-01-12T22:35:17.352Z,13.9635,121.1166,10,4.5,mb,,120,0.222,0.65,us,us60007eu0,2020-04-02T21:27:35.040Z,"3 km N of Banaybanay, Philippines",earthquake,6.2,1.9,0.11,24,reviewed,us,us
+2020-01-12T23:23:05.673Z,14.0405,121.135,10,4.4,mb,,184,0.202,0.36,us,us60007eub,2020-04-02T21:27:35.040Z,"1 km SW of San Pedro One, Philippines",earthquake,10.6,1.9,0.169,10,reviewed,us,us
+2020-01-13T00:14:05.213Z,13.9468,121.1554,10,4.3,mb,,175,0.262,0.59,us,us60007eui,2020-04-02T21:27:36.040Z,"1 km NW of Lipa City, Philippines",earthquake,9.3,0.9,0.188,8,reviewed,us,us
+2020-01-13T01:22:24.343Z,13.8485,121.072,10,4.4,mb,,131,0.284,0.35,us,us60007euq,2020-04-02T21:27:36.040Z,"2 km WNW of Bukal, Philippines",earthquake,8.9,1.5,0.154,12,reviewed,us,us
+2020-01-13T01:27:29.578Z,13.9376,120.8585,10,4.3,mb,,120,0.18,0.49,us,us60007evv,2020-04-02T21:27:39.040Z,"2 km NNE of Sinisian, Philippines",earthquake,4.1,1.9,0.153,12,reviewed,us,us
+2020-01-13T02:47:32.152Z,13.8628,120.9104,10,4.5,mb,,193,0.239,0.47,us,us60007eum,2020-04-02T21:27:36.040Z,"2 km SW of Taal, Philippines",earthquake,6.2,1.9,0.119,21,reviewed,us,us
+2020-01-13T03:37:49.301Z,13.9934,120.8798,10,4.6,mb,,234,14.312,0.35,us,us60007eun,2020-04-02T21:27:36.040Z,"1 km WSW of Payapa, Philippines",earthquake,7.9,2,0.116,22,reviewed,us,us
+2020-01-13T04:07:35.346Z,13.9632,120.9228,10,4.4,mb,,67,11.757,0.35,us,us60007ev1,2020-04-02T21:27:38.040Z,"2 km NW of Subic, Philippines",earthquake,9.2,1.9,0.149,13,reviewed,us,us
+2020-01-13T04:50:38.611Z,13.8976,120.8501,10,4.5,mb,,150,0.22,0.33,us,us60007eup,2020-04-02T21:27:36.040Z,"2 km SSE of Sinisian, Philippines",earthquake,10.1,2,0.172,10,reviewed,us,us
+2020-01-13T06:20:12.514Z,13.8761,121.1476,10,4.3,mb,,112,14.38,0.44,us,us60007evw,2020-04-02T21:27:39.040Z,"1 km W of Rizal, Philippines",earthquake,6.9,1.9,0.133,16,reviewed,us,us
+2020-01-13T07:29:54.845Z,13.8572,121.1535,10,4.2,mb,,145,21.812,0.38,us,us60007ev6,2020-04-02T21:27:38.040Z,"2 km SSW of Rizal, Philippines",earthquake,11.1,1.9,0.152,12,reviewed,us,us
+2020-01-13T10:18:53.493Z,13.8492,120.9096,10,4.6,mb,,127,0.252,0.49,us,us60007ev4,2020-04-02T21:27:38.040Z,"3 km SSW of Taal, Philippines",earthquake,14.3,1.9,0.111,24,reviewed,us,us
+2020-01-13T14:22:35.109Z,13.9348,121.2196,3.99,4.4,mb,,118,0.321,0.7,us,us60007ev9,2020-04-02T21:27:38.040Z,"1 km WNW of San Celestio, Philippines",earthquake,6.2,4.8,0.134,16,reviewed,us,us
+2020-01-13T14:55:08.981Z,13.9157,121.1292,10,4.4,mb,,118,0.263,0.77,us,us60007evb,2020-04-02T21:27:38.040Z,"0 km ESE of Pangao, Philippines",earthquake,5.4,1.9,0.12,20,reviewed,us,us
+2020-01-13T15:39:34.743Z,13.9093,121.1297,10,4.5,mb,,130,0.268,0.51,us,us60007evf,2020-04-02T21:27:39.040Z,"0 km SSE of Pangao, Philippines",earthquake,13.1,1.9,0.102,28,reviewed,us,us
+2020-01-13T18:05:58.024Z,13.9184,120.7395,10,4.3,mb,,109,0.264,1,us,us60007evi,2020-04-02T21:27:39.040Z,"2 km SSE of Balayan, Philippines",earthquake,6.7,1.9,0.133,16,reviewed,us,us
+2020-01-13T18:58:47.960Z,13.879,121.0565,10,4.2,mb,,136,0.25,0.36,us,us60007evj,2020-04-02T21:27:39.040Z,"2 km S of Cuenca, Philippines",earthquake,4.9,1.9,0.136,15,reviewed,us,us
+2020-01-14T02:56:53.147Z,13.9831,121.0421,10,4.5,mb,,131,18.918,0.97,us,us60007hc8,2020-04-02T21:27:40.040Z,"4 km W of Mahabang Parang, Philippines",earthquake,12.6,1.9,0.132,17,reviewed,us,us
+2020-01-14T02:58:14.354Z,13.9534,121.1301,10,4.3,mb,,134,21.745,0.7,us,us60007hd1,2020-04-02T21:27:42.040Z,"2 km NE of Banaybanay, Philippines",earthquake,15.6,2,0.154,12,reviewed,us,us
+2020-01-14T04:46:56.653Z,14.0229,121.1209,10,4.3,mb,,128,21.719,0.75,us,us60007hck,2020-04-02T21:27:41.040Z,"1 km SE of San Isidro, Philippines",earthquake,6.6,1.9,0.161,11,reviewed,us,us
+2020-01-14T07:31:25.681Z,13.8518,121.1114,10,4.6,mb,,132,14.339,0.69,us,us60007hch,2020-04-02T21:27:41.040Z,"2 km W of Santo Niño, Philippines",earthquake,9.2,1.9,0.146,14,reviewed,us,us
+2020-01-14T20:02:08.854Z,13.7519,120.983,10,4.2,mb,,129,10.866,0.44,us,us60007hcu,2020-04-02T21:27:42.040Z,"4 km S of Bolo, Philippines",earthquake,15.2,1.9,0.146,13,reviewed,us,us
+2020-01-19T12:59:04.499Z,14.0157,120.8913,10,4.5,mb,,117,8.298,0.97,us,us60007k75,2021-09-05T05:45:18.005Z,"1 km N of Payapa, Philippines",earthquake,10.2,1.9,0.108,25,reviewed,us,us
