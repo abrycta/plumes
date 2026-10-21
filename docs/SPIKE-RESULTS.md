@@ -35,3 +35,14 @@ No DECISIONS.md addendum (S1…) is written until there are measurements.
 | 23 | MSVOLSO2L4 read (GES DISC) | **Blocked**: HTTP 403 "EULA Acceptance Failure". Kurt must approve the GES DISC application once in Earthdata (urs.earthdata.nasa.gov, Applications → Authorized Apps, "NASA GESDISC DATA ARCHIVE"). The same approval covers OMSO2e (item 22) | Blocked on Kurt |
 
 Not yet run: crawl parse rates (4, 5, 17), sizes (8), Render/Neon/edge (13–15), ERA5 Zarr (18), Landsat/S1 thumbnails (20, 21), FIRMS API (19, no MAP_KEY).
+
+### Run 1, continued (Earth Engine story items)
+
+| # | Measurement | Result | Verdict |
+|---|---|---|---|
+| 18 | Sentinel-2 SR least-cloudy scene over Taal | Before: 2019-11-19 (32.8 % cloud, 10 scenes); after: 2020-01-28 (5.4 %, 6 scenes); later: 2020-03-23 (2.4 %) | **Pass** for scene availability |
+| 18 | `getThumbURL` from the service account | **Denied**: `earthengine.thumbnails.create` is not granted to `lgu-lights-ci` | **Change**: either grant the thumbnail permission on the Cloud project (Kurt) or export small images with `Export.image.toDrive`/`toCloudStorage` in the pipeline |
+| 21 | Sentinel-1 GRD IW scenes over Taal, 12–20 January 2020 | 2 scenes | **Pass**: radar sees the eruption week when optical is clouded |
+| 21 | Landsat 8 C2 L2 surface temperature of the crater lake before draining | 29.9 °C on 2019-02-05 (least-cloudy 2019 scene) | **Pass**: the lake-temperature series is feasible |
+| 20 | WorldPop 2020 within 14 km of Taal (`WorldPop/GP/100m/pop`) | about 318,000 | Differs from OCHA's about 459,000 (vintage and method); state both, as planned |
+| 20 | Community asset `projects/sat-io/open-datasets/WORLDPOP/pop` | Release R2025A, constrained, 100 m, annual from 2015 | Identified; use it for 2021+ |
