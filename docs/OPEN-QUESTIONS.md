@@ -1,8 +1,8 @@
 # Open questions and decisions for Kurt
 
-Status: 2026-10-21, after [CANDIDATES.md](CANDIDATES.md), [RESEARCH.md](RESEARCH.md), [ARCHITECTURE-OPTIONS.md](ARCHITECTURE-OPTIONS.md), [DATA-PLAN.md](DATA-PLAN.md) and [SPIKE-PLAN.md](SPIKE-PLAN.md). Nothing is implemented. Each question names the default the documents assume, so "Q1 = volcanoes, yes to the defaults" is enough to start. Answers go to [DECISIONS.md](DECISIONS.md).
+Status: 2026-10-21. **Q1–Q18 are answered** (see [DECISIONS.md](DECISIONS.md); Q3, Q4, Q5, Q11 and Q15 differ from the defaults below). The table is kept as written history. The open questions are **Q19 onwards** in §2, raised by folding the 77-source canvas into the plan and by the decided architecture. Nothing is implemented.
 
-## Decisions
+## 1. Q1–Q18 (answered 2026-10-21; kept as history)
 
 | # | Question | Options | Recommendation (the default in the docs) |
 |---|---|---|---|
@@ -25,21 +25,45 @@ Status: 2026-10-21, after [CANDIDATES.md](CANDIDATES.md), [RESEARCH.md](RESEARCH
 | Q17 | **Milestone-1 scope** | as ARCHITECTURE-OPTIONS.md §6; or a narrower M1 of Taal and Kanlaon only | **The §6 scope**: the per-volcano machinery costs the same for 4 or 24 once the pipeline exists |
 | Q18 | **Spike** | one day before building (SPIKE-PLAN.md); or start building | **Yes, one day**; the EE export path and the PHIVOLCS crawl are the two things that must be measured |
 
+## 2. Open: Q19–Q29 (raised 2026-10-21 by the source canvas and the decided architecture)
+
+Each has a recommendation; "yes to the recommendations" is enough. Nothing below is decided or built.
+
+| # | Question | Options | Recommendation |
+|---|---|---|---|
+| Q19 | **The Hugging Face fallback and "no published dataset" (Q12, Q15).** A private HF repo cannot serve files to an anonymous browser (DATA-PLAN.md §5), so the fallback must be public, and whatever is public is downloadable | (a) a **public, files-only** HF dataset repo `permission-alluring/plumes` whose README says it is the app's hosting mirror, not a dataset release (no card as a product, no licence tag beyond the per-file attributions already in the files, no DOI); (b) no HF at all: a second GitHub Pages repo as the fallback; (c) Cloudflare Pages static assets as the fallback (everything is under 25 MiB by design) | **(a)**, because it keeps Kurt's Q12 and Lights' proven pattern, and the files are the same ones GitHub Pages already serves publicly; the data version never contains anything that may not be redistributed (ISD station files, ODbL tables, a consolidated PHIVOLCS table). If Kurt wants literally nothing on HF, (c) |
+| Q20 | **Render: a second free web service beside Replay's** (`typhoon-replay-java`) in the shared workspace (750 instance hours and 5 GB a month, shared; exhaustion suspends both) | (a) a second free service `plumes-java` deploying a prebuilt GHCR image, no uptime pinger, sleep after 15 minutes, one nightly contract check, edge cache in front; (b) co-host Plumes' endpoints inside Replay's Java service (one JVM, two schemas); (c) a Cloudflare Worker with Hyperdrive to Neon instead of Java | **(a)**: about 30–90 awake hours a month for Plumes beside Replay's planned about 180 leaves headroom; revisit (b) if Replay deploys its other three engines (DATA-PLAN.md §8) |
+| Q21 | **Neon: its own free project** `plumes` (Singapore, PostGIS) beside Replay's | own project (100 allowed; 1 GB, 100 CU-hours, 5 GB egress each; 20 GB account total) or a schema inside Replay's project | **Own project**: separate quotas and no coupling; the catalogue is 100–300 MB **[U]** |
+| Q22 | **The shared Earth Engine quota rule** (Q11) | accept the DATA-PLAN.md §7 rule (Plumes ceiling 50 EECU-hours a month, 10 per run, chunked backfill, Sunday window, no per-day console cap except as a safety net); and whether to create a second service account in the same project with its own key `earth-engine-sa-key-plumes` (free; the quota stays shared; either key can be rotated alone) | **Accept the rule; create the second service account** when the repo exists (Kurt's action in the Cloud console; the key is saved hex-encoded like the Lights key) |
+| Q23 | **The milestone-1 source cut** (DATA-PLAN.md §9: 11 canvas rows, 25 registry entries) | as proposed; or trim VAAC, DROMIC and ERA5 to M2 (then story step 3 shows PHIVOLCS plume heights only and no evacuee or wind panel); or add the PHIVOLCS earthquake tables | **As proposed**: VAAC (45 small pages) and DROMIC (70 docx) are cheap and make story step 3 real; ERA5 reuses Replay's reader |
+| Q24 | **PHIVOLCS monthly earthquake tables** at M1 or M1.1 | M1 (a second crawler and 150k rows now) or M1.1 | **M1.1**: the bulletins already carry the volcanic-earthquake counts the story needs |
+| Q25 | **Noncommercial-only sources** on a non-commercial portfolio site (LICENCES.md): IOC sea level, DAHITI, Raspberry Shake (conditions), Global Fishing Watch (tokens for organisations), LaMEVE (written permission) | include those whose terms allow non-commercial display with attribution and state on the About page that Plumes is non-commercial; apply for GFW; write to VOGRIPA for LaMEVE; or exclude all noncommercial-only sources | **Include IOC, DAHITI and Raspberry Shake at their milestones with the About-page statement and their attribution lines; skip GFW and LaMEVE** unless Kurt wants to apply or write (both are decorations) |
+| Q26 | **Himawari event replays at M2**: which events and how many hours each (about 5 GB streamed per 12-hour window; 780 MB per full-disk scan) | Taal 2020-01-12, Kanlaon 2024-06-03 and 2024-12-09, Mayon 2018-01-22, Bulusan 2022-06-05, 12 hours each; or Taal 2020 only; or the 2.5-minute Target Area where it covered the event | **Five events × 12 hours**, derived WebM under 5 MB each; check the JMA observation list for Target Area coverage first |
+| Q27 | **Hand-collected sources** (sites that block scripts: PSA census and PSGC xlsx, DOH registry, NDRRMC PDFs, Slab2, GEBCO box, EMSR418 packages, the GVP terms page) | Kurt downloads once per vintage following a checklist in the repo and the pipeline adopts the files as archive releases (Lights' PSA pattern); or those sources are skipped | **The checklist and adopt path**; none of them is at M1 except re-reading the GVP terms page |
+| Q28 | **Registrations for later milestones** (free; Kurt's actions): FIRMS MAP_KEY (M1); OpenAQ key (M2); ReliefWeb appname and OpenAlex key (M3); ECMWF ADS/EWDS, Copernicus Marine, IOC, DAHITI, USGS EROS (M4); a second Earth Engine service account (Q22) | create all now, or only M1's | **Only M1's now** (FIRMS MAP_KEY as `firms-map-key` in the Keychain); the rest when their milestone starts |
+| Q29 | **Stories at M1** | Taal January 2020 only; or Taal 2020 plus Kanlaon 2024 (the §6 demo's second half) | **Taal 2020 at M1, Kanlaon 2024 at M1.1** on the same machinery; the demo's Kanlaon half uses the volcano page, not a story |
+
 ## Actions for Kurt
 
-1. Answer Q1 (and Q2 if 1).
-2. If Q11 = new project: create a Google Cloud project, register it for noncommercial Earth Engine (individual, Community tier), create a service account with an Earth Engine role, download its JSON key and save it: `security add-generic-password -a "$USER" -s earth-engine-sa-key-plumes -U -w "$(xxd -p < key.json | tr -d '\n')"` (multi-line values are stored hex-encoded, as with the Lights key). Later it becomes the GitHub secret on the project repo.
-3. Request a free FIRMS MAP_KEY at `https://firms.modaps.eosdis.nasa.gov/api/map_key/` (email) and save it in the Keychain as `firms-map-key`.
-4. If Q5 = (i): send the PHIVOLCS email (a draft can be written on request) to the Volcano Monitoring and Eruption Prediction Division contact on the LAVA portal (`mail.vmepd@phivolcs.dost.gov.ph`).
-5. Answer Q3–Q18 (defaults are fine).
+1. Answer Q19–Q29 (the recommendations are fine as defaults).
+2. Request a free FIRMS MAP_KEY at `https://firms.modaps.eosdis.nasa.gov/api/map_key/` (email) and save it in the Keychain as `firms-map-key`.
+3. Re-read by hand the terms pages that blocked scripts on 2026-10-21 (LICENCES.md, last section), starting with the Smithsonian GVP terms (https://www.si.edu/termsofuse, https://volcano.si.edu/gvp_termsofuse.cfm), because GVP is at M1.
+4. When the repo exists: add the `lgu-lights` Earth Engine key (or the second service account's key, Q22) and the FIRMS MAP_KEY as GitHub secrets; create the Neon project and the Render service only after spike items 13–15.
+
+The earlier action items for a new Earth Engine project (old Q11) and the PHIVOLCS email (old Q5) are withdrawn by Kurt's answers.
 
 ## Verification still to do by hand or in the spike
 
-- GVP's exact terms-of-use and citation wording (the site was behind Cloudflare; only the WFS answered).
+- GVP's exact terms-of-use and citation wording (the site was behind Cloudflare on 2026-10-21; only the WFS answered); the current database version string.
+- The other blocked terms pages listed at the end of LICENCES.md (PSA OpenSTAT and PSGC, DOH, NDRRMC, ScienceBase, Chronicling America rights, the OSMF produced-work guideline, the Darwin VAAC data.gov.au record, DAHITI, HydroSHEDS v1 TechDoc, GES DISC and ASDC citation pages, GloSSAC V2.24).
 - Whether the 2025+ WordPress "Summary of 24Hr Observation" pages are empty for every volcano, and the first LAVA bulletin id and date (ids 500 and below returned nothing; 1000 = 2022-04-02).
 - The LAVA portal's TLS chain from a GitHub runner.
-- Earth Engine batch export to Drive from a service account without billing (documentation is thin), and the EECU cost of one month of S5P reductions.
+- Earth Engine batch export to Drive from the service account without billing, the EECU cost of one month of S5P reductions, and the `batch_eecu_usage_seconds` accounting (spike items 1, 2, 16).
+- The Render cold start, the Neon catalogue size and the edge-cache hit rate (spike items 13–15).
+- The Tokyo VAAC advisory parse rate and the DROMIC docx tables (spike item 17); the Sentinel-2 thumbnails and the ERA5 pressure-level read (spike item 18).
+- Whether OpenAQ has any Philippine station with data for January 2020 (needs the free key; M2).
 - LiCSAR pair file sizes once the October 2025 storage migration settles (milestone 2 only).
 - The NOVAC Mayon SO2 flux dataset (CC BY 4.0 per the catalogue record): URL, years, format.
 - The Smithsonian weekly reports as a 2000–2017 source for PHIVOLCS figures (milestone 2 only).
 - Akari: whether synchronised multi-series charts with a shared time scrubber need a new Akari composite (an Akari change, not an app fork).
+- Hugging Face: CORS and Range on the Xet CDN host from a real browser (DATA-PLAN.md §5) before the mirror is used as a fallback.
