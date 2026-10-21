@@ -15,7 +15,7 @@ v3/story/<id>.json           Taal January 2020 at M1                            
 v3/assets/…                  before/after thumbnails
 ```
 
-Clients read `latest.json`, then fetch everything relative to `base`. Versions are immutable; rollback is a pointer flip. Hosting: GitHub Pages (primary) with the Hugging Face files-only mirror `permission-alluring/plumes` as fallback; `latest.json.mirrors` lists the base URLs.
+Published base URL: `https://krtmtthw.dev/plumes/data/` (GitHub Pages, range requests and CORS verified); fallback `https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/`. Clients read `latest.json`, then fetch everything relative to `base`. In published versions the thermal layer is one PMTiles file per year (`layers/thermal/{year}.pmtiles`, source layer `thermal`, filter on `month`); the fixture uses GeoJSON. Versions are immutable; rollback is a pointer flip. Hosting: GitHub Pages (primary) with the Hugging Face files-only mirror `permission-alluring/plumes` as fallback; `latest.json.mirrors` lists the base URLs.
 
 ## Conventions
 

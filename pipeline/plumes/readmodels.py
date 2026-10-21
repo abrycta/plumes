@@ -378,10 +378,14 @@ def thermal_layers(out_dir, as_of: str) -> dict | None:
     tmp = BUILD / "tmp"
     tmp.mkdir(parents=True, exist_ok=True)
     by_year = collections.defaultdict(list)
+    seen = set()
     for product in ("MODIS_SP", "VIIRS_SNPP_SP"):
         for p in sorted(glob.glob(str(RAW / "firms" / product / "*.csv"))):
             for r in rows(p):
-                by_year[r["acq_date"][:4]].append((product, r))
+                k = (product, r["latitude"], r["longitude"], r["acq_date"], r["acq_time"], r["satellite"])
+                if k not in seen:  # a re-fetched window must not double a detection
+                    seen.add(k)
+                    by_year[r["acq_date"][:4]].append((product, r))
     for y, rs in sorted(by_year.items()):
         src = tmp / f"thermal-{y}.geojsonl"
         with open(src, "w") as f:
@@ -436,6 +440,10 @@ def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list)
             e = errors(doc)
             check(f"schema {p.relative_to(site_v)}", not e, "; ".join(e[:3]))
     check("24 volcanoes in the crosswalk", len(vols) == 24, str(len(vols)))
+    years = {p.stem for p in (site_v / "layers" / "thermal").glob("*.pmtiles")}
+    last = int(json.loads((site_v / "layers.json").read_text())["dataAsOf"][:4]) - 1
+    missing = sorted({str(y) for y in range(2000, last + 1)} - years)
+    check("thermal detections: one tileset per year 2000 onward", not missing, ",".join(missing))
     check("GVP lists 23 Philippine volcanoes", len(gvp_v) == 23, str(len(gvp_v)))
     check("GVP eruptions within bounds", 200 <= len(gvp_e) <= 400, str(len(gvp_e)))
     for vid, m in models.items():
