@@ -1,6 +1,6 @@
 # Web app: install (private @abrycta/akari from GitHub Packages), typecheck, lint, unit tests, build, end-to-end tests
 # (screens, safety rules, axe in four themes, 390 px, the rule 6b device matrix); then, on main only, deploy web/dist
-# to the Cloudflare Pages project "plumes" (direct upload with wrangler, no Pages CI builds).
+# (with web/functions) to the Cloudflare Pages project "plumes" (direct upload with wrangler, no Pages CI builds).
 # Until the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repo secrets exist, the deploy job skips with a notice.
 name: Web
 
@@ -80,9 +80,13 @@ jobs:
             echo "::notice title=Deploy skipped::CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID are not set on this repository."
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
+      # The checkout supplies web/functions (the /api edge cache, a Pages Function), which wrangler bundles from the
+      # working directory; the built site comes from the check job.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.secrets.outputs.enabled == 'true'
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: steps.secrets.outputs.enabled == 'true'
-        with: { name: web-dist, path: dist }
+        with: { name: web-dist, path: web/dist }
       - name: Deploy to Cloudflare Pages (project plumes)
         id: deploy
         if: steps.secrets.outputs.enabled == 'true'
@@ -91,6 +95,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "4.151.3"
+          workingDirectory: web
           command: pages deploy dist --project-name=plumes --branch=main --commit-hash=${{ github.sha }}
       - name: Summary
         if: steps.secrets.outputs.enabled == 'true'
