@@ -20,6 +20,10 @@ dev = ["ruff>=0.13", "pytest>=8.4"]
 sources = ["archivekit"]
 # Earth Engine reductions (GitHub Actions only)
 ee = ["earthengine-api>=1.6"]
+# Publishing to the Hugging Face mirror
+publish = ["huggingface-hub>=0.35"]
+# ERA5 range reads (ARCO-ERA5 Blosc blocks)
+era5 = ["numpy>=2.3", "lz4>=4.4", "numcodecs>=0.15"]
 
 [tool.uv]
 default-groups = ["dev"]
@@ -32,6 +36,10 @@ pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.ruff]
-line-length = 120
+line-length = 150
 target-version = "py312"
 extend-exclude = ["scripts/build_fixtures.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["SIM115", "E501"]

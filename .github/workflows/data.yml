@@ -1,0 +1,95 @@
+name: Data
+# Weekly delta and manual runs (DATA-PLAN §7): fetch -> crawl deltas -> Earth Engine (budgeted) -> read models + checks
+# -> publish (GitHub Pages, then the Hugging Face mirror) -> adopt new bundles into abrycta/plumes-archive.
+# Earth Engine steps never run while a Lights data run is in progress, and stop at Plumes' cap (50 EECU-h a month, 10 a run).
+on:
+  schedule: [{ cron: "0 18 * * 6" }]   # Sundays 02:00 PHT
+  workflow_dispatch:
+    inputs:
+      ee: { description: "Run Earth Engine steps", type: boolean, default: true }
+      publish: { description: "Publish if checks pass", type: boolean, default: true }
+permissions: { contents: write, actions: read }
+concurrency: { group: data, cancel-in-progress: false }
+jobs:
+  data:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    env:
+      ARCHIVE_READ_TOKEN: ${{ secrets.ARCHIVE_READ_TOKEN }}
+    steps:
+      - id: token
+        run: |
+          if [ -z "$ARCHIVE_READ_TOKEN" ]; then
+            echo "::notice title=data run skipped::ARCHIVE_READ_TOKEN is not set yet; the private archivekit and the archived state can't be read."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else echo "ok=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.token.outputs.ok == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { fetch-depth: 1 }
+      - if: steps.token.outputs.ok == 'true'
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with: { enable-cache: true, cache-dependency-glob: pipeline/uv.lock }
+      - name: Install
+        if: steps.token.outputs.ok == 'true'
+        working-directory: pipeline
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq tippecanoe
+          git config --global url."https://x-access-token:${ARCHIVE_READ_TOKEN}@github.com/abrycta/data-archive-kit".insteadOf "https://github.com/abrycta/data-archive-kit"
+          uv sync --locked --group sources --group ee --group era5 --group publish
+      - name: Lights guard
+        id: lights
+        if: steps.token.outputs.ok == 'true'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          n=$(gh run list -R abrycta/lgu-lights --workflow data.yml --json status -q '[.[] | select(.status != "completed")] | length')
+          if [ "$n" != "0" ]; then echo "::warning title=Earth Engine skipped::a Lights data run is in progress"; echo "ee=false" >> "$GITHUB_OUTPUT";
+          else echo "ee=${{ github.event_name == 'schedule' || inputs.ee }}" >> "$GITHUB_OUTPUT"; fi
+      - name: Restore state (previous version, EE ledger, crawl records)
+        if: steps.token.outputs.ok == 'true'
+        working-directory: pipeline
+        env: { GH_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}" }
+        run: uv run python -m plumes.state restore
+      - name: Fetch file sources (archivekit)
+        if: steps.token.outputs.ok == 'true'
+        working-directory: pipeline
+        run: uv run python -m plumes.sources
+      - name: Crawl deltas
+        if: steps.token.outputs.ok == 'true'
+        working-directory: pipeline
+        env:
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+          EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+        run: |
+          uv run python -m plumes.crawl.wp
+          uv run python -m plumes.crawl.lava index --since "$(date -d '21 days ago' +%F)"
+          uv run python -m plumes.crawl.lava fetch
+          uv run python -m plumes.crawl.vaac --since "$(date +%Y)"
+          uv run python -m plumes.firms
+          test -f data/raw/nasa-msvolso2l4/philippines.json || uv run python -m plumes.nasa
+          test -f data/raw/cod-ab/phl_admin3.csv || uv run python -m plumes.codab
+      - name: Earth Engine (new months only)
+        if: steps.token.outputs.ok == 'true' && steps.lights.outputs.ee == 'true'
+        working-directory: pipeline
+        env: { EE_SA_KEY: "${{ secrets.EE_SA_KEY }}" }
+        run: |
+          uv run python -m plumes.ee_series so2
+          uv run python -m plumes.ee_series fire --start 2013-01
+      - name: Build read models and run the checks
+        if: steps.token.outputs.ok == 'true'
+        working-directory: pipeline
+        run: uv run python -m plumes.readmodels --version "$(uv run python -m plumes.state next-version)"
+      - name: Publish
+        if: steps.token.outputs.ok == 'true' && (github.event_name == 'schedule' || inputs.publish)
+        working-directory: pipeline
+        env: { HF_TOKEN: "${{ secrets.HF_TOKEN }}" }
+        run: |
+          git config --global user.name Kurt
+          git config --global user.email 73582015+abrycta@users.noreply.github.com
+          uv run python -m plumes.publish --version "$(uv run python -m plumes.state built-version)" --pages --hf
+      - name: Adopt new bundles into the archive
+        if: steps.token.outputs.ok == 'true'
+        working-directory: pipeline
+        env: { GH_TOKEN: "${{ secrets.ARCHIVE_WRITE_TOKEN }}" }
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "::notice title=adoption skipped::ARCHIVE_WRITE_TOKEN is not set"; exit 0; fi
+          uv run python -m plumes.adopt --changed-only

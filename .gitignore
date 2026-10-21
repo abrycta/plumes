@@ -8,3 +8,6 @@ __pycache__/
 .venv/
 spike/fixtures/raw/
 spike/fixtures/parsed.json
+pipeline/data/
+pipeline/snapshots/
+*.key.json
