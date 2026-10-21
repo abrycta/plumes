@@ -3,7 +3,7 @@
 # (core record plus nine passes), one entry per source, plus the PHIVOLCS channels and the Lights/Replay shared inputs.
 # Format: archivekit, abrycta/data-archive-kit v1.1.0. Moves to pipeline/sources.yaml when the repo exists.
 # Validate from the kit checkout (no install needed):
-#   cd ../../data-archive-kit && uv run archivekit validate-registry --registry ../dataviz-next/docs/sources-draft.yaml
+#   cd ../../data-archive-kit && uv run archivekit validate-registry --registry ../plumes/docs/sources-draft.yaml
 #
 # How to read an entry. The schema allows no extra fields, so each description carries, in this order:
 #   [Mn] milestone (DATA-PLAN.md §9) | Publisher | Access (URL or API pattern) | Format | Size (per volcano / total;
