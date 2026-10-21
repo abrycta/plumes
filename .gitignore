@@ -1,0 +1,8 @@
+# planning phase
+spike/out/
+spike/**/out/
+.env*
+*.log
+node_modules/
+__pycache__/
+.venv/
