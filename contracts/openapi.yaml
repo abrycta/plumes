@@ -1,0 +1,298 @@
+openapi: 3.1.0
+info:
+  title: Plumes catalogue API
+  version: 1.0.0
+  summary: Read-only spatial-temporal queries over the Plumes catalogue (Philippine volcanoes, a historical record).
+  description: |
+    The optional Java API of Plumes (DECISIONS Q3): the static read models carry the site, and the site works with
+    this API deleted. Served same-origin at `https://plumes.krtmtthw.dev/api/v1/…` through a Cloudflare Pages
+    Function that caches every read at the edge; the origin answers at `/v1/…`.
+
+    - `GET /v1/volcanoes` equals the published `volcanoes.geojson` and `GET /v1/volcanoes/{id}` equals
+      `volcano/<id>.json` (schemas in `contracts/schemas/`); a contract test compares them with the fixtures.
+    - Nothing is "current": records end at `dataAsOf` (Q14). No forecasts.
+    - Every response carries a weak ETag `W/"c{contract}-java-{implVersion}-d{dataVersion}"`; conditional requests
+      get 304. Errors are RFC 9457 problem documents (`application/problem+json`) with a `code`.
+    - Free hosting sleeps when idle: through the edge, a cold read answers 503 `backend-waking` with `Retry-After`.
+servers:
+  - url: https://plumes.krtmtthw.dev/api
+    description: Edge proxy (cached)
+tags:
+  - name: catalogue
+  - name: ops
+paths:
+  /v1/meta:
+    get:
+      tags: [ops]
+      operationId: getMeta
+      summary: Build, contract and loaded data version, with counts and event coverage
+      responses:
+        "200":
+          description: Metadata
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Meta" }
+        "304": { $ref: "#/components/responses/NotModified" }
+        "503": { $ref: "#/components/responses/NotReady" }
+  /v1/volcanoes:
+    get:
+      tags: [catalogue]
+      operationId: listVolcanoes
+      summary: The 24 volcanoes (equals the published volcanoes.geojson)
+      responses:
+        "200":
+          description: GeoJSON FeatureCollection
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/geo+json:
+              schema: { $ref: "https://plumes.krtmtthw.dev/schemas/volcanoes.schema.json" }
+        "304": { $ref: "#/components/responses/NotModified" }
+        "503": { $ref: "#/components/responses/NotReady" }
+  /v1/volcanoes/nearest:
+    get:
+      tags: [catalogue]
+      operationId: nearestVolcanoes
+      summary: Volcanoes nearest to a point, with geodesic distance
+      parameters:
+        - { name: lat, in: query, required: true, schema: { type: number, minimum: -90, maximum: 90 } }
+        - { name: lon, in: query, required: true, schema: { type: number, minimum: -180, maximum: 180 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 24, default: 1 } }
+      responses:
+        "200":
+          description: Nearest volcanoes, closest first
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Nearest" }
+        "304": { $ref: "#/components/responses/NotModified" }
+        "400": { $ref: "#/components/responses/Invalid" }
+  /v1/volcanoes/{id}:
+    get:
+      tags: [catalogue]
+      operationId: getVolcano
+      summary: One volcano's read model (equals the published volcano/<id>.json)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, pattern: "^[a-z0-9-]+$" }, example: taal }
+      responses:
+        "200":
+          description: The per-volcano read model
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/json:
+              schema: { $ref: "https://plumes.krtmtthw.dev/schemas/volcano.schema.json" }
+        "304": { $ref: "#/components/responses/NotModified" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /v1/events:
+    get:
+      tags: [catalogue]
+      operationId: searchEvents
+      summary: USGS earthquakes and FIRMS thermal detections within a radius, between two days
+      description: Centre on a volcano (`volcano`) or a point (`lat` and `lon`). Days are UTC and inclusive. At most 1,000 events are listed (ordered by time); `summary` always counts all of them.
+      parameters:
+        - { name: volcano, in: query, schema: { type: string }, example: taal }
+        - { name: lat, in: query, schema: { type: number } }
+        - { name: lon, in: query, schema: { type: number } }
+        - { name: radiusKm, in: query, schema: { type: number, exclusiveMinimum: 0, maximum: 100, default: 30 } }
+        - { name: from, in: query, required: true, schema: { type: string, format: date }, example: "2019-12-01" }
+        - { name: to, in: query, required: true, schema: { type: string, format: date }, example: "2020-02-15" }
+        - { name: kind, in: query, description: "Comma-separated: earthquake, thermal (default both)", schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 0, maximum: 1000, default: 1000 } }
+      responses:
+        "200":
+          description: Matching events
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Events" }
+        "304": { $ref: "#/components/responses/NotModified" }
+        "400": { $ref: "#/components/responses/Invalid" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /v1/eruptions/precursors:
+    get:
+      tags: [catalogue]
+      operationId: eruptionPrecursors
+      summary: What the instruments recorded in the days before each GVP eruption of at least a given VEI
+      parameters:
+        - { name: minVei, in: query, schema: { type: integer, minimum: 0, maximum: 8, default: 3 } }
+        - { name: days, in: query, schema: { type: integer, minimum: 1, maximum: 365, default: 14 } }
+        - { name: radiusKm, in: query, schema: { type: number, exclusiveMinimum: 0, maximum: 100, default: 30 } }
+        - { name: since, in: query, schema: { type: string, format: date, default: "2000-01-01" } }
+      responses:
+        "200":
+          description: One row per eruption with a full start date
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Precursors" }
+        "304": { $ref: "#/components/responses/NotModified" }
+        "400": { $ref: "#/components/responses/Invalid" }
+  /v1/openapi.yaml:
+    get:
+      tags: [ops]
+      operationId: getOpenApi
+      summary: This document
+      responses:
+        "200": { description: OpenAPI 3.1, content: { application/yaml: {} } }
+  /healthz:
+    get:
+      tags: [ops]
+      operationId: health
+      summary: Liveness (no database). Not proxied by the edge cache.
+      servers: [{ url: https://plumes.krtmtthw.dev/api }]
+      responses:
+        "200": { description: Up, content: { application/json: { schema: { type: object, properties: { status: { const: ok } } } } } }
+  /readyz:
+    get:
+      tags: [ops]
+      operationId: ready
+      summary: Readiness (the database answers and a data version is loaded)
+      responses:
+        "200":
+          description: Ready
+          content:
+            application/json:
+              schema: { type: object, required: [status, dataVersion], properties: { status: { const: ready }, dataVersion: { type: string } } }
+        "503": { $ref: "#/components/responses/NotReady" }
+components:
+  headers:
+    ETag:
+      description: 'Weak, data-derived: W/"c{contract}-java-{implVersion}-d{dataVersion}"'
+      schema: { type: string }
+  responses:
+    NotModified: { description: The cached copy is current (If-None-Match matched) }
+    Invalid:
+      description: A query parameter is missing or out of range (code invalid-parameter)
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    NotFound:
+      description: Unknown volcano, or no published file for it (code not-found)
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    NotReady:
+      description: The database is resuming or no data version is loaded (code not-ready, with Retry-After); through the edge, a sleeping origin answers backend-waking
+      headers: { Retry-After: { schema: { type: integer } } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+  schemas:
+    Problem:
+      type: object
+      required: [type, title, status, code]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        instance: { type: string }
+        code: { enum: [not-found, invalid-parameter, method-not-allowed, forbidden, not-ready, internal, backend-waking, backend-unavailable, bad-gateway] }
+    DataHeader:
+      type: object
+      required: [dataVersion, dataAsOf]
+      properties:
+        dataVersion: { type: string, pattern: "^v\\d+$" }
+        dataAsOf: { type: string, format: date, description: The record ends here; never a current status }
+        fixture: { type: boolean }
+    Meta:
+      allOf: [{ $ref: "#/components/schemas/DataHeader" }]
+      type: object
+      required: [impl, implVersion, contract, schemaVersion, counts, coverage]
+      properties:
+        impl: { const: java }
+        implVersion: { type: string }
+        contract: { type: string }
+        schemaVersion: { const: "1" }
+        commit: { type: string }
+        generatedAt: { type: string, format: date-time }
+        source: { type: string }
+        loadedAt: { type: string, format: date-time }
+        counts:
+          type: object
+          properties:
+            volcanoes: { type: integer }
+            volcanoFiles: { type: integer }
+            episodes: { type: integer }
+            earthquakes: { type: integer }
+            thermalDetections: { type: integer }
+        coverage:
+          type: object
+          description: First and last day of each event kind loaded
+          additionalProperties:
+            type: object
+            properties: { from: { type: [string, "null"], format: date }, to: { type: [string, "null"], format: date } }
+    Nearest:
+      allOf: [{ $ref: "#/components/schemas/DataHeader" }]
+      type: object
+      required: [kind, query, volcanoes]
+      properties:
+        kind: { const: nearest }
+        query: { type: object, properties: { lat: { type: number }, lon: { type: number } } }
+        volcanoes:
+          type: array
+          items:
+            type: object
+            required: [id, name, distanceKm]
+            properties:
+              id: { type: string }
+              name: { type: object, properties: { en: { type: string }, ja: { type: string } } }
+              distanceKm: { type: number }
+    Events:
+      allOf: [{ $ref: "#/components/schemas/DataHeader" }]
+      type: object
+      required: [kind, query, summary, returned, truncated, events]
+      properties:
+        kind: { const: events }
+        query:
+          type: object
+          properties:
+            volcano: { type: string }
+            lat: { type: number }
+            lon: { type: number }
+            radiusKm: { type: number }
+            from: { type: string, format: date }
+            to: { type: string, format: date }
+            kinds: { type: array, items: { enum: [earthquake, thermal] } }
+        summary:
+          type: object
+          properties:
+            earthquake: { type: object, properties: { n: { type: integer }, maxMag: { type: [number, "null"] }, firstDay: { type: [string, "null"] }, lastDay: { type: [string, "null"] } } }
+            thermal: { type: object, properties: { n: { type: integer }, maxFrpMw: { type: [number, "null"] }, firstDay: { type: [string, "null"] }, lastDay: { type: [string, "null"] } } }
+        returned: { type: integer }
+        truncated: { type: boolean }
+        events:
+          type: array
+          items:
+            type: object
+            required: [kind, id, lat, lon, distanceKm, source]
+            properties:
+              kind: { enum: [earthquake, thermal] }
+              id: { type: string }
+              time: { type: string, format: date-time, description: Earthquakes (UTC) }
+              date: { type: string, format: date, description: Thermal detections (acquisition day) }
+              lat: { type: number }
+              lon: { type: number }
+              distanceKm: { type: number }
+              mag: { type: [number, "null"] }
+              magType: { type: [string, "null"] }
+              depthKm: { type: [number, "null"] }
+              frpMw: { type: [number, "null"] }
+              sensor: { type: [string, "null"] }
+              type: { type: [integer, "null"], description: FIRMS type (0 vegetation fire, 1 active volcano, 2 other static land source, 3 offshore) }
+              source: { type: array, items: { type: string } }
+    Precursors:
+      allOf: [{ $ref: "#/components/schemas/DataHeader" }]
+      type: object
+      required: [kind, query, eruptions]
+      properties:
+        kind: { const: precursors }
+        query: { type: object }
+        note: { type: object, properties: { en: { type: string }, ja: { type: string } } }
+        eruptions:
+          type: array
+          items:
+            type: object
+            required: [volcano, episodeId, start, earthquakes, thermal]
+            properties:
+              volcano: { type: string }
+              episodeId: { type: string }
+              start: { type: string, format: date }
+              end: { type: [string, "null"] }
+              vei: { type: [integer, "null"] }
+              earthquakes: { type: object, properties: { n: { type: integer }, maxMag: { type: [number, "null"] } } }
+              thermal: { type: object, properties: { n: { type: integer }, maxFrpMw: { type: [number, "null"] } } }
