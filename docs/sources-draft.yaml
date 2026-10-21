@@ -1,0 +1,477 @@
+# yaml-language-server: $schema=../../data-archive-kit/schema/sources.schema.json
+# Source registry DRAFT for the recommended candidate (volcanoes), 2026-10-21.
+# Format: archivekit, abrycta/data-archive-kit v1.1.0. Moves to pipeline/sources.yaml once Q1/Q2 are answered
+# (OPEN-QUESTIONS.md); the project id, archive repo and user agent below use the proposed name "plumes".
+# Validate from the kit checkout (no install needed):
+#   cd ../../data-archive-kit && uv run archivekit validate-registry --registry ../dataviz-next/docs/sources-draft.yaml
+# Size bounds are first estimates with headroom; sha256 pins are filled in by the first validated fetch.
+# Rasters are `remote-dataset` entries processed inside Earth Engine (never downloaded, never archived).
+# PHIVOLCS pages are `update-input` entries crawled by the pipeline (DATA-PLAN.md §2, §3); the raw HTML bundles
+# are adopted as private archive releases, and no PHIVOLCS bulk file is published at v1.
+version: 1
+project: plumes
+
+archive:
+  repo: abrycta/plumes-archive
+  token_env: ARCHIVE_READ_TOKEN          # fine-grained PAT: Contents read on kit + archive, Issues read/write on archive
+  tag_format: "{id}-{date}"
+  compression: zstd
+  compression_level: auto
+
+health:
+  issue_label: source-health
+  issue_title_prefix: "plumes source"
+  issue_token_env: ARCHIVE_READ_TOKEN
+  token_expiry_warn_days: 30
+  token_expires: "2027-10-31"            # placeholder: set to the ARCHIVE_READ_TOKEN expiry when it is created
+  user_agent: "plumes-pipeline/0.1 (+https://github.com/abrycta/plumes)"
+  heartbeat_days: 14
+
+sources:
+  # ------------------------------------------------------------------ eruption history (Smithsonian GVP, WFS)
+  - id: gvp-volcanoes-ph
+    description: >-
+      Smithsonian Global Volcanism Program, Volcanoes of the World: Holocene volcanoes with Country = Philippines
+      (23 rows on 2026-10-21) as CSV from the GVP GeoServer WFS. Supplies GVP numbers, coordinates, elevation,
+      type and last eruption year; the crosswalk to the 24 PHIVOLCS active volcanoes is a repo file.
+    kind: file
+    format: csv
+    filename: gvp-volcanoes-ph.csv
+    local_path: data/raw/gvp/gvp-volcanoes-ph.csv
+    licence: >-
+      Smithsonian Terms of Use (personal, educational and other non-commercial use with citation; wording to be
+      confirmed on volcano.si.edu, which was behind a bot challenge on 2026-10-21); WFS GetCapabilities states
+      Fees NONE and AccessConstraints NONE. Derived figures are shown with the citation; no bulk copy is redistributed.
+    attribution: >-
+      Global Volcanism Program, 2025. Volcanoes of the World (v. 5.3.x). Distributed by Smithsonian Institution,
+      compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2025.5.3
+    cadence: database releases a few times a year
+    hooks: ["plumes.sources:check_gvp_volcanoes"]   # 23 rows, the expected Volcano_Number set
+    links:
+      - id: wfs-csv
+        url: "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Volcanoes&outputFormat=csv&CQL_FILTER=Country%3D%27Philippines%27"
+        probe_size: false
+      - id: wfs-geojson
+        url: "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Volcanoes&outputFormat=json&CQL_FILTER=Country%3D%27Philippines%27"
+        automatic: false                   # same rows as GeoJSON: a different container
+        probe_contains: "FeatureCollection"
+      - id: archive
+        archive: true
+    checks:
+      bytes: { min: 10000, max: 2000000 }
+      rows: { min: 20, max: 40 }
+      required_columns: [Volcano_Number, Volcano_Name, Latitude, Longitude, Elevation, Last_Eruption_Year]
+      profile: { key: Volcano_Number, numeric: [Latitude, Longitude, Elevation] }
+    archived: { enabled: true, retention: all, max_age_days: 400 }
+
+  - id: gvp-eruptions-ph
+    description: >-
+      Smithsonian GVP Holocene eruptions for the Philippine volcano numbers (271000-274999; 233 rows on
+      2026-10-21): VEI, start and end dates with explicit uncertainty fields and modifiers, evidence method.
+      Becomes the episode table (DATA-PLAN.md §4), published in a separately licensed file with the citation.
+    kind: file
+    format: csv
+    filename: gvp-eruptions-ph.csv
+    local_path: data/raw/gvp/gvp-eruptions-ph.csv
+    licence: "Smithsonian Terms of Use (non-commercial use with citation; see gvp-volcanoes-ph)"
+    attribution: >-
+      Global Volcanism Program, 2025. Volcanoes of the World (v. 5.3.x). Distributed by Smithsonian Institution,
+      compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2025.5.3
+    cadence: database releases a few times a year; recent eruptions updated continuously
+    hooks: ["plumes.sources:check_gvp_eruptions"]   # every Volcano_Number exists in gvp-volcanoes-ph; VEI in 0-8 or blank
+    links:
+      - id: wfs-csv
+        url: "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Eruptions&outputFormat=csv&CQL_FILTER=Volcano_Number%20BETWEEN%20271000%20AND%20274999"
+        probe_size: false
+      - id: archive
+        archive: true
+    checks:
+      bytes: { min: 20000, max: 5000000 }
+      rows: { min: 200, max: 400 }
+      required_columns: [Volcano_Number, Volcano_Name, Eruption_Number, ExplosivityIndexMax, StartDateYear, EndDateYear]
+      shrink_tolerance: 0.02
+      profile: { key: Eruption_Number, group: Volcano_Number, numeric: [StartDateYear, ExplosivityIndexMax] }
+    archived: { enabled: true, retention: all, max_age_days: 400 }
+
+  # ------------------------------------------------------------------ thermal: MIROVA Dataset v2.5 (OSF, CC BY 4.0)
+  - id: mirova-vrp
+    description: >-
+      MIROVA Dataset v2.5 (MODIS + VIIRS 2000-2025), VRP_GLOBAL_ARCHIVE_2025.csv (98,625,213 bytes on 2026-10-21)
+      from OSF project zm62w (DOI 10.17605/OSF.IO/ZM62W). Global volcanic radiative power detections; the pipeline
+      keeps the Philippine volcanoes (Taal, Mayon, Kanlaon, Pinatubo are listed; the subset is checked by a hook).
+      The schema is MIROVA_Database_Schema_v2.5.docx in the same folder (columns to be confirmed by the spike).
+    kind: file
+    format: csv
+    filename: mirova-vrp-global-2025.csv
+    local_path: data/raw/mirova/mirova-vrp-global-2025.csv
+    licence: "CC BY 4.0 (OSF project licence 'CC-By Attribution 4.0 International', read from the OSF API on 2026-10-21)"
+    attribution: >-
+      MIROVA Dataset v2.5, University of Turin (Coppola, D. et al.), https://osf.io/zm62w/ (DOI 10.17605/OSF.IO/ZM62W);
+      MIROVA system: Coppola et al. 2020, Frontiers in Earth Science 7, doi:10.3389/feart.2019.00362
+    cadence: yearly dataset releases
+    pin: { version: "v2.5", osf_file: "53zwm", osf_modified: "2026-08-19" }
+    hooks: ["plumes.sources:check_mirova"]           # Philippine GVP numbers present; dates parse
+    links:
+      - id: osf-download
+        url: "https://osf.io/download/53zwm/"        # 302 to files.osf.io (https)
+        probe_size: false
+      - id: archive
+        archive: true
+    checks:
+      bytes: { min: 50000000, max: 300000000 }
+      rows: { min: 200000, max: 20000000 }
+      shrink_tolerance: 0.02
+    archived: { enabled: true, retention: all, max_age_days: 400 }
+
+  # ------------------------------------------------------------------ earthquakes: USGS ComCat (public domain)
+  - id: usgs-comcat-ph-1900-2009
+    description: >-
+      USGS ComCat events in the Philippine box (4-22 N, 116-128 E) 1900-01-01 to 2009-12-31 as FDSN CSV
+      (15,738 events on 2026-10-21; the service caps a query at 20,000). Pre-1970 rows are mostly ISC-GEM imports.
+    kind: file
+    format: csv
+    filename: usgs-comcat-ph-1900-2009.csv
+    local_path: data/raw/usgs/usgs-comcat-ph-1900-2009.csv
+    licence: "U.S. public domain (USGS-authored data); credit U.S. Geological Survey"
+    attribution: "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/"
+    cadence: rarely changes (catalogue revisions); re-fetched quarterly
+    hooks: ["plumes.sources:check_usgs"]             # magnitude types; times parse; box respected
+    links:
+      - id: fdsn-csv
+        url: "https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=1900-01-01&endtime=2009-12-31&minlatitude=4&maxlatitude=22&minlongitude=116&maxlongitude=128&orderby=time-asc"
+        probe: "https://earthquake.usgs.gov/fdsnws/event/1/count?format=text&starttime=1900-01-01&endtime=2009-12-31&minlatitude=4&maxlatitude=22&minlongitude=116&maxlongitude=128"
+        probe_size: false
+      - id: archive
+        archive: true
+    checks:
+      bytes: { min: 2000000, max: 20000000 }
+      rows: { min: 14000, max: 20000 }
+      required_columns: [time, latitude, longitude, depth, mag, magType, id, place, type, status]
+      shrink_tolerance: 0.02
+      profile: { key: id, numeric: [latitude, longitude, depth, mag] }
+    archived: { enabled: true, retention: all }
+
+  - id: usgs-comcat-ph-2010
+    description: >-
+      USGS ComCat events in the Philippine box from 2010-01-01 to the fetch date as FDSN CSV (11,594 events on
+      2026-10-21). Split from the 1900-2009 file so both stay under the 20,000-event cap; a yearly split is
+      added when this one approaches 18,000.
+    kind: file
+    format: csv
+    filename: usgs-comcat-ph-2010.csv
+    local_path: data/raw/usgs/usgs-comcat-ph-2010.csv
+    licence: "U.S. public domain (USGS-authored data); credit U.S. Geological Survey"
+    attribution: "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/"
+    cadence: weekly (new events; revisions within months)
+    hooks: ["plumes.sources:check_usgs"]
+    links:
+      - id: fdsn-csv
+        url: "https://earthquake.usgs.gov/fdsnws/event/1/query?format=csv&starttime=2010-01-01&minlatitude=4&maxlatitude=22&minlongitude=116&maxlongitude=128&orderby=time-asc"
+        probe: "https://earthquake.usgs.gov/fdsnws/event/1/count?format=text&starttime=2010-01-01&minlatitude=4&maxlatitude=22&minlongitude=116&maxlongitude=128"
+        probe_size: false
+      - id: archive
+        archive: true
+    checks:
+      bytes: { min: 1500000, max: 20000000 }
+      rows: { min: 10000, max: 20000 }
+      required_columns: [time, latitude, longitude, depth, mag, magType, id, place, type, status]
+      shrink_tolerance: 0.02
+      profile: { key: id, numeric: [latitude, longitude, depth, mag] }
+    anomaly: { max_row_change: 0.3 }               # a big aftershock sequence can add thousands of rows in a week
+    archived: { enabled: true, retention: all, max_age_days: 60 }
+
+  # ------------------------------------------------------------------ faults (GEM, CC BY-SA 4.0, kept as a separate layer)
+  - id: gem-active-faults
+    description: >-
+      GEM Global Active Faults Database, harmonised GeoJSON (about 10.6 MB; Philippine traces from Penarubia et
+      al. 2019). Shown as its own credited layer; share-alike, so it is never merged into other published tables.
+    kind: file
+    format: geojson
+    filename: gem-active-faults.geojson
+    local_path: data/raw/gem/gem-active-faults.geojson
+    licence: "CC BY-SA 4.0"
+    share_alike: true
+    attribution: >-
+      Styron, R., Pagani, M. (2020). The GEM Global Active Faults Database. Earthquake Spectra 36(1S), 160-180,
+      doi:10.1177/8755293020944182. GEM Foundation, https://github.com/GEMScienceTools/gem-global-active-faults
+    cadence: occasional releases; re-fetched quarterly
+    links:
+      - id: github-raw
+        url: "https://raw.githubusercontent.com/GEMScienceTools/gem-global-active-faults/master/geojson/gem_active_faults_harmonized.geojson"
+      - id: archive
+        archive: true
+    checks:
+      bytes: { min: 5000000, max: 50000000 }
+      json_type: object
+      required_properties: [type, features]
+    archived: { enabled: true, retention: all, max_age_days: 400 }
+
+  # ------------------------------------------------------------------ boundaries (OCHA COD-AB, as in Lights)
+  - id: cod-ab-phl-gdb
+    description: >-
+      OCHA/NAMRIA/PSA Common Operational Dataset, Philippines administrative boundaries levels 0-4 (v03, file
+      geodatabase, about 361 MB; HDX resources modified 2026-05-28). Used for "LGUs within N km" and the map
+      boundaries; the same file Lights uses (../../lgu-lights/pipeline/sources.yaml).
+    kind: file
+    format: zip
+    filename: phl_admin_boundaries.gdb.zip
+    local_path: data/raw/boundaries/phl_admin_boundaries.gdb.zip
+    licence: "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)"
+    attribution: "OCHA Philippines, Philippines - Subnational Administrative Boundaries (COD-AB), source NAMRIA and PSA, https://data.humdata.org/dataset/philippines-administrative-levels-0-to-3"
+    cadence: yearly review
+    links:
+      - id: hdx
+        url: https://data.humdata.org/dataset/caf116df-f984-4deb-85ca-41b349d3f313/resource/3fa0dbcf-e07d-4506-9821-ba15baa6da07/download/phl_admin_boundaries.gdb.zip
+      - id: hdx-shp
+        url: https://data.humdata.org/dataset/caf116df-f984-4deb-85ca-41b349d3f313/resource/4e4067d6-3fc8-4d2c-91ea-330c3d4f8e8e/download/phl_admin_boundaries.shp.zip
+        automatic: false                   # the same boundaries as shapefiles: a different container
+      - id: archive
+        archive: true
+    pin: { version: v03, hdx_last_modified: "2026-05-28" }
+    checks:
+      bytes: { min: 200000000, max: 800000000 }
+      zip_member: "*.gdb/gdb"
+    archived: { enabled: true, retention: all, max_age_days: 400 }
+
+  # ------------------------------------------------------------------ PHIVOLCS pages (crawled by the pipeline; see DATA-PLAN.md §3)
+  - id: phivolcs-bulletins
+    description: >-
+      DOST-PHIVOLCS daily volcano bulletins and eruption bulletins on the WordPress site: HTML prose from
+      2017-09-02 (category listing paginates to page 1,498 on 2026-10-21); 2025+ "Summary of 24Hr Observation"
+      posts have empty bodies and are covered by phivolcs-lava-bulletins instead. Crawled at <= 1 request/s by the
+      pipeline's own client; raw HTML bundles are adopted as private archive releases (phivolcs-bulletins-<date>).
+      Parsed fields: alert level, volcanic earthquake counts and types, SO2 flux (t/day) with its date, plume,
+      crater-lake temperature, deformation statement. Every value is shown with its bulletin URL; no bulk file is
+      published at v1 (OPEN-QUESTIONS.md Q5).
+    kind: update-input
+    licence: >-
+      No terms stated on the site. Work of the Government of the Philippines (RA 8293 s.176.1: no copyright;
+      prior approval needed only for exploitation for profit). Displayed with citation; redistribution of a
+      derived bulk table pending PHIVOLCS's written answer.
+    attribution: "DOST-PHIVOLCS (Philippine Institute of Volcanology and Seismology), volcano bulletins, https://www.phivolcs.dost.gov.ph/"
+    cadence: daily for volcanoes with observatories (Taal, Mayon, Kanlaon, Bulusan; others during unrest)
+    links:
+      - id: category-listing
+        url: "https://www.phivolcs.dost.gov.ph/category/volcano-bulletin/"
+        probe_html: true
+        probe_contains: "VOLCANO"
+      - id: example-bulletin
+        url: "https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-14-march-2022-8-00-am/"
+        probe_html: true
+        probe_contains: "tonnes/day"
+    archived: { enabled: false }            # raw bundles are adopted per crawl by the pipeline (not fetched by the kit)
+
+  - id: phivolcs-lava-bulletins
+    description: >-
+      DOST-PHIVOLCS LAVA portal 24-hour volcano bulletins, structured HTML by id
+      (/bulletin/activity-{tvo,mvo,kvo,bvo}?bid=N&lang=en; id 1000 = 2022-04-02, id 16917 = 2026-10-21; ids are not
+      contiguous). Public pages only: the portal's registered datasets are not used (data policy of 2020-07-01:
+      cite DOST-PHIVOLCS; no redistribution; no public forecasting). Crawled at <= 1 request/s; raw bundles
+      adopted as private archive releases. The portal's TLS chain fails verification in some clients.
+    kind: update-input
+    licence: >-
+      PHIVOLCS-LAVA data policy (2020-07-01) governs registered downloads, which are not used; public bulletin
+      pages are government works (RA 8293 s.176.1). Displayed with citation; no bulk file at v1.
+    attribution: "DOST-PHIVOLCS, Local Active Volcanoes Archive (LAVA), https://wovodat.phivolcs.dost.gov.ph/"
+    cadence: daily per monitored volcano
+    links:
+      - id: list
+        url: "https://wovodat.phivolcs.dost.gov.ph/bulletin/list-of-bulletin"
+        probe_html: true
+        probe_contains: "activity-tvo"
+      - id: example-bulletin
+        url: "https://wovodat.phivolcs.dost.gov.ph/bulletin/activity-tvo?bid=16917&lang=en"
+        probe_html: true
+        probe_contains: "Sulfur Dioxide Flux"
+    archived: { enabled: false }
+
+  - id: phivolcs-earthquakes
+    description: >-
+      DOST-PHIVOLCS earthquake information: monthly HTML tables from 2016 with gaps
+      (/EQLatest-Monthly/YYYY/YYYY_Month.html, 0.5-2.8 MB each, about 1,450 events a month in 2025) with date-time
+      (PHT), latitude, longitude, depth, magnitude, location; magnitude type on the per-event page. Crawled monthly
+      by the pipeline; raw pages adopted as private archive releases. Used for per-volcano counts within 30 km;
+      a national table is published only after PHIVOLCS's answer (Q5).
+    kind: update-input
+    licence: "No terms stated; government work (RA 8293 s.176.1). Displayed with citation; no bulk file at v1."
+    attribution: "DOST-PHIVOLCS, Earthquake Information, https://earthquake.phivolcs.dost.gov.ph/"
+    cadence: continuous; monthly pages rebuilt
+    links:
+      - id: latest
+        url: "https://earthquake.phivolcs.dost.gov.ph/"
+        probe_html: true
+        probe_contains: "LATEST EARTHQUAKE INFORMATION"
+      - id: monthly-example
+        url: "https://earthquake.phivolcs.dost.gov.ph/EQLatest-Monthly/2025/2025_January.html"
+        probe_html: true
+        probe_contains: "Date - Time"
+    archived: { enabled: false }
+
+  # ------------------------------------------------------------------ satellite rasters on Earth Engine (never downloaded or archived)
+  - id: s5p-offl-so2
+    description: >-
+      Sentinel-5P TROPOMI offline L3 SO2 (COPERNICUS/S5P/OFFL/L3_SO2), 2018-12-05 onward, 1,113 m, one image per
+      orbit; bands SO2_column_number_density (ground-level a priori), SO2_column_number_density_15km, cloud_fraction.
+      Reduced in Earth Engine to daily column mass and valid-pixel fraction per volcano box and ring, and to
+      monthly national mean mosaics (DATA-PLAN.md §2).
+    kind: remote-dataset
+    licence: "Copernicus Sentinel data: free, full and open; reproduction, distribution and adaptation permitted with attribution"
+    attribution: "Contains modified Copernicus Sentinel data [Year], processed by ESA; TROPOMI SO2 retrieval Theys et al. 2017 (doi:10.5194/amt-10-119-2017). Processed in Google Earth Engine."
+    cadence: daily (OFFL latency about a week)
+    links:
+      - id: earth-engine
+        url: ee://COPERNICUS/S5P/OFFL/L3_SO2
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS/COPERNICUS_S5P_OFFL_L3_SO2.json
+        probe_contains: "L3_SO2"
+      - id: earth-engine-nrti
+        url: ee://COPERNICUS/S5P/NRTI/L3_SO2
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS/COPERNICUS_S5P_NRTI_L3_SO2.json
+        probe_contains: "L3_SO2"
+    archived: { enabled: false }
+
+  - id: firms-modis
+    description: >-
+      NASA FIRMS MODIS active fire and thermal anomalies on Earth Engine (collection FIRMS, 1 km daily, 2000-11-01
+      onward; bands T21, confidence). Counted per volcano ring and day; "thermal detections (includes vegetation
+      fires)". The standard-quality archive CSV with the `type` attribute (1 = active volcano) is requested
+      separately through the FIRMS download tool with the Earthdata login (MAP_KEY as a GitHub secret).
+    kind: remote-dataset
+    licence: "NASA open data (LANCE/FIRMS); replicate the LANCE disclaimer; the fire products are not validated for detecting volcanoes"
+    attribution: "NASA FIRMS, MODIS Collection 6.1 active fire product (MCD14DL/MCD14ML), doi:10.5067/FIRMS/MODIS/MCD14DL.NRT.006. Processed in Google Earth Engine."
+    cadence: daily
+    links:
+      - id: earth-engine
+        url: ee://FIRMS
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/FIRMS/FIRMS.json
+        probe_contains: "FIRMS"
+      - id: firms-api
+        url: https://firms.modaps.eosdis.nasa.gov/api/area/
+        probe: https://firms.modaps.eosdis.nasa.gov/api/
+        probe_html: true
+        probe_contains: "area"
+    archived: { enabled: false }
+
+  - id: modis-mod14a1
+    description: "MODIS Terra thermal anomalies and fire daily L3 1 km (MODIS/061/MOD14A1), 2000-02-24 onward; FireMask classes 7-9 and MaxFRP, reduced per ring in Earth Engine. Terra's end of science is expected in 2027."
+    kind: remote-dataset
+    licence: "NASA LP DAAC: no restrictions on subsequent use, sale, or redistribution"
+    attribution: "Giglio, L., Justice, C. (2021). MODIS/Terra Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V061, NASA EOSDIS LP DAAC, doi:10.5067/MODIS/MOD14A1.061. Processed in Google Earth Engine."
+    cadence: daily
+    links:
+      - id: earth-engine
+        url: ee://MODIS/061/MOD14A1
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/MODIS/MODIS_061_MOD14A1.json
+        probe_contains: "MOD14A1"
+      - id: cmr
+        url: https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD14A1&version=061
+        probe: https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD14A1&version=061&page_size=1
+        probe_contains: "MOD14A1"
+    archived: { enabled: false }
+
+  - id: viirs-vnp14a1
+    description: "VIIRS S-NPP thermal anomalies and fire daily L3 1 km (NASA/VIIRS/002/VNP14A1), 2012-01-19 onward, reduced per ring in Earth Engine. S-NPP deliveries end 2026-11-02; NOAA-20 (VJ114A1) is the continuity series and is checked by the spike."
+    kind: remote-dataset
+    licence: "NASA open data (LP DAAC); cite when publishing"
+    attribution: "Schroeder, W., Giglio, L. (2018). VIIRS/NPP Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V002, NASA EOSDIS LP DAAC. Processed in Google Earth Engine."
+    cadence: daily
+    links:
+      - id: earth-engine
+        url: ee://NASA/VIIRS/002/VNP14A1
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/NASA/NASA_VIIRS_002_VNP14A1.json
+        probe_contains: "VNP14A1"
+      - id: cmr
+        url: https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VNP14A1&version=002
+        probe: https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VNP14A1&version=002&page_size=1
+        probe_contains: "VNP14A1"
+    archived: { enabled: false }
+
+  - id: worldpop-100m
+    description: "WorldPop 100 m population counts (WorldPop/GP/100m/pop on Earth Engine, 2000-2020; the Global 2 R2024B/R2025A PHL GeoTIFFs for 2021 onward), reduced to population within 5/10/20/30 km rings and the PDZ per volcano, once per year."
+    kind: remote-dataset
+    licence: "CC BY 4.0"
+    attribution: "WorldPop (www.worldpop.org, School of Geography and Environmental Science, University of Southampton) and CIESIN, Columbia University. Processed in Google Earth Engine."
+    cadence: yearly
+    links:
+      - id: earth-engine
+        url: ee://WorldPop/GP/100m/pop
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/WorldPop/WorldPop_GP_100m_pop.json
+        probe_contains: "WorldPop"
+      - id: worldpop-ftp
+        url: https://data.worldpop.org/GIS/Population/Global_2015_2030/R2024B/2020/PHL/v1/100m/
+        probe_html: true
+        probe_contains: "phl"
+    archived: { enabled: false }
+
+  - id: ghsl-r2023a
+    description: "GHSL R2023A population (JRC/GHSL/P2023A/GHS_POP) and built-up surface (GHS_BUILT_S), 100 m, epochs 1975-2030 in 5-year steps, reduced per ring in Earth Engine for exposure growth since 1975."
+    kind: remote-dataset
+    licence: "European Commission JRC open and free data; reuse authorised provided the source is acknowledged"
+    attribution: "Pesaresi, M. et al. (2024). GHS-POP and GHS-BUILT-S R2023A, European Commission Joint Research Centre. Processed in Google Earth Engine."
+    cadence: releases every few years
+    links:
+      - id: earth-engine-pop
+        url: ee://JRC/GHSL/P2023A/GHS_POP
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/JRC/JRC_GHSL_P2023A_GHS_POP.json
+        probe_contains: "GHS_POP"
+      - id: earth-engine-built
+        url: ee://JRC/GHSL/P2023A/GHS_BUILT_S
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/JRC/JRC_GHSL_P2023A_GHS_BUILT_S.json
+        probe_contains: "GHS_BUILT_S"
+    archived: { enabled: false }
+
+  - id: esa-worldcover-v200
+    description: "ESA WorldCover 2021 v200, 10 m land cover (ESA/WorldCover/v200), reduced to class shares per ring in Earth Engine."
+    kind: remote-dataset
+    licence: "CC BY 4.0"
+    attribution: "Zanaga, D. et al. (2022). ESA WorldCover 10 m 2021 v200, doi:10.5281/zenodo.7254221. Processed in Google Earth Engine."
+    cadence: once (2021); a newer vintage replaces it when released
+    links:
+      - id: earth-engine
+        url: ee://ESA/WorldCover/v200
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/ESA/ESA_WorldCover_v200.json
+        probe_contains: "WorldCover"
+      - id: zenodo
+        url: https://zenodo.org/records/7254221
+        probe: https://zenodo.org/api/records/7254221
+        probe_contains: "WorldCover"
+    archived: { enabled: false }
+
+  - id: copernicus-dem-glo30
+    description: "Copernicus DEM GLO-30 (COPERNICUS/DEM/GLO30_2024_1 on Earth Engine; the older GLO30 asset is superseded), 30 m, for hillshade, ring terrain and profiles."
+    kind: remote-dataset
+    licence: "Copernicus DEM free licence (notice required); (c) DLR e.V. 2010-2014 and (c) Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA"
+    attribution: "Copernicus DEM GLO-30, European Space Agency, doi:10.5270/ESA-c5d3d65. Processed in Google Earth Engine."
+    cadence: yearly releases
+    links:
+      - id: earth-engine
+        url: ee://COPERNICUS/DEM/GLO30_2024_1
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS/COPERNICUS_DEM_GLO30_2024_1.json
+        probe_contains: "GLO30"
+      - id: earth-engine-legacy
+        url: ee://COPERNICUS/DEM/GLO30
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS/COPERNICUS_DEM_GLO30.json
+        probe_contains: "GLO30"
+    archived: { enabled: false }
+
+  # ------------------------------------------------------------------ milestone 2: InSAR (listed now so the health check watches the paths)
+  - id: licsar-taal-032d
+    description: >-
+      COMET LiCSAR Sentinel-1 frame 032D_07536_111313 (Taal and Pinatubo; 374 epochs 2014-10-19 to 2026-08-12,
+      about 2,888 pairs). Milestone 2 downloads a cropped subset of unwrapped phase and coherence for pairs
+      around 2020 and runs LiCSBAS; the frame is never mirrored. The October 2025 storage migration left pair
+      folders returning 404 on 2026-10-21; the metadata folder answered.
+    kind: remote-dataset
+    status: active
+    licence: "Derived works of Copernicus Sentinel data (free, full and open); acknowledgement required"
+    attribution: "LiCSAR contains modified Copernicus Sentinel data [year]; Lazecky, M. et al. (2020), Remote Sensing 12(15), 2430; LiCSBAS: Morishita, Y. et al. (2020), Remote Sensing 12(3), 424. COMET, University of Leeds."
+    cadence: every 6-12 days per epoch
+    links:
+      - id: jasmin
+        url: https://gws-access.jasmin.ac.uk/public/nceo_geohazards/LiCSAR_products/32/032D_07536_111313/
+        probe: https://gws-access.jasmin.ac.uk/public/nceo_geohazards/LiCSAR_products/32/032D_07536_111313/metadata/metadata.txt
+        probe_contains: "032D_07536_111313"
+      - id: ceda
+        url: https://data.ceda.ac.uk/neodc/comet/data/licsar_products/32/032D_07536_111313/
+        probe_html: true
+        probe_contains: "032D_07536_111313"
+    archived: { enabled: false }
