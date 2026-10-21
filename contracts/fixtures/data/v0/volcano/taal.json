@@ -1,0 +1,1194 @@
+{
+ "schemaVersion": "1",
+ "dataVersion": "v0",
+ "dataAsOf": "2026-10-21",
+ "generatedAt": "2026-10-22T00:00:00Z",
+ "fixture": true,
+ "kind": "volcano",
+ "volcano": {
+  "id": "taal",
+  "gvpNumber": 273070,
+  "gvpName": "Taal",
+  "name": {
+   "en": "Taal",
+   "ja": "タール火山"
+  },
+  "lat": 14.0106,
+  "lon": 120.9975,
+  "elevationM": 311,
+  "type": "Caldera",
+  "observatory": true,
+  "coverage": "deep",
+  "links": {
+   "phivolcs": "https://www.phivolcs.dost.gov.ph/",
+   "gvp": "https://volcano.si.edu/volcano.cfm?vn=273070",
+   "comet": "https://comet.nerc.ac.uk/comet-lics-portal/",
+   "hazardhunter": "https://hazardhunter.georisk.gov.ph/"
+  }
+ },
+ "span": {
+  "start": "2019-12-01",
+  "end": "2020-02-15"
+ },
+ "daily": {
+  "so2_s5p_15km": {
+   "source": [
+    "s5p-offl-so2"
+   ],
+   "unit": "µmol/m²",
+   "ringKm": 15,
+   "start": "2020-01-01",
+   "label": {
+    "en": "TROPOMI SO₂ column, mean within 15 km",
+    "ja": "TROPOMI SO₂カラム量(15 km圏平均)"
+   },
+   "values": [
+    19,
+    -32,
+    48,
+    28,
+    21,
+    75,
+    263,
+    null,
+    -117,
+    -42,
+    74,
+    78,
+    6218,
+    null,
+    null,
+    334,
+    -136,
+    null,
+    null,
+    null,
+    -384,
+    59,
+    128,
+    null,
+    null,
+    -87,
+    293,
+    209,
+    491,
+    11,
+    -231
+   ],
+   "coverage": [
+    0.61,
+    0.208,
+    1.0,
+    0.024,
+    0.809,
+    1.0,
+    0.203,
+    0.0,
+    0.793,
+    0.197,
+    0.614,
+    0.685,
+    0.008,
+    0.0,
+    0.0,
+    0.779,
+    0.23,
+    0.0,
+    0.0,
+    0.0,
+    0.202,
+    0.968,
+    0.869,
+    0.0,
+    0.0,
+    0.522,
+    0.819,
+    0.918,
+    0.888,
+    0.724,
+    0.421
+   ],
+   "note": {
+    "en": "Fixture: coverage approximated as valid pixels / the month's maximum.",
+    "ja": "フィクスチャ:被覆率は当月最大の有効画素数に対する比で近似。"
+   }
+  },
+  "so2_s5p_50km": {
+   "source": [
+    "s5p-offl-so2"
+   ],
+   "unit": "µmol/m²",
+   "ringKm": 50,
+   "start": "2020-01-01",
+   "label": {
+    "en": "TROPOMI SO₂ column, mean within the 50 km box",
+    "ja": "TROPOMI SO₂カラム量(50 km範囲平均)"
+   },
+   "values": [
+    28,
+    -11,
+    49,
+    -34,
+    83,
+    85,
+    114,
+    112,
+    53,
+    1,
+    75,
+    94,
+    5126,
+    null,
+    245,
+    45,
+    -148,
+    119,
+    null,
+    163,
+    46,
+    84,
+    48,
+    115,
+    -101,
+    -12,
+    107,
+    161,
+    139,
+    56,
+    -90
+   ]
+  }
+ },
+ "events": {
+  "frp_modis_15km": {
+   "source": [
+    "modis-mod14a1"
+   ],
+   "label": {
+    "en": "MODIS max fire radiative power within 15 km",
+    "ja": "MODIS 最大放射電力(15 km圏)"
+   },
+   "cols": [
+    "date",
+    "maxFrpMw",
+    "n"
+   ],
+   "units": {
+    "maxFrpMw": "MW",
+    "n": "pixels"
+   },
+   "ringKm": 15,
+   "start": "2000-11-01",
+   "rows": [
+    [
+     "2020-01-14",
+     169,
+     1
+    ],
+    [
+     "2020-01-17",
+     87,
+     1
+    ],
+    [
+     "2020-01-20",
+     201,
+     2
+    ],
+    [
+     "2020-01-22",
+     166,
+     1
+    ]
+   ]
+  },
+  "fire_viirs_15km": {
+   "source": [
+    "firms-modis"
+   ],
+   "label": {
+    "en": "VIIRS (S-NPP) detections within 15 km, FIRMS",
+    "ja": "VIIRS(S-NPP)熱異常検知数(15 km圏、FIRMS)"
+   },
+   "cols": [
+    "date",
+    "n",
+    "maxFrpMw"
+   ],
+   "units": {
+    "n": "detections",
+    "maxFrpMw": "MW"
+   },
+   "ringKm": 15,
+   "start": "2012-01-20",
+   "rows": [
+    [
+     "2020-01-13",
+     5,
+     4.8
+    ],
+    [
+     "2020-01-14",
+     3,
+     5.1
+    ],
+    [
+     "2020-01-15",
+     6,
+     4.0
+    ],
+    [
+     "2020-01-16",
+     2,
+     23.2
+    ],
+    [
+     "2020-01-17",
+     3,
+     4.5
+    ],
+    [
+     "2020-01-18",
+     5,
+     2.9
+    ],
+    [
+     "2020-01-19",
+     3,
+     4.1
+    ],
+    [
+     "2020-01-20",
+     2,
+     2.8
+    ],
+    [
+     "2020-01-21",
+     1,
+     8.9
+    ],
+    [
+     "2020-01-22",
+     4,
+     15.4
+    ],
+    [
+     "2020-01-23",
+     2,
+     10.4
+    ],
+    [
+     "2020-01-26",
+     3,
+     3.7
+    ]
+   ]
+  },
+  "eq_usgs_30km": {
+   "source": [
+    "usgs-comcat-ph-2010"
+   ],
+   "label": {
+    "en": "USGS earthquakes within 30 km",
+    "ja": "USGS 地震(30 km圏)"
+   },
+   "cols": [
+    "date",
+    "n",
+    "maxMag"
+   ],
+   "units": {
+    "n": "events",
+    "maxMag": "M"
+   },
+   "ringKm": 30,
+   "start": "1900-01-01",
+   "rows": [
+    [
+     "2020-01-12",
+     35,
+     4.7
+    ],
+    [
+     "2020-01-13",
+     15,
+     4.6
+    ],
+    [
+     "2020-01-14",
+     5,
+     4.6
+    ],
+    [
+     "2020-01-19",
+     1,
+     4.5
+    ]
+   ]
+  }
+ },
+ "bulletins": {
+  "source": [
+   "phivolcs-bulletins"
+  ],
+  "authority": "DOST-PHIVOLCS",
+  "cols": [
+   "date",
+   "alertLevel",
+   "volcanicEq",
+   "tremor",
+   "so2FluxTpd",
+   "so2FluxDate",
+   "plumeM",
+   "deformation",
+   "url"
+  ],
+  "rows": [
+   [
+    "2020-01-12",
+    2,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    "https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-update-12-january-2020-04-00-pm-2/"
+   ],
+   [
+    "2020-01-13",
+    4,
+    75,
+    null,
+    null,
+    null,
+    null,
+    null,
+    "https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-13-january-2020-8-00-a-m/"
+   ]
+  ],
+  "gaps": [
+   {
+    "start": "2021-10",
+    "end": "2022-06",
+    "reason": {
+     "en": "WordPress summaries are empty and LAVA had not started.",
+     "ja": "WordPressの要約は空で、LAVAは未開始。"
+    }
+   }
+  ]
+ },
+ "advisories": {
+  "source": [
+   "vaac-tokyo-advisories"
+  ],
+  "cols": [
+   "dtg",
+   "advisoryNo",
+   "topFl",
+   "heightBasis",
+   "url"
+  ],
+  "rows": [
+   [
+    "2020-01-12T07:19:00Z",
+    "2020/1",
+    50,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200112_27307000_0001_Text.html"
+   ],
+   [
+    "2020-01-12T09:00:00Z",
+    "2020/3",
+    550,
+    "observed",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200112_27307000_0003_Text.html"
+   ],
+   [
+    "2020-01-12T15:00:00Z",
+    "2020/5",
+    550,
+    "observed",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200112_27307000_0005_Text.html"
+   ],
+   [
+    "2020-01-12T21:00:00Z",
+    "2020/7",
+    550,
+    "observed",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200112_27307000_0007_Text.html"
+   ],
+   [
+    "2020-01-13T03:00:00Z",
+    "2020/9",
+    550,
+    "observed",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200113_27307000_0009_Text.html"
+   ],
+   [
+    "2020-01-13T09:00:00Z",
+    "2020/11",
+    360,
+    "observed",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200113_27307000_0011_Text.html"
+   ],
+   [
+    "2020-01-13T14:50:00Z",
+    "2020/13",
+    null,
+    "none",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200113_27307000_0013_Text.html"
+   ],
+   [
+    "2020-01-13T20:15:00Z",
+    "2020/15",
+    40,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200113_27307000_0015_Text.html"
+   ],
+   [
+    "2020-01-14T04:13:00Z",
+    "2020/17",
+    40,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200114_27307000_0017_Text.html"
+   ],
+   [
+    "2020-01-14T16:35:00Z",
+    "2020/19",
+    30,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200114_27307000_0019_Text.html"
+   ],
+   [
+    "2020-01-15T00:05:00Z",
+    "2020/21",
+    30,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200115_27307000_0021_Text.html"
+   ],
+   [
+    "2020-01-15T08:22:00Z",
+    "2020/23",
+    30,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200115_27307000_0023_Text.html"
+   ],
+   [
+    "2020-01-15T22:45:00Z",
+    "2020/25",
+    40,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200115_27307000_0025_Text.html"
+   ],
+   [
+    "2020-01-16T05:39:00Z",
+    "2020/27",
+    20,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200116_27307000_0027_Text.html"
+   ],
+   [
+    "2020-01-16T15:37:00Z",
+    "2020/29",
+    20,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200116_27307000_0029_Text.html"
+   ],
+   [
+    "2020-01-17T00:19:00Z",
+    "2020/31",
+    30,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200117_27307000_0031_Text.html"
+   ],
+   [
+    "2020-01-17T06:58:00Z",
+    "2020/33",
+    20,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200117_27307000_0033_Text.html"
+   ],
+   [
+    "2020-01-17T12:25:00Z",
+    "2020/35",
+    20,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200117_27307000_0035_Text.html"
+   ],
+   [
+    "2020-01-18T04:03:00Z",
+    "2020/37",
+    40,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200118_27307000_0037_Text.html"
+   ],
+   [
+    "2020-01-18T08:13:00Z",
+    "2020/39",
+    40,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200118_27307000_0039_Text.html"
+   ],
+   [
+    "2020-01-19T00:17:00Z",
+    "2020/41",
+    50,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200119_27307000_0041_Text.html"
+   ],
+   [
+    "2020-01-23T22:28:00Z",
+    "2020/43",
+    30,
+    "reported",
+    "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200123_27307000_0043_Text.html"
+   ]
+  ]
+ },
+ "displacement": {
+  "source": [
+   "dswd-dromic-reports"
+  ],
+  "cols": [
+   "asOf",
+   "report",
+   "affectedPersons",
+   "insidePersonsNow",
+   "insidePersonsCum",
+   "outsidePersonsNow",
+   "outsidePersonsCum",
+   "url"
+  ],
+  "rows": [
+   [
+    "2020-01-14",
+    "3",
+    38203,
+    38203,
+    38203,
+    null,
+    null,
+    "https://dromic.dswd.gov.ph/wp-content/uploads/2020/01/DSWD-DROMIC-Report-3-on-the-Taal-Volcano-Phreatic-Eruption-as-of-14-January-2020-6AM.docx"
+   ],
+   [
+    "2020-01-21",
+    "17",
+    282237,
+    148987,
+    180207,
+    90017,
+    98726,
+    "https://dromic.dswd.gov.ph/wp-content/uploads/2020/01/DSWD-DROMIC-Report-17-on-the-Taal-Volcano-Phreatic-Eruption-as-of-21-January-2020-6PM.docx"
+   ],
+   [
+    "2020-02-07",
+    "40",
+    504265,
+    22479,
+    229859,
+    212367,
+    270487,
+    "https://dromic.dswd.gov.ph/wp-content/uploads/2020/02/DSWD-DROMIC-Report-40-on-the-Taal-Volcano-Eruption-as-of-07-February-2020-6PM.docx"
+   ]
+  ]
+ },
+ "episodes": [
+  {
+   "id": "gvp-16826",
+   "kind": "gvp_eruption",
+   "start": "-3580",
+   "end": null,
+   "vei": 6,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16827",
+   "kind": "gvp_eruption",
+   "start": "1572",
+   "end": null,
+   "vei": 3,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16828",
+   "kind": "gvp_eruption",
+   "start": "1591",
+   "end": null,
+   "vei": 3,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16829",
+   "kind": "gvp_eruption",
+   "start": "1608",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16830",
+   "kind": "gvp_eruption",
+   "start": "1634",
+   "end": null,
+   "vei": 3,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16831",
+   "kind": "gvp_eruption",
+   "start": "1635",
+   "end": null,
+   "vei": 3,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16832",
+   "kind": "gvp_eruption",
+   "start": "1641",
+   "end": null,
+   "vei": 3,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16833",
+   "kind": "gvp_eruption",
+   "start": "1645",
+   "end": null,
+   "vei": 3,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16834",
+   "kind": "gvp_eruption",
+   "start": "1707",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16835",
+   "kind": "gvp_eruption",
+   "start": "1709",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16836",
+   "kind": "gvp_eruption",
+   "start": "1715",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16837",
+   "kind": "gvp_eruption",
+   "start": "1716-09-24",
+   "end": "1716-09-27",
+   "vei": 4,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16838",
+   "kind": "gvp_eruption",
+   "start": "1729",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16839",
+   "kind": "gvp_eruption",
+   "start": "1731",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16840",
+   "kind": "gvp_eruption",
+   "start": "1749-08-11",
+   "end": "1749-09",
+   "vei": 4,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16841",
+   "kind": "gvp_eruption",
+   "start": "1754-05-15",
+   "end": "1754-12-04",
+   "vei": 4,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16842",
+   "kind": "gvp_eruption",
+   "start": "1790",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16843",
+   "kind": "gvp_eruption",
+   "start": "1808-02-16",
+   "end": "1808-04-16",
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16844",
+   "kind": "gvp_eruption",
+   "start": "1825-07-02",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16845",
+   "kind": "gvp_eruption",
+   "start": "1842-07-02",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16846",
+   "kind": "gvp_eruption",
+   "start": "1873-07-02",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16847",
+   "kind": "gvp_eruption",
+   "start": "1874-07-19",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16848",
+   "kind": "gvp_eruption",
+   "start": "1878-11-12",
+   "end": "1878-11-15",
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16849",
+   "kind": "gvp_eruption",
+   "start": "1885-07-02",
+   "end": null,
+   "vei": null,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16850",
+   "kind": "gvp_eruption",
+   "start": "1903-04-16",
+   "end": null,
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16851",
+   "kind": "gvp_eruption",
+   "start": "1904-04-16",
+   "end": "1904-07-15",
+   "vei": 1,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16852",
+   "kind": "gvp_eruption",
+   "start": "1911-01-27",
+   "end": "1911-02-08",
+   "vei": 3,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16853",
+   "kind": "gvp_eruption",
+   "start": "1965-09-28",
+   "end": "1965-09-30",
+   "vei": 4,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16854",
+   "kind": "gvp_eruption",
+   "start": "1966-07-05",
+   "end": "1966-08-04",
+   "vei": 3,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16855",
+   "kind": "gvp_eruption",
+   "start": "1967-08-16",
+   "end": "1967-08-19",
+   "vei": 1,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16856",
+   "kind": "gvp_eruption",
+   "start": "1968-01-31",
+   "end": "1968-04-02",
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16857",
+   "kind": "gvp_eruption",
+   "start": "1969-10-29",
+   "end": "1969-12-10",
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16858",
+   "kind": "gvp_eruption",
+   "start": "1970-11-09",
+   "end": "1970-11-13",
+   "vei": 1,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16859",
+   "kind": "gvp_eruption",
+   "start": "1976-09-03",
+   "end": "1976-10-17",
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-16860",
+   "kind": "gvp_eruption",
+   "start": "1977-10-03",
+   "end": "1977-11-12",
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-22344",
+   "kind": "gvp_eruption",
+   "start": "2020-01-12",
+   "end": "2020-01-22",
+   "vei": 4,
+   "source": [
+    "gvp-eruptions-ph",
+    "nasa-msvolso2l4"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070",
+   "so2MassKt": 170,
+   "plumeAltKm": 17
+  },
+  {
+   "id": "gvp-22406",
+   "kind": "gvp_eruption",
+   "start": "2021-07-01",
+   "end": "2021-07-09",
+   "vei": 1,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-22452",
+   "kind": "gvp_eruption",
+   "start": "2021-11-15",
+   "end": "2022-04-01",
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-22481",
+   "kind": "gvp_eruption",
+   "start": "2022-10-05",
+   "end": "2022-10-29",
+   "vei": 1,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "gvp-22563",
+   "kind": "gvp_eruption",
+   "start": "2024-04-12",
+   "end": "2026-03-16",
+   "vei": 2,
+   "source": [
+    "gvp-eruptions-ph"
+   ],
+   "url": "https://volcano.si.edu/volcano.cfm?vn=273070"
+  },
+  {
+   "id": "alert-2020-01",
+   "kind": "alert_window",
+   "start": "2020-01-12",
+   "end": "2020-01-26",
+   "maxAlert": 4,
+   "source": [
+    "phivolcs-bulletins"
+   ],
+   "url": "https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-13-january-2020-8-00-a-m/"
+  }
+ ],
+ "readings": [
+  {
+   "id": "taal-2020-01",
+   "episodeId": "alert-2020-01",
+   "start": "2020-01-12",
+   "end": "2020-01-26",
+   "status": "draft",
+   "text": {
+    "en": "On 12 January 2020 PHIVOLCS raised Taal to Alert Level 4 within hours. Tokyo VAAC saw ash to about FL550 (16.8 km) on 12–13 January; TROPOMI measured an SO₂ column about 80 times the early-January background on 13 January, from only a few clear pixels. USGS located 35 earthquakes within 30 km on 12 January. GVP records the eruption as VEI 4.",
+    "ja": "2020年1月12日、PHIVOLCSは数時間のうちにタール火山の警戒レベルを4に引き上げた。東京VAACは12〜13日に高度約FL550(16.8 km)の火山灰を観測し、13日のTROPOMI SO₂カラム量は1月初旬の背景値の約80倍だった(有効画素はわずか)。USGSは12日に30 km圏で35回の地震を観測した。GVPはこの噴火をVEI 4としている。"
+   },
+   "limits": {
+    "en": "Satellite SO₂ is a column amount on clear days only (14–15 January had no valid pixels), not a flux. This is a past record, not a hazard assessment.",
+    "ja": "衛星SO₂は晴天日のみのカラム量で(1月14〜15日は有効画素なし)、放出量ではない。これは過去の記録であり、ハザード評価ではない。"
+   },
+   "figures": [
+    {
+     "label": {
+      "en": "Alert level",
+      "ja": "警戒レベル"
+     },
+     "value": 4,
+     "source": "phivolcs-bulletins",
+     "asOf": "2020-01-13",
+     "url": "https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-13-january-2020-8-00-a-m/"
+    },
+    {
+     "label": {
+      "en": "Ash top (VAAC)",
+      "ja": "火山灰の高度(VAAC)"
+     },
+     "value": 550,
+     "unit": "FL",
+     "source": "vaac-tokyo-advisories",
+     "asOf": "2020-01-12",
+     "url": "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200112_27307000_0003_Text.html"
+    },
+    {
+     "label": {
+      "en": "SO₂ mass (MSVOLSO2L4)",
+      "ja": "SO₂量(MSVOLSO2L4)"
+     },
+     "value": 170,
+     "unit": "kt",
+     "source": "nasa-msvolso2l4",
+     "asOf": "2020-01-12"
+    }
+   ]
+  }
+ ],
+ "exposure": {
+  "rings": [
+   {
+    "radiusKm": 14,
+    "population": 318177,
+    "year": 2020,
+    "source": "worldpop-100m"
+   }
+  ]
+ },
+ "provenance": {
+  "sources": [
+   {
+    "id": "s5p-offl-so2",
+    "attribution": "Contains modified Copernicus Sentinel data [Year], processed by ESA; TROPOMI SO2 retrieval Theys et al. 2017 (doi:10.5194/amt-10-119-2017). Processed in Google Earth Engine.",
+    "licence": "open: Copernicus Sentinel Data Legal Notice (free, full and open; reproduction, distribution, adaptation permitted); Earth Engine used under its noncommercial terms",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "modis-mod14a1",
+    "attribution": "Giglio, L., Justice, C. (2021). MODIS/Terra Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V061, NASA EOSDIS LP DAAC, doi:10.5067/MODIS/MOD14A1.061. Processed in Google Earth Engine.",
+    "licence": "open: NASA LP DAAC, no restrictions on subsequent use, sale, or redistribution",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "firms-modis",
+    "attribution": "We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (https://earthdata.nasa.gov/firms), part of NASA's Earth Science Data and Information System (ESDIS). MODIS Collection 6.1 active fire product (MCD14DL/MCD14ML). Processed in Google Earth Engine.",
+    "licence": "open: NASA open data (LANCE/FIRMS) provided 'as is'; the LANCE disclaimer is reproduced; the fire products are not validated for detecting volcanoes",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "usgs-comcat-ph-2010",
+    "attribution": "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/",
+    "licence": "open: U.S. public domain (USGS-authored data); credit U.S. Geological Survey",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "phivolcs-bulletins",
+    "attribution": "DOST-PHIVOLCS (Philippine Institute of Volcanology and Seismology), volcano bulletins, https://www.phivolcs.dost.gov.ph/",
+    "licence": "link-only in the canvas sense (cite every figure with its link; no bulk file). No terms stated on the site; work of the Government of the Philippines (RA 8293 s.176.1: no copyright; prior approval needed only for exploitation for profit).",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "vaac-tokyo-advisories",
+    "attribution": "Source: Japan Meteorological Agency website, Tokyo VAAC volcanic ash advisories (https://ds.data.jma.go.jp/svd/vaac/data/)",
+    "licence": "open-with-conditions: JMA website terms ('The user must cite the source when using the Content.'; compatible with CC BY 4.0)",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "dswd-dromic-reports",
+    "attribution": "DSWD DROMIC Report #N on the Taal Volcano Eruption as of <date>, https://dromic.dswd.gov.ph/",
+    "licence": "open: work of the Government of the Philippines (RA 8293 s.176.1); no site terms stated",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "gvp-eruptions-ph",
+    "attribution": "Global Volcanism Program, 2026. [Database] Volcanoes of the World (v. 5.4.0; 7 Aug 2026). Distributed by Smithsonian Institution, compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2026.5.4",
+    "licence": "open-with-conditions: Smithsonian Terms of Use (non-commercial use with citation; see gvp-volcanoes-ph)",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "nasa-msvolso2l4",
+    "attribution": "Carn, S. (2025), Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4, Goddard Earth Science Data and Information Services Center (GES DISC), doi:10.5067/MEASURES/SO2/DATA405",
+    "licence": "open: NASA full and open (CMR access constraints 'None'; EOSDIS data use guidance)",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "worldpop-100m",
+    "attribution": "WorldPop (www.worldpop.org, School of Geography and Environmental Science, University of Southampton) and CIESIN, Columbia University. Processed in Google Earth Engine.",
+    "licence": "open: CC BY 4.0",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   }
+  ],
+  "earthEngine": {
+   "assets": [
+    "COPERNICUS/S5P/OFFL/L3_SO2",
+    "MODIS/061/MOD14A1",
+    "WorldPop/GP/100m/pop"
+   ],
+   "eecuSeconds": 3.0
+  }
+ }
+}

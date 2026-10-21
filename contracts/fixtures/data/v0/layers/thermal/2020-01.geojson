@@ -1,0 +1,837 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99893,
+     14.00436
+    ]
+   },
+   "properties": {
+    "date": "2020-01-13",
+    "frp": 4.76,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.9994,
+     14.00786
+    ]
+   },
+   "properties": {
+    "date": "2020-01-13",
+    "frp": 4.76,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99542,
+     14.00844
+    ]
+   },
+   "properties": {
+    "date": "2020-01-13",
+    "frp": 4.76,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99983,
+     14.01135
+    ]
+   },
+   "properties": {
+    "date": "2020-01-13",
+    "frp": 3.31,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99586,
+     14.01193
+    ]
+   },
+   "properties": {
+    "date": "2020-01-13",
+    "frp": 3.31,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99747,
+     14.00605
+    ]
+   },
+   "properties": {
+    "date": "2020-01-14",
+    "frp": 5.08,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00275,
+     14.0101
+    ]
+   },
+   "properties": {
+    "date": "2020-01-14",
+    "frp": 5.08,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99753,
+     14.01075
+    ]
+   },
+   "properties": {
+    "date": "2020-01-14",
+    "frp": 5.08,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00005,
+     14.00686
+    ]
+   },
+   "properties": {
+    "date": "2020-01-15",
+    "frp": 2.12,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 0
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99496,
+     14.00742
+    ]
+   },
+   "properties": {
+    "date": "2020-01-15",
+    "frp": 2.12,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00166,
+     14.0096
+    ]
+   },
+   "properties": {
+    "date": "2020-01-15",
+    "frp": 2.31,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00014,
+     14.01326
+    ]
+   },
+   "properties": {
+    "date": "2020-01-15",
+    "frp": 2.12,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 0
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99579,
+     14.01011
+    ]
+   },
+   "properties": {
+    "date": "2020-01-15",
+    "frp": 2.74,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99527,
+     14.01048
+    ]
+   },
+   "properties": {
+    "date": "2020-01-15",
+    "frp": 4.0,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99639,
+     14.00835
+    ]
+   },
+   "properties": {
+    "date": "2020-01-16",
+    "frp": 14.61,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00161,
+     14.00904
+    ]
+   },
+   "properties": {
+    "date": "2020-01-16",
+    "frp": 23.25,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.8231,
+     13.92092
+    ]
+   },
+   "properties": {
+    "date": "2020-01-17",
+    "frp": 1.17,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99661,
+     14.00699
+    ]
+   },
+   "properties": {
+    "date": "2020-01-17",
+    "frp": 4.46,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00199,
+     14.00994
+    ]
+   },
+   "properties": {
+    "date": "2020-01-17",
+    "frp": 3.57,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99746,
+     14.01071
+    ]
+   },
+   "properties": {
+    "date": "2020-01-17",
+    "frp": 4.46,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.82386,
+     13.92204
+    ]
+   },
+   "properties": {
+    "date": "2020-01-18",
+    "frp": 1.88,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99912,
+     14.00656
+    ]
+   },
+   "properties": {
+    "date": "2020-01-18",
+    "frp": 2.92,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99554,
+     14.00711
+    ]
+   },
+   "properties": {
+    "date": "2020-01-18",
+    "frp": 2.92,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99966,
+     14.0099
+    ]
+   },
+   "properties": {
+    "date": "2020-01-18",
+    "frp": 2.92,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99603,
+     14.01045
+    ]
+   },
+   "properties": {
+    "date": "2020-01-18",
+    "frp": 2.92,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00018,
+     14.01323
+    ]
+   },
+   "properties": {
+    "date": "2020-01-18",
+    "frp": 2.42,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 0
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99979,
+     14.00679
+    ]
+   },
+   "properties": {
+    "date": "2020-01-19",
+    "frp": 3.57,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99589,
+     14.00731
+    ]
+   },
+   "properties": {
+    "date": "2020-01-19",
+    "frp": 4.06,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00023,
+     14.01097
+    ]
+   },
+   "properties": {
+    "date": "2020-01-19",
+    "frp": 3.57,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00258,
+     14.01049
+    ]
+   },
+   "properties": {
+    "date": "2020-01-20",
+    "frp": 2.79,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99812,
+     14.01101
+    ]
+   },
+   "properties": {
+    "date": "2020-01-20",
+    "frp": 2.79,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.82253,
+     13.92161
+    ]
+   },
+   "properties": {
+    "date": "2020-01-21",
+    "frp": 0.77,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.82458,
+     13.9234
+    ]
+   },
+   "properties": {
+    "date": "2020-01-21",
+    "frp": 1.07,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.9948,
+     14.00648
+    ]
+   },
+   "properties": {
+    "date": "2020-01-21",
+    "frp": 8.88,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.17235,
+     13.82318
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 3.4,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 0
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.8231,
+     13.9219
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 3.53,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.9989,
+     14.00728
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 9.42,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99844,
+     14.01067
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 15.39,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.82474,
+     13.92159
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 0.88,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99905,
+     14.00761
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 9.06,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99534,
+     14.00827
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 7.02,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00111,
+     14.00798
+    ]
+   },
+   "properties": {
+    "date": "2020-01-23",
+    "frp": 8.01,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 0
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.00035,
+     14.01155
+    ]
+   },
+   "properties": {
+    "date": "2020-01-23",
+    "frp": 10.4,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99892,
+     14.01172
+    ]
+   },
+   "properties": {
+    "date": "2020-01-26",
+    "frp": 3.68,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99904,
+     14.00809
+    ]
+   },
+   "properties": {
+    "date": "2020-01-26",
+    "frp": 2.88,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.99409,
+     14.00914
+    ]
+   },
+   "properties": {
+    "date": "2020-01-26",
+    "frp": 3.1,
+    "sensor": "VIIRS_SNPP_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.9981,
+     14.006
+    ]
+   },
+   "properties": {
+    "date": "2020-01-14",
+    "frp": 16.9,
+    "sensor": "MODIS_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.002,
+     14.0029
+    ]
+   },
+   "properties": {
+    "date": "2020-01-17",
+    "frp": 8.8,
+    "sensor": "MODIS_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.0,
+     14.0093
+    ]
+   },
+   "properties": {
+    "date": "2020-01-17",
+    "frp": 6.7,
+    "sensor": "MODIS_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.9923,
+     14.0083
+    ]
+   },
+   "properties": {
+    "date": "2020-01-20",
+    "frp": 20.2,
+    "sensor": "MODIS_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.9971,
+     14.0039
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 16.6,
+    "sensor": "MODIS_SP",
+    "type": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.9902,
+     14.0018
+    ]
+   },
+   "properties": {
+    "date": "2020-01-22",
+    "frp": 27.3,
+    "sensor": "MODIS_SP",
+    "type": 1
+   }
+  }
+ ]
+}

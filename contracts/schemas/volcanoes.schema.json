@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plumes.krtmtthw.dev/schemas/volcanoes.schema.json",
+  "title": "National volcano index: <version>/volcanoes.geojson",
+  "description": "A GeoJSON FeatureCollection of the 24 PHIVOLCS active volcanoes (points), with the read-model header as foreign members. The overview map loads this first.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/header" }],
+  "type": "object",
+  "required": ["type", "kind", "features"],
+  "properties": {
+    "type": { "const": "FeatureCollection" },
+    "kind": { "const": "volcanoes" },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "geometry", "properties"],
+        "properties": {
+          "type": { "const": "Feature" },
+          "id": { "type": "string" },
+          "geometry": {
+            "type": "object",
+            "required": ["type", "coordinates"],
+            "properties": {
+              "type": { "const": "Point" },
+              "coordinates": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 3 }
+            }
+          },
+          "properties": {
+            "type": "object",
+            "required": ["id", "name", "observatory", "coverage", "file"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "$ref": "common.schema.json#/$defs/localText" },
+              "gvpNumber": { "type": ["integer", "null"] },
+              "elevationM": { "type": ["number", "null"] },
+              "observatory": { "type": "boolean" },
+              "coverage": { "enum": ["deep", "satellite"] },
+              "lastEruption": {
+                "oneOf": [
+                  { "type": "null" },
+                  { "type": "object", "required": ["start"], "properties": { "start": { "type": "string" }, "vei": { "type": ["integer", "null"] } } }
+                ]
+              },
+              "eruptionsSince1900": { "type": "integer", "minimum": 0 },
+              "eruptionsSince2000": { "type": "integer", "minimum": 0 },
+              "monthly": {
+                "type": "object",
+                "description": "Optional per-month summaries for the map scrubber, keyed by series id; values[i] is month start+i",
+                "additionalProperties": {
+                  "type": "object",
+                  "required": ["start", "values"],
+                  "properties": { "start": { "$ref": "common.schema.json#/$defs/month" }, "values": { "type": "array", "items": { "type": ["number", "null"] } } }
+                }
+              },
+              "file": { "type": "string", "description": "Path of the per-volcano read model, relative to the version root" }
+            }
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}

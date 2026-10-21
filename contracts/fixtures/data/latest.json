@@ -1,0 +1,10 @@
+{
+ "schemaVersion": "1",
+ "kind": "latest",
+ "current": "v0",
+ "base": "v0/",
+ "dataAsOf": "2026-10-21",
+ "generatedAt": "2026-10-22T00:00:00Z",
+ "previous": null,
+ "fixture": true
+}

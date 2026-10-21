@@ -1,0 +1,25 @@
+id,phivolcs_name,name_ja,gvp_number,gvp_name,observatory,coverage,lat,lon,coord_source
+babuyan-claro,Babuyan Claro,バブヤン・クラロ山,274030,Babuyan Claro,false,satellite,,,gvp
+banahaw,Banahaw,バナハウ山,273050,Banahaw,false,satellite,,,gvp
+biliran,Biliran (Anas),ビリラン山,272080,Biliran,false,satellite,,,gvp
+bud-dajo,Bud Dajo,ブド・ダホ山,,,false,satellite,6.013,121.057,manual (not in GVP Holocene list; verify)
+bulusan,Bulusan,ブルサン山,273010,Bulusan,true,deep,,,gvp
+cabalian,Cabalian,カバリアン山,272050,Cabalían,false,satellite,,,gvp
+cagua,Cagua,カグア山,273090,Cagua,false,satellite,,,gvp
+camiguin-de-babuyanes,Camiguin de Babuyanes,カミギン・デ・バブヤネス山,274010,Camiguin de Babuyanes,false,satellite,,,gvp
+didicas,Didicas,ディディカス山,274020,Didicas,false,satellite,,,gvp
+hibok-hibok,Hibok-hibok,ヒボック・ヒボック山,271080,Camiguin,true,satellite,,,gvp
+iraya,Iraya,イラヤ山,274060,Iraya,false,satellite,,,gvp
+iriga,Iriga,イリガ山,273041,Iriga,false,satellite,,,gvp
+isarog,Isarog,イサログ山,273042,Isarog,false,satellite,,,gvp
+kanlaon,Kanlaon,カンラオン山,272020,Kanlaon,true,deep,,,gvp
+leonard-kniaseff,Leonard Kniaseff,レオナルド・クニアセフ山,271031,Leonard Range,false,satellite,,,gvp
+makaturing,Makaturing,マカトゥリン山,271040,Makaturing,false,satellite,,,gvp
+matutum,Matutum,マトゥトゥム山,271020,Matutum,false,satellite,,,gvp
+mayon,Mayon,マヨン山,273030,Mayon,true,deep,,,gvp
+musuan,Musuan (Calayo),ムスアン山,271070,Musuan,false,satellite,,,gvp
+parker,Parker,パーカー山,271011,Melebingoy,false,satellite,,,gvp
+pinatubo,Pinatubo,ピナツボ山,273083,Pinatubo,true,satellite,,,gvp
+ragang,Ragang,ラガン山,271060,Ragang,false,satellite,,,gvp
+smith,Smith,スミス山,,,false,satellite,19.539,121.913,manual (GVP groups it under Babuyan Claro; verify)
+taal,Taal,タール火山,273070,Taal,true,deep,,,gvp

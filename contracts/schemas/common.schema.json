@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plumes.krtmtthw.dev/schemas/common.schema.json",
+  "title": "Plumes read models: shared definitions",
+  "$defs": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "description": "ISO date (YYYY-MM-DD), Asia/Manila calendar day unless stated" },
+    "month": { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
+    "dateTime": { "type": "string", "format": "date-time" },
+    "dataVersion": { "type": "string", "pattern": "^v\\d+$", "description": "Immutable data version folder, e.g. v1" },
+    "sourceId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "An id from pipeline/sources.yaml" },
+    "localText": {
+      "type": "object",
+      "description": "Text in English and Japanese (Q16: no Filipino)",
+      "required": ["en", "ja"],
+      "properties": { "en": { "type": "string" }, "ja": { "type": "string" } },
+      "additionalProperties": false
+    },
+    "header": {
+      "type": "object",
+      "description": "Every read model starts with these fields",
+      "required": ["schemaVersion", "kind", "dataVersion", "dataAsOf", "generatedAt"],
+      "properties": {
+        "schemaVersion": { "const": "1" },
+        "kind": { "type": "string" },
+        "dataVersion": { "$ref": "#/$defs/dataVersion" },
+        "dataAsOf": { "$ref": "#/$defs/date", "description": "Snapshot date: the record ends here. Never a 'current' status (Q14)" },
+        "generatedAt": { "$ref": "#/$defs/dateTime" },
+        "fixture": { "type": "boolean", "description": "true only in hand-built contract fixtures" }
+      }
+    },
+    "figure": {
+      "type": "object",
+      "description": "One cited number. Every PHIVOLCS, VAAC and DROMIC figure carries its url (Q5 ii)",
+      "required": ["label", "value", "source"],
+      "properties": {
+        "label": { "$ref": "#/$defs/localText" },
+        "value": { "type": ["number", "string"] },
+        "unit": { "type": "string" },
+        "source": { "$ref": "#/$defs/sourceId" },
+        "url": { "type": "string", "format": "uri" },
+        "asOf": { "$ref": "#/$defs/date", "description": "The date the publisher reported the figure for" },
+        "note": { "$ref": "#/$defs/localText" }
+      },
+      "additionalProperties": false
+    },
+    "asset": {
+      "type": "object",
+      "required": ["kind", "url", "date", "credit"],
+      "properties": {
+        "kind": { "enum": ["image"] },
+        "url": { "type": "string", "description": "Relative to the data version root" },
+        "date": { "$ref": "#/$defs/date" },
+        "sensor": { "type": "string" },
+        "source": { "$ref": "#/$defs/sourceId" },
+        "caption": { "$ref": "#/$defs/localText" },
+        "credit": { "type": "string", "description": "Attribution line shown with the image" },
+        "width": { "type": "integer" },
+        "height": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["sources"],
+      "properties": {
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "attribution", "licence"],
+            "properties": {
+              "id": { "$ref": "#/$defs/sourceId" },
+              "attribution": { "type": "string" },
+              "licence": { "type": "string" },
+              "link": { "type": "string", "description": "Registry link id actually used (primary, mirror or archive)" },
+              "snapshotDate": { "$ref": "#/$defs/date" },
+              "fromArchive": { "type": "boolean", "description": "true: the app shows 'data as of <snapshotDate>'" },
+              "url": { "type": "string", "format": "uri", "description": "Publisher page to link from the Sources panel" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "earthEngine": {
+          "type": "object",
+          "properties": {
+            "assets": { "type": "array", "items": { "type": "string" } },
+            "eecuSeconds": { "type": "number" }
+          }
+        },
+        "commit": { "type": "string" }
+      }
+    }
+  }
+}

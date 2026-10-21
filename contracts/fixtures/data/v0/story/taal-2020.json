@@ -1,0 +1,462 @@
+{
+ "schemaVersion": "1",
+ "dataVersion": "v0",
+ "dataAsOf": "2026-10-21",
+ "generatedAt": "2026-10-22T00:00:00Z",
+ "fixture": true,
+ "kind": "story",
+ "id": "taal-2020",
+ "volcanoId": "taal",
+ "volcanoFile": "volcano/taal.json",
+ "title": {
+  "en": "Taal, January 2020",
+  "ja": "タール火山 2020年1月"
+ },
+ "summary": {
+  "en": "What the instruments recorded before, during and after the 12 January 2020 eruption.",
+  "ja": "2020年1月12日の噴火の前後に観測機器が記録したこと。"
+ },
+ "span": {
+  "start": "2019-12-01",
+  "end": "2020-02-15"
+ },
+ "steps": [
+  {
+   "id": "before",
+   "start": "2019-12-01",
+   "end": "2020-01-11",
+   "title": {
+    "en": "Before",
+    "ja": "噴火前"
+   },
+   "text": {
+    "en": "Alert Level 1. Satellite SO₂ near background; no USGS-located earthquakes within 30 km.",
+    "ja": "警戒レベル1。衛星SO₂は背景値付近で、30 km圏にUSGSの震源はない。"
+   },
+   "status": "draft",
+   "series": [
+    "so2_s5p_15km",
+    "eq_usgs_30km",
+    "bulletins"
+   ],
+   "figures": [],
+   "map": {
+    "center": [
+     120.9975,
+     14.0106
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "eruption",
+   "start": "2020-01-12",
+   "end": "2020-01-13",
+   "title": {
+    "en": "12–13 January",
+    "ja": "1月12〜13日"
+   },
+   "text": {
+    "en": "On 12 January 2020 PHIVOLCS raised Taal to Alert Level 4 within hours. Tokyo VAAC saw ash to about FL550 (16.8 km) on 12–13 January; TROPOMI measured an SO₂ column about 80 times the early-January background on 13 January, from only a few clear pixels. USGS located 35 earthquakes within 30 km on 12 January. GVP records the eruption as VEI 4.",
+    "ja": "2020年1月12日、PHIVOLCSは数時間のうちにタール火山の警戒レベルを4に引き上げた。東京VAACは12〜13日に高度約FL550(16.8 km)の火山灰を観測し、13日のTROPOMI SO₂カラム量は1月初旬の背景値の約80倍だった(有効画素はわずか)。USGSは12日に30 km圏で35回の地震を観測した。GVPはこの噴火をVEI 4としている。"
+   },
+   "status": "draft",
+   "series": [
+    "so2_s5p_15km",
+    "eq_usgs_30km",
+    "advisories",
+    "bulletins"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Alert level",
+      "ja": "警戒レベル"
+     },
+     "value": 4,
+     "source": "phivolcs-bulletins",
+     "asOf": "2020-01-13",
+     "url": "https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-13-january-2020-8-00-a-m/"
+    },
+    {
+     "label": {
+      "en": "Ash top (VAAC)",
+      "ja": "火山灰の高度(VAAC)"
+     },
+     "value": 550,
+     "unit": "FL",
+     "source": "vaac-tokyo-advisories",
+     "asOf": "2020-01-12",
+     "url": "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2020/20200112_27307000_0003_Text.html"
+    },
+    {
+     "label": {
+      "en": "SO₂ mass (MSVOLSO2L4)",
+      "ja": "SO₂量(MSVOLSO2L4)"
+     },
+     "value": 170,
+     "unit": "kt",
+     "source": "nasa-msvolso2l4",
+     "asOf": "2020-01-12"
+    }
+   ],
+   "map": {
+    "center": [
+     120.9975,
+     14.0106
+    ],
+    "zoom": 9,
+    "layers": [
+     "thermal-detections"
+    ],
+    "month": "2020-01"
+   }
+  },
+  {
+   "id": "people",
+   "start": "2020-01-14",
+   "end": "2020-02-07",
+   "title": {
+    "en": "People displaced",
+    "ja": "避難した人々"
+   },
+   "text": {
+    "en": "DSWD DROMIC reports counted 504,265 people affected by 7 February 2020.",
+    "ja": "DSWD DROMIC報告は2020年2月7日までに504,265人の被災者を数えた。"
+   },
+   "status": "draft",
+   "series": [
+    "displacement"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Persons affected",
+      "ja": "被災者数"
+     },
+     "value": 504265,
+     "source": "dswd-dromic-reports",
+     "asOf": "2020-02-07",
+     "url": "https://dromic.dswd.gov.ph/wp-content/uploads/2020/02/DSWD-DROMIC-Report-40-on-the-Taal-Volcano-Eruption-as-of-07-February-2020-6PM.docx"
+    }
+   ]
+  },
+  {
+   "id": "crater",
+   "start": "2019-11-19",
+   "end": "2020-01-28",
+   "title": {
+    "en": "The crater lake",
+    "ja": "火口湖"
+   },
+   "text": {
+    "en": "Sentinel-2 before and after: the main crater lake drained.",
+    "ja": "Sentinel-2の前後比較:主火口湖は干上がった。"
+   },
+   "status": "draft",
+   "series": [],
+   "figures": [],
+   "assets": [
+    {
+     "kind": "image",
+     "url": "assets/taal-before-2019-11.jpg",
+     "date": "2019-11-19",
+     "sensor": "Sentinel-2 MSI",
+     "source": "s2-sr-harmonized",
+     "caption": {
+      "en": "Before: Sentinel-2, 19 Nov 2019",
+      "ja": "噴火前:Sentinel-2、2019年11月19日"
+     },
+     "credit": "Contains modified Copernicus Sentinel data 2019",
+     "width": 640,
+     "height": 640
+    },
+    {
+     "kind": "image",
+     "url": "assets/taal-after-2020-01.jpg",
+     "date": "2020-01-28",
+     "sensor": "Sentinel-2 MSI",
+     "source": "s2-sr-harmonized",
+     "caption": {
+      "en": "After: Sentinel-2, 28 Jan 2020",
+      "ja": "噴火後:Sentinel-2、2020年1月28日"
+     },
+     "credit": "Contains modified Copernicus Sentinel data 2020",
+     "width": 640,
+     "height": 640
+    }
+   ]
+  }
+ ],
+ "winds": {
+  "source": [
+   "era5-pressure-levels"
+  ],
+  "point": [
+   121.0,
+   14.0
+  ],
+  "cols": [
+   "time",
+   "hPa",
+   "u",
+   "v",
+   "speedMs",
+   "dirToDeg"
+  ],
+  "rows": [
+   [
+    "2020-01-12T00:00Z",
+    250,
+    -3.55,
+    10.79,
+    11.4,
+    342.0
+   ],
+   [
+    "2020-01-12T00:00Z",
+    300,
+    -3.06,
+    10.22,
+    10.7,
+    343.0
+   ],
+   [
+    "2020-01-12T00:00Z",
+    500,
+    2.49,
+    1.26,
+    2.8,
+    63.0
+   ],
+   [
+    "2020-01-12T06:00Z",
+    250,
+    2.89,
+    12.07,
+    12.4,
+    13.0
+   ],
+   [
+    "2020-01-12T06:00Z",
+    300,
+    2.09,
+    10.64,
+    10.8,
+    11.0
+   ],
+   [
+    "2020-01-12T06:00Z",
+    500,
+    1.06,
+    3.53,
+    3.7,
+    17.0
+   ],
+   [
+    "2020-01-12T12:00Z",
+    250,
+    9.19,
+    11.26,
+    14.5,
+    39.0
+   ],
+   [
+    "2020-01-12T12:00Z",
+    300,
+    6.44,
+    13.23,
+    14.7,
+    26.0
+   ],
+   [
+    "2020-01-12T12:00Z",
+    500,
+    0.65,
+    5.5,
+    5.5,
+    7.0
+   ],
+   [
+    "2020-01-12T18:00Z",
+    250,
+    10.41,
+    7.16,
+    12.6,
+    56.0
+   ],
+   [
+    "2020-01-12T18:00Z",
+    300,
+    9.45,
+    9.59,
+    13.5,
+    45.0
+   ],
+   [
+    "2020-01-12T18:00Z",
+    500,
+    3.42,
+    7.04,
+    7.8,
+    26.0
+   ],
+   [
+    "2020-01-13T00:00Z",
+    250,
+    5.5,
+    11.31,
+    12.6,
+    26.0
+   ],
+   [
+    "2020-01-13T00:00Z",
+    300,
+    9.69,
+    9.09,
+    13.3,
+    47.0
+   ],
+   [
+    "2020-01-13T00:00Z",
+    500,
+    8.24,
+    2.8,
+    8.7,
+    71.0
+   ],
+   [
+    "2020-01-13T06:00Z",
+    250,
+    8.14,
+    4.3,
+    9.2,
+    62.0
+   ],
+   [
+    "2020-01-13T06:00Z",
+    300,
+    11.35,
+    0.76,
+    11.4,
+    86.0
+   ],
+   [
+    "2020-01-13T06:00Z",
+    500,
+    6.76,
+    5.71,
+    8.8,
+    50.0
+   ],
+   [
+    "2020-01-13T12:00Z",
+    250,
+    11.44,
+    4.63,
+    12.3,
+    68.0
+   ],
+   [
+    "2020-01-13T12:00Z",
+    300,
+    13.37,
+    -3.99,
+    14.0,
+    107.0
+   ],
+   [
+    "2020-01-13T12:00Z",
+    500,
+    5.79,
+    7.36,
+    9.4,
+    38.0
+   ],
+   [
+    "2020-01-13T18:00Z",
+    250,
+    13.2,
+    -0.39,
+    13.2,
+    92.0
+   ],
+   [
+    "2020-01-13T18:00Z",
+    300,
+    14.15,
+    -6.59,
+    15.6,
+    115.0
+   ],
+   [
+    "2020-01-13T18:00Z",
+    500,
+    8.44,
+    6.45,
+    10.6,
+    53.0
+   ]
+  ]
+ },
+ "provenance": {
+  "sources": [
+   {
+    "id": "phivolcs-bulletins",
+    "attribution": "DOST-PHIVOLCS (Philippine Institute of Volcanology and Seismology), volcano bulletins, https://www.phivolcs.dost.gov.ph/",
+    "licence": "link-only in the canvas sense (cite every figure with its link; no bulk file). No terms stated on the site; work of the Government of the Philippines (RA 8293 s.176.1: no copyright; prior approval needed only for exploitation for profit).",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "vaac-tokyo-advisories",
+    "attribution": "Source: Japan Meteorological Agency website, Tokyo VAAC volcanic ash advisories (https://ds.data.jma.go.jp/svd/vaac/data/)",
+    "licence": "open-with-conditions: JMA website terms ('The user must cite the source when using the Content.'; compatible with CC BY 4.0)",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "dswd-dromic-reports",
+    "attribution": "DSWD DROMIC Report #N on the Taal Volcano Eruption as of <date>, https://dromic.dswd.gov.ph/",
+    "licence": "open: work of the Government of the Philippines (RA 8293 s.176.1); no site terms stated",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "s2-sr-harmonized",
+    "attribution": "Contains modified Copernicus Sentinel data [Year]. Processed in Google Earth Engine.",
+    "licence": "open: Copernicus Sentinel Data Legal Notice",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "era5-pressure-levels",
+    "attribution": "Contains modified Copernicus Climate Change Service information [Year]. Hersbach, H., et al. (2020) doi:10.1002/qj.3803; ERA5 doi:10.24381/cds.adbb2d47. ARCO-ERA5 (Google Research) when served by it.",
+    "licence": "open: CC BY 4.0 (CDS licence since 2025-07-02; the ARCO-ERA5 copy under the Copernicus terms; the NSF NCAR copy under UCAR terms, CC BY 4.0)",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "nasa-msvolso2l4",
+    "attribution": "Carn, S. (2025), Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4, Goddard Earth Science Data and Information Services Center (GES DISC), doi:10.5067/MEASURES/SO2/DATA405",
+    "licence": "open: NASA full and open (CMR access constraints 'None'; EOSDIS data use guidance)",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "s5p-offl-so2",
+    "attribution": "Contains modified Copernicus Sentinel data [Year], processed by ESA; TROPOMI SO2 retrieval Theys et al. 2017 (doi:10.5194/amt-10-119-2017). Processed in Google Earth Engine.",
+    "licence": "open: Copernicus Sentinel Data Legal Notice (free, full and open; reproduction, distribution, adaptation permitted); Earth Engine used under its noncommercial terms",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "usgs-comcat-ph-2010",
+    "attribution": "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/",
+    "licence": "open: U.S. public domain (USGS-authored data); credit U.S. Geological Survey",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   }
+  ]
+ }
+}

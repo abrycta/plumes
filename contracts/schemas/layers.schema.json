@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plumes.krtmtthw.dev/schemas/layers.schema.json",
+  "title": "National layer manifest: <version>/layers.json",
+  "description": "Map layers by month (thermal detections, earthquakes, SO2 mosaic, hillshade). url templates are relative to the version root and may contain {month} (YYYY-MM), {year}, {z}/{x}/{y}. Fixtures use GeoJSON; published versions use PMTiles and raster tiles with the same ids.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/header" }],
+  "type": "object",
+  "required": ["kind", "layers"],
+  "properties": {
+    "kind": { "const": "layers" },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "format", "url", "sources", "attribution"],
+        "properties": {
+          "id": { "enum": ["thermal-detections", "earthquakes-usgs", "so2-monthly", "hillshade", "rings"] },
+          "title": { "$ref": "common.schema.json#/$defs/localText" },
+          "format": { "enum": ["geojson", "pmtiles", "raster-xyz", "cog"] },
+          "url": { "type": "string" },
+          "sourceLayer": { "type": "string", "description": "Vector layer name inside PMTiles" },
+          "time": {
+            "type": "object",
+            "required": ["step", "start", "end"],
+            "properties": {
+              "step": { "enum": ["month", "year", "none"] },
+              "start": { "type": "string" },
+              "end": { "type": "string" },
+              "available": { "type": "array", "items": { "type": "string" }, "description": "Present when not every step between start and end exists" }
+            }
+          },
+          "minzoom": { "type": "integer" },
+          "maxzoom": { "type": "integer" },
+          "bounds": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+          "properties": {
+            "type": "object",
+            "description": "Feature property name -> unit or meaning, for vector layers",
+            "additionalProperties": { "type": "string" }
+          },
+          "legend": {
+            "type": "object",
+            "properties": {
+              "unit": { "type": "string" },
+              "stops": { "type": "array", "items": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "string" }], "minItems": 2 } }
+            }
+          },
+          "sources": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" } },
+          "attribution": { "type": "string" },
+          "note": { "$ref": "common.schema.json#/$defs/localText" }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

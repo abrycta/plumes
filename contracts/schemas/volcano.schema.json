@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plumes.krtmtthw.dev/schemas/volcano.schema.json",
+  "title": "Per-volcano read model: <version>/volcano/<id>.json",
+  "description": "Everything the volcano page needs, in one file (target under 80 kB gzip, 120 kB for Taal, Mayon, Kanlaon, Bulusan; DECISIONS S5). Daily series are dense arrays; event series are sparse rows. A historical record only: alert levels are 'as reported by PHIVOLCS on <date>', never current.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/header" }],
+  "type": "object",
+  "required": ["kind", "volcano", "span", "daily", "events", "episodes", "readings", "exposure", "provenance"],
+  "properties": {
+    "kind": { "const": "volcano" },
+    "volcano": { "$ref": "#/$defs/volcano" },
+    "span": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": { "start": { "$ref": "common.schema.json#/$defs/date" }, "end": { "$ref": "common.schema.json#/$defs/date" } }
+    },
+    "daily": {
+      "type": "object",
+      "description": "Dense daily series keyed by series id (see contracts/README.md for the id list)",
+      "additionalProperties": { "$ref": "#/$defs/dailySeries" }
+    },
+    "events": {
+      "type": "object",
+      "description": "Sparse dated series keyed by series id",
+      "additionalProperties": { "$ref": "#/$defs/sparseSeries" }
+    },
+    "bulletins": { "oneOf": [{ "$ref": "#/$defs/bulletins" }, { "type": "null" }] },
+    "advisories": { "oneOf": [{ "$ref": "#/$defs/advisories" }, { "type": "null" }] },
+    "displacement": { "oneOf": [{ "$ref": "#/$defs/displacement" }, { "type": "null" }] },
+    "episodes": { "type": "array", "items": { "$ref": "#/$defs/episode" } },
+    "readings": { "type": "array", "items": { "$ref": "#/$defs/reading" } },
+    "exposure": { "$ref": "#/$defs/exposure" },
+    "provenance": { "$ref": "common.schema.json#/$defs/provenance" }
+  },
+  "$defs": {
+    "volcano": {
+      "type": "object",
+      "required": ["id", "name", "lat", "lon", "observatory", "coverage", "links"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Slug of the PHIVOLCS name, e.g. taal, hibok-hibok" },
+        "gvpNumber": { "type": ["integer", "null"], "description": "null for Bud Dajo and Smith (not in GVP's Holocene list)" },
+        "gvpName": { "type": ["string", "null"] },
+        "name": { "$ref": "common.schema.json#/$defs/localText" },
+        "lat": { "type": "number" },
+        "lon": { "type": "number" },
+        "elevationM": { "type": ["number", "null"] },
+        "type": { "type": ["string", "null"] },
+        "observatory": { "type": "boolean", "description": "PHIVOLCS bulletins exist for this volcano" },
+        "coverage": { "enum": ["deep", "satellite"], "description": "deep: bulletins + satellites; satellite: satellites, GVP, earthquakes and exposure only (the page says so)" },
+        "links": {
+          "type": "object",
+          "properties": {
+            "phivolcs": { "type": "string", "format": "uri" },
+            "gvp": { "type": "string", "format": "uri" },
+            "comet": { "type": "string", "format": "uri" },
+            "hazardhunter": { "type": "string", "format": "uri" }
+          }
+        }
+      }
+    },
+    "dailySeries": {
+      "type": "object",
+      "description": "values[i] is the value for start + i days; null = no valid observation",
+      "required": ["source", "unit", "label", "start", "values"],
+      "properties": {
+        "source": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" }, "minItems": 1 },
+        "unit": { "type": "string" },
+        "label": { "$ref": "common.schema.json#/$defs/localText" },
+        "start": { "$ref": "common.schema.json#/$defs/date" },
+        "ringKm": { "type": "number", "description": "Radius of the ring or half-width of the box the value is reduced over" },
+        "values": { "type": "array", "items": { "type": ["number", "null"] } },
+        "coverage": { "type": "array", "items": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }, "description": "Valid-pixel fraction per day; same length as values" },
+        "note": { "$ref": "common.schema.json#/$defs/localText" }
+      },
+      "additionalProperties": false
+    },
+    "sparseSeries": {
+      "type": "object",
+      "description": "rows[k][0] is an ISO date; the other columns follow cols",
+      "required": ["source", "label", "cols", "units", "rows"],
+      "properties": {
+        "source": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" }, "minItems": 1 },
+        "label": { "$ref": "common.schema.json#/$defs/localText" },
+        "cols": { "type": "array", "items": { "type": "string" }, "prefixItems": [{ "const": "date" }], "minItems": 2 },
+        "units": { "type": "object", "additionalProperties": { "type": "string" } },
+        "ringKm": { "type": "number" },
+        "start": { "$ref": "common.schema.json#/$defs/date", "description": "First day the instrument could report (an empty series is not 'no activity' before this)" },
+        "rows": { "type": "array", "items": { "type": "array", "minItems": 2 } },
+        "note": { "$ref": "common.schema.json#/$defs/localText" }
+      },
+      "additionalProperties": false
+    },
+    "bulletins": {
+      "type": "object",
+      "description": "PHIVOLCS bulletin readings, one row per bulletin used (at most one a day). Every row links to its bulletin (Q5 ii)",
+      "required": ["source", "authority", "cols", "rows"],
+      "properties": {
+        "source": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" } },
+        "authority": { "const": "DOST-PHIVOLCS" },
+        "cols": { "const": ["date", "alertLevel", "volcanicEq", "tremor", "so2FluxTpd", "so2FluxDate", "plumeM", "deformation", "url"] },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              { "$ref": "common.schema.json#/$defs/date" },
+              { "type": ["integer", "null"], "minimum": 0, "maximum": 5 },
+              { "type": ["integer", "null"] },
+              { "type": ["integer", "null"] },
+              { "type": ["number", "null"] },
+              { "oneOf": [{ "$ref": "common.schema.json#/$defs/date" }, { "type": "null" }] },
+              { "type": ["number", "null"] },
+              { "type": ["string", "null"] },
+              { "type": "string", "format": "uri" }
+            ],
+            "items": false,
+            "minItems": 9
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "description": "Periods with no usable bulletin (e.g. 2021-10 to 2022-06, S2)",
+          "items": { "type": "object", "required": ["start", "end", "reason"], "properties": { "start": { "type": "string" }, "end": { "type": "string" }, "reason": { "$ref": "common.schema.json#/$defs/localText" } } }
+        }
+      }
+    },
+    "advisories": {
+      "type": "object",
+      "description": "Tokyo VAAC advisories. topFl: the height in the advisory (observed by satellite, or reported by PHIVOLCS when ash was not identifiable)",
+      "required": ["source", "cols", "rows"],
+      "properties": {
+        "source": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" } },
+        "cols": { "const": ["dtg", "advisoryNo", "topFl", "heightBasis", "url"] },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              { "type": "string", "description": "Issue time, ISO UTC" },
+              { "type": "string" },
+              { "type": ["integer", "null"], "description": "Flight level (hundreds of ft)" },
+              { "enum": ["observed", "reported", "none"] },
+              { "type": "string", "format": "uri" }
+            ],
+            "items": false,
+            "minItems": 5
+          }
+        }
+      }
+    },
+    "displacement": {
+      "type": "object",
+      "description": "DSWD DROMIC report grand totals",
+      "required": ["source", "cols", "rows"],
+      "properties": {
+        "source": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" } },
+        "cols": { "const": ["asOf", "report", "affectedPersons", "insidePersonsNow", "insidePersonsCum", "outsidePersonsNow", "outsidePersonsCum", "url"] },
+        "rows": { "type": "array", "items": { "type": "array", "minItems": 8, "maxItems": 8 } }
+      }
+    },
+    "episode": {
+      "type": "object",
+      "required": ["id", "kind", "start", "source"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "enum": ["gvp_eruption", "alert_window", "strong_degassing"] },
+        "start": { "type": "string", "description": "YYYY, YYYY-MM or YYYY-MM-DD (GVP dates can be partial)" },
+        "end": { "type": ["string", "null"] },
+        "startUncertaintyDays": { "type": ["integer", "null"] },
+        "vei": { "type": ["integer", "null"] },
+        "so2MassKt": { "type": ["number", "null"], "description": "MSVOLSO2L4" },
+        "plumeAltKm": { "type": ["number", "null"], "description": "MSVOLSO2L4" },
+        "maxAlert": { "type": ["integer", "null"] },
+        "source": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" } },
+        "url": { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": false
+    },
+    "reading": {
+      "type": "object",
+      "description": "A plain-language reading of one window: what each instrument saw and what it cannot say. Never a forecast",
+      "required": ["id", "start", "end", "status", "text", "figures"],
+      "properties": {
+        "id": { "type": "string" },
+        "episodeId": { "type": "string" },
+        "start": { "$ref": "common.schema.json#/$defs/date" },
+        "end": { "$ref": "common.schema.json#/$defs/date" },
+        "status": { "enum": ["draft", "reviewed"], "description": "draft until Kurt has reviewed the EN and JA text" },
+        "text": { "$ref": "common.schema.json#/$defs/localText" },
+        "limits": { "$ref": "common.schema.json#/$defs/localText" },
+        "figures": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/figure" } }
+      },
+      "additionalProperties": false
+    },
+    "exposure": {
+      "type": "object",
+      "required": ["rings"],
+      "properties": {
+        "rings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["radiusKm", "population", "year", "source"],
+            "properties": {
+              "radiusKm": { "type": "number" },
+              "population": { "type": "number" },
+              "year": { "type": "integer" },
+              "source": { "$ref": "common.schema.json#/$defs/sourceId" }
+            }
+          }
+        },
+        "comparisons": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/figure" }, "description": "Official figures shown beside the modelled count (e.g. OCHA's 459,300 within 14 km of Taal)" },
+        "lgus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["pcode", "name", "distanceKm"],
+            "properties": { "pcode": { "type": "string" }, "name": { "type": "string" }, "province": { "type": "string" }, "distanceKm": { "type": "number" } }
+          }
+        }
+      }
+    }
+  }
+}

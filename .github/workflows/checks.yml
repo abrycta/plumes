@@ -1,0 +1,44 @@
+name: Checks
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+concurrency: { group: "checks-${{ github.ref }}", cancel-in-progress: true }
+jobs:
+  pipeline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with: { enable-cache: true, cache-dependency-glob: pipeline/uv.lock }
+      - name: Lint and test (without the private kit)
+        working-directory: pipeline
+        run: |
+          uv sync --locked --no-group sources
+          uv run ruff check .
+          uv run pytest -q
+      - id: token
+        env: { T: "${{ secrets.ARCHIVE_READ_TOKEN }}" }
+        run: |
+          if [ -z "$T" ]; then
+            echo "::notice title=registry check skipped::ARCHIVE_READ_TOKEN is not available (fork PR or not created yet); the private archivekit can't be installed."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else echo "ok=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Validate the source registry
+        if: steps.token.outputs.ok == 'true' && hashFiles('pipeline/sources.yaml') != ''
+        env: { ARCHIVE_READ_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}" }
+        working-directory: pipeline
+        run: |
+          git config --global url."https://x-access-token:${ARCHIVE_READ_TOKEN}@github.com/abrycta/data-archive-kit".insteadOf "https://github.com/abrycta/data-archive-kit"
+          uv sync --locked --group sources
+          uv run archivekit validate-registry --registry sources.yaml
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with: { node-version: 24 }
+      - name: Typecheck the TypeScript read-model types
+        run: npx -y -p typescript@5.9.3 tsc --noEmit --strict --target es2022 contracts/ts/readmodels.ts

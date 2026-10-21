@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plumes.krtmtthw.dev/schemas/story.schema.json",
+  "title": "Story read model: <version>/story/<id>.json",
+  "description": "A dated, stepped story (Taal January 2020 at M1, Kanlaon 2024 at M1.1). Steps reference series ids of the volcano read model, so the page shows the same data the volcano view does.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/header" }],
+  "type": "object",
+  "required": ["kind", "id", "volcanoId", "title", "span", "steps", "provenance"],
+  "properties": {
+    "kind": { "const": "story" },
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "volcanoId": { "type": "string" },
+    "volcanoFile": { "type": "string", "description": "Path of the volcano read model the steps refer to" },
+    "title": { "$ref": "common.schema.json#/$defs/localText" },
+    "summary": { "$ref": "common.schema.json#/$defs/localText" },
+    "span": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": { "start": { "$ref": "common.schema.json#/$defs/date" }, "end": { "$ref": "common.schema.json#/$defs/date" } }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "start", "end", "title", "text", "series", "figures"],
+        "properties": {
+          "id": { "type": "string" },
+          "start": { "$ref": "common.schema.json#/$defs/date" },
+          "end": { "$ref": "common.schema.json#/$defs/date" },
+          "title": { "$ref": "common.schema.json#/$defs/localText" },
+          "text": { "$ref": "common.schema.json#/$defs/localText" },
+          "status": { "enum": ["draft", "reviewed"] },
+          "series": { "type": "array", "items": { "type": "string" }, "description": "Series ids (daily/events keys, or 'bulletins', 'advisories', 'displacement') to show" },
+          "figures": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/figure" } },
+          "assets": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/asset" } },
+          "map": {
+            "type": "object",
+            "properties": {
+              "center": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "[lon, lat]" },
+              "zoom": { "type": "number" },
+              "layers": { "type": "array", "items": { "type": "string" } },
+              "month": { "$ref": "common.schema.json#/$defs/month" }
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "winds": {
+      "type": "object",
+      "description": "ERA5 pressure-level winds at the volcano, for the wind arrows",
+      "required": ["source", "point", "cols", "rows"],
+      "properties": {
+        "source": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" } },
+        "point": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "[lon, lat] of the grid point" },
+        "cols": { "const": ["time", "hPa", "u", "v", "speedMs", "dirToDeg"] },
+        "rows": { "type": "array", "items": { "type": "array", "minItems": 6, "maxItems": 6 } }
+      }
+    },
+    "provenance": { "$ref": "common.schema.json#/$defs/provenance" }
+  }
+}

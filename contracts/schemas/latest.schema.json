@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plumes.krtmtthw.dev/schemas/latest.schema.json",
+  "title": "Data version pointer: latest.json, and the per-version manifest.json",
+  "description": "latest.json sits at the data root and is flipped only after every check passes (archiving standard §5). The app reads it first, then fetches files under '<base>'. Rollback = point it back.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["schemaVersion", "kind", "current", "base", "dataAsOf", "generatedAt"],
+      "properties": {
+        "schemaVersion": { "const": "1" },
+        "kind": { "const": "latest" },
+        "current": { "$ref": "common.schema.json#/$defs/dataVersion" },
+        "base": { "type": "string", "pattern": "^v\\d+/$" },
+        "dataAsOf": { "$ref": "common.schema.json#/$defs/date" },
+        "generatedAt": { "$ref": "common.schema.json#/$defs/dateTime" },
+        "previous": { "type": ["string", "null"] },
+        "mirrors": { "type": "array", "items": { "type": "string", "format": "uri" }, "description": "Base URLs serving the same files (GitHub Pages primary, Hugging Face fallback)" },
+        "fixture": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    {
+      "allOf": [{ "$ref": "common.schema.json#/$defs/header" }],
+      "type": "object",
+      "required": ["kind", "files", "checks"],
+      "properties": {
+        "kind": { "const": "manifest" },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "bytes", "sha256"],
+            "properties": { "path": { "type": "string" }, "bytes": { "type": "integer" }, "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+          }
+        },
+        "checks": {
+          "type": "object",
+          "required": ["passed"],
+          "properties": { "passed": { "type": "boolean" }, "results": { "type": "array", "items": { "type": "object" } } }
+        },
+        "provenance": { "$ref": "common.schema.json#/$defs/provenance" },
+        "archivekit": { "type": "object", "description": "archivekit.data_version_metadata output" }
+      }
+    }
+  ]
+}

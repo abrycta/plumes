@@ -1,0 +1,37 @@
+[project]
+name = "plumes-pipeline"
+version = "0.1.0"
+description = "Plumes data pipeline: sources (archivekit), crawlers, Earth Engine reductions, read models"
+authors = [{ name = "Kurt" }]
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "httpx>=0.28",
+    "pyyaml>=6",
+    "jsonschema>=4.25",
+    "referencing>=0.36",
+    "lxml>=6",
+    "python-docx>=1.2",
+    "certifi>=2025.1",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.13", "pytest>=8.4"]
+# archivekit (private kit, pinned tag): installing it needs ARCHIVE_READ_TOKEN in CI (DATA-ARCHIVING.md §6)
+sources = ["archivekit"]
+# Earth Engine reductions (GitHub Actions only)
+ee = ["earthengine-api>=1.6"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.sources]
+archivekit = { git = "https://github.com/abrycta/data-archive-kit", rev = "v1.1.0" }
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["scripts/build_fixtures.py"]

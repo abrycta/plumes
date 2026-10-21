@@ -1,0 +1,698 @@
+{
+ "schemaVersion": "1",
+ "dataVersion": "v0",
+ "dataAsOf": "2026-10-21",
+ "generatedAt": "2026-10-22T00:00:00Z",
+ "fixture": true,
+ "kind": "volcanoes",
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "id": "babuyan-claro",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.95,
+     19.524
+    ]
+   },
+   "properties": {
+    "id": "babuyan-claro",
+    "name": {
+     "en": "Babuyan Claro",
+     "ja": "バブヤン・クラロ山"
+    },
+    "gvpNumber": 274030,
+    "elevationM": 1064.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1924-07-02",
+     "vei": 2
+    },
+    "eruptionsSince1900": 6,
+    "eruptionsSince2000": 0,
+    "file": "volcano/babuyan-claro.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "banahaw",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.48,
+     14.07
+    ]
+   },
+   "properties": {
+    "id": "banahaw",
+    "name": {
+     "en": "Banahaw",
+     "ja": "バナハウ山"
+    },
+    "gvpNumber": 273050,
+    "elevationM": 2158.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1909-07-02",
+     "vei": null
+    },
+    "eruptionsSince1900": 1,
+    "eruptionsSince2000": 0,
+    "file": "volcano/banahaw.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "biliran",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     124.535,
+     11.523
+    ]
+   },
+   "properties": {
+    "id": "biliran",
+    "name": {
+     "en": "Biliran (Anas)",
+     "ja": "ビリラン山"
+    },
+    "gvpNumber": 272080,
+    "elevationM": 1301.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1939-09-26",
+     "vei": 1
+    },
+    "eruptionsSince1900": 1,
+    "eruptionsSince2000": 0,
+    "file": "volcano/biliran.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "bud-dajo",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.057,
+     6.013
+    ]
+   },
+   "properties": {
+    "id": "bud-dajo",
+    "name": {
+     "en": "Bud Dajo",
+     "ja": "ブド・ダホ山"
+    },
+    "gvpNumber": null,
+    "elevationM": null,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": null,
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/bud-dajo.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "bulusan",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     124.056,
+     12.769
+    ]
+   },
+   "properties": {
+    "id": "bulusan",
+    "name": {
+     "en": "Bulusan",
+     "ja": "ブルサン山"
+    },
+    "gvpNumber": 273010,
+    "elevationM": 1535.0,
+    "observatory": true,
+    "coverage": "deep",
+    "lastEruption": {
+     "start": "2025-04-28",
+     "vei": 2
+    },
+    "eruptionsSince1900": 19,
+    "eruptionsSince2000": 9,
+    "file": "volcano/bulusan.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "cabalian",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     125.218,
+     10.285
+    ]
+   },
+   "properties": {
+    "id": "cabalian",
+    "name": {
+     "en": "Cabalian",
+     "ja": "カバリアン山"
+    },
+    "gvpNumber": 272050,
+    "elevationM": 912.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1820-07-02",
+     "vei": null
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/cabalian.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "cagua",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     122.123,
+     18.222
+    ]
+   },
+   "properties": {
+    "id": "cagua",
+    "name": {
+     "en": "Cagua",
+     "ja": "カグア山"
+    },
+    "gvpNumber": 273090,
+    "elevationM": 1133.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1860-10-16",
+     "vei": 2
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/cagua.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "camiguin-de-babuyanes",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.86,
+     18.83
+    ]
+   },
+   "properties": {
+    "id": "camiguin-de-babuyanes",
+    "name": {
+     "en": "Camiguin de Babuyanes",
+     "ja": "カミギン・デ・バブヤネス山"
+    },
+    "gvpNumber": 274010,
+    "elevationM": 712.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1857-07-02",
+     "vei": 2
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/camiguin-de-babuyanes.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "didicas",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     122.202,
+     19.077
+    ]
+   },
+   "properties": {
+    "id": "didicas",
+    "name": {
+     "en": "Didicas",
+     "ja": "ディディカス山"
+    },
+    "gvpNumber": 274020,
+    "elevationM": 228.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1978-01-06",
+     "vei": 2
+    },
+    "eruptionsSince1900": 4,
+    "eruptionsSince2000": 0,
+    "file": "volcano/didicas.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "hibok-hibok",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     124.673,
+     9.203
+    ]
+   },
+   "properties": {
+    "id": "hibok-hibok",
+    "name": {
+     "en": "Hibok-hibok",
+     "ja": "ヒボック・ヒボック山"
+    },
+    "gvpNumber": 271080,
+    "elevationM": 1552.0,
+    "observatory": true,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1948-09-01",
+     "vei": 3
+    },
+    "eruptionsSince1900": 1,
+    "eruptionsSince2000": 0,
+    "file": "volcano/hibok-hibok.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "iraya",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     122.01,
+     20.469
+    ]
+   },
+   "properties": {
+    "id": "iraya",
+    "name": {
+     "en": "Iraya",
+     "ja": "イラヤ山"
+    },
+    "gvpNumber": 274060,
+    "elevationM": 1009.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1454",
+     "vei": null
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/iraya.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "iriga",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     123.451,
+     13.458
+    ]
+   },
+   "properties": {
+    "id": "iriga",
+    "name": {
+     "en": "Iriga",
+     "ja": "イリガ山"
+    },
+    "gvpNumber": 273041,
+    "elevationM": 1138.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": null,
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/iriga.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "isarog",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     123.38,
+     13.658
+    ]
+   },
+   "properties": {
+    "id": "isarog",
+    "name": {
+     "en": "Isarog",
+     "ja": "イサログ山"
+    },
+    "gvpNumber": 273042,
+    "elevationM": 1966.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "-3500",
+     "vei": null
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/isarog.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "kanlaon",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     123.13,
+     10.4096
+    ]
+   },
+   "properties": {
+    "id": "kanlaon",
+    "name": {
+     "en": "Kanlaon",
+     "ja": "カンラオン山"
+    },
+    "gvpNumber": 272020,
+    "elevationM": 2422.0,
+    "observatory": true,
+    "coverage": "deep",
+    "lastEruption": {
+     "start": "2024-10-19",
+     "vei": 3
+    },
+    "eruptionsSince1900": 28,
+    "eruptionsSince2000": 8,
+    "file": "volcano/kanlaon.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "leonard-kniaseff",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     126.047,
+     7.382
+    ]
+   },
+   "properties": {
+    "id": "leonard-kniaseff",
+    "name": {
+     "en": "Leonard Kniaseff",
+     "ja": "レオナルド・クニアセフ山"
+    },
+    "gvpNumber": 271031,
+    "elevationM": 1080.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "80",
+     "vei": null
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/leonard-kniaseff.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "makaturing",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     124.317,
+     7.644
+    ]
+   },
+   "properties": {
+    "id": "makaturing",
+    "name": {
+     "en": "Makaturing",
+     "ja": "マカトゥリン山"
+    },
+    "gvpNumber": 271040,
+    "elevationM": 1818.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1882-07-02",
+     "vei": null
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/makaturing.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "matutum",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     125.0765,
+     6.3604
+    ]
+   },
+   "properties": {
+    "id": "matutum",
+    "name": {
+     "en": "Matutum",
+     "ja": "マトゥトゥム山"
+    },
+    "gvpNumber": 271020,
+    "elevationM": 2262.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1911-03-07",
+     "vei": null
+    },
+    "eruptionsSince1900": 1,
+    "eruptionsSince2000": 0,
+    "file": "volcano/matutum.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "mayon",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     123.685,
+     13.257
+    ]
+   },
+   "properties": {
+    "id": "mayon",
+    "name": {
+     "en": "Mayon",
+     "ja": "マヨン山"
+    },
+    "gvpNumber": 273030,
+    "elevationM": 2462.0,
+    "observatory": true,
+    "coverage": "deep",
+    "lastEruption": {
+     "start": "2026-01-06",
+     "vei": null
+    },
+    "eruptionsSince1900": 31,
+    "eruptionsSince2000": 18,
+    "file": "volcano/mayon.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "musuan",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     125.0697,
+     7.8765
+    ]
+   },
+   "properties": {
+    "id": "musuan",
+    "name": {
+     "en": "Musuan (Calayo)",
+     "ja": "ムスアン山"
+    },
+    "gvpNumber": 271070,
+    "elevationM": 610.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1886-12-31",
+     "vei": 1
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/musuan.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "parker",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     124.892,
+     6.113
+    ]
+   },
+   "properties": {
+    "id": "parker",
+    "name": {
+     "en": "Parker",
+     "ja": "パーカー山"
+    },
+    "gvpNumber": 271011,
+    "elevationM": 1824.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1640-12-26",
+     "vei": 5
+    },
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/parker.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "pinatubo",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.35,
+     15.13
+    ]
+   },
+   "properties": {
+    "id": "pinatubo",
+    "name": {
+     "en": "Pinatubo",
+     "ja": "ピナツボ山"
+    },
+    "gvpNumber": 273083,
+    "elevationM": 1486.0,
+    "observatory": true,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "2021-11-30",
+     "vei": 1
+    },
+    "eruptionsSince1900": 4,
+    "eruptionsSince2000": 1,
+    "file": "volcano/pinatubo.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "ragang",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     124.507,
+     7.691
+    ]
+   },
+   "properties": {
+    "id": "ragang",
+    "name": {
+     "en": "Ragang",
+     "ja": "ラガン山"
+    },
+    "gvpNumber": 271060,
+    "elevationM": 2790.0,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": {
+     "start": "1916-07-16",
+     "vei": 1
+    },
+    "eruptionsSince1900": 2,
+    "eruptionsSince2000": 0,
+    "file": "volcano/ragang.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "smith",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.913,
+     19.539
+    ]
+   },
+   "properties": {
+    "id": "smith",
+    "name": {
+     "en": "Smith",
+     "ja": "スミス山"
+    },
+    "gvpNumber": null,
+    "elevationM": null,
+    "observatory": false,
+    "coverage": "satellite",
+    "lastEruption": null,
+    "eruptionsSince1900": 0,
+    "eruptionsSince2000": 0,
+    "file": "volcano/smith.json"
+   }
+  },
+  {
+   "type": "Feature",
+   "id": "taal",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.9975,
+     14.0106
+    ]
+   },
+   "properties": {
+    "id": "taal",
+    "name": {
+     "en": "Taal",
+     "ja": "タール火山"
+    },
+    "gvpNumber": 273070,
+    "elevationM": 311.0,
+    "observatory": true,
+    "coverage": "deep",
+    "lastEruption": {
+     "start": "2024-04-12",
+     "vei": 2
+    },
+    "eruptionsSince1900": 16,
+    "eruptionsSince2000": 5,
+    "file": "volcano/taal.json"
+   }
+  }
+ ]
+}
