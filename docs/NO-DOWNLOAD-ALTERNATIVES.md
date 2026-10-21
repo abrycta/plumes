@@ -1,5 +1,7 @@
 # Twenty sources, queried in place
 
+**Decided 2026-10-21:** Kurt accepted the 20 (DECISIONS.md Q30), with Black Marble and the Lights poverty join at M1.1, and added four more from NASA-EE-CANDIDATES.md (Q31): 24 sources. The text below is kept as the proposal it was.
+
 Status: 2026-10-21, a proposal for Kurt (OPEN-QUESTIONS.md **Q30**); nothing here is decided, and [DECISIONS.md](DECISIONS.md) is unchanged. Kurt's brief, in two steps the same day: first "look for alternative databases that do not require downloads", then **Plumes should have 20 sources in total**, chosen to prefer query-in-place access (Earth Engine, APIs, cloud-optimised remote reads), all free, with the Taal January 2020 story and the overview map of all 24 volcanoes still working end to end.
 
 The 20 are marked in [sources-draft.yaml](sources-draft.yaml) with a `# proposed_keep: true` comment under their id. The registry schema allows no extra fields, so the mark is a comment, and the registry still validates (`archivekit validate-registry`: no problems). No other entry is changed or deleted. Every access route marked "tested" was probed live on 2026-10-21 with a small query; samples stay in the session scratchpad, not in the repo. **[U]** marks an estimate.

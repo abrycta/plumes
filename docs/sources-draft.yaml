@@ -16,10 +16,11 @@
 # or too big to archive, >= 2 automatic links; `update-input` = read by the pipeline's own client (crawled pages,
 # hand-downloaded files adopted as private archive releases, authenticated downloads). Rasters are never archived.
 # PHIVOLCS: public pages only, every figure cited with its link, no bulk file published, no email (Q5 = ii).
-# PROPOSAL (2026-10-21, OPEN-QUESTIONS Q30, not decided): Kurt asked for 20 sources in total, query-in-place where possible.
-# The proposed 20 (21 entries: USGS ComCat is one source split in two for the 20,000-event cap) carry the comment
-# `# proposed_keep: true` under their id. The schema allows no extra fields, so the mark is a comment; nothing else is
-# deleted or changed. The access-method changes for the kept entries are in NO-DOWNLOAD-ALTERNATIVES.md.
+# DECIDED (2026-10-21, DECISIONS.md Q30, Q31): Plumes uses 24 sources (25 with M1.1), query-in-place where possible:
+# the 20 of NO-DOWNLOAD-ALTERNATIVES.md plus OMI SO2, MSVOLSO2L4, Landsat and Sentinel-1 (NASA-EE-CANDIDATES.md A1-A4),
+# and Google Open Buildings Temporal (A5) at M1.1. They carry the comment `# chosen: true` under their id with the
+# source number and milestone (27 entries: USGS and Landsat are each one source split in two). The schema allows no
+# extra fields, so the mark is a comment. Every unmarked entry is out of scope (Q30) and kept as history.
 version: 1
 project: plumes
 
@@ -43,7 +44,7 @@ sources:
   # =================================================================== CORE RECORD (M1)
   # ------------------------------------------------------------------ eruption history (Smithsonian GVP, WFS)
   - id: gvp-volcanoes-ph
-    # proposed_keep: true   # source 1 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 1 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] Smithsonian Global Volcanism Program, Volcanoes of the World: Holocene volcanoes with Country = Philippines
       (23 rows on 2026-10-21) as CSV from the GVP GeoServer WFS. Supplies GVP numbers, coordinates, elevation,
@@ -82,7 +83,7 @@ sources:
     archived: { enabled: true, retention: all, max_age_days: 400 }
 
   - id: gvp-eruptions-ph
-    # proposed_keep: true   # source 2 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 2 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] Smithsonian GVP Holocene eruptions for the Philippine volcano numbers (271000-274999; 233 rows on
       2026-10-21): VEI, start and end dates with explicit uncertainty fields and modifiers, evidence method.
@@ -145,7 +146,7 @@ sources:
 
   # ------------------------------------------------------------------ earthquakes: USGS ComCat (public domain)
   - id: usgs-comcat-ph-1900-2009
-    # proposed_keep: true   # source 5 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 5 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] USGS ComCat events in the Philippine box (4-22 N, 116-128 E) 1900-01-01 to 2009-12-31 as FDSN CSV
       (15,738 events on 2026-10-21; the service caps a query at 20,000). Pre-1970 rows are mostly ISC-GEM imports.
@@ -174,7 +175,7 @@ sources:
     archived: { enabled: true, retention: all }
 
   - id: usgs-comcat-ph-2010
-    # proposed_keep: true   # source 5 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 5 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] USGS ComCat events in the Philippine box from 2010-01-01 to the fetch date as FDSN CSV (11,594 events on
       2026-10-21). Split from the 1900-2009 file so both stay under the 20,000-event cap; a yearly split is
@@ -205,11 +206,14 @@ sources:
 
   # ------------------------------------------------------------------ boundaries and codes (shared with Lights and Replay)
   - id: cod-ab-phl-gdb
-    # proposed_keep: true   # source 14 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 14 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] OCHA/NAMRIA/PSA Common Operational Dataset, Philippines administrative boundaries levels 0-4 (v03, file
       geodatabase, about 361 MB; HDX resources modified 2026-05-28). Used for "LGUs within N km" and the map
-      boundaries; the same file Lights uses (../../lgu-lights/pipeline/sources.yaml). Format: zip (gdb). Auth: none.
+      boundaries; the same file Lights uses (../../lgu-lights/pipeline/sources.yaml). Decided (Q30): the pipeline reads
+      only the member phl_admin3.dbf of the hdx-shp zip by HTTP range (119,401 bytes: 1,642 LGUs with adm3_pcode,
+      names, area, centre); the gdb entry below stays until the range-read hook replaces it (spike item 21).
+      Format: zip (gdb). Auth: none.
     kind: file
     format: zip
     filename: phl_admin_boundaries.gdb.zip
@@ -262,7 +266,7 @@ sources:
 
   # ------------------------------------------------------------------ PHIVOLCS pages (crawled by the pipeline; DATA-PLAN.md §3, Q5 = ii)
   - id: phivolcs-bulletins
-    # proposed_keep: true   # source 3 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 3 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] DOST-PHIVOLCS daily volcano bulletins and eruption bulletins on the WordPress site: HTML prose from
       2017-09-02 (category listing paginates to page 1,498 on 2026-10-21); 2025+ "Summary of 24Hr Observation"
@@ -290,7 +294,7 @@ sources:
     archived: { enabled: false }            # raw bundles are adopted per crawl by the pipeline (not fetched by the kit)
 
   - id: phivolcs-lava-bulletins
-    # proposed_keep: true   # source 4 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 4 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] DOST-PHIVOLCS LAVA portal 24-hour volcano bulletins, structured HTML by id
       (/bulletin/activity-{tvo,mvo,kvo,bvo}?bid=N&lang=en; id 1000 = 2022-04-02, id 16917 = 2026-10-21; ids are not
@@ -339,7 +343,7 @@ sources:
 
   # ------------------------------------------------------------------ satellite rasters on Earth Engine (never downloaded or archived)
   - id: s5p-offl-so2
-    # proposed_keep: true   # source 6 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 6 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] Copernicus / ESA Sentinel-5P TROPOMI offline L3 SO2 (COPERNICUS/S5P/OFFL/L3_SO2), 2018-12-05 onward,
       1,113 m, one image per orbit; bands SO2_column_number_density (ground-level a priori),
@@ -363,12 +367,13 @@ sources:
     archived: { enabled: false }
 
   - id: firms-modis
-    # proposed_keep: true   # source 8 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 8 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] NASA FIRMS (LANCE) MODIS active fire and thermal anomalies on Earth Engine (collection FIRMS, 1 km daily,
       2000-11-01 onward; bands T21, confidence). Counted per volcano ring and day as "thermal detections (includes
-      vegetation fires)". The standard-quality archive CSV with the `type` attribute (1 = active volcano) is requested
-      through the FIRMS download tool (Earthdata login or emailed code); the area API needs a free MAP_KEY
+      vegetation fires)". Decided (Q30): the national detections layer comes from the FIRMS area API
+      (.../api/area/csv/<MAP_KEY>/{MODIS_SP,VIIRS_SNPP_SP}/116,4,128,22/5/<date>, 5 days per call) instead of the
+      emailed archive download; whether the SP CSV carries `type` (1 = active volcano) is spike item 19. The API needs a free MAP_KEY
       (Kurt's action; GitHub secret FIRMS_MAP_KEY; 5,000 transactions per 10 minutes). Format: EE; CSV. Size: a
       Philippine-box VIIRS day is 50-500 kB [U]; a volcano-month under 100 kB [U]. Auth: Earth Engine service account; MAP_KEY.
     kind: remote-dataset
@@ -388,7 +393,7 @@ sources:
     archived: { enabled: false }
 
   - id: modis-mod14a1
-    # proposed_keep: true   # source 9 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 9 of 24, M1 (DECISIONS.md Q30)
     description: "[M1] NASA LP DAAC MODIS Terra thermal anomalies and fire daily L3 1 km (MODIS/061/MOD14A1), 2000-02-24 onward; FireMask classes 7-9 and MaxFRP, reduced per ring in Earth Engine. Terra's end of science is expected in 2027. Format: EE. Size: per-volcano daily rows only. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: NASA LP DAAC, no restrictions on subsequent use, sale, or redistribution"
@@ -406,7 +411,7 @@ sources:
     archived: { enabled: false }
 
   - id: viirs-vnp14a1
-    # proposed_keep: true   # source 10 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 10 of 24, M1 (DECISIONS.md Q30)
     description: "[M1] NASA LP DAAC VIIRS S-NPP thermal anomalies and fire daily L3 1 km (NASA/VIIRS/002/VNP14A1), 2012-01-19 onward, reduced per ring in Earth Engine. S-NPP deliveries end 2026-11-02; NOAA-20 (VJ114A1) is the continuity series and is checked by the spike. Format: EE. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: NASA open data (LP DAAC); cite when publishing"
@@ -424,8 +429,8 @@ sources:
     archived: { enabled: false }
 
   - id: worldpop-100m
-    # proposed_keep: true   # source 13 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
-    description: "[M1] WorldPop (University of Southampton) 100 m population counts (WorldPop/GP/100m/pop on Earth Engine, 2000-2020; the Global 2 R2024B/R2025A PHL GeoTIFFs for 2021 onward), reduced to population within 5/10/15/30 km rings and the PDZ per volcano, once per year. Format: EE. Size: 24 x rings x years rows. Auth: Earth Engine service account."
+    # chosen: true   # source 13 of 24, M1 (DECISIONS.md Q30)
+    description: "[M1] WorldPop (University of Southampton) 100 m population counts (WorldPop/GP/100m/pop on Earth Engine, 2000-2020; Global 2, 2015-2030, from the Earth Engine community catalogue asset projects/sat-io/open-datasets/WORLDPOP/pop instead of the GeoTIFF download, Q30; which release it holds is spike item 20), reduced to population within 5/10/15/30 km rings and the PDZ per volcano, once per year. Format: EE. Size: 24 x rings x years rows. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: CC BY 4.0"
     attribution: "WorldPop (www.worldpop.org, School of Geography and Environmental Science, University of Southampton) and CIESIN, Columbia University. Processed in Google Earth Engine."
@@ -476,7 +481,7 @@ sources:
     archived: { enabled: false }
 
   - id: copernicus-dem-glo30
-    # proposed_keep: true   # source 15 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 15 of 24, M1 (DECISIONS.md Q30)
     description: "[M1] Copernicus DEM GLO-30 (COPERNICUS/DEM/GLO30_2024_1 on Earth Engine; the older GLO30 asset is superseded), 30 m, for hillshade, ring terrain and profiles. Format: EE; hillshade tiles for the map. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open-with-conditions: Copernicus DEM free licence with the mandatory notice; (c) DLR e.V. 2010-2014 and (c) Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved"
@@ -521,7 +526,7 @@ sources:
     archived: { enabled: false }
 
   - id: s5p-offl-aer-ai
-    # proposed_keep: true   # source 7 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 7 of 24, M2 (DECISIONS.md Q30)
     description: "[M2] Copernicus / ESA Sentinel-5P TROPOMI UV aerosol index (COPERNICUS/S5P/OFFL/L3_AER_AI), 2018-07-04 onward, 1,113 m; band absorbing_aerosol_index. Reduced per volcano box and day in Earth Engine for the plume track (ash and aerosol). Format: EE. Size: per-volcano daily rows. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: Copernicus Sentinel Data Legal Notice"
@@ -556,7 +561,7 @@ sources:
     archived: { enabled: false }
 
   - id: vaac-tokyo-advisories
-    # proposed_keep: true   # source 11 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 11 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] Japan Meteorological Agency, Tokyo VAAC volcanic ash advisories (the Philippines north of 10 N is in
       Tokyo's area, not Darwin's: ICAO FASID Table MET 3B; Taal, Mayon, Kanlaon and Bulusan are Tokyo's). Access:
@@ -628,7 +633,7 @@ sources:
     archived: { enabled: false }
 
   - id: era5-pressure-levels
-    # proposed_keep: true   # source 17 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 17 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] ECMWF / Copernicus Climate Change Service ERA5 hourly winds on pressure levels (u and v at 250, 300, 500
       and 700 hPa) over each volcano for story days: why the plume and vog went where they did. Read as small windows
@@ -703,7 +708,7 @@ sources:
     archived: { enabled: false }
 
   - id: s2-sr-harmonized
-    # proposed_keep: true   # source 16 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 16 of 24, M1 (DECISIONS.md Q30)
     description: "[M1] Copernicus / ESA Sentinel-2 L2A surface reflectance (COPERNICUS/S2_SR_HARMONIZED), 2017-03-28 onward, 10 m (B4, B8): least-cloudy composites for the before/after strip (getThumbURL at 1024 px, four dates per story), crater-lake area and NDVI loss within 10 km. Format: EE; PNG thumbnails about 300 kB each [U]. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: Copernicus Sentinel Data Legal Notice"
@@ -720,7 +725,8 @@ sources:
     archived: { enabled: false }
 
   - id: landsat-c2-l2
-    description: "[M1] USGS Landsat 8 and 9 Collection 2 Level-2 (LANDSAT/LC08/C02/T1_L2 from 2013-03-18; LANDSAT/LC09/C02/T1_L2 from 2021-10-31), 30 m: the before/after strip before 2017 and NDVI (SR_B4, SR_B5). Format: EE. Auth: Earth Engine service account."
+    # chosen: true   # source 23 of 24, M1 (DECISIONS.md Q31)
+    description: "[M1] USGS Landsat Collection 2 Level-2: TM (LANDSAT/LT05/C02/T1_L2, 1984-03 to 2012-05), ETM+ (LANDSAT/LE07/C02/T1_L2, 1999-05 to 2024-01), OLI (LANDSAT/LC08/C02/T1_L2 from 2013-03-18), OLI-2 (LANDSAT/LC09/C02/T1_L2 from 2021-10-31), 30 m: getThumbURL before/after composites for every event since 2000 (Sentinel-2 starts in 2017) and NDVI. Format: EE. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: U.S. public domain ('There are no restrictions on Landsat data downloaded from the USGS; it can be used or redistributed as desired.')"
     attribution: "Landsat image courtesy of the U.S. Geological Survey. Processed in Google Earth Engine."
@@ -734,10 +740,19 @@ sources:
         url: ee://LANDSAT/LC09/C02/T1_L2
         probe: https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LC09_C02_T1_L2.json
         probe_contains: "LC09"
+      - id: earth-engine-lt05
+        url: ee://LANDSAT/LT05/C02/T1_L2
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LT05_C02_T1_L2.json
+        probe_contains: "LT05"
+      - id: earth-engine-le07
+        url: ee://LANDSAT/LE07/C02/T1_L2
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/LANDSAT/LANDSAT_LE07_C02_T1_L2.json
+        probe_contains: "LE07"
     archived: { enabled: false }
 
   - id: landsat-surface-temperature
-    description: "[M2] USGS Landsat 8/9 Collection 2 Level-2 surface temperature band ST_B10 (K; scale 0.00341802, offset 149; masked on L2SR scenes), 30 m, 16 days per satellite: the Taal main-crater lake temperature track (about 1.2 km across, a few dozen pixels; no lake after January 2020). Same assets as landsat-c2-l2; listed separately because it is a separate track with its own caveats. Format: EE. Auth: Earth Engine service account."
+    # chosen: true   # source 23 of 24, M1 (DECISIONS.md Q31)
+    description: "[M1] USGS Landsat Collection 2 Level-2 surface temperature (ST_B10 on Landsat 8/9; ST_B6 on Landsat 5/7 for 2000-2012) (K; scale 0.00341802, offset 149; masked on L2SR scenes), 30 m, 16 days per satellite: the Taal main-crater lake temperature track (about 1.2 km across, a few dozen pixels; no lake after January 2020). Same assets as landsat-c2-l2; listed separately because it is a separate track with its own caveats. Format: EE. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: U.S. public domain"
     attribution: "Landsat surface temperature courtesy of the U.S. Geological Survey. Processed in Google Earth Engine."
@@ -754,7 +769,8 @@ sources:
     archived: { enabled: false }
 
   - id: s1-grd
-    description: "[M2] Copernicus / ESA Sentinel-1 GRD (COPERNICUS/S1_GRD), 2014-10-03 onward, VV/VH in dB at 10 m: backscatter change before and after an eruption as a fresh-deposit (lahar, ash) layer per event, reduced in Earth Engine. Format: EE; a small GeoTIFF per event (under 2 MB [U]). Auth: Earth Engine service account."
+    # chosen: true   # source 24 of 24, M1 (DECISIONS.md Q31)
+    description: "[M1] Copernicus / ESA Sentinel-1 GRD (COPERNICUS/S1_GRD), 2014-10-03 onward, VV/VH in dB at 10 m: before/after backscatter and log-ratio change thumbnails per event (getThumbURL), the view that sees through ash and cloud (Taal 2020-01, Kanlaon 2024, Mayon 2018), reduced in Earth Engine. Format: EE; a small GeoTIFF per event (under 2 MB [U]). Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: Copernicus Sentinel Data Legal Notice"
     attribution: "Contains modified Copernicus Sentinel data [Year]. Processed in Google Earth Engine."
@@ -837,7 +853,7 @@ sources:
     archived: { enabled: false }
 
   - id: gpm-imerg-v07
-    # proposed_keep: true   # source 20 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 18 of 24, M2 (DECISIONS.md Q30)
     description: "[M2] NASA GPM IMERG V07 precipitation (NASA/GPM_L3/IMERG_V07 on Earth Engine: half-hourly, 0.1 degree, 1998 onward; GES DISC daily files as the second route), reduced to daily rainfall per volcano box: the lahar-context rainfall track. Format: EE; NetCDF (12 MB per global day) at GES DISC. Size: per-volcano daily rows, tens of kB. Auth: Earth Engine service account (GES DISC needs the Earthdata login)."
     kind: remote-dataset
     licence: "open: CC0 ('All NASA-produced data from the GPM mission is made freely available for the public to use.')"
@@ -856,7 +872,7 @@ sources:
 
   # =================================================================== PASS 3: PEOPLE AND IMPACT
   - id: dswd-dromic-reports
-    # proposed_keep: true   # source 12 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 12 of 24, M1 (DECISIONS.md Q30)
     description: >-
       [M1] DSWD Disaster Response Operations Monitoring and Information Center situation reports: people in
       evacuation centres and affected families per day during an event (Taal 2020: 70 reports, 2020-01-13 to
@@ -1402,22 +1418,21 @@ sources:
 
   # =================================================================== PASS 6: SOCIETY, RESPONSE AND THE OTHER PROJECTS
   - id: black-marble-vnp46a2
-    # proposed_keep: true   # source 18 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 19 of 24, M1.1 (DECISIONS.md Q30)
     description: >-
-      [M3] NASA Black Marble daily nighttime lights (VNP46A2, Collection 2, 15 arc-second tiles h29v07 h29v08 h30v06
-      h30v07 h30v08), the power-cut and recovery track after an eruption; the yearly VNP46A4 is Lights' input
-      (../../lgu-lights/pipeline/sources.yaml black-marble-vnp46a4) and its reader (lgu/laads.py pattern) is reused,
-      not copied. Access: LAADS archive by tile and day. Format: HDF5. Size: about 10 MB per tile-day [U]; only event
-      windows (about 60 days per story, 5 tiles) are read. Auth: NASA Earthdata token (CI mints it from the login).
+      [M1.1] NASA Black Marble daily nighttime lights (VNP46A2, Collection 2, 500 m), the power-cut and recovery
+      track after an eruption and the night-lights link to Lights. Decided (Q30): read on Earth Engine
+      (NASA/VIIRS/002/VNP46A2, 2012-01-19 onward) and reduced per ring for event windows, instead of LAADS HDF5
+      tiles. Format: EE. Size: per-volcano daily rows for about 60 days per event. Auth: Earth Engine service account.
     kind: remote-dataset
     licence: "open: NASA open data; no restrictions"
-    attribution: "Roman, M.O., et al. NASA Black Marble VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 500m Linear Lat Lon Grid, VNP46A2 v002, doi:10.5067/VIIRS/VNP46A2.002 (LAADS DAAC)."
+    attribution: "Roman, M.O., et al. NASA Black Marble VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 500m Linear Lat Lon Grid, VNP46A2 v002, doi:10.5067/VIIRS/VNP46A2.002. Processed in Google Earth Engine."
     cadence: daily; S-NPP deliveries end 2026-11-02 (continuity via NOAA-20 VJ146A2)
     links:
-      - id: laads-archive
-        url: https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A2/
-        probe: https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/details/allData/5200/VNP46A2/2020/013
-        probe_contains: "VNP46A2.A2020013."
+      - id: earth-engine
+        url: ee://NASA/VIIRS/002/VNP46A2
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/NASA/NASA_VIIRS_002_VNP46A2.json
+        probe_contains: "VNP46A2"
       - id: cmr
         url: https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VNP46A2&version=2
         probe: https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VNP46A2&version=2&page_size=1
@@ -1425,9 +1440,9 @@ sources:
     archived: { enabled: false }
 
   - id: lights-poverty-estimates
-    # proposed_keep: true   # source 19 of the proposed 20 (NO-DOWNLOAD-ALTERNATIVES.md, OPEN-QUESTIONS Q30)
+    # chosen: true   # source 20 of 24, M1.1 (DECISIONS.md Q30)
     description: >-
-      [M3] Own data: the Lights project's published per-LGU poverty estimates and night-light features (CC BY 4.0
+      [M1.1] Own data: the Lights project's published per-LGU poverty estimates and night-light features (CC BY 4.0
       with Lights' attribution block), read from the Lights data version by LGU PSGC for the "Who lives nearby"
       panel. Access: the Lights data release (GitHub release assets, Hugging Face mirror permission-alluring/lgu-lights).
       Format: Parquet. Size: tens of MB total; a few kB per volcano after the join. Auth: none.
@@ -1727,9 +1742,10 @@ sources:
 
   # =================================================================== PASS 8: THE LONG AIR RECORD, SOUND AND PRESSURE
   - id: nasa-msvolso2l4
+    # chosen: true   # source 22 of 24, M1 (DECISIONS.md Q31)
     description: >-
-      [M2] NASA GES DISC MEaSUREs Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4
-      (MSVOLSO2L4): SO2 mass per eruption since 1978-10-31 (Pinatubo 1991 included), the pre-2018 SO2 track.
+      [M1] NASA GES DISC MEaSUREs Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4
+      (MSVOLSO2L4): SO2 mass and plume altitude per eruption since 1978-10-31 (Pinatubo 1991 included), beside VEI in the eruptions band.
       Access: https://measures.gesdisc.eosdis.nasa.gov/data/SO2/MSVOLSO2L4.4/MSVOLSO2L4_v04-00-2026m0513.txt
       (193,575 bytes; one ASCII table). Read by the pipeline's own client with the Earthdata token and adopted as an
       archive release. Format: text. Auth: NASA Earthdata login plus the "NASA GESDISC DATA ARCHIVE" app authorisation.
@@ -1746,6 +1762,55 @@ sources:
         automatic: false                   # 302 to urs.earthdata.nasa.gov without the token
     archived: { enabled: false }
 
+
+  - id: omi-omso2e
+    # chosen: true   # source 21 of 24, M1 (DECISIONS.md Q31)
+    description: >-
+      [M1] NASA GES DISC OMI/Aura Sulfur Dioxide Total Column Daily L3 Best Pixel 0.25 deg (OMSO2e v003), 2004-10-01
+      onward: the SO2 track before TROPOMI for every volcano (NASA-EE-CANDIDATES.md A1). Access: one Harmony request
+      per volcano box and date range (services "Harmony OPeNDAP SubSetter (HOSS) Geographic", "OPeNDAP"); only the
+      subset is returned and reduced to daily rows. Format: netCDF4 subsets. Size: a few MB per volcano over 22 years
+      returned; about 8,000 daily rows per volcano, under 0.3 MB [U]. Auth: NASA Earthdata token (CI mints it from the login).
+    kind: remote-dataset
+    licence: "open: NASA EOSDIS data use policy (no restriction; citation requested)"
+    attribution: "Li, C., Krotkov, N. A., Leonard, P. (2020), OMI/Aura Sulfur Dioxide (SO2) Total Column Daily L3 Best Pixel in 0.25 degree x 0.25 degree V3, GES DISC, doi:10.5067/Aura/OMI/DATA3008 [U: copy the exact citation from the GES DISC page when built]"
+    cadence: daily
+    links:
+      - id: harmony
+        url: https://harmony.earthdata.nasa.gov/
+        probe_html: true                   # the landing page is public; requests need the Earthdata token
+        probe_contains: "Harmony"
+      - id: cmr
+        url: https://cmr.earthdata.nasa.gov/search/collections.umm_json?short_name=OMSO2e&version=003
+        probe: https://cmr.earthdata.nasa.gov/search/collections.json?short_name=OMSO2e&version=003
+        probe_contains: "OMSO2e"
+      - id: gibs-omi-so2
+        url: https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/1.0.0/WMTSCapabilities.xml
+        automatic: false                   # map backdrop tiles only, not a data route
+    archived: { enabled: false }
+
+  - id: open-buildings-temporal
+    # chosen: true   # source 25 of 25, M1.1 (DECISIONS.md Q31)
+    description: >-
+      [M1.1] Google Research Open Buildings 2.5D Temporal (GOOGLE/Research/open-buildings-temporal/v1 on Earth
+      Engine), annual 2016-06-30 to 2023-06-30, effective 4 m: building presence, fractional counts and heights,
+      reduced to buildings inside the 7/14 km rings per volcano per year (exposure and recovery, e.g. Taal Volcano
+      Island before and after 2020; NASA-EE-CANDIDATES.md A5). Format: EE. Size: 24 x rings x 8 years rows.
+      Auth: Earth Engine service account.
+    kind: remote-dataset
+    licence: "open: CC BY 4.0 (Earth Engine STAC license field)"
+    attribution: "Google Open Buildings 2.5D Temporal Dataset (Google Research), CC BY 4.0. Processed in Google Earth Engine."
+    cadence: none (the series ends 2023)
+    links:
+      - id: earth-engine
+        url: ee://GOOGLE/Research/open-buildings-temporal/v1
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/GOOGLE/GOOGLE_Research_open-buildings-temporal_v1.json
+        probe_contains: "open-buildings-temporal"
+      - id: project-site
+        url: https://sites.research.google/gr/open-buildings/temporal/
+        probe_html: true
+        probe_contains: "Temporal"
+    archived: { enabled: false }
   - id: merra2-aerosol
     description: "[M4] NASA GMAO MERRA-2 aerosol diagnostics (NASA/GSFC/MERRA/aer_nv/2 on Earth Engine, 3-hourly, 0.5 x 0.625 degree, 1980-01 onward; GES DISC M2TMNXAER monthly files, 481 MB each, as the second route): sulphate and aerosol in the air since 1980, the context group. Format: EE. Auth: Earth Engine service account (GES DISC needs the Earthdata login)."
     kind: remote-dataset

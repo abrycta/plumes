@@ -2,6 +2,8 @@
 
 Status: 2026-10-21. One row group per source on the approved sources canvas (the core record plus nine passes, 77 rows), in canvas order. Every verdict was checked on the publisher's own terms page on 2026-10-21 unless the row says **not fetched**, in which case the page to check by hand is named. Quotes are verbatim from the fetched page; nothing in quotation marks is paraphrased. **[U]** marks an estimate or a claim read from a search snippet rather than the page itself.
 
+**Scope (2026-10-21, DECISIONS.md Q30, Q31):** only 24 sources (25 at M1.1) are in use; see "Scope after Q30 and Q31" below. Entries for the other sources are kept, marked out of scope in the summary table.
+
 The registry ([sources-draft.yaml](sources-draft.yaml)) carries the short form of each verdict in its `licence` field and the attribution text in `attribution`; this file holds the evidence. The product posture that applies to every source: Plumes is a non-commercial portfolio site that shows **derived per-volcano summaries and dated, linked figures**; it redistributes no dataset (DECISIONS.md Q1, Q15). Raw copies live only in the private archive (archiving standard §6).
 
 ## Verdict scale
@@ -26,6 +28,28 @@ The canvas marked 45 rows "to verify" and the rest open, public domain or CC. Af
 - **Substance corrections (3):** the Philippine volcanoes north of 10°N are in **Tokyo VAAC's** area, not Darwin's, and JMA publishes an open text archive from 2010; Himawari L1b on NODD is **HSD binary, not NetCDF** (780 MB per 10-minute full disk; ash RGB is built from bands 11/13/15); EarthScope holds only two open stations in the Philippines (IU DAV, PS BAG), and the FDSN code `PH` is Hawaii.
 - **Sites that block scripts (403) and need a hand download once (5):** psa.gov.ph and openstat.psa.gov.ph (census, PSGC), nhfr.doh.gov.ph, ndrrmc.gov.ph, ScienceBase (Slab2), si.edu (GVP terms page). Their files are downloaded by hand and adopted as private archive releases, as Lights did for the PSA file.
 - **Everything else** is confirmed open or CC BY with the attribution lines recorded below; nothing in the plan costs money.
+
+---
+
+## Scope after Q30 and Q31 (2026-10-21)
+
+Kurt accepted the 20 query-in-place sources and four NASA/Earth Engine additions ([DECISIONS.md](DECISIONS.md), Q30, Q31): **24 sources, 25 with Open Buildings Temporal at M1.1**. In scope: GVP (volcanoes, eruptions), PHIVOLCS WordPress and LAVA bulletins, USGS ComCat, Sentinel-5P SO2 and aerosol index (M2), FIRMS, MOD14A1, VNP14A1, Tokyo VAAC, DSWD DROMIC, WorldPop, OCHA COD-AB, Copernicus DEM, Sentinel-2, ERA5, GPM IMERG (M2), Black Marble on Earth Engine (M1.1), the Lights poverty estimates (M1.1), **OMI SO2 `OMSO2e`**, **MSVOLSO2L4**, **Landsat C2 L2** (with the thermal band), **Sentinel-1 GRD**, and **Google Open Buildings 2.5D Temporal** (M1.1). Every other entry below is **out of scope (Q30)**: its verdict and evidence stay as history, and the summary table's "M" column says "out (Q30)". HazardHunterPH stays a link, not a source.
+
+### NASA OMI/Aura SO2 daily L3 (`OMSO2e`) (added by Q31)
+
+- **Verdict:** open. The CMR record points to the EOSDIS data use and citation guidance (NASA open data, no restriction, citation requested) (NASA-EE-CANDIDATES.md A1). 2004-10-01 → now, 0.25° daily; GES DISC, cloud-hosted.
+- **Access:** a Harmony request (services "Harmony OPeNDAP SubSetter (HOSS) Geographic", "OPeNDAP") per volcano box and date range; nothing bulk-downloaded. **Auth: Earthdata login** (bearer token; CI mints short-lived tokens from the login, as Lights does).
+- **Attribution [U]:** the GES DISC dataset citation for OMSO2e v003 (doi:10.5067/Aura/OMI/DATA3008), to be copied from the GES DISC landing page when the entry is built.
+
+### Google Open Buildings 2.5D Temporal (added by Q31, M1.1)
+
+- **Verdict:** open: **CC BY 4.0** (the Earth Engine STAC `license` field for `GOOGLE/Research/open-buildings-temporal/v1`; NASA-EE-CANDIDATES.md A5). Annual 2016-06-30 → 2023-06-30, effective 4 m (building presence, fractional counts, heights), covering South-East Asia per the STAC description.
+- **Access:** Earth Engine reductions per ring per year with the existing service account; nothing downloaded.
+- **Attribution [U]:** "Google Open Buildings 2.5D Temporal Dataset, CC BY 4.0" plus "Processed in Google Earth Engine"; the paper citation from the STAC record when the entry is built.
+
+### Now in scope: Landsat, Sentinel-1, MSVOLSO2L4
+
+Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band), Sentinel-1 GRD and MSVOLSO2L4 move to M1 under Q31. Their verdicts (open, below under Pass 2 and Pass 8) are unchanged; MSVOLSO2L4 brings back the Earthdata login.
 
 ---
 
@@ -464,89 +488,89 @@ The canvas marked 45 rows "to verify" and the rest open, public domain or CC. Af
 
 ## Summary table
 
-Verdicts in canvas order; "registry id" points into [sources-draft.yaml](sources-draft.yaml); "M" is the milestone proposed in [DATA-PLAN.md](DATA-PLAN.md) §9. "Changed" marks a verdict or fact that differs from the canvas.
+Verdicts in canvas order; "registry id" points into [sources-draft.yaml](sources-draft.yaml); "M" is the milestone decided on 2026-10-21 (DECISIONS.md Q30, Q31; [DATA-PLAN.md](DATA-PLAN.md) §9); "out (Q30)" marks a source outside the 24+1 set, kept here as evidence and history. "Changed" marks a verdict or fact that differs from the canvas.
 
 | # | Canvas row | Verdict | Auth | Registry id(s) | M | Changed |
 |---|---|---|---|---|---|---|
 | 1 | Sentinel-5P TROPOMI SO2 | open | EE service account | `s5p-offl-so2` | M1 | |
 | 2 | NASA FIRMS (VIIRS, MODIS) | open | EE; free MAP_KEY; Earthdata for the archive tool | `firms-modis`, `modis-mod14a1`, `viirs-vnp14a1` | M1 | |
-| 3 | MIROVA v2.5 | open (CC BY 4.0) | none | `mirova-vrp` | M1 | |
+| 3 | MIROVA v2.5 | open (CC BY 4.0) | none | `mirova-vrp` | out (Q30) | |
 | 4 | USGS ComCat | open (public domain) | none | `usgs-comcat-ph-1900-2009`, `usgs-comcat-ph-2010` | M1 | |
 | 5 | Smithsonian GVP | open-with-conditions (non-commercial, cite); terms page not fetched | none | `gvp-volcanoes-ph`, `gvp-eruptions-ph` | M1 | |
-| 6 | WorldPop, GHSL, WorldCover, DEM | open (CC BY 4.0; JRC; CC BY 4.0; notice) | EE | `worldpop-100m`, `ghsl-r2023a`, `esa-worldcover-v200`, `copernicus-dem-glo30` | M1 | |
-| 7 | PHIVOLCS public bulletins | link-only (cite each figure) | none | `phivolcs-bulletins`, `phivolcs-lava-bulletins` (+ `phivolcs-earthquakes` M1.1) | M1 | |
-| 8 | Himawari-8/9 (NODD) | open | none | `himawari-ahi-nodd` | M2 | **fact: HSD, not NetCDF; 780 MB per scan** |
-| 9 | Sentinel-5P aerosol index and layer height | open | EE | `s5p-offl-aer-ai`, `s5p-offl-aer-lh` | M2 | |
+| 6 | WorldPop, GHSL, WorldCover, DEM | open (CC BY 4.0; JRC; CC BY 4.0; notice) | EE | `worldpop-100m`, `ghsl-r2023a`, `esa-worldcover-v200`, `copernicus-dem-glo30` | M1 (WorldPop, DEM); GHSL, WorldCover out (Q30) | |
+| 7 | PHIVOLCS public bulletins | link-only (cite each figure) | none | `phivolcs-bulletins`, `phivolcs-lava-bulletins` (+ `phivolcs-earthquakes` M1.1) | M1 (earthquake tables out, Q30) | |
+| 8 | Himawari-8/9 (NODD) | open | none | `himawari-ahi-nodd` | out (Q30) | **fact: HSD, not NetCDF; 780 MB per scan** |
+| 9 | Sentinel-5P aerosol index and layer height | open | EE | `s5p-offl-aer-ai`, `s5p-offl-aer-lh` | M2 (AER_AI); AER_LH out (Q30) | |
 | 10 | Darwin VAAC advisories | **Tokyo VAAC (JMA): open-with-conditions; Darwin (BoM): link-only** | none | `vaac-tokyo-advisories` | M1 | **changed: issuer and verdict** |
-| 11 | CALIPSO lidar | open (CC0) | Earthdata login | `calipso-lid-l2` | M3 | |
-| 12 | Copernicus CAMS reanalysis | open (CC BY 4.0) | free ADS account | `cams-eac4` | M4 | |
+| 11 | CALIPSO lidar | open (CC0) | Earthdata login | `calipso-lid-l2` | out (Q30) | |
+| 12 | Copernicus CAMS reanalysis | open (CC BY 4.0) | free ADS account | `cams-eac4` | out (Q30) | |
 | 13 | ERA5 winds | open (CC BY 4.0) | none (buckets) | `era5-pressure-levels` | M1 | |
-| 14 | NASA Worldview / GIBS | open | none | `nasa-gibs-worldview` | M2 | |
-| 15 | Sentinel-1 InSAR (LiCSAR) | open-with-conditions (acknowledgement) | none | `licsar-taal-032d` | M2 | |
+| 14 | NASA Worldview / GIBS | open | none | `nasa-gibs-worldview` | out (Q30) | |
+| 15 | Sentinel-1 InSAR (LiCSAR) | open-with-conditions (acknowledgement) | none | `licsar-taal-032d` | out (Q30) | |
 | 16 | Sentinel-2 and Landsat | open | EE | `s2-sr-harmonized`, `landsat-c2-l2` | M1 | |
-| 17 | Landsat thermal band | open | EE | `landsat-surface-temperature` | M2 | |
-| 18 | Sentinel-1 SAR change detection | open | EE | `s1-grd` | M2 | |
-| 19 | Copernicus EMS rapid mapping | open (mandatory citation form) | none | `copernicus-ems-emsr418` | M2 | EMSR418 found (Taal 2020) |
-| 20 | Raspberry Shake | open-with-conditions (logo + line; no re-serving) | none | `raspberry-shake-am` | M3 | not CC BY-SA |
-| 21 | EarthScope FDSN | open (CC BY 4.0 default) | none | `earthscope-fdsn` | M3 | **fact: only IU DAV and PS BAG in the Philippines** |
+| 17 | Landsat thermal band | open | EE | `landsat-surface-temperature` | M1 (Q31) | |
+| 18 | Sentinel-1 SAR change detection | open | EE | `s1-grd` | M1 (Q31) | |
+| 19 | Copernicus EMS rapid mapping | open (mandatory citation form) | none | `copernicus-ems-emsr418` | out (Q30) | EMSR418 found (Taal 2020) |
+| 20 | Raspberry Shake | open-with-conditions (logo + line; no re-serving) | none | `raspberry-shake-am` | out (Q30) | not CC BY-SA |
+| 21 | EarthScope FDSN | open (CC BY 4.0 default) | none | `earthscope-fdsn` | out (Q30) | **fact: only IU DAV and PS BAG in the Philippines** |
 | 22 | NASA GPM IMERG | open (CC0) | EE | `gpm-imerg-v07` | M2 | |
 | 23 | DSWD DROMIC | open (government work) | none | `dswd-dromic-reports` | M1 | fact: .docx files |
-| 24 | NDRRMC situation reports | open (government work); site blocks scripts; mirrors personal-use | none (hand) | `ndrrmc-sitreps` | M2 | **in practice hand-collected** |
-| 25 | NOAA NCEI significant eruptions | open | none | `ncei-significant-eruptions` | M2 | |
-| 26 | DA damage bulletins + cropland NDVI | open but **link-only in practice** (no hosted bulletins) | none | `da-damage-bulletins`, `s2-sr-harmonized` | M4 | **changed** |
-| 27 | OpenStreetMap | open-with-conditions (ODbL) | none | `osm-philippines` | M3 | |
-| 28 | Meta high-resolution population | open-with-conditions (CC BY) | none | `meta-hrsl-phl` | M3 | |
-| 29 | OpenAQ and MODIS AOD | open-with-conditions (OpenAQ, per station; free key) / open (MCD19A2) | free API key / EE | `openaq-ph`, `modis-mcd19a2-aod` | M2 | PH coverage unverified |
+| 24 | NDRRMC situation reports | open (government work); site blocks scripts; mirrors personal-use | none (hand) | `ndrrmc-sitreps` | out (Q30) | **in practice hand-collected** |
+| 25 | NOAA NCEI significant eruptions | open | none | `ncei-significant-eruptions` | out (Q30) | |
+| 26 | DA damage bulletins + cropland NDVI | open but **link-only in practice** (no hosted bulletins) | none | `da-damage-bulletins`, `s2-sr-harmonized` | out (Q30) | **changed** |
+| 27 | OpenStreetMap | open-with-conditions (ODbL) | none | `osm-philippines` | out (Q30) | |
+| 28 | Meta high-resolution population | open-with-conditions (CC BY) | none | `meta-hrsl-phl` | out (Q30) | |
+| 29 | OpenAQ and MODIS AOD | open-with-conditions (OpenAQ, per station; free key) / open (MCD19A2) | free API key / EE | `openaq-ph`, `modis-mcd19a2-aod` | out (Q30) | PH coverage unverified |
 | 30 | OpenSky Network | **noncommercial-only and unusable (historical access by application)** | application | `opensky-network` (retired) | dropped | **changed** |
-| 31 | Wikipedia page views and GDELT | open (CC0) / open (cite) | none | `wikimedia-pageviews`, `gdelt-v2` | M2 | BigQuery route paid, not used |
-| 32 | HazardHunterPH / GeoRiskPH | link-only | n/a | `hazardhunterph` | M1 | |
-| 33 | Nevada Geodetic Lab GNSS | open (cite) | none | `ngl-gnss-tenv3` | M3 | |
-| 34 | GEM Global Active Faults | open-with-conditions (CC BY-SA) | none | `gem-active-faults` | M1 | |
-| 35 | USGS Slab2 | open (public domain); ScienceBase blocks scripts | none (hand) | `usgs-slab2` | M3 | |
+| 31 | Wikipedia page views and GDELT | open (CC0) / open (cite) | none | `wikimedia-pageviews`, `gdelt-v2` | out (Q30) | BigQuery route paid, not used |
+| 32 | HazardHunterPH / GeoRiskPH | link-only | n/a | `hazardhunterph` | link only | |
+| 33 | Nevada Geodetic Lab GNSS | open (cite) | none | `ngl-gnss-tenv3` | out (Q30) | |
+| 34 | GEM Global Active Faults | open-with-conditions (CC BY-SA) | none | `gem-active-faults` | out (Q30) | |
+| 35 | USGS Slab2 | open (public domain); ScienceBase blocks scripts | none (hand) | `usgs-slab2` | out (Q30) | |
 | 36 | LaMEVE (VOGRIPA) | **noncommercial-only / written permission needed** | none | `lameve-vogripa` (retired) | dropped unless permitted | **changed** |
-| 37 | GloSSAC | open | Earthdata login | `glossac` | M3 | |
-| 38 | eVolv2k | open (CC BY 4.0, v3/v4) | none | `evolv2k-v4` | M3 | v2 "scientific use only" avoided |
-| 39 | NASA GISTEMP | open | none | `nasa-gistemp-v4` | M3 | |
-| 40 | DAHITI / Hydroweb | open-with-conditions, NC-ambiguous (DAHITI); open ETALAB (Hydroweb, Taal unconfirmed) | registration | `dahiti-taal` | M4 | Taal has 15 points |
-| 41 | JRC Global Surface Water | open | EE | `jrc-global-surface-water` | M2 | ends 2021 |
-| 42 | Sentinel-3 OLCI | open | EE | `s3-olci` | M4 | L1B only on EE |
-| 43 | HydroSHEDS | open (v1; v2 Americas only) | EE | `hydrosheds-v1` | M4 | |
-| 44 | Copernicus GloFAS | open-with-conditions (CEMS-FLOODS; account) | free EWDS account | `glofas-historical` | M4 | |
-| 45 | NASA SMAP | open (public domain) | EE | `nasa-smap-l4` | M4 | |
-| 46 | MODIS land surface temperature | open | EE | `modis-lst-daily` | M2 | |
-| 47 | Hansen Global Forest Change | open (CC BY 4.0) | EE | `hansen-gfc` | M3 | |
-| 48 | NASA Black Marble | open | Earthdata token | `black-marble-vnp46a2` | M3 | |
-| 49 | Lights poverty estimates | own data (CC BY 4.0) | none | `lights-poverty-estimates` | M3 | |
-| 50 | PSA census by barangay | open-with-conditions (CC BY per OpenSTAT); site blocks scripts | none (hand) | `psa-census-barangay-2020` | M3 | hand download |
-| 51 | Overture, Google and Microsoft buildings | open-with-conditions (ODbL / CC BY 4.0 / CDLA-P 2.0) | none | `overture-buildings` | M3 | Microsoft global is CDLA, not ODbL |
-| 52 | DOH health facility registry | open (government work); site blocks scripts; terms not fetched | none (hand) | `doh-nhfr` | M3 | hand download |
-| 53 | OCHA Financial Tracking Service | open (public API) | none | `ocha-fts-flows` | M3 | |
-| 54 | ReliefWeb API and GLIDE | open-with-conditions (gated appname; files link-only) / open | appname / none | `reliefweb-glide` | M3 | API gated since 2025-11-01 |
-| 55 | OurAirports | open (public domain) | none | `ourairports` | M2 | |
-| 56 | NOAA NCEI tsunami database | open | none | `ncei-tsunami-events` | M3 | |
-| 57 | GEBCO bathymetry | open (public domain) | none (hand) | `gebco-grid` | M3 | |
-| 58 | IOC Sea Level Station Monitoring Facility | **noncommercial-only**; registration | registration | `ioc-sea-level` | M4 | **changed** |
-| 59 | Copernicus Marine ocean colour | open (Copernicus Marine licence; account) | free account | `cmems-ocean-colour` | M4 | |
-| 60 | NOAA OISST | open | none | `noaa-oisst-v21` | M4 | |
-| 61 | Allen Coral Atlas | open (CC BY 4.0) | EE | `allen-coral-atlas` | M3 | |
-| 62 | Global Fishing Watch | **noncommercial-only (CC BY-NC 4.0); token for organisations** | application | `global-fishing-watch` | M4, pending Q25 | |
-| 63 | NASA MEaSUREs MSVOLSO2L4 | open | Earthdata login | `nasa-msvolso2l4` | M2 | |
-| 64 | NASA MERRA-2 | open | EE / Earthdata | `merra2-aerosol` | M4 | |
-| 65 | IASI SO2 (AERIS) | open-with-conditions (notify the PI) | none | `iasi-so2-aeris` | M4 | |
-| 66 | NOAA IGRA radiosondes | open | none | `noaa-igra2-ph` | M4 | |
-| 67 | NOAA Integrated Surface Database | open-with-conditions (WMO Res. 40: no redistribution of PH station files) | none | `noaa-isd-ph` | M4 | **condition added** |
-| 68 | Infrasound channels on FDSN | open (as EarthScope) | none | `earthscope-fdsn` | M3 | |
+| 37 | GloSSAC | open | Earthdata login | `glossac` | out (Q30) | |
+| 38 | eVolv2k | open (CC BY 4.0, v3/v4) | none | `evolv2k-v4` | out (Q30) | v2 "scientific use only" avoided |
+| 39 | NASA GISTEMP | open | none | `nasa-gistemp-v4` | out (Q30) | |
+| 40 | DAHITI / Hydroweb | open-with-conditions, NC-ambiguous (DAHITI); open ETALAB (Hydroweb, Taal unconfirmed) | registration | `dahiti-taal` | out (Q30) | Taal has 15 points |
+| 41 | JRC Global Surface Water | open | EE | `jrc-global-surface-water` | out (Q30) | ends 2021 |
+| 42 | Sentinel-3 OLCI | open | EE | `s3-olci` | out (Q30) | L1B only on EE |
+| 43 | HydroSHEDS | open (v1; v2 Americas only) | EE | `hydrosheds-v1` | out (Q30) | |
+| 44 | Copernicus GloFAS | open-with-conditions (CEMS-FLOODS; account) | free EWDS account | `glofas-historical` | out (Q30) | |
+| 45 | NASA SMAP | open (public domain) | EE | `nasa-smap-l4` | out (Q30) | |
+| 46 | MODIS land surface temperature | open | EE | `modis-lst-daily` | out (Q30) | |
+| 47 | Hansen Global Forest Change | open (CC BY 4.0) | EE | `hansen-gfc` | out (Q30) | |
+| 48 | NASA Black Marble | open | EE service account | `black-marble-vnp46a2` | M1.1 (now on EE) | |
+| 49 | Lights poverty estimates | own data (CC BY 4.0) | none | `lights-poverty-estimates` | M1.1 | |
+| 50 | PSA census by barangay | open-with-conditions (CC BY per OpenSTAT); site blocks scripts | none (hand) | `psa-census-barangay-2020` | out (Q30) | hand download |
+| 51 | Overture, Google and Microsoft buildings | open-with-conditions (ODbL / CC BY 4.0 / CDLA-P 2.0) | none | `overture-buildings` | out (Q30) | Microsoft global is CDLA, not ODbL |
+| 52 | DOH health facility registry | open (government work); site blocks scripts; terms not fetched | none (hand) | `doh-nhfr` | out (Q30) | hand download |
+| 53 | OCHA Financial Tracking Service | open (public API) | none | `ocha-fts-flows` | out (Q30) | |
+| 54 | ReliefWeb API and GLIDE | open-with-conditions (gated appname; files link-only) / open | appname / none | `reliefweb-glide` | out (Q30) | API gated since 2025-11-01 |
+| 55 | OurAirports | open (public domain) | none | `ourairports` | out (Q30) | |
+| 56 | NOAA NCEI tsunami database | open | none | `ncei-tsunami-events` | out (Q30) | |
+| 57 | GEBCO bathymetry | open (public domain) | none (hand) | `gebco-grid` | out (Q30) | |
+| 58 | IOC Sea Level Station Monitoring Facility | **noncommercial-only**; registration | registration | `ioc-sea-level` | out (Q30) | **changed** |
+| 59 | Copernicus Marine ocean colour | open (Copernicus Marine licence; account) | free account | `cmems-ocean-colour` | out (Q30) | |
+| 60 | NOAA OISST | open | none | `noaa-oisst-v21` | out (Q30) | |
+| 61 | Allen Coral Atlas | open (CC BY 4.0) | EE | `allen-coral-atlas` | out (Q30) | |
+| 62 | Global Fishing Watch | **noncommercial-only (CC BY-NC 4.0); token for organisations** | application | `global-fishing-watch` | out (Q30) | |
+| 63 | NASA MEaSUREs MSVOLSO2L4 | open | Earthdata login | `nasa-msvolso2l4` | M1 (Q31) | |
+| 64 | NASA MERRA-2 | open | EE / Earthdata | `merra2-aerosol` | out (Q30) | |
+| 65 | IASI SO2 (AERIS) | open-with-conditions (notify the PI) | none | `iasi-so2-aeris` | out (Q30) | |
+| 66 | NOAA IGRA radiosondes | open | none | `noaa-igra2-ph` | out (Q30) | |
+| 67 | NOAA Integrated Surface Database | open-with-conditions (WMO Res. 40: no redistribution of PH station files) | none | `noaa-isd-ph` | out (Q30) | **condition added** |
+| 68 | Infrasound channels on FDSN | open (as EarthScope) | none | `earthscope-fdsn` | out (Q30) | |
 | 69 | WWLLN lightning | **paid / unusable** | contract | `wwlln-lightning` (retired) | dropped | **changed (canvas: "may cost")** |
-| 70 | Chronicling America | open (public domain newspapers; API, rate-limited) | none | `loc-chronicling-america` | M4 | rights page not fetched |
-| 71 | USGS declassified imagery | open (public domain) for scanned frames; **$30 per unscanned frame** | EROS login | `usgs-declassified-imagery` | M4 | scanning fee excluded |
-| 72 | Wikimedia Commons photos | open-with-conditions (per file) | none | `wikimedia-commons-photos` | M2 | |
-| 73 | OpenAlex | open (CC0) | none (free key optional) | `openalex-works` | M3 | |
-| 74 | PSGC geographic codes | open; site blocks scripts (mirror automatic) | none | `psgc-cities-municipalities` | M1 | |
-| 75 | WRI Global Power Plant Database | open (CC BY 4.0) | none | `wri-global-power-plants` | M3 | |
+| 70 | Chronicling America | open (public domain newspapers; API, rate-limited) | none | `loc-chronicling-america` | out (Q30) | rights page not fetched |
+| 71 | USGS declassified imagery | open (public domain) for scanned frames; **$30 per unscanned frame** | EROS login | `usgs-declassified-imagery` | out (Q30) | scanning fee excluded |
+| 72 | Wikimedia Commons photos | open-with-conditions (per file) | none | `wikimedia-commons-photos` | out (Q30) | |
+| 73 | OpenAlex | open (CC0) | none (free key optional) | `openalex-works` | out (Q30) | |
+| 74 | PSGC geographic codes | open; site blocks scripts (mirror automatic) | none | `psgc-cities-municipalities` | out (Q30) | |
+| 75 | WRI Global Power Plant Database | open (CC BY 4.0) | none | `wri-global-power-plants` | out (Q30) | |
 | 76 | PhilGEPS procurement notices | **link-only (copyright reserved; portal down)** | registration | `philgeps-notices` (retired) | dropped | **changed** |
-| 77 | Department of Tourism arrivals | open (public domain); provincial series hand-transcribed | none | `dot-visitor-arrivals` | M4 | |
+| 77 | Department of Tourism arrivals | open (public domain); provincial series hand-transcribed | none | `dot-visitor-arrivals` | out (Q30) | |
 
-Also in the registry but not canvas rows: `cod-ab-phl-gdb` (OCHA boundaries, CC BY-IGO, M1) and `phivolcs-earthquakes` (the monthly tables, M1.1).
+Also in the registry but not canvas rows: `cod-ab-phl-gdb` (OCHA boundaries, CC BY-IGO, M1, read by range), `phivolcs-earthquakes` (the monthly tables, out under Q30), and the two Q31 additions `omi-omso2e` (OMI SO2, open, Earthdata login, M1) and `open-buildings-temporal` (CC BY 4.0, EE, M1.1).
 
 ## Pages to re-read by hand (blocked on 2026-10-21)
 

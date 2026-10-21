@@ -1,6 +1,6 @@
 # Open questions and decisions for Kurt
 
-Status: 2026-10-21. **Q1–Q18 are answered** (see [DECISIONS.md](DECISIONS.md); Q3, Q4, Q5, Q11 and Q15 differ from the defaults below). The table is kept as written history. The open questions are **Q19 onwards** in §2, raised by folding the 77-source canvas into the plan and by the decided architecture. Nothing is implemented.
+Status: 2026-10-21. **Q1–Q31 are all answered** (see [DECISIONS.md](DECISIONS.md); Q3, Q4, Q5, Q11 and Q15 differ from the defaults below; Q19–Q31 took the recommendations, "go ahead with everything", with Q23–Q28 re-read against the 24 sources of Q30/Q31). Both tables are kept as written history. No question is open; the remaining actions for Kurt are below.
 
 ## 1. Q1–Q18 (answered 2026-10-21; kept as history)
 
@@ -25,9 +25,9 @@ Status: 2026-10-21. **Q1–Q18 are answered** (see [DECISIONS.md](DECISIONS.md);
 | Q17 | **Milestone-1 scope** | as ARCHITECTURE-OPTIONS.md §6; or a narrower M1 of Taal and Kanlaon only | **The §6 scope**: the per-volcano machinery costs the same for 4 or 24 once the pipeline exists |
 | Q18 | **Spike** | one day before building (SPIKE-PLAN.md); or start building | **Yes, one day**; the EE export path and the PHIVOLCS crawl are the two things that must be measured |
 
-## 2. Open: Q19–Q31 (raised 2026-10-21 by the source canvas, the decided architecture, the 20-source proposal and the NASA/Earth Engine sweep)
+## 2. Q19–Q31 (answered 2026-10-21; kept as history)
 
-Each has a recommendation; "yes to the recommendations" is enough. Nothing below is decided or built.
+Raised by the source canvas, the decided architecture, the 20-source proposal and the NASA/Earth Engine sweep. Kurt accepted every recommendation; Q24, Q26 and most of Q25 and Q27 became moot under Q30, and Q23 and Q28 changed premise (DECISIONS.md, "Q19 to Q31").
 
 | # | Question | Options | Recommendation |
 |---|---|---|---|
@@ -47,10 +47,11 @@ Each has a recommendation; "yes to the recommendations" is enough. Nothing below
 
 ## Actions for Kurt
 
-1. Answer Q19–Q31 (the recommendations are fine as defaults); Q30 (the 20 sources) first, because it changes Q23–Q28, then Q31 (additions to the 20).
-2. Request a free FIRMS MAP_KEY at `https://firms.modaps.eosdis.nasa.gov/api/map_key/` (email) and save it in the Keychain as `firms-map-key`.
-3. Re-read by hand the terms pages that blocked scripts on 2026-10-21 (LICENCES.md, last section), starting with the Smithsonian GVP terms (https://www.si.edu/termsofuse, https://volcano.si.edu/gvp_termsofuse.cfm), because GVP is at M1.
-4. When the repo exists: add the `lgu-lights` Earth Engine key (or the second service account's key, Q22) and the FIRMS MAP_KEY as GitHub secrets; create the Neon project and the Render service only after spike items 13–15.
+1. Request a free FIRMS MAP_KEY at `https://firms.modaps.eosdis.nasa.gov/api/map_key/` (email) and save it in the Keychain as `firms-map-key` (Q28; spike item 19 waits for it).
+2. Re-read by hand the Smithsonian GVP terms (https://www.si.edu/termsofuse, https://volcano.si.edu/gvp_termsofuse.cfm), which blocked scripts on 2026-10-21; GVP is at M1 (Q25, Q27).
+3. Allow the spike to read NASA files with the Earthdata token (spike items 23 and 24: MSVOLSO2L4, MSAQSO2L4, OMSO2e); the read was refused by the session's permission check on 2026-10-21.
+4. Give the go-ahead for the throwaway free-plan Render service and Neon project of spike items 13–15 (Q20, Q21), deleted after the measurement.
+5. When the repo exists: create the second Earth Engine service account and save its key as `earth-engine-sa-key-plumes` (Q22); add it (or the `lgu-lights` key), the FIRMS MAP_KEY and the Earthdata login as GitHub secrets.
 
 The earlier action items for a new Earth Engine project (old Q11) and the PHIVOLCS email (old Q5) are withdrawn by Kurt's answers.
 
@@ -62,8 +63,8 @@ The earlier action items for a new Earth Engine project (old Q11) and the PHIVOL
 - The LAVA portal's TLS chain from a GitHub runner.
 - Earth Engine batch export to Drive from the service account without billing, the EECU cost of one month of S5P reductions, and the `batch_eecu_usage_seconds` accounting (spike items 1, 2, 16).
 - The Render cold start, the Neon catalogue size and the edge-cache hit rate (spike items 13–15).
-- The Tokyo VAAC advisory parse rate and the DROMIC docx tables (spike item 17); the Sentinel-2 thumbnails and the ERA5 pressure-level read (spike item 18).
-- Whether OpenAQ has any Philippine station with data for January 2020 (needs the free key; M2).
+- The Tokyo VAAC advisory parse rate and the DROMIC docx tables (spike item 17); the Sentinel-2 and Landsat thumbnails and the ERA5 pressure-level read (spike item 18); the new checks for the 24 sources (spike items 19–27).
+- ~~Whether OpenAQ has any Philippine station with data for January 2020~~ (OpenAQ is out of scope under Q30).
 - LiCSAR pair file sizes once the October 2025 storage migration settles (milestone 2 only).
 - The NOVAC Mayon SO2 flux dataset (CC BY 4.0 per the catalogue record): URL, years, format.
 - The Smithsonian weekly reports as a 2000–2017 source for PHIVOLCS figures (milestone 2 only).

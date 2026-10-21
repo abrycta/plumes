@@ -1,5 +1,7 @@
 # More query-in-place sources from NASA and Earth Engine
 
+**Decided 2026-10-21:** Kurt accepted (b): A1–A4 now (24 sources) and A5 at M1.1 (25) (DECISIONS.md Q31); the (b) list is held. The text below is kept as the proposal it was.
+
 Status: 2026-10-21. This is a proposal for Kurt (OPEN-QUESTIONS.md **Q31**). Nothing is decided. [DECISIONS.md](DECISIONS.md) and the 20 in [NO-DOWNLOAD-ALTERNATIVES.md](NO-DOWNLOAD-ALTERNATIVES.md) are unchanged. Kurt's request: "can you query nasa and earth engine for more sources?" Every fact below comes from a catalogue query run on 2026-10-21, not from memory. **[U]** marks an estimate, and "unverified" marks what the catalogues could not confirm.
 
 ## Summary
