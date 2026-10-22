@@ -312,6 +312,20 @@ def date_en(iso: str) -> str:
     return f"{d.day} {MONTHS_EN[d.month - 1]} {d.year}"
 
 
+def fl_gloss(fl: int) -> dict:
+    """A flight level with its height in km: EN "FL550 (about 16.8 km)", JA "FL550（約16.8 km）" (full-width brackets)."""
+    km = fl * 30.48 / 1000
+    return lt(f"FL{fl} (about {km:.1f} km)", f"FL{fl}（約{km:.1f} km）")
+
+
+# English words, ISO dates and half-width brackets that should not be left in Japanese text.
+_JA_LEFTOVERS = re.compile(r"\b(?:about|the|and|by|on|from|to|in|of|n/a)\b|\d{4}-\d{2}-\d{2}|[()]")
+
+
+def ja_leftovers(text: str) -> list[str]:
+    return _JA_LEFTOVERS.findall(text)
+
+
 def date_ja(iso: str) -> str:
     """'2020-09-07' -> '2020年9月7日'."""
     d = dt.date.fromisoformat(iso[:10])
@@ -329,7 +343,7 @@ def share_txt(c: float) -> str:
 
 
 def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
-    """The Taal January 2020 story (text reviewed by Kurt on 2026-10-22) and the Taal reading (draft, unchanged).
+    """The Taal January 2020 story (text reviewed by Kurt on 2026-10-22) and the Taal reading (reviewed by Kurt on 2026-10-22).
 
     Every number in the text is read from the volcano read model, so a rebuild with other data restates it."""
     b = vm["bulletins"]["rows"] if vm["bulletins"] else []
@@ -380,7 +394,7 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
     levels = sorted({r[1] for r in pre})
     if len(levels) == 1:
         before_en.append(f"PHIVOLCS bulletins reported Alert Level {levels[0]} on every day from {date_en(pre[0][0])} to {date_en(pre[-1][0])}, as reported by PHIVOLCS.")
-        before_ja.append(f"PHIVOLCSの火山情報は{date_ja(pre[0][0])}から{date_ja(pre[-1][0])}まで毎日、警戒レベル{levels[0]}を発表していた(PHIVOLCS発表)。")
+        before_ja.append(f"PHIVOLCSの火山情報は{date_ja(pre[0][0])}から{date_ja(pre[-1][0])}まで毎日、警戒レベル{levels[0]}を発表していた（PHIVOLCS発表）。")
     if s5:
         dec = sorted(x for x in (so2_at(f"2019-12-{d:02d}")[0] for d in range(1, 32)) if x is not None)
         if dec:
@@ -388,14 +402,14 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
             wk = [x for x in (so2_at(f"2020-01-{d:02d}")[0] for d in range(1, 12)) if x is not None]
             before_en.append(f"The TROPOMI SO₂ column within 15 km had a December median of {med} µmol/m² ({len(dec)} of 31 days with a clear view); "
                              f"from 1 to 11 January 2020 it read between {neg(min(wk))} and {neg(max(wk))} µmol/m² on the {len(wk)} clear days.")
-            before_ja.append(f"15 km圏のTROPOMI SO₂カラム量は12月の中央値が{med} µmol/m²(31日中{len(dec)}日が観測可能)で、"
+            before_ja.append(f"15 km圏のTROPOMI SO₂カラム量は12月の中央値が{med} µmol/m²（31日中{len(dec)}日が観測可能）で、"
                              f"2020年1月1日から11日までは観測できた{len(wk)}日で{neg(min(wk))}〜{neg(max(wk))} µmol/m²だった。")
     quiet = [r for r in eq_rows if r[0] < "2020-01-12"]
     if eq12 and quiet:
         before_en.append(f"The USGS catalogue lists no earthquake within 30 km after {date_en(quiet[-1][0])} until 12 January 2020, "
                          f"when it lists {eq12[1]}, the largest M{eq12[2]}.")
         before_ja.append(f"USGSのカタログには{date_ja(quiet[-1][0])}の後、2020年1月12日まで30 km圏の地震がなく、"
-                         f"同日には{eq12[1]}回(最大M{eq12[2]})が記録されている。")
+                         f"同日には{eq12[1]}回（最大M{eq12[2]}）が記録されている。")
 
     # Step 2: the alert level as reported, with the bulletin's time
     def time_en(h, m):
@@ -406,10 +420,10 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
         when_en = f" in its {time_en(t12['hour'], t12['minute'])} bulletin" if t12.get("hour") is not None else ""
         when_ja = f"{'午前' if t12['hour'] < 12 else '午後'}{t12['hour'] % 12 or 12}時{t12['minute']:02d}分の火山情報で" if t12.get("hour") is not None else ""
         erupt_en.append(f"PHIVOLCS raised the alert to level {a12[1]} on 12 January 2020{when_en}, as reported by PHIVOLCS.")
-        erupt_ja.append(f"PHIVOLCSは2020年1月12日{when_ja}警戒レベルを{a12[1]}に引き上げた(PHIVOLCS発表)。")
+        erupt_ja.append(f"PHIVOLCSは2020年1月12日{when_ja}警戒レベルを{a12[1]}に引き上げた（PHIVOLCS発表）。")
     if top:
-        erupt_en.append(f"Tokyo VAAC observed ash up to FL{top[2]} (about {top[2] * 30.48 / 1000:.1f} km) on {date_en(top[0])}.")
-        erupt_ja.append(f"東京VAACは{date_ja(top[0])}に最高FL{top[2]}(約{top[2] * 30.48 / 1000:.1f} km)の火山灰を観測した。")
+        erupt_en.append(f"Tokyo VAAC observed ash up to {fl_gloss(top[2])['en']} on {date_en(top[0])}.")
+        erupt_ja.append(f"東京VAACは{date_ja(top[0])}に最高{fl_gloss(top[2])['ja']}の火山灰を観測した。")
     if gvp and gvp.get("vei") is not None:
         erupt_en.append(f"GVP records the eruption as VEI {gvp['vei']}.")
         erupt_ja.append(f"GVPはこの噴火をVEI {gvp['vei']}としている。")
@@ -429,7 +443,7 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
                     (f"WorldPopの推計では2020年に14 km圏内に{pop14:,}人が住んでいた。" if pop14 else "")),
          "series": ["displacement"],
          "figures": ([{"label": lt("Persons affected", "被災者数"), "value": last[2], "source": "dswd-dromic-reports", "asOf": last[0], "url": last[7]}] if last else [])
-         + ([{"label": lt("People within 14 km (WorldPop 2020)", "14 km圏内の人口(WorldPop 2020)"), "value": pop14, "source": "worldpop-100m"}] if pop14 else [])},
+         + ([{"label": lt("People within 14 km (WorldPop 2020)", "14 km圏内の人口（WorldPop 2020）"), "value": pop14, "source": "worldpop-100m"}] if pop14 else [])},
         {"id": "crater", "start": "2019-11-19", "end": "2020-03-23", "status": "reviewed", "title": lt("The crater lake", "火口湖"),
          "text": lt("Sentinel-2 before and after: the main crater lake on Volcano Island drained during the eruption.", "Sentinel-2の前後比較:火山島の主火口湖は噴火中に干上がった。"),
          "series": [], "figures": [], "assets": assets},
@@ -442,11 +456,11 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
              "winds": {"source": ["era5-pressure-levels"], "point": winds["point"], "cols": winds["cols"], "rows": winds["rows"]},
              "provenance": provenance(["phivolcs-bulletins", "vaac-tokyo-advisories", "dswd-dromic-reports", "s5p-offl-so2", "usgs-comcat-ph-2010",
                                        "gvp-eruptions-ph", "nasa-msvolso2l4", "worldpop-100m", "s2-sr-harmonized", "era5-pressure-levels"], {})}
-    # The volcano page's reading keeps its v1 draft text until Kurt reviews it (separately from the story).
-    top_txt = f"FL{top[2]} (about {top[2] * 30.48 / 1000:.1f} km)" if top else "n/a"
-    reading = {"id": "taal-2020-01", "start": "2020-01-12", "end": "2020-01-26", "status": "draft",
-               "text": lt(f"PHIVOLCS raised the alert within hours. Tokyo VAAC observed ash up to {top_txt}. GVP records the eruption as VEI 4.",
-                          f"PHIVOLCSは数時間のうちに警戒レベルを引き上げた。東京VAACは最高{top_txt}の火山灰を観測した。GVPはこの噴火をVEI 4としている。"),
+    # The volcano page's reading, reviewed by Kurt on 2026-10-22 (JA height gloss in full-width brackets).
+    top_txt = fl_gloss(top[2]) if top else lt("n/a", "不明")
+    reading = {"id": "taal-2020-01", "start": "2020-01-12", "end": "2020-01-26", "status": "reviewed",
+               "text": lt(f"PHIVOLCS raised the alert within hours. Tokyo VAAC observed ash up to {top_txt['en']}. GVP records the eruption as VEI 4.",
+                          f"PHIVOLCSは数時間のうちに警戒レベルを引き上げた。東京VAACは最高{top_txt['ja']}の火山灰を観測した。GVPはこの噴火をVEI 4としている。"),
                "limits": lt("Satellite SO₂ is a column amount on clear pixels only, not a flux; the record is retrospective, not a hazard assessment.",
                             "衛星SO₂は有効画素のみのカラム量で、フラックスではない。過去の記録であり、ハザード評価ではない。"),
                "figures": figs_erupt}
@@ -558,9 +572,12 @@ def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list)
     story = json.loads((site_v / "story" / "taal-2020.json").read_text())
     ja = " ".join([story["title"]["ja"], story["summary"]["ja"]] + [x for st in story["steps"] for x in (st["title"]["ja"], st["text"]["ja"])]
                   + [a["caption"]["ja"] for st in story["steps"] for a in st.get("assets", [])])
-    left = re.findall(r"\b(?:about|the|and|by|on|from|to|in|of)\b|\d{4}-\d{2}-\d{2}", ja)
-    check("story: no English words or ISO dates left in the Japanese text", not left, ", ".join(left[:5]))
+    left = ja_leftovers(ja)
+    check("story: no English words, ISO dates or half-width brackets left in the Japanese text", not left, ", ".join(left[:5]))
     check("story: every step reviewed", all(st.get("status") == "reviewed" for st in story["steps"]))
+    rd = [x for x in t.get("readings", []) if x["id"] == "taal-2020-01"]
+    check("Taal reading: reviewed, Japanese text clean", bool(rd) and rd[0]["status"] == "reviewed" and not ja_leftovers(rd[0]["text"]["ja"]),
+          ", ".join(ja_leftovers(rd[0]["text"]["ja"])[:5]) if rd else "missing")
     for vid in ("taal", "mayon", "kanlaon", "bulusan"):
         n = len((models[vid].get("bulletins") or {"rows": []})["rows"])
         check(f"{vid}: at least 1,500 bulletin days (2017-09 onward)", n >= 1500, str(n))

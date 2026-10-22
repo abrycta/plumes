@@ -120,3 +120,13 @@ Kurt's answers to the nine questions of [LAYERS-PLAN.md](LAYERS-PLAN.md) §5 (wr
 | L7 | **OSM school and hospital counts at M3 only with a clear "as of <date>" label** | a snapshot of today, not history |
 | L8 | **ISC licence: checked by hand later; not needed for M2.** Stays open | its site returned 404 on 2026-10-22 |
 | L9 | **One read of `MSAQSO2L4` allowed; done.** It lists 7 Philippine sources: Mayon, Bulusan, Kanlaon and "Taai" (presumably Taal) **[U]**, plus three power plants (Sual, Masinloc, Mariveles). Per-year values not yet read | the one 1.7 MB file, read with the Earthdata token; nothing else downloaded |
+
+## 2026-10-22: layers plan revisions L1a, L3a, L9a; Taal reading reviewed
+
+| # | Decision | Note |
+|---|---|---|
+| L1a | **Supersedes L1: no email to COMET.** The COMET Volcano Portal's CC BY-NC 4.0 notice is treated as covering the LiCSBAS data; Plumes publishes the derived series and velocity layer with attribution to COMET, the LiCSAR Copernicus acknowledgement and the CC BY-NC 4.0 notice (wording in LICENCES.md). The draft [research/comet-licence-email.md](research/comet-licence-email.md) is kept, marked "not sent — decided 2026-10-22" | Kurt's choice |
+| L3a | **The `deformation-velocity` contract change is approved** as specified in LAYERS-PLAN.md §3.1 (`layers.schema.json` enum, `LayerId`, `{frame}`, `frames`). It is built with M2 step 9, not now | Kurt's approval |
+| L9a | **Agents may install `h5py` in the plumes environment**, for reading the `MSAQSO2L4` per-year values at M3. Nothing is run now | the earlier install was refused by the permission check |
+| T1 | **The Taal reading on the volcano page is reviewed** (`status: reviewed`, published with the next data version). Its Japanese height gloss reads （約16.8 km） in full-width brackets instead of the English "(about 16.8 km)"; the story's other Japanese glosses use full-width brackets too. The version check now also rejects half-width brackets and English left in the reading's Japanese text | `pipeline/plumes/readmodels.py` (`fl_gloss`, `ja_leftovers`), `pipeline/tests/test_text.py` |
+
