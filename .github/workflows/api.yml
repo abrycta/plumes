@@ -14,7 +14,11 @@ on:
     inputs:
       deploy: { description: "Build the native image and deploy", type: boolean, default: false }
 permissions: { contents: read }
-concurrency: { group: "api-${{ github.ref }}-${{ github.event_name }}", cancel-in-progress: true }
+# main: a running build/deploy is never cancelled (runs queue; a newer pending run replaces an older pending one
+# and deploys the newer commit, which includes it). Branches and PRs cancel superseded runs.
+concurrency:
+  group: api-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 env:
   IMAGE: ghcr.io/abrycta/plumes-api
 

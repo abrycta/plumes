@@ -16,9 +16,12 @@ permissions:
   contents: read
   packages: read # @abrycta/akari; the package must grant this repository read access (Package settings)
 
+# Branches and PRs: a newer push cancels the older run. main: never cancelled or replaced (each run has its own
+# group), so every merged commit gets a finished check; the deploy job (one at a time) always ships main's newest
+# covered commit once its check is green (.github/scripts/deploy-gate.sh; "Merged means deployed", rule 23).
 concurrency:
-  group: web-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: web-${{ github.ref == 'refs/heads/main' && github.run_id || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   check:
@@ -65,6 +68,7 @@ jobs:
     permissions:
       contents: read
       deployments: write
+      actions: read # CI results and the web-dist artifact of main's newest commit
     concurrency:
       group: deploy-production
       cancel-in-progress: false
@@ -80,30 +84,48 @@ jobs:
             echo "::notice title=Deploy skipped::CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID are not set on this repository."
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.secrets.outputs.enabled == 'true'
+        with: { sparse-checkout: .github }
+      # main's newest commit touching what the site ships (.github/deploy-target), once its check job is green: a
+      # run for an older commit deploys the newest one; still running -> that run deploys it; red -> this job fails.
+      - name: Which commit to deploy
+        id: gate
+        if: steps.secrets.outputs.enabled == 'true'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: .github/scripts/deploy-gate.sh web.yml check
       # The checkout supplies web/functions (the /api edge cache, a Pages Function), which wrangler bundles from the
       # working directory; the built site comes from the check job.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: steps.secrets.outputs.enabled == 'true'
+        if: steps.gate.outputs.deploy == 'true'
+        with: { ref: "${{ steps.gate.outputs.sha }}" }
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        if: steps.secrets.outputs.enabled == 'true'
-        with: { name: web-dist, path: web/dist }
+        if: steps.gate.outputs.deploy == 'true'
+        with:
+          name: web-dist
+          path: web/dist
+          run-id: ${{ steps.gate.outputs.run_id }}
+          github-token: ${{ github.token }}
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        if: steps.secrets.outputs.enabled == 'true'
+        if: steps.gate.outputs.deploy == 'true'
         with: { node-version: 24 }
       # npx runs wrangler on its own, without installing the app's dependencies (the private Akari package needs a
       # token this job doesn't have). web/functions is bundled from the working directory.
       - name: Deploy to Cloudflare Pages (project plumes)
         id: deploy
-        if: steps.secrets.outputs.enabled == 'true'
+        if: steps.gate.outputs.deploy == 'true'
         working-directory: web
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SHA: ${{ steps.gate.outputs.sha }}
         run: |
-          npx --yes wrangler@4.151.3 pages deploy dist --project-name=plumes --branch=main --commit-hash=${{ github.sha }} | tee deploy.log
+          # The deployed commit, for live-check.yml.
+          printf '{"sha":"%s","run":"%s/%s/actions/runs/%s"}\n' "$SHA" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > dist/deploy.json
+          npx --yes wrangler@4.151.3 pages deploy dist --project-name=plumes --branch=main --commit-hash="$SHA" | tee deploy.log
           echo "deployment-url=$(grep -oE 'https://[a-z0-9]+\.plumes\.pages\.dev' deploy.log | tail -1)" >> "$GITHUB_OUTPUT"
       - name: Summary
-        if: steps.secrets.outputs.enabled == 'true'
+        if: steps.gate.outputs.deploy == 'true'
         env: { URL: "${{ steps.deploy.outputs.deployment-url }}" }
         run: |
           echo "### Deployed to Cloudflare Pages: $URL (production https://plumes.pages.dev)" >> "$GITHUB_STEP_SUMMARY"
