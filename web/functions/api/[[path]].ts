@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: the same-origin edge cache in front of the Java API (DATA-PLAN §8, Q20).
 //   /api/v1/*      -> {API_ORIGIN}/v1/*   cached at the edge (s-maxage + stale-while-revalidate, revalidated by ETag)
-//   /api/healthz, /api/readyz             passed through, never cached
+//   /api/healthz, /api/readyz             cached at the edge for 30 s (200s only), so probes don't each reach Render
 // Render free sleeps after 15 minutes and its 5 GB of monthly egress is shared, so every read is served from the
 // edge when possible. A cold origin gets a 503 "backend-waking" problem with Retry-After (as Replay's edge), while the
 // request keeps running in the background to wake the service and fill the cache.
@@ -15,7 +15,8 @@
 // bucket (RATE_PER_MINUTE, burst RATE_BURST; over it: 429 with Retry-After), only routes in contracts/openapi.yaml
 // are proxied (others: 404 at the edge), and the query string is cut down to the parameters the contract lists for
 // the route, in a fixed order, before it builds the cache key and the origin URL, so junk parameters can't miss the
-// cache and wake Render. Every /api response carries X-Robots-Tag: noindex.
+// cache and wake Render. Point queries (lat and lon) are rounded to 2 decimals (about 1 km) the same way, so nearby
+// requests share one cache entry; the answer is for the rounded point (its `query` echoes it). Every /api response carries X-Robots-Tag: noindex.
 // Settings (Pages project variables): API_ORIGIN (default below), DATA_ROOT (the published data root, holds
 // latest.json), EDGE_SECRET (secret, also set on Render as PLUMES_EDGE_SECRET: the origin answers /v1 only to
 // requests that carry it).
@@ -40,6 +41,8 @@ const ORIGIN_TIMEOUT_MS = 8000;
 /** Background work after the response is capped at 30 s by the runtime. */
 const BACKGROUND_TIMEOUT_MS = 29_000;
 const HEALTH_TIMEOUT_MS = 3000;
+/** How long a 200 from /healthz or /readyz is served from the edge. */
+const HEALTH_CACHE_S = 30;
 const WAKE_RETRY_AFTER_S = 10;
 /** Fallbacks when the origin sends no s-maxage / stale-while-revalidate. */
 const DEFAULT_FRESH_S = 3600;
@@ -55,6 +58,9 @@ const FORWARD = ["accept", "accept-language", "user-agent"];
 const RATE_PER_MINUTE = 120;
 const RATE_BURST = 60;
 const RATE_MAX_KEYS = 10_000;
+/** Decimals kept for lat/lon query parameters (0.01 degree is about 1.1 km), and their contract bounds. */
+const COORD_DECIMALS = 2;
+const COORD_BOUNDS: Readonly<Record<string, number>> = { lat: 90, lon: 180 };
 /** The contract's routes (contracts/openapi.yaml) and the query parameters each one takes; first match wins. */
 const ROUTES: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
   [/^\/healthz$/, []],
@@ -102,14 +108,29 @@ export const onRequest = async (context: Context): Promise<Response> => {
   const search = normalQuery(url.search, route[1]);
   const target = new URL(origin + rest + search);
 
+  const cache = (caches as unknown as { default: Cache }).default;
+  const key = new Request(target.toString(), { method: "GET" });
   if (rest === "/healthz" || rest === "/readyz") {
+    const inm = request.headers.get("If-None-Match");
+    const cached = await cache.match(key);
+    if (cached && Date.now() - Number(cached.headers.get(STORED_AT) || 0) < HEALTH_CACHE_S * 1000) {
+      return done(answer(cached, inm, request), "HIT");
+    }
     const r = await originFetch(target, request, env, HEALTH_TIMEOUT_MS);
     if (r === "timeout") return done(waking(), "BYPASS");
     if (r instanceof Error) return done(problem("bad-gateway", 502, "Bad gateway"), "BYPASS");
-    return done(passthrough(r), "BYPASS");
+    const out = passthrough(r);
+    if (out.status !== 200) return done(out, "BYPASS");
+    // Only a 200 is kept, for HEALTH_CACHE_S; a waking or failing origin is never pinned at the edge.
+    const body = await out.arrayBuffer();
+    const headers = new Headers(out.headers);
+    headers.set(ORIGIN_CC, headers.get("Cache-Control") ?? "");
+    headers.set("Cache-Control", `public, max-age=${HEALTH_CACHE_S}`);
+    headers.set(STORED_AT, String(Date.now()));
+    headers.delete("Set-Cookie");
+    context.waitUntil(cache.put(key, new Response(body.slice(0), { status: 200, headers })).catch(() => undefined));
+    return done(answer(new Response(body, { status: 200, headers }), inm, request), "MISS");
   }
-  const cache = (caches as unknown as { default: Cache }).default;
-  const key = new Request(target.toString(), { method: "GET" });
   const [cached, published] = await Promise.all([cache.match(key), publishedVersion(env)]);
   const inm = request.headers.get("If-None-Match");
   const cold = async (fallback: Response) => {
@@ -186,16 +207,33 @@ function takeToken(key: string, now: number): number {
   return 0;
 }
 
-/** Only the parameters the route takes, sorted by name, first value of each (as the origin reads them). */
-function normalQuery(search: string, allowed: readonly string[]): string {
+/**
+ * Only the parameters the route takes, sorted by name, first value of each (as the origin reads them), with lat and
+ * lon rounded to COORD_DECIMALS.
+ */
+export function normalQuery(search: string, allowed: readonly string[]): string {
   const q = new URLSearchParams(search);
   const out = new URLSearchParams();
   for (const name of [...allowed].sort()) {
     const v = q.get(name);
-    if (v !== null) out.set(name, v);
+    const bound = COORD_BOUNDS[name];
+    if (v !== null) out.set(name, bound === undefined ? v : roundCoord(v, bound));
   }
   const s = out.toString();
   return s ? "?" + s : "";
+}
+
+/**
+ * A plain decimal coordinate within its contract bound, rounded to COORD_DECIMALS ("14.0042" -> "14", "121.0049" ->
+ * "121", "-0.001" -> "0"). Anything else (not a plain number, out of range) is passed on unchanged, so the origin
+ * still answers it with its own 400; rounding never turns an invalid value into a valid one.
+ */
+export function roundCoord(v: string, bound: number): string {
+  if (!/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(v)) return v;
+  const x = Number(v);
+  if (!Number.isFinite(x) || Math.abs(x) > bound) return v;
+  const r = Math.round(x * 10 ** COORD_DECIMALS) / 10 ** COORD_DECIMALS;
+  return String(r === 0 ? 0 : r);
 }
 
 interface Fetched {
