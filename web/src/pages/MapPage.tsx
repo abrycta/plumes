@@ -195,7 +195,7 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
         </div>
         {summary}
         {mapBox}
-        {deformation ? <DeformationKey layer={deformation.layer} names={Object.fromEntries(index.features.map((f) => [f.properties.id, f.properties.name[lang]]))} /> : null}
+        {deformation && !embed ? <DeformationKey layer={deformation.layer} names={Object.fromEntries(index.features.map((f) => [f.properties.id, f.properties.name[lang]]))} /> : null}
         {record.length ? <MapTimeline record={record} recordQuakes={recordQuakes} end={end} span={WINDOW_MONTHS} onEnd={(i) => setEnd(Math.max(0, Math.min(record.length - 1, i)))} counts={data?.counts ?? null} formatMonth={fmt} /> : null}
         <div className="flex flex-wrap items-start gap-x-8 gap-y-3">
           {thermalLayer ? (
