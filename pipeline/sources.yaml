@@ -119,6 +119,41 @@ sources:
       profile: { key: Eruption_Number, group: Volcano_Number, numeric: [StartDateYear, ExplosivityIndexMax] }
     archived: { enabled: true, retention: all, max_age_days: 400 }
 
+  # ------------------------------------------------------------------ deep-time impacts (NOAA NCEI HazEL; LAYERS-PLAN §7 step 3)
+  - id: noaa-hazel-volcanoes-ph
+    # chosen: true   # M2 deep-time strip (LAYERS-PLAN.md item 8, §7 step 3)
+    description: >-
+      [M2] NOAA NCEI/WDS Global Significant Volcanic Eruptions Database (HazEL), events with country = Philippines
+      (50 rows on 2026-10-22, 3580 BCE - 2024): date, VEI, deaths, injuries, missing, damage (million US$), houses
+      destroyed, each with NCEI's amount-order code, the killing agents, and tsunami or earthquake links. Joined to
+      the GVP eruptions by GVP number (volcanoLocationNewNum) and date for the deep-time strip; every figure is shown
+      as a compiled estimate with a link to its NCEI event page. Access: the HazEL hazard-service JSON API, one page
+      of up to 200 items. Format: JSON object {items, page, totalPages, totalItems}. Size: about 25 kB. Auth: none
+      (LICENCES.md recorded a 403 for a non-browser User-Agent; on 2026-10-22 the API answered the pipeline's
+      User-Agent with 200, and a 403 falls through to the archive link).
+    kind: file
+    format: json
+    filename: noaa-hazel-volcanoes-ph.json
+    local_path: data/raw/hazel/noaa-hazel-volcanoes-ph.json
+    licence: >-
+      open: "Access to this dataset is unrestricted." (NCEI metadata gov.noaa.ngdc.mgg.hazards:G10147, LICENCES.md);
+      "Please cite this data/database as doi:10.7289/V5JW8BSH".
+    attribution: >-
+      National Geophysical Data Center / World Data Service (NGDC/WDS): NCEI/WDS Global Significant Volcanic
+      Eruptions Database. NOAA National Centers for Environmental Information. doi:10.7289/V5JW8BSH
+    cadence: updated as events are added or revised (a few times a year)
+    hooks: ["plumes.deeptime:check_hazel"]   # one page holds every item; Philippine GVP numbers; dates and counts sane
+    links:
+      - id: hazel-api
+        url: "https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/volcanoes?country=PHILIPPINES&itemsPerPage=200"
+        probe_contains: "\"items\""
+      - id: archive
+        archive: true
+    checks:
+      bytes: { min: 10000, max: 1000000 }
+      json_type: object
+    archived: { enabled: true, retention: all, max_age_days: 400 }
+
   # ------------------------------------------------------------------ thermal: MIROVA Dataset v2.5 (OSF, CC BY 4.0)
   - id: usgs-comcat-ph-1900-2009
     # chosen: true   # source 5 of 24, M1 (DECISIONS.md Q30)

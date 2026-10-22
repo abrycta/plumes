@@ -25,6 +25,7 @@ import { periodsOf } from "@/data/periods";
 import { absentRecords, buildTracks, ringOptions } from "@/data/tracks";
 import { addDays, formatDate, formatRange, toDay } from "@/lib/dates";
 import { formatNumber, volcanoType } from "@/lib/format";
+import { DeepTimeStrip } from "@/volcano/DeepTimeStrip";
 import { Readout } from "@/volcano/Readout";
 import { Timeline } from "@/volcano/Timeline";
 
@@ -356,6 +357,7 @@ export default function VolcanoPage({ id }: { id: string }) {
       }
     >
       <Facts f={f} model={model} />
+      <DeepTimeStrip volcanoId={p.id} />
       {model ? (
         <Record model={model} f={f} />
       ) : (

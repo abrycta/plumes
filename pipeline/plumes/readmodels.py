@@ -23,7 +23,7 @@ import subprocess
 
 import yaml
 
-from plumes import comet, omi, run_b, thermal_n20
+from plumes import comet, deeptime, omi, run_b, thermal_n20
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
@@ -659,7 +659,8 @@ def build(version: int, as_of: str) -> dict:
     so2_map = run_b.so2_monthly_layer(TABLES, v_dir, " ".join(REG["s5p-offl-so2"]["attribution"].split()))
     layers = [x for x in (thermal_layers(v_dir, as_of), quake_layer(v_dir, usgs), so2_map, defo_layer) if x]
     (v_dir / "layers.json").write_text(json.dumps({**hdr, "kind": "layers", "layers": layers}, ensure_ascii=False))
-    checks = run_checks(v_dir, vols, models, gvp_v, gvp_e)
+    deep_checks = deeptime.write(v_dir, hdr, vols, gvp_e, RAW / "hazel" / f"{deeptime.SOURCE_ID}.json", provenance([deeptime.GVP_ID, deeptime.SOURCE_ID], fprov))
+    checks = run_checks(v_dir, vols, models, gvp_v, gvp_e) + deep_checks
     passed = all(c["passed"] for c in checks)
     files = [{"path": str(p.relative_to(v_dir)), "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
              for p in sorted(v_dir.rglob("*")) if p.is_file()]

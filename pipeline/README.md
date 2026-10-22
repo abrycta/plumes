@@ -18,6 +18,7 @@ Python (uv). Builds Plumes' data versions from the 22 M1 registry entries in [`s
 | Earth Engine run B | `plumes.ee_run_b rain / so2-map [--canary YYYY-MM]` | `gpm-imerg-v07`, `s5p-offl-so2` | IMERG Final daily rain per 15 km ring (`ee-rain/`), national monthly SO₂ GeoTIFFs (`ee-so2-monthly/`); gated: Kurt checks the monthly EE total, then a one-month canary sizes the backfill (S8); `--max-eecu-h` stops a run early. Not in `data.yml` until the backfill is done |
 | ERA5 | `plumes.era5` | `era5-pressure-levels` | point winds by Blosc block range reads; `--verify` (B6) |
 | COMET LiCSBAS | `plumes.comet fetch`, `reduce` (canary) | `comet-licsbas` | 18 volcanoes, 31 frames; LOS series `los_comet_<frame>` and the `deformation-velocity` GeoTIFFs, built by `readmodels` when `data/raw/comet-licsbas/` exists; group `comet` (numpy). Not in `data.yml` yet |
+| Deep time | `plumes.deeptime` (called by `plumes.readmodels`) | `gvp-eruptions-ph`, `noaa-hazel-volcanoes-ph` | `vN/deeptime.json`: GVP eruptions with NCEI HazEL deaths and damage; `--fixture` rewrites the contract fixture |
 | Read models | `plumes.readmodels --version N` | — | writes `data/build/site/vN/`; `latest.json` only if every check passes |
 | Publish | `plumes.publish --version N --pages --hf` | — | gh-pages `data/` (krtmtthw.dev/plumes/data/), then the HF mirror; latest.json last |
 | Archive | `plumes.adopt [--changed-only]` | crawled and queried ids | releases in `abrycta/plumes-archive` (B8) |

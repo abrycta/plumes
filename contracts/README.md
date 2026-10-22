@@ -13,6 +13,7 @@ v3/layers.json               national layers by month                           
 v3/layers/…                  PMTiles / raster tiles (GeoJSON in the fixture)
 v3/layers/deformation/<f>.tif  deformation-velocity: one Int16 GeoTIFF per volcano and frame (mm/yr x 10, nodata -32768); ids in layers.json frames
 v3/story/<id>.json           Taal January 2020 at M1                                    (story.schema.json)
+v3/deeptime.json             GVP eruptions of the 24 volcanoes with NCEI HazEL impacts   (deeptime.schema.json; TS in ts/deeptime.ts)
 v3/assets/…                  before/after thumbnails
 ```
 

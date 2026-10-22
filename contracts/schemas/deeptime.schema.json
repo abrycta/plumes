@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plumes.krtmtthw.dev/schemas/deeptime.schema.json",
+  "title": "Deep-time strip: <version>/deeptime.json",
+  "description": "Every GVP Holocene eruption of the 24 volcanoes, with GVP's date uncertainty, and the NOAA NCEI HazEL impacts (deaths, damage, houses destroyed) attached to the eruption whose dates contain them. HazEL events outside every GVP eruption window (mostly later lahars) are listed in otherImpacts. Dates are partial ISO (YYYY, YYYY-MM, YYYY-MM-DD); BCE years are negative without a year 0 (-3580 is 3580 BCE), as GVP and HazEL write them. LAYERS-PLAN §7 step 3.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/header" }],
+  "type": "object",
+  "required": ["kind", "span", "glossary", "notes", "volcanoes", "provenance"],
+  "properties": {
+    "kind": { "const": "deeptime" },
+    "span": {
+      "type": "object",
+      "required": ["startYear", "satelliteEraStart"],
+      "properties": {
+        "startYear": { "type": "integer", "description": "Earliest eruption start year in the file (negative = BCE)" },
+        "satelliteEraStart": { "$ref": "common.schema.json#/$defs/date", "description": "Where the per-volcano record (volcano/<id>.json) begins" }
+      },
+      "additionalProperties": false
+    },
+    "glossary": {
+      "type": "object",
+      "required": ["agents", "orders"],
+      "properties": {
+        "agents": { "type": "object", "additionalProperties": { "$ref": "common.schema.json#/$defs/localText" }, "description": "NCEI killing-agent codes (P, T, M, m, …)" },
+        "orders": {
+          "type": "object",
+          "required": ["people", "damage"],
+          "properties": {
+            "people": { "$ref": "#/$defs/orderScale", "description": "NCEI amount-order codes for deaths, injuries, missing and houses" },
+            "damage": { "$ref": "#/$defs/orderScale", "description": "NCEI amount-order codes for damage in US$" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "notes": {
+      "type": "object",
+      "required": ["impacts", "dates"],
+      "properties": { "impacts": { "$ref": "common.schema.json#/$defs/localText" }, "dates": { "$ref": "common.schema.json#/$defs/localText" } },
+      "additionalProperties": false
+    },
+    "volcanoes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "gvpNumber", "eruptions", "otherImpacts"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "gvpNumber": { "type": ["integer", "null"] },
+          "eruptions": { "type": "array", "items": { "$ref": "#/$defs/eruption" } },
+          "otherImpacts": { "type": "array", "items": { "$ref": "#/$defs/impact" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "provenance": { "$ref": "common.schema.json#/$defs/provenance" }
+  },
+  "$defs": {
+    "partialDate": { "type": "string", "pattern": "^-?\\d{1,5}(-\\d{2}(-\\d{2})?)?$" },
+    "order": { "type": "integer", "minimum": 0, "maximum": 4 },
+    "orderScale": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[1-4]$" },
+      "additionalProperties": { "$ref": "common.schema.json#/$defs/localText" }
+    },
+    "eruption": {
+      "type": "object",
+      "required": ["id", "start", "end", "certainty", "vei", "url"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^gvp-\\d+$" },
+        "start": { "$ref": "#/$defs/partialDate" },
+        "end": { "anyOf": [{ "$ref": "#/$defs/partialDate" }, { "type": "null" }] },
+        "certainty": { "enum": ["confirmed", "uncertain"] },
+        "vei": { "type": ["integer", "null"], "minimum": 0, "maximum": 8 },
+        "veiModifier": { "type": "string", "description": "GVP's modifier: ? uncertain, ^ at least, P plinian, …" },
+        "startYearUncertainty": { "type": "integer", "minimum": 0, "description": "± years (radiocarbon dates)" },
+        "startDayUncertainty": { "type": "integer", "minimum": 0, "description": "± days" },
+        "startYearModifier": { "type": "string", "description": "? uncertain year, < before" },
+        "evidence": { "type": "string", "description": "GVP StartEvidenceMethod, e.g. 'Isotopic: 14C (calibrated)'" },
+        "url": { "type": "string", "format": "uri" },
+        "impacts": { "type": "array", "items": { "$ref": "#/$defs/impact" } }
+      },
+      "additionalProperties": false
+    },
+    "impact": {
+      "type": "object",
+      "description": "One NOAA NCEI HazEL significant-eruption event. Figures are compiled estimates; '*Order' fields are NCEI's amount-order codes (glossary.orders), given where the exact number is unknown too. '*Total' includes secondary effects (tsunami, earthquake).",
+      "required": ["id", "date", "url"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^hazel-\\d+$" },
+        "date": { "$ref": "#/$defs/partialDate" },
+        "vei": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "deaths": { "type": "integer", "minimum": 0 },
+        "deathsOrder": { "$ref": "#/$defs/order" },
+        "deathsTotal": { "type": "integer", "minimum": 0 },
+        "deathsTotalOrder": { "$ref": "#/$defs/order" },
+        "injuries": { "type": "integer", "minimum": 0 },
+        "injuriesOrder": { "$ref": "#/$defs/order" },
+        "injuriesTotal": { "type": "integer", "minimum": 0 },
+        "injuriesTotalOrder": { "$ref": "#/$defs/order" },
+        "missing": { "type": "integer", "minimum": 0 },
+        "missingOrder": { "$ref": "#/$defs/order" },
+        "missingTotal": { "type": "integer", "minimum": 0 },
+        "missingTotalOrder": { "$ref": "#/$defs/order" },
+        "damageMusd": { "type": "number", "minimum": 0 },
+        "damageOrder": { "$ref": "#/$defs/order" },
+        "damageMusdTotal": { "type": "number", "minimum": 0 },
+        "damageTotalOrder": { "$ref": "#/$defs/order" },
+        "housesDestroyed": { "type": "integer", "minimum": 0 },
+        "housesDestroyedOrder": { "$ref": "#/$defs/order" },
+        "housesDestroyedTotal": { "type": "integer", "minimum": 0 },
+        "housesDestroyedTotalOrder": { "$ref": "#/$defs/order" },
+        "agents": { "type": "array", "items": { "type": "string", "pattern": "^[A-Za-z]$" } },
+        "tsunami": { "const": true },
+        "earthquake": { "const": true },
+        "url": { "type": "string", "format": "uri", "description": "NCEI event page" }
+      },
+      "additionalProperties": false
+    }
+  }
+}
