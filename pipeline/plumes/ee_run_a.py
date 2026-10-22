@@ -105,8 +105,22 @@ def lakegsw(budget: Budget, lakes: list[dict], start: str = "2000-01", end: str 
     return _props(budget.get(out)["features"])
 
 
+def s2_water(img) -> tuple:
+    """(water, clear) masks of a Sentinel-2 L2A image; the Earth Engine form of run_a.is_water (same thresholds).
+
+    Clear: SCL is not no-data, defective, cloud shadow, cloud or cirrus. Water: (MNDWI > 0.3 or NDWI > 0.2) and SWIR (B11)
+    < 0.08 and NIR (B8) < 0.15. The SWIR and NIR limits drop wet ash and haze, which are spectrally flat (B3 ~ B8 ~ B11
+    ~ 0.1) and passed the first test (NDWI > 0); checked on Taal scenes 2019-12 to 2021-04."""
+    clear = img.select("SCL").remap(S2_CLEAR_SCL, [1] * len(S2_CLEAR_SCL), 0)
+    r = img.select(["B3", "B8", "B11"]).divide(10000)
+    ndwi, mndwi = r.normalizedDifference(["B3", "B8"]), r.normalizedDifference(["B3", "B11"])
+    water = (mndwi.gt(run_a.WATER_MNDWI).Or(ndwi.gt(run_a.WATER_NDWI)).And(r.select("B11").lt(run_a.WATER_MAX_B11))
+             .And(r.select("B8").lt(run_a.WATER_MAX_B8)).And(clear))
+    return water, clear
+
+
 def lakes2_year(year: int, budget: Budget, lakes: list[dict]) -> list[dict]:
-    """Every Sentinel-2 L2A granule over each crater disc in `year`: water area (NDWI = (B3 - B8) / (B3 + B8) > 0 on clear
+    """Every Sentinel-2 L2A granule over each crater disc in `year`: water area (s2_water: the run_a.is_water test on clear
     pixels), clear area (SCL not cloud, shadow, cirrus or no data), disc area, and the mean B4/B3/B2 reflectance of the
     water (as area-weighted sums divided here)."""
     lo, hi = max(run_a.S2_START, f"{year}-01-01"), f"{year + 1}-01-01"
@@ -115,10 +129,8 @@ def lakes2_year(year: int, budget: Budget, lakes: list[dict]) -> list[dict]:
         crater = _disc(lake, "craterM")
 
         def per(img, lake=lake, crater=crater):
-            scl = img.select("SCL")
-            clear = scl.remap(S2_CLEAR_SCL, [1] * len(S2_CLEAR_SCL), 0)
-            refl = img.select(["B4", "B3", "B2", "B8"]).divide(10000)
-            water = refl.normalizedDifference(["B3", "B8"]).gt(0).And(clear)
+            refl = img.select(["B4", "B3", "B2"]).divide(10000)
+            water, clear = s2_water(img)
             px = ee.Image.pixelArea()
             wpx = px.updateMask(water)
             stack = (wpx.rename("water").addBands(px.updateMask(clear).rename("clear")).addBands(px.rename("total"))

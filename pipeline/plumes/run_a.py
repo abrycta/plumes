@@ -45,7 +45,15 @@ UVAI_BOX_KM = 50
 MIN_TEMP_PIXELS = 10  # clear water pixels in the core disc (30 m grid; the thermal band is 100-120 m native)
 MIN_TEMP_SHARE = 0.5  # share of the core disc that is clear water
 MIN_AREA_CLEAR = 0.9  # report area only when this share of the crater disc is clear ("cloud-free dates only")
-MIN_LAKE_M2 = 20_000  # below this the crater is treated as dry (about 200 Sentinel-2 pixels)
+MIN_LAKE_M2 = 200_000  # below this the crater is treated as dry: pools on wet ash reach about 0.15 km² (Taal, 2020-01-28)
+
+# Sentinel-2 water test (ee_run_a.s2_water applies the same thresholds in Earth Engine). NDWI > 0 alone counted wet ash
+# and haze as water (Taal 2020-09-19: 3.9 km² against a lake of about 1 km²); those surfaces are spectrally flat, so a
+# SWIR and a NIR ceiling remove them while dark and turquoise lake water both pass.
+WATER_MNDWI = 0.3  # (B3 - B11) / (B3 + B11)
+WATER_NDWI = 0.2  # (B3 - B8) / (B3 + B8)
+WATER_MAX_B11 = 0.08
+WATER_MAX_B8 = 0.15
 
 WINDOW_BEFORE_DAYS = 30
 WINDOW_AFTER_DAYS = 30
@@ -160,6 +168,17 @@ def srgb_hex(r: float | None, g: float | None, b: float | None, white: float = 0
         return round(x * 255)
 
     return f"#{ch(r):02x}{ch(g):02x}{ch(b):02x}"
+
+
+# ---------------------------------------------------------------- Sentinel-2 water test
+
+def _nd(a: float, b: float) -> float:
+    return (a - b) / (a + b) if a + b else 0.0
+
+
+def is_water(b3: float, b8: float, b11: float) -> bool:
+    """One clear Sentinel-2 pixel (surface reflectance 0-1): water or not. The reference for ee_run_a.s2_water."""
+    return (_nd(b3, b11) > WATER_MNDWI or _nd(b3, b8) > WATER_NDWI) and b11 < WATER_MAX_B11 and b8 < WATER_MAX_B8
 
 
 # ---------------------------------------------------------------- read-model series
