@@ -93,3 +93,16 @@ def test_series_fit_the_volcano_contract():
 def test_no_tables_adds_nothing():
     assert run_a.volcano_series("taal", run_a.load_lakes(), {}, {}) == {}
     assert run_a.volcano_series("mayon", run_a.load_lakes(), tables(), {}) == {}
+
+
+# Real Sentinel-2 L2A pixels (B3, B8, B11) sampled inside Taal's crater disc on 2026-10-23.
+LAKE_PIXELS = [(0.016, 0.001, 0.008), (0.028, 0.014, 0.015),  # 2019-12-24, dark lake before the eruption
+               (0.187, 0.06, 0.074), (0.169, 0.034, 0.025), (0.106, 0.023, 0.023)]  # 2020-06/09, turquoise lake after it
+NOT_WATER = [(0.116, 0.112, 0.115), (0.169, 0.158, 0.166),  # 2020-01-28, wet ash (old test: water)
+             (0.117, 0.113, 0.107), (0.074, 0.07, 0.072)]  # 2020-09-19 and 2020-06-16, haze over the crater (old test: water)
+
+
+def test_water_test_keeps_lake_water_and_drops_wet_ash_and_haze():
+    assert all(run_a.is_water(*p) for p in LAKE_PIXELS)
+    assert not any(run_a.is_water(*p) for p in NOT_WATER)
+    assert all((p[0] - p[1]) / (p[0] + p[1]) > 0 for p in NOT_WATER)  # the old test (NDWI > 0) let every one through
