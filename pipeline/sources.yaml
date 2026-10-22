@@ -355,6 +355,38 @@ sources:
         probe_contains: "VNP14A1"
     archived: { enabled: false }
 
+  - id: firms-viirs-noaa20
+    # chosen: true   # M2 step 1 (LAYERS-PLAN.md §7, DECISIONS L5): the VIIRS continuity series after S-NPP
+    description: >-
+      [M2] NASA FIRMS VIIRS NOAA-20 375 m active fire and thermal anomalies over the Philippine box (area API,
+      .../api/area/csv/<MAP_KEY>/VIIRS_NOAA20_SP/116,4,128,22/5/<date>, 2018-04-01 onward, about 3-4 months behind;
+      VIIRS_NOAA20_NRT fills the days after it, provisional and without `type`). S-NPP deliveries end 2026-11-02, so
+      this is the primary VIIRS source from M2, published as its own series `fire_viirs_n20_15km` (never spliced into
+      S-NPP) and added to the national thermal layer. Client: plumes/thermal_n20.py. Format: CSV. Size: about 1-3 MB a
+      year for the box [U]. Auth: FIRMS MAP_KEY (GitHub secret FIRMS_MAP_KEY). Fallback: the adopted bundle in
+      abrycta/plumes-archive (restored before the crawl).
+    kind: remote-dataset
+    licence: "open: NASA open data (LANCE/FIRMS) provided 'as is'; the LANCE disclaimer is reproduced; the fire products are not validated for detecting volcanoes"
+    attribution: "We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (https://earthdata.nasa.gov/firms), part of NASA's Earth Science Data and Information System (ESDIS). NRT VIIRS 375 m Active Fire product VJ114IMGTDL_NRT and the standard product VJ114IMG, NOAA-20, Collection 2."
+    cadence: daily
+    links:
+      - id: firms-api-sp
+        url: https://firms.modaps.eosdis.nasa.gov/api/area/
+        probe: https://firms.modaps.eosdis.nasa.gov/api/
+        probe_html: true
+        probe_contains: "area"
+      - id: firms-api-nrt                  # same host; the days after the standard product, provisional
+        url: https://firms.modaps.eosdis.nasa.gov/api/area/
+        probe: https://firms.modaps.eosdis.nasa.gov/api/data_availability/
+        probe_html: true
+        probe_contains: "availability"
+      - id: cmr-vj114a1                    # independent record: LP DAAC VIIRS/NOAA-20 thermal anomalies daily L3 1 km v002
+        url: https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VJ114A1&version=002
+        automatic: false                   # gridded HDF5, a different format from the FIRMS points
+        probe: https://cmr.earthdata.nasa.gov/search/granules.json?short_name=VJ114A1&version=002&page_size=1
+        probe_contains: "VJ114A1"
+    archived: { enabled: false }
+
   - id: worldpop-100m
     # chosen: true   # source 13 of 24, M1 (DECISIONS.md Q30)
     description: "[M1] WorldPop (University of Southampton) 100 m population counts (WorldPop/GP/100m/pop on Earth Engine, 2000-2020; Global 2, 2015-2030, from the Earth Engine community catalogue asset projects/sat-io/open-datasets/WORLDPOP/pop instead of the GeoTIFF download, Q30; which release it holds is spike item 20), reduced to population within 5/10/15/30 km rings and the PDZ per volcano, once per year. Format: EE. Size: 24 x rings x years rows. Auth: Earth Engine service account."
@@ -611,25 +643,34 @@ sources:
 
 
   - id: omi-omso2e
-    # chosen: true   # source 21 of 24, M1 (DECISIONS.md Q31)
+    # chosen: true   # source 21 of 24, M1 (DECISIONS.md Q31); built at M2 step 2 (LAYERS-PLAN.md §7)
     description: >-
-      [M1] NASA GES DISC OMI/Aura Sulfur Dioxide Total Column Daily L3 Best Pixel 0.25 deg (OMSO2e v003), 2004-10-01
-      onward: the SO2 track before TROPOMI for every volcano (NASA-EE-CANDIDATES.md A1). Access: one Harmony request
-      per volcano box and date range (services "Harmony OPeNDAP SubSetter (HOSS) Geographic", "OPeNDAP"); only the
-      subset is returned and reduced to daily rows. Format: netCDF4 subsets. Size: a few MB per volcano over 22 years
-      returned; about 8,000 daily rows per volcano, under 0.3 MB [U]. Auth: NASA Earthdata token (CI mints it from the login).
+      [M2] NASA GES DISC OMI/Aura Sulfur Dioxide Total Column Daily L3 Best Pixel 0.25 deg, OMSO2e **v004**
+      (C3756242136-GES_DISC), 2004-10-01 onward: the SO2 track before TROPOMI for every volcano
+      (NASA-EE-CANDIDATES.md A1). v003 stopped at 2026-03-22; v004's ColumnAmountSO2 uses a GEOS-5 profile (one
+      column, not v003's PBL/TRL/STL family). Access: one Harmony request per calendar year over the Philippine box
+      (HOSS bbox and variable subset, about 25 kB a day), reduced at once to rows per volcano (50 km box, cloud
+      radiance fraction at most 0.3) by plumes/omi.py; the raw subsets are discarded and the reduced table
+      data/tables/omi-so2/<year>.csv is adopted into abrycta/plumes-archive (restored before the run). Format: netCDF4
+      subsets in, CSV out. Size: about 200 MB returned for 22 years [U]; about 8,000 daily rows per volcano, under
+      0.3 MB. Auth: NASA Earthdata token (CI mints it from the login).
     kind: remote-dataset
     licence: "open: NASA EOSDIS data use policy (no restriction; citation requested)"
-    attribution: "Li, C., Krotkov, N. A., Leonard, P. (2020), OMI/Aura Sulfur Dioxide (SO2) Total Column Daily L3 Best Pixel in 0.25 degree x 0.25 degree V3, GES DISC, doi:10.5067/Aura/OMI/DATA3008 [U: copy the exact citation from the GES DISC page when built]"
+    attribution: "Li, C., Krotkov, N. A., Leonard, P., OMI/Aura Sulfur Dioxide (SO2) Total Column Daily L3 1 day Best Pixel in 0.25 degree x 0.25 degree V4, Greenbelt, MD, USA, Goddard Earth Sciences Data and Information Services Center (GES DISC), doi:10.5067/AURA/OMI/DATA3408"
     cadence: daily
     links:
       - id: harmony
-        url: https://harmony.earthdata.nasa.gov/
-        probe_html: true                   # the landing page is public; requests need the Earthdata token
-        probe_contains: "Harmony"
+        url: https://harmony.earthdata.nasa.gov/C3756242136-GES_DISC/ogc-api-coverages/1.0.0/collections/parameter_vars/coverage/rangeset
+        probe: https://harmony.earthdata.nasa.gov/capabilities?collectionId=C3756242136-GES_DISC
+        probe_contains: "OMSO2e"
+      - id: harmony-v003                   # the M1 route: same host, v003 (ends 2026-03-22), a different column definition
+        url: https://harmony.earthdata.nasa.gov/C1266136112-GES_DISC/ogc-api-coverages/1.0.0/collections/parameter_vars/coverage/rangeset
+        automatic: false
+        probe: https://harmony.earthdata.nasa.gov/capabilities?collectionId=C1266136112-GES_DISC
+        probe_contains: "OMSO2e"
       - id: cmr
-        url: https://cmr.earthdata.nasa.gov/search/collections.umm_json?short_name=OMSO2e&version=003
-        probe: https://cmr.earthdata.nasa.gov/search/collections.json?short_name=OMSO2e&version=003
+        url: https://cmr.earthdata.nasa.gov/search/collections.umm_json?short_name=OMSO2e&version=004
+        probe: https://cmr.earthdata.nasa.gov/search/collections.json?short_name=OMSO2e&version=004
         probe_contains: "OMSO2e"
       - id: gibs-omi-so2
         url: https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/1.0.0/WMTSCapabilities.xml

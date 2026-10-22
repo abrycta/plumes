@@ -10,7 +10,9 @@ Python (uv). Builds Plumes' data versions from the 22 M1 registry entries in [`s
 | Tokyo VAAC | `plumes.crawl.vaac` | `vaac-tokyo-advisories` | Philippine advisories 2010 → from the yearly lists |
 | DROMIC | `plumes.crawl.dromic` | `dswd-dromic-reports` | Taal 2020: grand totals from 69 `.docx` reports (Report #1 is `.doc`) |
 | FIRMS area API | `plumes.firms` | `firms-modis` | MODIS_SP and VIIRS_SNPP_SP, 5-day windows (needs `FIRMS_MAP_KEY`) |
+| FIRMS NOAA-20 (M2) | `plumes.thermal_n20` | `firms-viirs-noaa20` | `VIIRS_NOAA20_SP` windows, then the SP/NRT tail to today in `recent.csv`; the S-NPP successor, its own series |
 | MSVOLSO2L4 | `plumes.nasa` | `nasa-msvolso2l4` | needs `EARTHDATA_TOKEN` |
+| OMI SO₂ (M2) | `plumes.omi` | `omi-omso2e` | OMSO2e v004 via Harmony, one job per year, reduced per volcano box; needs `EARTHDATA_TOKEN` and `h5py` |
 | COD-AB | `plumes.codab` | `cod-ab-phl-gdb` | range read of `phl_admin3.dbf` only (B3) |
 | Earth Engine | `plumes.ee_series so2 / fire / exposure / thumbs-taal` | S5P, MOD14A1, VNP14A1, FIRMS, WorldPop, Sentinel-2 | one aggregation per month; Plumes cap 50 EECU-h a month, 10 a run (B4); needs `EE_SA_KEY` or `EE_KEY_FILE` |
 | Earth Engine run B | `plumes.ee_run_b rain / so2-map [--canary YYYY-MM]` | `gpm-imerg-v07`, `s5p-offl-so2` | IMERG Final daily rain per 15 km ring (`ee-rain/`), national monthly SO₂ GeoTIFFs (`ee-so2-monthly/`); gated: Kurt checks the monthly EE total, then a one-month canary sizes the backfill (S8); `--max-eecu-h` stops a run early. Not in `data.yml` until the backfill is done |

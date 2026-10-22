@@ -32,9 +32,10 @@ Published base URL: `https://krtmtthw.dev/plumes/data/` (GitHub Pages, range req
 | id | where | unit | source |
 |---|---|---|---|
 | `so2_s5p_15km`, `so2_s5p_50km` | daily | µmol/m² column mean (published versions may add `so2_s5p_mass_15km` in t) | `s5p-offl-so2` |
-| `so2_omi_box` | daily | DU, PBL column | `omi-omso2e` |
+| `so2_omi_box` | daily | DU, mean column within a 50 km box (OMSO2e v004: GEOS-5 profile, not v003's PBL column; v003 ended 2026-03-22) | `omi-omso2e` |
 | `frp_modis_15km`, `frp_viirs_15km` | events | MW (MaxFRP), pixels | `modis-mod14a1`, `viirs-vnp14a1` |
 | `fire_viirs_15km`, `fire_modis_15km` | events | detections, MW | `firms-modis` (area API) |
+| `fire_viirs_n20_15km` (M2) | events | detections, FIRMS-flagged volcanic detections, MW; NOAA-20, its own series (never joined to S-NPP) | `firms-viirs-noaa20` (area API) |
 | `eq_usgs_30km`, `eq_usgs_10km` | events | count, max magnitude | `usgs-comcat-ph-*` |
 | `lake_temp_landsat` | events | °C | `landsat-surface-temperature` |
 | `bulletins` / `advisories` / `displacement` | tables | see schema | `phivolcs-*`, `vaac-tokyo-advisories`, `dswd-dromic-reports` |
