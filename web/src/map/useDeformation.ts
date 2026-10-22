@@ -1,4 +1,4 @@
-// Draws the deformation-velocity frames on the interactive map: from the layer's minzoom, only frames in view, each
+// Draws the deformation-velocity frames on the interactive map: from national zoom (z4), only frames in view, each
 // fetched once (one GET of a ~5-15 kB file), decoded, coloured from the theme's diverging ramp and shown as a MapLibre
 // image source at the frame's bounds. COMET's reference areas are drawn as small rings.
 
@@ -20,6 +20,7 @@ export interface DeformationOverlay {
 
 const REF = "deformation-ref";
 const PREFIX = "deformation-";
+const DEFO_MINZOOM = 4;
 
 function token(id: string, key: ThemeKey): string {
   const t = (flat as unknown as Record<string, Record<string, string>>)[id];
@@ -67,7 +68,9 @@ export function useDeformation(map: MlMap | null, ready: boolean, overlay: Defor
     const frames = layer.frames!;
     const domain = velocityDomain(layer);
     const ramp = rampFor(key);
-    const minzoom = layer.minzoom ?? 7;
+    // From national zoom: the frames are whole small images (about 6 KB each), not a tile pyramid, so they draw at any
+    // zoom; layers.json's minzoom 7 is only advice and is capped here at 4.
+    const minzoom = Math.min(layer.minzoom ?? DEFO_MINZOOM, DEFO_MINZOOM);
     let live = true;
 
     // Below the density and circle layers (hexes, thermal, quakes) when they exist; the volcano markers are DOM and stay on top.

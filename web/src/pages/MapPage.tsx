@@ -37,7 +37,7 @@ export default function MapPage() {
   const rich = useRichMedia();
   const thermalLayer = layers.layers.find((l) => l.id === "thermal-detections");
   const quakeLayer = layers.layers.find((l) => l.id === "earthquakes-usgs");
-  // COMET deformation velocity (LAYERS-PLAN §3.1): on by default, interactive map only, drawn from the layer's minzoom.
+  // COMET deformation velocity (LAYERS-PLAN §3.1): on by default, interactive map only, drawn from national zoom (z4).
   const defo = layers.layers.find((l) => l.id === "deformation-velocity" && l.frames?.length);
   const [showDefo, setShowDefo] = useState(true);
   const deformation = useMemo(
