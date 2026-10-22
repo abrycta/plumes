@@ -20,7 +20,7 @@
     "sources": "uv run --no-project --with pyyaml python scripts/extract_sources.py"
   },
   "dependencies": {
-    "@abrycta/akari": "^0.14.0",
+    "@abrycta/akari": "^0.15.0",
     "@mapbox/vector-tile": "^3.0.0",
     "geotiff": "^3.0.5",
     "maplibre-gl": "^6.15.0",

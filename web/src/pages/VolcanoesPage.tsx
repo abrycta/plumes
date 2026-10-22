@@ -1,7 +1,6 @@
 import { Page, useT } from "@abrycta/akari/react";
 import { use, useEffect } from "react";
 
-import { COMPACT_PAGE } from "@/app/layout";
 import { DataThrough } from "@/components/DataThrough";
 import { VolcanoList } from "@/components/VolcanoList";
 import { loadRoot, loadVolcanoes } from "@/data/load";
@@ -15,7 +14,6 @@ export default function VolcanoesPage() {
   }, [t]);
   return (
     <Page
-      className={COMPACT_PAGE}
       eyebrow={<DataThrough date={root.latest.dataAsOf} />}
       title={t(`The ${index.features.length} active volcanoes`, `${index.features.length}の活火山`)}
       lede={t(
