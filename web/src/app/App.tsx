@@ -2,6 +2,7 @@ import { AkariProvider } from "@abrycta/akari/react";
 import { lazy, Suspense } from "react";
 
 import { ErrorBoundary } from "./ErrorBoundary";
+import { PageGlyph } from "./PageGlyph";
 import { Shell } from "./Shell";
 import { parseUrl, useUrlState } from "./url";
 
@@ -49,7 +50,7 @@ function Pages() {
   }
   return (
     <ErrorBoundary key={`${page}/${id ?? ""}`}>
-      <Suspense fallback={<div className="p-8 text-sm text-muted-foreground">…</div>}>{el}</Suspense>
+      <Suspense fallback={<PageGlyph />}>{el}</Suspense>
     </ErrorBoundary>
   );
 }
