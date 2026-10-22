@@ -42,7 +42,7 @@ export function PlumesHeader({ url }: { url: UrlState }) {
       location={url.page === "notfound" ? undefined : { pathname: formatUrl({ ...url, lang: null, date: null, from: null, to: null, ring: null }) }}
       portfolioLink
       languages
-      width={url.page === "map" ? "full" : "contained"}
+      width="full"
       renderLink={(p) => (
         <a
           {...p}
