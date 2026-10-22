@@ -1,6 +1,6 @@
-# COMET licence email (draft, not sent)
+# COMET licence email (not sent — decided 2026-10-22)
 
-Status: 2026-10-22. Draft for Kurt to send himself (decision L1 in [../DECISIONS.md](../DECISIONS.md)). **Nothing has been sent.** COMET data is not published by Plumes until the reply is recorded in DECISIONS.md.
+Status: **not sent — decided 2026-10-22.** Kurt decided the same day not to email COMET (DECISIONS L1a): the portal's CC BY-NC 4.0 notice is treated as covering the LiCSBAS data, which Plumes publishes with attribution and the CC BY-NC notice. The draft below is kept as history only.
 
 Where to send it: the COMET Volcano Portal's "Contact/Give Feedback" page, https://comet.nerc.ac.uk/comet-volcano-portal/contact (the copyright page lists no email address; checked 2026-10-22).
 

@@ -53,9 +53,7 @@ Raised by the source canvas, the decided architecture, the 20-source proposal an
 4. Give the go-ahead for the throwaway free-plan Render service and Neon project of spike items 13–15 (Q20, Q21), deleted after the measurement.
 5. When the repo exists: create the second Earth Engine service account and save its key as `earth-engine-sa-key-plumes` (Q22); add it (or the `lgu-lights` key), the FIRMS MAP_KEY and the Earthdata login as GitHub secrets.
 
-6. **Send the COMET licence email** (L1): draft at [research/comet-licence-email.md](research/comet-licence-email.md), via https://comet.nerc.ac.uk/comet-volcano-portal/contact; pass on the reply so it can be recorded. COMET data stays unpublished until then.
-7. **Approve the `deformation-velocity` contract change** (L3; [LAYERS-PLAN.md](LAYERS-PLAN.md) §3.1) before M2 step 9 is built.
-8. Later, by hand: the ISC Bulletin licence (L8), for a possible second earthquake catalogue at M3.
+6. Later, by hand: the ISC Bulletin licence (L8), for a possible second earthquake catalogue at M3.
 
 Action 3 is partly done: the one `MSAQSO2L4` read was allowed and made on 2026-10-22 (L9); `MSVOLSO2L4` is already a source.
 
