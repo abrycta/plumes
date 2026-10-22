@@ -27,7 +27,7 @@ export function LakeColours({ model }: { model: VolcanoReadModel }) {
         {swatches.map((s) => (
           <li
             key={s.date}
-            className="size-3 rounded-sm border border-border"
+            className="size-3 rounded-[2px] border border-border"
             style={{ backgroundColor: s.colour }}
             title={`${formatDate(s.date, lang)} · ${formatNumber(s.areaKm2, lang, 2)} km²`}
           >

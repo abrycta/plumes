@@ -9,10 +9,10 @@ maplibregl.setWorkerUrl(workerUrl);
 
 import { applyBasemapTheme, stepColor } from "@abrycta/akari/maps";
 import { useContrast, useLang, useT, useTheme } from "@abrycta/akari/react";
+import { flat } from "@abrycta/akari/tokens";
 import type { ExpressionSpecification, GeoJSONSource, Map as MlMap, StyleSpecification } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
 
-import { type ThemeKey, tokenColour } from "@/lib/tokens";
 import type { VolcanoesIndex } from "@contracts/readmodels";
 
 import { formatUrl, navigateHref } from "@/app/url";
@@ -23,6 +23,7 @@ import { PH_BOUNDS } from "./geo";
 import { type DeformationOverlay, useDeformation } from "./useDeformation";
 import type { MapGeojson } from "./windowData";
 
+type ThemeKey = "light" | "dark" | "light-hc" | "dark-hc";
 
 /** Akari data colours of the layers (the legends use the same tokens). */
 const LAYER_TOKENS = {
@@ -32,7 +33,8 @@ const LAYER_TOKENS = {
 } as const;
 
 function tokenColor(id: string, key: ThemeKey): string {
-  return tokenColour(id, key);
+  const t = (flat as unknown as Record<string, Record<string, string>>)[id];
+  return t?.[key] ?? t?.light ?? "#888888";
 }
 
 /** Offline fallback: the bundled Natural Earth coastline only (public domain). */
