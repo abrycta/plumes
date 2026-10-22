@@ -20,17 +20,13 @@ import { formatNumber } from "@/lib/format";
 
 import { HEX_BREAKS, type Activity } from "./density";
 import { PH_BOUNDS } from "./geo";
+import { LAYER_TOKENS } from "./layerColors";
+import { MapGlyph } from "./MapGlyph";
 import { type DeformationOverlay, useDeformation } from "./useDeformation";
 import type { MapGeojson } from "./windowData";
 
 type ThemeKey = "light" | "dark" | "light-hc" | "dark-hc";
 
-/** Akari data colours of the layers (the legends use the same tokens). */
-const LAYER_TOKENS = {
-  thermal: "data.cat.4",
-  /** Earthquake depth classes: shallow, intermediate, deep. */
-  depth: ["data.div.7", "data.div.6", "data.div.5"],
-} as const;
 
 function tokenColor(id: string, key: ThemeKey): string {
   const t = (flat as unknown as Record<string, Record<string, string>>)[id];
@@ -83,6 +79,8 @@ export interface EmbedOptions {
   scale: number;
   /** Called once, when the first full frame with its layers is drawn. */
   onReady: () => void;
+  /** Called after every data change once the map has drawn it (the tour fades back in then). */
+  onDrawn?: () => void;
 }
 
 const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: [] };
@@ -101,6 +99,8 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
   const [map, setMap] = useState<MlMap | null>(null);
   const fallback = useRef(false);
   const signalled = useRef(false);
+  // The glyph still covers the map until its first full frame with data (MapGlyph).
+  const [drawn, setDrawn] = useState(false);
   const k = embed?.scale ?? 1;
 
   useEffect(() => {
@@ -210,10 +210,14 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     const map = mapRef.current;
     if (!map || !ready) return;
     for (const id of LAYERS) (map.getSource(id) as GeoJSONSource | undefined)?.setData(data?.[id] ?? EMPTY);
-    if (embed && data && !signalled.current) {
+    // The first idle with the window's data drawn: the glyph still lifts, and the embed is ready.
+    if (data && !signalled.current) {
       signalled.current = true;
-      map.once("idle", () => embed.onReady());
-    }
+      map.once("idle", () => {
+        setDrawn(true);
+        embed?.onReady();
+      });
+    } else if (embed?.onDrawn && data) map.once("idle", embed.onDrawn);
   }, [ready, data, embed]);
 
   useDeformation(map, ready > 0, deformation, key);
@@ -302,5 +306,10 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, lang, activityKey, eruptionKey]);
 
-  return <div ref={box} className={embed ? "h-full w-full" : "h-full min-h-90 w-full"} role="region" aria-label={t("Interactive map of the 24 volcanoes", "24火山のインタラクティブ地図")} data-interactive-map />;
+  return (
+    <>
+      <div ref={box} className={embed ? "h-full w-full" : "h-full min-h-90 w-full"} role="region" aria-label={t("Interactive map of the 24 volcanoes", "24火山のインタラクティブ地図")} data-interactive-map />
+      {drawn ? null : <MapGlyph />}
+    </>
+  );
 }
