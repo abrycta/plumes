@@ -32,5 +32,10 @@ describe("density helpers", () => {
       { month: "2020-01", thermalNear: 1, thermalFar: 1, quakes: 0 },
       { month: "2020-02", thermalNear: 0, thermalFar: 0, quakes: 1 },
     ]);
+    // Months outside a layer's record are flagged not observed (a gap), never counted as zero.
+    expect(monthlyCounts(["2020-01", "2020-02"], thermal, quakes, { thermal: new Set(["2020-01"]), quakes: null })).toEqual([
+      { month: "2020-01", thermalNear: 1, thermalFar: 1, quakes: 0 },
+      { month: "2020-02", thermalNear: 0, thermalFar: 0, quakes: 1, thermalObserved: false },
+    ]);
   });
 });

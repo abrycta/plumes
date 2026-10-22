@@ -36,7 +36,11 @@ export function MapTimeline({ record, recordQuakes, end, span, onEnd, counts, fo
   const n = record.length;
   const start = Math.max(0, end - span + 1);
   const qMax = Math.max(1, ...(recordQuakes ?? [0]));
-  const cMax = Math.max(1, ...(counts ?? []).map((c) => Math.max(c.thermalNear + c.thermalFar, c.quakes)));
+  const cMax = Math.max(1, ...(counts ?? []).map((c) => Math.max(c.thermalObserved === false ? 0 : c.thermalNear + c.thermalFar, c.quakesObserved === false ? 0 : c.quakes)));
+  // Months outside a layer's record: a shaded gap, never a zero bar (as on the volcano timeline).
+  const notObserved = t("Not observed: outside this instrument's record", "観測なし(この観測機器の記録の範囲外)");
+  const thermalGap = t("thermal detections not observed (outside this instrument's record)", "熱異常は観測なし(この観測機器の記録の範囲外)");
+  const quakesGap = t("earthquakes not observed (outside this instrument's record)", "地震は観測なし(この観測機器の記録の範囲外)");
   const years = record.map((m, i) => [m, i] as const).filter(([m]) => m.endsWith("-01") && Number(m.slice(0, 4)) % 5 === 0);
   const windowLabel = `${formatMonth(record[start] ?? "", "short")} – ${formatMonth(record[end] ?? "", "short")}`;
 
@@ -79,22 +83,28 @@ export function MapTimeline({ record, recordQuakes, end, span, onEnd, counts, fo
         </Button>
       </div>
       <ol className="m-0 grid list-none grid-cols-12 gap-1 p-0" aria-label={t("The window, month by month", "期間の月ごとの件数")} data-window-months>
-        {(counts ?? record.slice(start, end + 1).map((m) => ({ month: m, thermalNear: 0, thermalFar: 0, quakes: 0 }))).map((c) => {
+        {(counts ?? record.slice(start, end + 1).map((m): MonthCount => ({ month: m, thermalNear: 0, thermalFar: 0, quakes: 0 }))).map((c) => {
           const thermal = c.thermalNear + c.thermalFar;
+          const thermalSeen = c.thermalObserved !== false;
+          const quakesSeen = c.quakesObserved !== false;
           return (
-            <li key={c.month} className="flex min-w-0 flex-col gap-1">
+            <li key={c.month} className="flex min-w-0 flex-col gap-1" data-not-observed={[!thermalSeen && "thermal", !quakesSeen && "quakes"].filter(Boolean).join(" ") || undefined}>
               <div className="flex h-12 items-end gap-0.5" aria-hidden="true">
-                <div className="flex h-full flex-1 flex-col justify-end">
-                  <div className="bg-chart-4 opacity-30" style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
-                  <div className="bg-chart-4" style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
-                </div>
-                <div className="flex-1" style={{ height: `${(100 * c.quakes) / cMax}%`, background: "var(--ak-div-7)" }} />
+                {thermalSeen ? (
+                  <div className="flex h-full flex-1 flex-col justify-end">
+                    <div className="bg-chart-4 opacity-30" style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
+                    <div className="bg-chart-4" style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
+                  </div>
+                ) : (
+                  <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} />
+                )}
+                {quakesSeen ? <div className="flex-1" style={{ height: `${(100 * c.quakes) / cMax}%`, background: "var(--ak-div-7)" }} /> : <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} />}
               </div>
               <span className="truncate text-center font-mono text-ak-2xs text-muted-foreground">{monthAbbr(c.month, lang)}</span>
               <span className="sr-only">
                 {t(
-                  `${formatNumber(thermal, lang)} thermal detections (${formatNumber(c.thermalNear, lang)} near a volcano), ${formatNumber(c.quakes, lang)} earthquakes`,
-                  `熱異常${formatNumber(thermal, lang)}件(火山付近${formatNumber(c.thermalNear, lang)}件)、地震${formatNumber(c.quakes, lang)}件`,
+                  `${thermalSeen ? `${formatNumber(thermal, lang)} thermal detections (${formatNumber(c.thermalNear, lang)} near a volcano)` : thermalGap}, ${quakesSeen ? `${formatNumber(c.quakes, lang)} earthquakes` : quakesGap}`,
+                  `${thermalSeen ? `熱異常${formatNumber(thermal, lang)}件(火山付近${formatNumber(c.thermalNear, lang)}件)` : thermalGap}、${quakesSeen ? `地震${formatNumber(c.quakes, lang)}件` : quakesGap}`,
                 )}
               </span>
             </li>

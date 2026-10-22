@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import type { Layer, Layers } from "@contracts/readmodels";
+import type { Layer, Layers, VolcanoesIndex } from "@contracts/readmodels";
 
-import { defaultWindowMonths, recordMonths } from "./windowData";
+import { defaultWindowMonths, deriveWindow, layerCoverage, recordMonths } from "./windowData";
 
 const base = { title: { en: "", ja: "" }, sources: [] as string[], attribution: "" };
 const thermal = { ...base, id: "thermal-detections", format: "pmtiles", url: "layers/thermal/{year}.pmtiles", time: { step: "month", start: "2025-01", end: "2026-03" } } as Layer;
@@ -22,5 +22,17 @@ describe("the map's first window (prefetched from main.tsx, then shown by MapPag
     expect(months[0]).toBe("2025-03");
     expect(months.at(-1)).toBe("2026-02");
     expect(defaultWindowMonths([])).toEqual([]);
+  });
+});
+
+describe("months outside a layer's record", () => {
+  it("are not observed (a gap), never zero", () => {
+    const index = { features: [] } as unknown as VolcanoesIndex;
+    const d = deriveWindow(index, ["2024-12", "2025-01", "2026-03"], [], [], layerCoverage(layers));
+    expect(d.counts.map((c) => [c.month, c.thermalObserved ?? true, c.quakesObserved ?? true])).toEqual([
+      ["2024-12", false, true],
+      ["2025-01", true, true],
+      ["2026-03", true, false],
+    ]);
   });
 });

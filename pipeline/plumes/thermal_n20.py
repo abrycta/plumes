@@ -78,7 +78,9 @@ def fetch_tail(key: str, c: Polite, since: dt.date, sp_to: dt.date, until: dt.da
         w = csv.DictWriter(f, fieldnames=[*firms.COLS, "product"], extrasaction="ignore")
         w.writeheader()
         w.writerows(out)
-    return {"tail_rows": len(out), "from": since.isoformat(), "sp_to": sp_to.isoformat(), "to": until.isoformat()}
+    meta = {"from": since.isoformat(), "sp_to": sp_to.isoformat(), "to": until.isoformat()}
+    _tail_meta().write_text(json.dumps(meta) + "\n")  # the tail's coverage, read back as the series' end
+    return {"tail_rows": len(out), **meta}
 
 
 def fetch(start: str | None = None, end: str | None = None, nrt: bool = True) -> dict:
@@ -133,6 +135,27 @@ def _detections() -> tuple[list[dict], str | None]:
     return out, covered
 
 
+def _tail_meta():
+    """recent.json beside recent.csv: the days the last complete tail fetch covered ({from, sp_to, to})."""
+    return NRT_FILE.with_name("recent.json")
+
+
+def covered_end(covered: str | None) -> str | None:
+    """Last day the series covers: the tail's recorded end (recent.json), else the newest day in a tail file written
+    before recent.json existed (the national box has detections nearly every day), else the standard coverage end.
+    Later days read as not observed, never as "nothing detected"."""
+    tail_to = None
+    if NRT_FILE.exists():
+        meta = _tail_meta()
+        if meta.exists():
+            tail_to = json.loads(meta.read_text()).get("to")
+        else:
+            with open(NRT_FILE, newline="") as f:
+                tail_to = max((r["acq_date"] for r in csv.DictReader(f)), default=None)
+    ends = [d for d in (covered, tail_to) if d]
+    return max(ends) if ends else None
+
+
 def _lt(en: str, ja: str) -> dict:
     return {"en": en, "ja": ja}
 
@@ -164,6 +187,7 @@ def series_by_volcano(vols: list[dict]) -> dict[str, dict]:
         f"{SNPP_END}に終了)。熱異常には植生火災も含まれる。「火山フラグ」はFIRMS type 1(活火山)の件数。"
         + "火山フラグの件数がない日は準リアルタイム(暫定)の検知で、typeフラグがない。",
     )
+    end = covered_end(covered)
     out = {}
     for v in vols:
         by = days.get(v["id"], {})
@@ -174,7 +198,7 @@ def series_by_volcano(vols: list[dict]) -> dict[str, dict]:
             "units": {"n": "detections", "nVolcano": "detections", "maxFrpMw": "MW"},
             "ringKm": RING_KM, "start": START,
             "rows": [[d, x[0], None if x[3] else x[1], None if x[2] is None else round(x[2], 1)] for d, x in sorted(by.items())],
-            "note": note}}
+            "note": note} | ({"end": end} if end else {})}
     return out
 
 
