@@ -59,14 +59,25 @@ jobs:
           for f in in/usgs-comcat-ph-*/*.csv; do args+=(--usgs "/${f}"); done
           for f in in/firms-modis/raw/firms/*/*.csv; do args+=(--firms "/${f}"); done
           docker run --rm -e DATABASE_URL -v "$PWD/in:/in:ro" --entrypoint /app/plumes-api "$IMAGE" "${args[@]}"
-      - name: The API reports the published version (through the edge)
+      - name: The API serves the published version (through the edge)
+        # The edge keeps a copy fresh for s-maxage (10 minutes), then revalidates it by ETag, so this waits up to 12.
         if: steps.secrets.outputs.ok == 'true'
         run: |
           want=$(curl -fsS "${ROOT}latest.json" | jq -r .current)
-          for _ in $(seq 1 18); do
+          base="${ROOT}${want}/"
+          for _ in $(seq 1 72); do
             got=$(curl -s "$SITE/api/v1/meta" | jq -r '.dataVersion // empty' 2>/dev/null || true)
-            echo "meta: ${got:-waiting} (want $want)"
-            if [ "$got" = "$want" ]; then exit 0; fi
-            sleep 10
+            if [ "$got" = "$want" ]; then break; fi
+            echo "meta: ${got:-waiting} (want $want)"; sleep 10
           done
-          echo "::warning::the edge still serves an older /v1/meta; it revalidates by ETag on the next request"
+          [ "$got" = "$want" ] || { echo "::error::/v1/meta still reports ${got:-nothing}, not $want"; exit 1; }
+          # The list and Taal equal the published files (the contract's "equals" rule), retried while the edge refreshes.
+          for pair in "volcanoes=volcanoes.geojson" "volcanoes/taal=volcano/taal.json"; do
+            set -- "${pair%%=*}" "${pair#*=}"
+            for _ in $(seq 1 72); do
+              if cmp -s <(curl -fsS "$SITE/api/v1/$1" | jq -S .) <(curl -fsS "$base$2" | jq -S .); then echo "/v1/$1 equals $want/$2"; continue 2; fi
+              sleep 10
+            done
+            echo "::error::/v1/$1 differs from $want/$2"; exit 1
+          done
+          echo "API serves $want" >> "$GITHUB_STEP_SUMMARY"
