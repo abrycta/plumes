@@ -1,6 +1,7 @@
 import { Page, Prose, T, useLang, useT } from "@abrycta/akari/react";
 import { use, useEffect } from "react";
 
+import { COMPACT_PAGE } from "@/app/layout";
 import { ExtLink } from "@/app/Link";
 import { PHIVOLCS_BULLETINS_URL, PHIVOLCS_URL } from "@/app/SafetyBanner";
 import sources from "@/content/sources.json";
@@ -40,7 +41,7 @@ export default function AboutPage() {
   const rows = (sources as SourceRow[]).slice().sort((a, b) => a.milestone.localeCompare(b.milestone) || a.id.localeCompare(b.id));
   return (
     <Page
-      width="full"
+      className={COMPACT_PAGE}
       title={t("About & sources", "概要と出典")}
       lede={t(
         "Plumes is a retrospective record of the 24 active Philippine volcanoes: a past record and visualisation only, never a hazard service.",
@@ -145,9 +146,13 @@ export default function AboutPage() {
                   </td>
                   <td className="py-2 pr-3">
                     <span className="block">{VERDICTS[r.verdict]?.[lang] ?? r.verdict}</span>
-                    <span className="block text-xs text-muted-foreground" lang="en">
-                      {r.licence}
-                    </span>
+                    {/* The full terms one tap away (rule 28b). */}
+                    <details className="text-xs text-muted-foreground">
+                      <summary className="cursor-pointer">{t("Terms", "利用条件")}</summary>
+                      <span className="block" lang="en">
+                        {r.licence}
+                      </span>
+                    </details>
                   </td>
                   <td className="py-2 text-xs" lang="en">
                     {r.attribution}

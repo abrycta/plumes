@@ -1,6 +1,7 @@
 import { Page, useLang, useT } from "@abrycta/akari/react";
 import { use, useEffect } from "react";
 
+import { COMPACT_PAGE } from "@/app/layout";
 import { AppLink } from "@/app/Link";
 import { loadStory, STORIES } from "@/data/load";
 import { formatRange } from "@/lib/dates";
@@ -25,7 +26,7 @@ export default function StoriesPage() {
     document.title = `${t("Stories", "ストーリー")} · Plumes`;
   }, [t]);
   return (
-    <Page width="full" title={t("Stories", "ストーリー")} lede={t("Past eruptions told step by step, every number linked to its source and date.", "過去の噴火を一歩ずつ。すべての数値に出典と日付のリンク付き。")}>
+    <Page className={COMPACT_PAGE} title={t("Stories", "ストーリー")} lede={t("Past eruptions told step by step, every number linked to its source and date.", "過去の噴火を一歩ずつ。すべての数値に出典と日付のリンク付き。")}>
       <ul className="m-0 grid list-none items-start gap-3 p-0 sm:grid-cols-2">
         {STORIES.map((s) => (
           <StoryCard key={s.id} id={s.id} />

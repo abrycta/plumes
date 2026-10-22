@@ -1,6 +1,7 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, Page, Scrollytelling, T, useLang, useT } from "@abrycta/akari/react";
 import { use, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
+import { COMPACT_PAGE } from "@/app/layout";
 import type { Story, StoryStep, VolcanoReadModel } from "@contracts/readmodels";
 
 import { AppLink } from "@/app/Link";
@@ -101,7 +102,7 @@ function StoryView({ story }: { story: Story }) {
   if (!model) return <NotFoundPage />;
   return (
     <Page
-      width="full"
+      className={COMPACT_PAGE}
       eyebrow={
         <Breadcrumb>
           <BreadcrumbList>

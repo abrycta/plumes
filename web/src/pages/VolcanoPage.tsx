@@ -14,6 +14,7 @@ import {
 } from "@abrycta/akari/react";
 import { use, useEffect, useMemo } from "react";
 
+import { COMPACT_PAGE } from "@/app/layout";
 import type { VolcanoReadModel, VolcanoesIndex } from "@contracts/readmodels";
 
 import { AppLink, ExtLink } from "@/app/Link";
@@ -103,7 +104,7 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
 
   return (
     <>
-      <section aria-labelledby="record-title" className="flex flex-col gap-4">
+      <section aria-labelledby="record-title" className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
           <h2 id="record-title" className="m-0 font-heading text-2xl font-semibold">
             <T en="Every record on one time axis" ja="すべての記録を一つの時間軸に" />
@@ -164,16 +165,20 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
           </div>
         </div>
 
-        <div className="grid items-start gap-ak-block-gap xl:grid-cols-[minmax(0,1fr)_360px]">
+        {/* In the 1120px column a side readout would leave the plots about 470px wide (772px before): the readout
+            sits under the timeline at every width so the charts keep their width (rule 28c). */}
+        <div className="grid items-start gap-6">
           <Timeline tracks={tracks} from={period.from} to={period.to} cursor={cursor} onCursor={setCursor} dataAsOf={model.dataAsOf} />
-          <aside className="xl:sticky xl:top-[calc(var(--scrolly-top,5rem)+4rem)]">
+          <aside>
             <Readout tracks={tracks} date={cursor} />
           </aside>
         </div>
         {absent.length ? (
-          <div className="flex flex-col gap-2" data-absent-records>
-            <h3 className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{t("Nothing to show, and why", "記録がない系列とその理由")}</h3>
-            <dl className="m-0 grid max-w-4xl gap-x-6 gap-y-2 text-sm md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
+          <details data-absent-records>
+            <summary className="cursor-pointer text-muted-foreground">
+              <h3 className="m-0 inline font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{t("Nothing to show, and why", "記録がない系列とその理由")}</h3>
+            </summary>
+            <dl className="m-0 mt-2 grid max-w-4xl gap-x-6 gap-y-2 text-sm md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
               {absent.map((a) => (
                 <div key={a.id} className="contents" data-absent={a.id}>
                   <dt className="font-medium">{a.title[lang]}</dt>
@@ -181,17 +186,17 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
                 </div>
               ))}
             </dl>
-          </div>
+          </details>
         ) : null}
       </section>
 
       {model.readings.length ? (
-        <section aria-labelledby="readings-title" className="flex flex-col gap-4">
+        <section aria-labelledby="readings-title" className="flex flex-col gap-3">
           <h2 id="readings-title" className="m-0 font-heading text-2xl font-semibold">
             <T en="What the records show" ja="記録が示すこと" />
           </h2>
           {model.readings.map((r) => (
-            <article key={r.id} className="flex flex-col gap-3 rounded-sm border border-border bg-card p-4">
+            <article key={r.id} className="flex flex-col gap-2 rounded-sm border border-border bg-card p-3">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="m-0 font-heading text-lg font-semibold">{formatRange(r.start, r.end, lang)}</h3>
                 <DraftBadge status={r.status} />
@@ -338,7 +343,7 @@ export default function VolcanoPage({ id }: { id: string }) {
   const p = f.properties;
   return (
     <Page
-      width="full"
+      className={COMPACT_PAGE}
       eyebrow={<Breadcrumbs name={p.name[lang]} />}
       title={
         <>
@@ -362,7 +367,7 @@ export default function VolcanoPage({ id }: { id: string }) {
         <Record model={model} f={f} />
       ) : (
         <>
-          <section className="flex flex-col gap-2 rounded-sm border border-dashed border-border p-4">
+          <section className="flex flex-col gap-2 rounded-sm border border-dashed border-border p-3">
             <p className="m-0">
               <T en="This data version has no per-volcano record for this volcano yet." ja="このデータ版には、この火山の個別の記録はまだありません。" />
             </p>
