@@ -1,0 +1,4 @@
+# Story reviews (STORIES-PLAN §B6.2). One entry per story step: the SHA-256 of the step's rendered EN + JA text and
+# figures (plumes.stories.generate.step_hash), the reviewer and the date. A step is reviewed only while its hash
+# matches, so new data that changes a number turns it back into a draft. Entries are added by a PR after Kurt's review.
+reviews: []

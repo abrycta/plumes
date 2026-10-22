@@ -1,0 +1,21 @@
+# Story overrides (STORIES-PLAN §B1.5): data only, never prose. Each entry carries the reason it exists.
+#
+# first: story ids generated and reviewed first, in this order (Q29: Kanlaon 2024 at M1.1).
+# events.<id>: before_start, after_end (pin the outer ends of the before and after steps),
+#   images.<before|after>: a scene pinned by hand while the imagery rule (§B5) is not built.
+first: [kanlaon-2024-06]
+
+events:
+  kanlaon-2024-06:
+    reason: >-
+      The alert window that ends on 9 September 2024 and the one that starts on 20 September 2024 are split by a gap in
+      the crawled bulletins (level 2 on both sides), not by a change of level. Without this pin the after step would stop
+      at the gap; with it, the after step keeps its standard 90 days (to 8 December 2024).
+    after_end: "2024-12-08"
+  taal-2020:
+    reason: >-
+      Keeps the reviewed Taal story's span (1 December 2019 onward); the Sentinel-2 pair is the one the reviewed story shows, already in the data version.
+    before_start: "2019-12-01"
+    images:
+      before: { url: assets/taal-s2-2019-11.jpg, date: "2019-11-19", sensor: Sentinel-2, source: s2-sr-harmonized }
+      after: { url: assets/taal-s2-2020-03.jpg, date: "2020-03-23", sensor: Sentinel-2, source: s2-sr-harmonized }

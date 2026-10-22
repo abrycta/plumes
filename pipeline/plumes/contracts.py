@@ -7,7 +7,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 
 SCHEMAS = pathlib.Path(__file__).resolve().parents[2] / "contracts" / "schemas"
-KIND_TO_SCHEMA = {"volcano": "volcano", "volcanoes": "volcanoes", "layers": "layers", "story": "story", "latest": "latest", "manifest": "latest", "deeptime": "deeptime"}
+KIND_TO_SCHEMA = {"volcano": "volcano", "volcanoes": "volcanoes", "layers": "layers", "story": "story", "latest": "latest", "manifest": "latest", "deeptime": "deeptime", "stories": "stories"}
 
 
 def _registry() -> Registry:

@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plumes.krtmtthw.dev/schemas/stories.schema.json",
+  "title": "Story index: <version>/stories.json",
+  "description": "Every generated story and reading of a data version, with its score and review status, plus the hand-built stories already in the version. A story with a file is generated in full; drafts live under story/drafts/ and are hidden on the site unless the preview parameter is set (ST1). The same id may appear twice: a reviewed file and a newer draft of the same event.",
+  "allOf": [
+    {
+      "$ref": "common.schema.json#/$defs/header"
+    }
+  ],
+  "type": "object",
+  "required": [
+    "kind",
+    "stories"
+  ],
+  "properties": {
+    "kind": {
+      "const": "stories"
+    },
+    "stories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "volcanoId",
+          "title",
+          "span",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "volcanoId": {
+            "type": "string"
+          },
+          "title": {
+            "$ref": "common.schema.json#/$defs/localText"
+          },
+          "span": {
+            "type": "object",
+            "required": [
+              "start",
+              "end"
+            ],
+            "properties": {
+              "start": {
+                "$ref": "common.schema.json#/$defs/date"
+              },
+              "end": {
+                "$ref": "common.schema.json#/$defs/date"
+              }
+            }
+          },
+          "episodeIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "score": {
+            "$ref": "story.schema.json#/$defs/score"
+          },
+          "status": {
+            "enum": [
+              "draft",
+              "reviewed"
+            ]
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Generation and review order (STORIES-PLAN §B1.4)"
+          },
+          "file": {
+            "type": "string",
+            "description": "Path of the story file, relative to the version root; absent for readings"
+          },
+          "sentences": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -15,6 +15,8 @@ export interface UrlState {
   from: string | null;
   to: string | null;
   ring: number | null;
+  /** ?preview: show story drafts that Kurt has not reviewed yet (ST1). Never linked from the site. */
+  preview?: boolean;
 }
 
 const ID = /^[a-z0-9-]{1,64}$/;
@@ -49,6 +51,7 @@ export function parseUrl(pathname: string, search: string): UrlState {
     from: day("from"),
     to: day("to"),
     ring: Number.isInteger(ring) && ring > 0 && ring <= 200 ? ring : null,
+    preview: q.has("preview"),
   };
 }
 
@@ -73,6 +76,7 @@ export function formatUrl(s: UrlState): string {
     if (s.ring) q.set("ring", String(s.ring));
   }
   if (s.lang) q.set("lang", s.lang);
+  if (s.preview) q.set("preview", "1");
   const qs = q.toString();
   const path = s.page === "notfound" ? (typeof location !== "undefined" ? location.pathname : "/") : pathOf(s.page, s.id);
   return `${path}${qs ? `?${qs}` : ""}`;

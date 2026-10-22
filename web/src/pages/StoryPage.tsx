@@ -1,4 +1,19 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, Page, Scrollytelling, T, useLang, useT } from "@abrycta/akari/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Page,
+  Scrollytelling,
+  T,
+  useLang,
+  useT,
+} from "@abrycta/akari/react";
 import { use, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { COMPACT_PAGE } from "@/app/layout";
@@ -6,8 +21,9 @@ import type { Story, StoryStep, VolcanoReadModel } from "@contracts/readmodels";
 
 import { AppLink } from "@/app/Link";
 import { DataThrough } from "@/components/DataThrough";
+import { useUrlState } from "@/app/url";
 import { DraftBadge, FigureList } from "@/components/FigureList";
-import { assetUrl, loadRoot, loadStoryOrNull, loadVolcano, STORIES } from "@/data/load";
+import { assetUrl, loadRoot, loadStoriesIndex, loadStoryFile, loadVolcano, storyRefs } from "@/data/load";
 import { buildTracks, type Track, tracksForStep } from "@/data/tracks";
 import { formatDate, formatRange } from "@/lib/dates";
 import { formatNumber } from "@/lib/format";
@@ -26,11 +42,27 @@ function nearbyStep(model: VolcanoReadModel, story: Story): StoryStep | null {
     title: { en: "Who lives nearby", ja: "周辺に住む人々" },
     text: {
       en: `About ${formatNumber(ring.population, "en", 0)} people lived within ${ring.radiusKm} km of the summit (WorldPop ${ring.year} estimate). Rings are distances, not hazard zones; hazard maps stay with PHIVOLCS.`,
-      ja: `山頂から${ring.radiusKm} km圏には約${formatNumber(ring.population, "ja", 0)}人が住んでいた(WorldPop ${ring.year}年推計)。距離の円はハザード区域ではなく、ハザードマップはPHIVOLCSのものを参照。`,
+      ja: `山頂から${ring.radiusKm} km圏には約${formatNumber(ring.population, "ja", 0)}人が住んでいた（WorldPop ${ring.year}年推計）。距離の円はハザード区域ではなく、ハザードマップはPHIVOLCSのものを参照。`,
     },
     series: [],
     figures: [],
   };
+}
+
+/** A generated step reads as a list, one short line per fact (and per missing record); a hand-built step stays one paragraph. */
+function StepText({ step }: { step: StoryStep }) {
+  const { lang } = useLang();
+  const lines = [...(step.sentences ?? []).map((x) => ({ key: x.template, text: x.text, absent: false })), ...(step.absent ?? []).map((x) => ({ key: x.why, text: x.text, absent: true }))];
+  if (!lines.length) return <p className="m-0">{step.text[lang]}</p>;
+  return (
+    <ul className="m-0 flex list-disc flex-col gap-1 pl-5" data-step-lines>
+      {lines.map((l, i) => (
+        <li key={`${l.key}-${i}`} className={l.absent ? "text-muted-foreground" : undefined}>
+          {l.text[lang]}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 /** Akari's Scrollytelling breakpoint (md, 48rem): beside the text from here up, stacked inside each step below it. */
@@ -73,7 +105,7 @@ function StepVisual({ story, model, step, tracks }: { story: Story; model: Volca
           {model.exposure.rings.map((r) => (
             <p key={r.radiusKm} className="m-0">
               <span className="font-heading text-3xl font-semibold tabular">≈ {formatNumber(r.population, lang, 0)}</span>{" "}
-              <span className="text-sm text-muted-foreground">{lang === "ja" ? `${r.radiusKm} km圏の人口(WorldPop ${r.year}年)` : `people within ${r.radiusKm} km (WorldPop ${r.year})`}</span>
+              <span className="text-sm text-muted-foreground">{lang === "ja" ? `${r.radiusKm} km圏の人口（WorldPop ${r.year}年）` : `people within ${r.radiusKm} km (WorldPop ${r.year})`}</span>
             </p>
           ))}
           <DataThrough date={story.dataAsOf} />
@@ -121,6 +153,17 @@ function StoryView({ story }: { story: Story }) {
       title={story.title[lang]}
       lede={story.summary?.[lang]}
     >
+      {story.status === "draft" ? (
+        <Alert data-story-draft>
+          <AlertTitle>{t("Draft, not yet reviewed", "下書き（未レビュー）")}</AlertTitle>
+          <AlertDescription>
+            {t(
+              "Generated from the data with fixed sentence templates. It is shown only with the preview link until Kurt has reviewed it.",
+              "データから固定の文型で生成した下書きです。レビューが済むまで、プレビュー用のリンクでのみ表示されます。",
+            )}
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <p className="m-0 text-sm text-muted-foreground">
         {t(`Story · ${steps.length} steps · scroll, or move through the steps with Tab`, `ストーリー · ${steps.length}段階 · スクロールまたはTabキーで移動`)}
       </p>
@@ -134,7 +177,7 @@ function StoryView({ story }: { story: Story }) {
             <div className="flex flex-col gap-2">
               <p className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{formatRange(s.start, s.end, lang)}</p>
               <h2 className="m-0 font-heading text-xl font-semibold">{s.title[lang]}</h2>
-              <p className="m-0">{s.text[lang]}</p>
+              <StepText step={s} />
               {wide ? null : <StepVisual story={story} model={model} step={s} tracks={tracks} />}
               <DraftBadge status={s.status} />
               <FigureList figures={s.figures} />
@@ -165,12 +208,15 @@ function StoryView({ story }: { story: Story }) {
   );
 }
 
+/** Reviewed stories for everyone; drafts only with ?preview (ST1). In preview a draft replaces the reviewed file. */
 export default function StoryPage({ id }: { id: string }) {
-  if (!STORIES.some((s) => s.id === id)) return <NotFoundPage />;
-  return <StoryLoader id={id} />;
+  const { preview } = useUrlState();
+  const ref = storyRefs(use(loadStoriesIndex()), Boolean(preview)).find((s) => s.id === id);
+  if (!ref) return <NotFoundPage />;
+  return <StoryLoader file={ref.file} />;
 }
 
-function StoryLoader({ id }: { id: string }) {
-  const story = use(loadStoryOrNull(id));
+function StoryLoader({ file }: { file: string }) {
+  const story = use(loadStoryFile(file));
   return story ? <StoryView story={story} /> : <NotFoundPage />;
 }

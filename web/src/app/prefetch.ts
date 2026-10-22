@@ -6,7 +6,7 @@
 
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 
-import { loadLayers, loadRoot, loadStoryOrNull, loadVolcano, loadVolcanoes, STORIES } from "@/data/load";
+import { loadLayers, loadRoot, loadStoriesIndex, loadStoryFile, loadVolcano, loadVolcanoes, storyRefs } from "@/data/load";
 import { snapshot as richMediaNow } from "@/lib/richMedia";
 
 import { parseUrl } from "./url";
@@ -31,7 +31,8 @@ function preconnect(origin: string) {
 const quiet = (p: Promise<unknown>) => void p.catch(() => {});
 
 export function prefetchFirstView(): void {
-  const { page, id } = parseUrl(location.pathname, location.search);
+  const url = parseUrl(location.pathname, location.search);
+  const { page, id } = url;
   switch (page) {
     case "map": {
       if (richMediaNow()) {
@@ -65,12 +66,17 @@ export function prefetchFirstView(): void {
       );
       break;
     case "stories":
-      for (const s of STORIES) quiet(loadStoryOrNull(s.id));
+      quiet(loadStoriesIndex().then((ix) => Promise.all(storyRefs(ix, Boolean(url.preview)).map((s) => loadStoryFile(s.file)))));
       break;
     case "story":
       if (id)
         quiet(
-          loadStoryOrNull(id).then((story) => (story ? loadVolcano(story.volcanoFile ?? `volcano/${story.volcanoId}.json`) : null)),
+          loadStoriesIndex()
+            .then((ix) => {
+              const ref = storyRefs(ix, Boolean(url.preview)).find((s) => s.id === id);
+              return ref ? loadStoryFile(ref.file) : null;
+            })
+            .then((story) => (story ? loadVolcano(story.volcanoFile ?? `volcano/${story.volcanoId}.json`) : null)),
         );
       break;
     default:
