@@ -144,8 +144,11 @@ def check_raw(j: dict) -> list[str]:
 def _arrays(j: dict):
     import numpy as np
 
+    def num(a):  # the portal writes missing cells as "null" strings in data_raw and, for some frames, in coh
+        return np.vectorize(lambda v: np.nan if v in ("null", None) else float(v), otypes=[float])(np.asarray(a, dtype=object))
+
     d = np.array([[[np.nan if v in ("null", None) else v for v in row] for row in t] for t in j["data_raw"]], dtype=float)
-    return d, np.asarray(j["mask"]) == 1, np.asarray(j["coh"], dtype=float)
+    return d, np.asarray(j["mask"]) == 1, num(j["coh"])
 
 
 def ref_series(j: dict, d):

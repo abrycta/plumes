@@ -107,3 +107,11 @@ def test_attribution_names_comet_copernicus_licence_and_changes():
     a = comet.attribution("2014-10-19", "2026-08-12")
     assert "LiCSAR contains modified Copernicus Sentinel data 2014–2026" in a
     assert "CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)" in a and "Changes made" in a
+
+
+def test_null_strings_in_coherence_are_gaps():
+    import numpy as np
+
+    j = {"data_raw": [[[1, "null"], [2, 3]]], "mask": [[1, 1], [0, 1]], "coh": [[0.8, "null"], [None, 0.5]]}
+    d, mask, coh = comet._arrays(j)
+    assert np.isnan(d[0, 0, 1]) and np.isnan(coh[0, 1]) and np.isnan(coh[1, 0]) and coh[0, 0] == 0.8
