@@ -8,6 +8,7 @@ import { defineConfig } from "vitest/config";
 import { embedPack } from "./scripts/vite-embed-pack.ts";
 import { mapPack } from "./scripts/vite-map-pack.ts";
 import { preloadEmbed } from "./scripts/vite-preload-embed.ts";
+import { sitemap } from "./scripts/vite-sitemap.ts";
 import { fixtureData } from "./scripts/vite-fixture-data.ts";
 import { akariThemeInit } from "./scripts/vite-theme-init.ts";
 
@@ -35,6 +36,8 @@ export default defineConfig({
     embedPack(fileURLToPath(new URL("./public/config.json", import.meta.url))),
     // The map page's first window (map/firstWindow.ts): one small file instead of two yearly layers on first view.
     mapPack(fileURLToPath(new URL("./public/config.json", import.meta.url))),
+    // sitemap.xml: the fixed pages, every volcano and every reviewed story of the published data.
+    sitemap(fileURLToPath(new URL("./public/config.json", import.meta.url))),
     // /embed: the map chunk, its worker and the pack index preloaded from embed.html.
     preloadEmbed(),
   ],
