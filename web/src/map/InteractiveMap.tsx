@@ -24,6 +24,9 @@ import { PH_BOUNDS } from "./geo";
 
 type ThemeKey = "light" | "dark" | "light-hc" | "dark-hc";
 
+/** Akari data colours of the overlays (the legend on the map page uses the same ones). */
+const OVERLAY_COLOR = { thermal: "data.cat.4", earthquakes: "data.cat.2" } as const;
+
 function tokenColor(id: string, key: ThemeKey): string {
   const t = (flat as unknown as Record<string, Record<string, string>>)[id];
   return t?.[key] ?? t?.light ?? "#888888";
@@ -41,20 +44,29 @@ function fallbackStyle(coastUrl: string, key: ThemeKey): StyleSpecification {
   };
 }
 
+/** A national layer drawn over the basemap for one month (thermal detections, earthquakes). */
+export interface Overlay {
+  id: "thermal" | "earthquakes";
+  /** Absolute URL of a GeoJSON file or a PMTiles archive. */
+  url: string;
+  /** Source layer inside a PMTiles archive. */
+  sourceLayer?: string;
+  /** Keep only features whose `month` property equals this (files holding several months). */
+  month?: string;
+  attribution: string;
+}
+
 export interface InteractiveMapProps {
   index: VolcanoesIndex;
   styleUrl: string;
   coastUrl: string;
-  /** GeoJSON URL of the thermal detections for the chosen month, or null to hide. */
-  thermalUrl: string | null;
-  thermalAttribution?: string;
-  /** Source layer inside a PMTiles archive. */
-  thermalSourceLayer?: string;
+  /** Layers to draw, bottom first; an empty list shows the basemap and the volcanoes only. */
+  overlays: Overlay[];
   lang: "en" | "ja";
 }
 
 /** The interactive overview map (loaded only when rule 6b allows): basemap, thermal detections, volcano links. */
-export default function InteractiveMap({ index, styleUrl, coastUrl, thermalUrl, thermalAttribution, thermalSourceLayer }: Omit<InteractiveMapProps, "lang">) {
+export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: Omit<InteractiveMapProps, "lang">) {
   const t = useT();
   const { lang } = useLang();
   const { resolvedTheme } = useTheme();
@@ -114,39 +126,45 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, thermalUrl, 
       if (map.getLayer("background")) map.setPaintProperty("background", "background-color", tokenColor("color.bg", key));
       if (map.getLayer("coastline")) map.setPaintProperty("coastline", "line-color", tokenColor("color.text-muted", key));
     } else applyBasemapTheme(map, resolvedTheme);
-    if (map.getLayer("thermal")) {
-      map.setPaintProperty("thermal", "circle-stroke-color", tokenColor("color.bg", key));
-      map.setPaintProperty("thermal", "circle-color", tokenColor("data.cat.4", key));
-    }
+    for (const id of ["thermal", "earthquakes"] as const)
+      if (map.getLayer(id)) {
+        map.setPaintProperty(id, "circle-stroke-color", tokenColor("color.bg", key));
+        map.setPaintProperty(id, "circle-color", tokenColor(OVERLAY_COLOR[id], key));
+      }
   }, [ready, key, resolvedTheme]);
 
-  // Thermal detections for the chosen month.
+  // National layers for the chosen month (re-added when the month or the layer set changes).
+  const overlayKey = JSON.stringify(overlays);
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
-    if (map.getLayer("thermal")) map.removeLayer("thermal");
-    if (map.getSource("thermal")) map.removeSource("thermal");
-    if (!thermalUrl) return;
-    const pm = thermalUrl.endsWith(".pmtiles");
-    map.addSource(
-      "thermal",
-      pm ? { type: "vector", url: `pmtiles://${thermalUrl}`, attribution: "NASA FIRMS" } : { type: "geojson", data: thermalUrl, attribution: thermalAttribution ? "NASA FIRMS" : undefined },
-    );
-    map.addLayer({
-      id: "thermal",
-      type: "circle",
-      source: "thermal",
-      ...(pm ? { "source-layer": thermalSourceLayer ?? "thermal" } : {}),
-      paint: {
-        "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2.5, 10, 5],
-        "circle-color": tokenColor("data.cat.4", key),
-        "circle-opacity": 0.85,
-        "circle-stroke-width": 1,
-        "circle-stroke-color": tokenColor("color.bg", key),
-      },
-    });
+    for (const id of ["earthquakes", "thermal"] as const) {
+      if (map.getLayer(id)) map.removeLayer(id);
+      if (map.getSource(id)) map.removeSource(id);
+    }
+    for (const o of overlays) {
+      const pm = o.url.endsWith(".pmtiles");
+      map.addSource(o.id, pm ? { type: "vector", url: `pmtiles://${o.url}`, attribution: o.attribution } : { type: "geojson", data: o.url, attribution: o.attribution });
+      map.addLayer({
+        id: o.id,
+        type: "circle",
+        source: o.id,
+        ...(pm ? { "source-layer": o.sourceLayer ?? o.id } : {}),
+        ...(o.month ? { filter: ["==", ["get", "month"], o.month] } : {}),
+        paint: {
+          "circle-radius":
+            o.id === "earthquakes"
+              ? ["interpolate", ["linear"], ["coalesce", ["get", "mag"], 4], 3, 2, 5, 4, 7, 9]
+              : ["interpolate", ["linear"], ["zoom"], 5, 2.5, 10, 5],
+          "circle-color": tokenColor(OVERLAY_COLOR[o.id], key),
+          "circle-opacity": o.id === "earthquakes" ? 0.6 : 0.85,
+          "circle-stroke-width": 1,
+          "circle-stroke-color": tokenColor("color.bg", key),
+        },
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, thermalUrl]);
+  }, [ready, overlayKey]);
 
   // Volcano markers: real links (keyboard reachable), deep-record volcanoes labelled.
   useEffect(() => {
