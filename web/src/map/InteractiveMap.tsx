@@ -27,7 +27,6 @@ import type { MapGeojson } from "./windowData";
 
 type ThemeKey = "light" | "dark" | "light-hc" | "dark-hc";
 
-
 function tokenColor(id: string, key: ThemeKey): string {
   const t = (flat as unknown as Record<string, Record<string, string>>)[id];
   return t?.[key] ?? t?.light ?? "#888888";
@@ -68,6 +67,8 @@ export interface InteractiveMapProps {
   deformation?: DeformationOverlay;
   /** The /embed krtmtthw.dev frames: a non-interactive map with no links, controls or attribution box. */
   embed?: EmbedOptions;
+  /** /embed tour stop: the map centred on a volcano at this zoom (null: the whole country). */
+  focus?: { center: [number, number]; zoom: number } | null;
 }
 
 export interface EmbedOptions {
@@ -87,7 +88,11 @@ const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: 
 const LAYERS = ["hexes", "thermal", "quakes"] as const;
 
 /** The interactive overview map (loaded only when rule 6b allows): basemap, density, points, volcano links. */
-export default function InteractiveMap({ index, styleUrl, coastUrl, data, show = { hexes: true, thermal: true, quakes: true }, activity, eruptions, formatMonth, deformation, embed }: InteractiveMapProps) {
+export default function InteractiveMap({ index, styleUrl, coastUrl, data, show = { hexes: true, thermal: true, quakes: true }, activity, eruptions, formatMonth, deformation, embed, focus = null }: InteractiveMapProps) {
+  const focusRef = useRef(focus);
+  useEffect(() => {
+    focusRef.current = focus;
+  });
   const t = useT();
   const { lang } = useLang();
   const { resolvedTheme } = useTheme();
@@ -125,15 +130,18 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     });
     if (embed)
       // A rotation or a mode change resizes the frame: fit the Philippines again (never a cropped or scaled view).
-      map.on("resize", () =>
-        map.fitBounds(
-          [
-            [PH_BOUNDS[0], PH_BOUNDS[1]],
-            [PH_BOUNDS[2], PH_BOUNDS[3]],
-          ],
-          { padding: embed.padding, animate: false },
-        ),
-      );
+      map.on("resize", () => {
+        const f = focusRef.current;
+        if (f) map.jumpTo({ center: f.center, zoom: f.zoom });
+        else
+          map.fitBounds(
+            [
+              [PH_BOUNDS[0], PH_BOUNDS[1]],
+              [PH_BOUNDS[2], PH_BOUNDS[3]],
+            ],
+            { padding: embed.padding, animate: false },
+          );
+      });
     else {
       map.touchZoomRotate.disableRotation();
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
@@ -225,6 +233,16 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     map.setPaintProperty("quakes", "circle-stroke-color", depth);
     map.setPaintProperty("quakes-halo", "circle-stroke-color", bg);
   }, [ready, key, resolvedTheme]);
+
+  // The embed's tour stop: centre on its volcano (before the window's data, so the next idle has both).
+  const focusKey = focus ? `${focus.center.join(",")}@${focus.zoom}` : "";
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready || !embed) return;
+    if (focus) map.jumpTo({ center: focus.center, zoom: focus.zoom });
+    // embed is fixed for the map's life.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, focusKey]);
 
   // The window's data.
   useEffect(() => {
