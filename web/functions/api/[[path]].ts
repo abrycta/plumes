@@ -4,12 +4,20 @@
 // Render free sleeps after 15 minutes and its 5 GB of monthly egress is shared, so every read is served from the
 // edge when possible. A cold origin gets a 503 "backend-waking" problem with Retry-After (as Replay's edge), while the
 // request keeps running in the background to wake the service and fill the cache.
+// A stored copy follows the published data version: its ETag names the version it was built from (`-d2"`), and the
+// edge reads the published latest.json (DATA_ROOT, at most once a minute). A copy of an older version is not served as
+// fresh: the edge asks the origin again (conditionally, at most once a minute while the origin still holds the old
+// version), so a new version reaches every route within about a minute of the API load, with no purge.
+// While the origin sleeps and nothing is stored, the list and the per-volcano files (equal to the published files by
+// the contract) are answered from the published data root instead of a 503.
 // Pages only invokes Functions for /api/* (the routes are generated from this folder); static assets never run it.
-// Settings (Pages project variables): API_ORIGIN (default below), EDGE_SECRET (secret, also set on Render as
-// PLUMES_EDGE_SECRET: the origin answers /v1 only to requests that carry it).
+// Settings (Pages project variables): API_ORIGIN (default below), DATA_ROOT (the published data root, holds
+// latest.json), EDGE_SECRET (secret, also set on Render as PLUMES_EDGE_SECRET: the origin answers /v1 only to
+// requests that carry it).
 
 interface Env {
   API_ORIGIN?: string;
+  DATA_ROOT?: string;
   EDGE_SECRET?: string;
 }
 
@@ -20,6 +28,7 @@ interface Context {
 }
 
 const DEFAULT_ORIGIN = "https://plumes-java.onrender.com";
+const DEFAULT_DATA_ROOT = "https://krtmtthw.dev/plumes/data/";
 const PROBLEM_BASE = "https://plumes.krtmtthw.dev/problems/";
 /** How long a reader waits for the origin before getting "waking" (a warm origin answers in well under 1 s). */
 const ORIGIN_TIMEOUT_MS = 8000;
@@ -31,9 +40,17 @@ const WAKE_RETRY_AFTER_S = 10;
 const DEFAULT_FRESH_S = 3600;
 const DEFAULT_STALE_S = 86_400;
 const STORED_AT = "X-Edge-Stored-At";
+/** How often the published version is re-read, and how often an outdated copy is re-checked with the origin. */
+const VERSION_TTL_S = 60;
+const VERSION_TIMEOUT_MS = 1500;
 const FORWARD = ["accept", "accept-language", "user-agent"];
 
-type Label = "HIT" | "MISS" | "STALE" | "BYPASS";
+type Label = "HIT" | "MISS" | "STALE" | "BYPASS" | "REVALIDATED" | "FALLBACK";
+
+interface Published {
+  current: string;
+  base: string;
+}
 
 export const onRequest = async (context: Context): Promise<Response> => {
   const t0 = Date.now();
@@ -58,39 +75,56 @@ export const onRequest = async (context: Context): Promise<Response> => {
 
   const cache = (caches as unknown as { default: Cache }).default;
   const key = new Request(target.toString(), { method: "GET" });
-  const cached = await cache.match(key);
+  const [cached, published] = await Promise.all([cache.match(key), publishedVersion(env)]);
   const inm = request.headers.get("If-None-Match");
+  const cold = async (fallback: Response) => {
+    const file = await publishedFile(rest, url.search, published);
+    return file ? done(file, "FALLBACK") : done(fallback, "MISS");
+  };
 
   if (cached) {
     const age = (Date.now() - Number(cached.headers.get(STORED_AT) || 0)) / 1000;
     const { fresh, stale } = lifetimes(cached.headers.get("Cache-Control"));
-    if (age < fresh) return done(answer(cached, inm, request), "HIT");
-    if (age < fresh + stale) {
-      context.waitUntil(revalidate(cache, key, cached, target, request, env).catch(() => undefined));
-      return done(answer(cached, inm, request, "revalidating"), "STALE");
+    const held = versionOf(cached.headers.get("ETag"));
+    if (published && held && held !== published.current) {
+      // Built from an older version: ask the origin below (it may not hold the new one yet; then ask again later).
+      if (age < VERSION_TTL_S) return done(answer(cached, inm, request, "origin-not-loaded"), "STALE");
+    } else {
+      if (age < fresh) return done(answer(cached, inm, request), "HIT");
+      if (age < fresh + stale) {
+        context.waitUntil(revalidate(cache, key, cached, target, request, env).catch(() => undefined));
+        return done(answer(cached, inm, request, "revalidating"), "STALE");
+      }
     }
   }
 
-  const pending = originFetch(target, request, env, BACKGROUND_TIMEOUT_MS);
+  const pending = originFetch(target, request, env, BACKGROUND_TIMEOUT_MS, cached?.headers.get("ETag"));
   const first = await Promise.race([pending, sleep(ORIGIN_TIMEOUT_MS).then(() => "slow" as const)]);
   if (first === "slow") {
     // Cold start: keep going in the background (wakes Render, then fills the cache).
-    context.waitUntil(pending.then((r) => (r instanceof Response ? store(cache, key, r) : undefined)).catch(() => undefined));
+    context.waitUntil(pending.then((r) => settle(cache, key, cached, r)).catch(() => undefined));
     if (cached) return done(answer(cached, inm, request, "origin-slow"), "STALE");
-    return done(waking(), "MISS");
+    return cold(waking());
   }
   if (first === "timeout" || first instanceof Error) {
     if (cached) return done(answer(cached, inm, request, "origin-error"), "STALE");
-    return done(first === "timeout" ? waking() : problem("bad-gateway", 502, "Bad gateway"), "MISS");
+    return cold(first === "timeout" ? waking() : problem("bad-gateway", 502, "Bad gateway"));
+  }
+  if (first.status === 304 && cached) {
+    // The origin still holds the stored copy's version: keep it, and ask again after VERSION_TTL_S / its lifetime.
+    const reply = answer(cached, inm, request);
+    context.waitUntil(settle(cache, key, cached, first).catch(() => undefined));
+    return done(reply, "REVALIDATED");
   }
   if (await isWaking(first)) {
     // Render is up but Neon is resuming: one background retry fills the cache.
     context.waitUntil(sleep(4000).then(() => originFetch(target, request, env, BACKGROUND_TIMEOUT_MS - 4000))
-      .then((r) => (r instanceof Response ? store(cache, key, r) : undefined)).catch(() => undefined));
+      .then((r) => settle(cache, key, undefined, r)).catch(() => undefined));
     if (cached) return done(answer(cached, inm, request, "origin-waking"), "STALE");
-    return done(waking(), "MISS");
+    return cold(waking());
   }
   if (first.status >= 500 && cached) return done(answer(cached, inm, request, "origin-error"), "STALE");
+  if (first.status >= 500) return cold(passthrough(first));
   if (first.status === 200 || first.status === 404) {
     const copy = first.clone();
     context.waitUntil(store(cache, key, copy).catch(() => undefined));
@@ -139,8 +173,13 @@ async function store(cache: Cache, key: Request, response: Response): Promise<vo
 
 async function revalidate(cache: Cache, key: Request, cached: Response, target: URL, request: Request, env: Env) {
   const r = await originFetch(target, request, env, BACKGROUND_TIMEOUT_MS, cached.headers.get("ETag"));
+  await settle(cache, key, cached, r);
+}
+
+/** File an origin answer: a 304 restarts the stored copy's clock, a 200 or 404 replaces it, anything else is dropped. */
+async function settle(cache: Cache, key: Request, cached: Response | undefined, r: Response | Error | "timeout") {
   if (!(r instanceof Response)) return;
-  if (r.status === 304) {
+  if (r.status === 304 && cached) {
     const headers = new Headers(cached.headers);
     headers.set(STORED_AT, String(Date.now()));
     await cache.put(key, new Response(cached.body, { status: cached.status, headers }));
@@ -148,6 +187,71 @@ async function revalidate(cache: Cache, key: Request, cached: Response, target: 
     await store(cache, key, r);
   } else {
     await r.body?.cancel();
+  }
+}
+
+/** The data version a stored copy was built from, read from its weak ETag (`W/"c1.0.0-java-0.1.0-d2"` -> "v2"). */
+function versionOf(etag: string | null): string | null {
+  const m = /-d([0-9A-Za-z.]+)"$/.exec(etag ?? "");
+  return m ? "v" + m[1] : null;
+}
+
+let publishedMemo: { at: number; value: Published | null } | undefined;
+
+/** The published version (latest.json under DATA_ROOT), re-read at most once a minute; null when unknown. */
+async function publishedVersion(env: Env): Promise<Published | null> {
+  if (publishedMemo && Date.now() - publishedMemo.at < VERSION_TTL_S * 1000) return publishedMemo.value;
+  const root = (env.DATA_ROOT || DEFAULT_DATA_ROOT).replace(/\/?$/, "/");
+  let value: Published | null = null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), VERSION_TIMEOUT_MS);
+  try {
+    const init = { signal: ctrl.signal, cf: { cacheTtl: VERSION_TTL_S, cacheEverything: true } } as RequestInit;
+    const r = await fetch(root + "latest.json", init);
+    if (r.ok) {
+      const j = (await r.json()) as { current?: unknown; base?: unknown };
+      if (typeof j.current === "string" && /^v[0-9]+$/.test(j.current)) {
+        const base = typeof j.base === "string" ? j.base : j.current + "/";
+        value = { current: j.current, base: new URL(base, root).toString() };
+      }
+    } else {
+      await r.body?.cancel();
+    }
+  } catch {
+    // unknown this time; keep the last known value below
+  } finally {
+    clearTimeout(timer);
+  }
+  publishedMemo = { at: Date.now(), value: value ?? publishedMemo?.value ?? null };
+  return publishedMemo.value;
+}
+
+/**
+ * The published file a route equals by the contract (`/v1/volcanoes` = volcanoes.geojson, `/v1/volcanoes/{id}` =
+ * volcano/{id}.json), for a cold origin with nothing stored; null for any other route or when the file is missing.
+ */
+async function publishedFile(rest: string, search: string, published: Published | null): Promise<Response | null> {
+  if (!published || search) return null;
+  let file: string | null = null;
+  let type = "application/json";
+  if (rest === "/v1/volcanoes") {
+    file = "volcanoes.geojson";
+    type = "application/geo+json";
+  } else {
+    const m = /^\/v1\/volcanoes\/([a-z0-9-]{1,60})$/.exec(rest);
+    if (m && m[1] !== "nearest") file = `volcano/${m[1]}.json`;
+  }
+  if (!file) return null;
+  try {
+    const r = await fetch(published.base + file, { cf: { cacheTtl: 3600, cacheEverything: true } } as RequestInit);
+    if (!r.ok) {
+      await r.body?.cancel();
+      return null;
+    }
+    const headers = new Headers({ "Content-Type": type, "Cache-Control": "no-store", "X-Edge-Fallback": "published-file" });
+    return new Response(r.body, { status: 200, headers });
+  } catch {
+    return null;
   }
 }
 
