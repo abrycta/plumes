@@ -118,15 +118,6 @@ templates:
     en: "The {sensor} SO₂ column within {r} km had a median of {med} µmol/m² from {span} ({n} of {N} days with a clear view)."
     ja: "{r} km圏の{sensor} SO₂カラム量は{span}の中央値が{med} µmol/m²だった（{N}日中{n}日が観測可能）。"
 
-  - id: SO2-BASELINE-OMI
-    steps: [before]
-    family: so2
-    source: [omi-omso2e]
-    types: { med: num, span: span, n: int, N: int }
-    constants: ["50 km"]
-    en: "The OMI SO₂ column in the 50 km box had a median of {med} DU from {span} ({n} of {N} days with a clear view)."
-    ja: "50 km範囲のOMI SO₂カラム量は{span}の中央値が{med} DUだった（{N}日中{n}日が観測可能）。"
-
   - id: SO2-PEAK
     steps: [onset, course]
     family: so2
@@ -134,15 +125,6 @@ templates:
     types: { sensor: sensor, r: km, x: num, date: date, cov: share }
     en: "The {sensor} SO₂ column within {r} km reached {x} µmol/m² on {date}, the highest in this period (coverage {cov})."
     ja: "{r} km圏の{sensor} SO₂カラム量は{date}に{x} µmol/m²で、この期間の最大だった（被覆率{cov}）。"
-
-  - id: SO2-PEAK-OMI
-    steps: [onset, course]
-    family: so2
-    source: [omi-omso2e]
-    types: { x: num, date: date, cov: share }
-    constants: ["50 km"]
-    en: "The OMI SO₂ column in the 50 km box reached {x} DU on {date}, the highest in this period (coverage {cov})."
-    ja: "50 km範囲のOMI SO₂カラム量は{date}に{x} DUで、この期間の最大だった（被覆率{cov}）。"
 
   # ------------------------------------------------------------ USGS earthquakes
   - id: EQ-QUIET

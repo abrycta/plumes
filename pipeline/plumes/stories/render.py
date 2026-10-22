@@ -21,7 +21,7 @@ LANGS = ("en", "ja")
 _PH = re.compile(r"\{(\w+)\}")
 
 # Closed lists: values of these types are chosen by the generator, never read from a source's text.
-SENSORS = {"TROPOMI", "OMI", "MODIS", "VIIRS", "Sentinel-2", "Landsat 5", "Landsat 7", "Landsat 8", "Landsat 9"}
+SENSORS = {"TROPOMI", "MODIS", "VIIRS", "Sentinel-2", "Landsat 5", "Landsat 7", "Landsat 8", "Landsat 9"}
 DIRS = {"toward": tx.lt("toward", "近づく"), "away": tx.lt("away from", "遠ざかる")}
 AGENCIES = {"PHIVOLCS": tx.lt("PHIVOLCS", "PHIVOLCS"), "DSWD": tx.lt("DSWD", "DSWD"), "NDRRMC": tx.lt("NDRRMC", "NDRRMC")}
 
