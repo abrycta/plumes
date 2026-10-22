@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 
 import type { Plugin } from "vite";
 
-import type { Layers, VolcanoesIndex } from "../../contracts/ts/readmodels";
+import type { Layers, VolcanoesIndex, VolcanoReadModel } from "../../contracts/ts/readmodels";
 import { resolveRoot, resolveUrl, type AppConfig } from "../src/data/load";
 import { buildPack, PACK_DIR } from "../src/embed/pack";
 
@@ -24,7 +24,7 @@ export function embedPack(configPath: string): Plugin {
         };
         const root = await resolveRoot(config, getJson);
         const [layers, index] = await Promise.all([getJson<Layers>(resolveUrl(root.versionBase, "layers.json")), getJson<VolcanoesIndex>(resolveUrl(root.versionBase, "volcanoes.geojson"))]);
-        const pack = await buildPack(layers, root.versionBase, index, root.latest.current, root.latest.dataAsOf);
+        const pack = await buildPack(layers, root.versionBase, index, root.latest.current, root.latest.dataAsOf, (file) => getJson<VolcanoReadModel>(resolveUrl(root.versionBase, file)));
         this.emitFile({ type: "asset", fileName: `${PACK_DIR}/index.json`, source: JSON.stringify(pack.index) });
         for (const [name, body] of Object.entries(pack.files)) this.emitFile({ type: "asset", fileName: `${PACK_DIR}/${name}`, source: JSON.stringify(body) });
         const kb = (n: number) => `${Math.round(n / 1024)} kB`;

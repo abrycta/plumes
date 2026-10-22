@@ -2,7 +2,7 @@
 // - desktop: krtmtthw.dev shows a fixed 1280×800 frame scaled to its picture slot (mouse and trackpad devices), so
 //   type and markers are drawn large enough to read once scaled down;
 // - compact: phones and tablets get the frame at the slot's real size (at most about 960 px wide) and it lays out
-//   for that size: the map over a two-line caption at 14/12 px. Never the desktop view scaled down.
+//   for that size: the map beside a fact panel at 14/12 px. Never the desktop view scaled down.
 import { useSyncExternalStore } from "react";
 
 export const COMPACT_QUERY = "(max-width: 1100px)";
