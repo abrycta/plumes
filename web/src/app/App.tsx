@@ -3,7 +3,6 @@ import { lazy, Suspense } from "react";
 
 import { useCanonical } from "./canonical";
 import { ErrorBoundary } from "./ErrorBoundary";
-import { PageGlyph } from "./PageGlyph";
 import { Shell } from "./Shell";
 import { parseUrl, useUrlState } from "./url";
 
@@ -17,6 +16,12 @@ const StoriesPage = lazy(() => import("@/pages/StoriesPage"));
 const StoryPage = lazy(() => import("@/pages/StoryPage"));
 const AboutPage = lazy(() => import("@/pages/AboutPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
+
+/** While a page's code loads: the shell (Header, footer) shows at once and this keeps the page's room, so the footer
+ * does not jump; no loading screen (Kurt, 2026-10-23). */
+function PageSpace() {
+  return <div className="min-h-[calc(100dvh-81px)]" />;
+}
 
 function initialLang(): "en" | "ja" {
   const fromUrl = parseUrl(location.pathname, location.search).lang;
@@ -52,7 +57,7 @@ function Pages() {
   }
   return (
     <ErrorBoundary key={`${page}/${id ?? ""}`}>
-      <Suspense fallback={<PageGlyph />}>{el}</Suspense>
+      <Suspense fallback={<PageSpace />}>{el}</Suspense>
     </ErrorBoundary>
   );
 }
