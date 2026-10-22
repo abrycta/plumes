@@ -70,8 +70,8 @@ export function useDeformation(map: MlMap | null, ready: boolean, overlay: Defor
     const minzoom = layer.minzoom ?? 7;
     let live = true;
 
-    // Below the circle overlays (thermal, earthquakes) when they exist; the volcano markers are DOM and stay on top.
-    const beforeId = () => ["earthquakes", "thermal"].find((id) => map.getLayer(id));
+    // Below the density and circle layers (hexes, thermal, quakes) when they exist; the volcano markers are DOM and stay on top.
+    const beforeId = () => ["hexes", "thermal", "quakes"].find((id) => map.getLayer(id));
 
     const refData = {
       type: "FeatureCollection" as const,
