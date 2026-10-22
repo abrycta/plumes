@@ -374,7 +374,7 @@ sources:
 
   - id: viirs-vnp14a1
     # chosen: true   # source 10 of 24, M1 (DECISIONS.md Q30)
-    description: "[M1] NASA LP DAAC VIIRS S-NPP thermal anomalies and fire daily L3 1 km (NASA/VIIRS/002/VNP14A1), 2012-01-19 onward, reduced per ring in Earth Engine. S-NPP deliveries end 2026-11-02; NOAA-20 (VJ114A1) is the continuity series and is checked by the spike. Format: EE. Auth: Earth Engine service account."
+    description: "[M1] NASA LP DAAC VIIRS S-NPP thermal anomalies and fire daily L3 1 km (NASA/VIIRS/002/VNP14A1), 2012-01-19 onward, reduced per ring in Earth Engine. S-NPP deliveries end 2026-11-01 13:00 UTC (NASA Earthdata alert, 2026-08-07, subject to change); NOAA-20 (VJ114A1) is the continuity series and is checked by the spike. Format: EE. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: NASA open data (LP DAAC); cite when publishing"
     attribution: "Schroeder, W., Giglio, L. (2018). VIIRS/NPP Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V002, NASA EOSDIS LP DAAC. Processed in Google Earth Engine."

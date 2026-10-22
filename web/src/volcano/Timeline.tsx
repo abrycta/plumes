@@ -1,11 +1,13 @@
-import { useLang, useT } from "@abrycta/akari/react";
+import { EventMarkerGroup, type EventMarker, eventMarkersSummary, layoutEventMarkers, useLang, useT } from "@abrycta/akari/react";
 import { type PointerEvent, useEffect, useRef, useState } from "react";
 
 import { DataThrough } from "@/components/DataThrough";
 import { GROUPS, observedShare, type Track, valuesIn } from "@/data/tracks";
-import { formatDate, fromDay, monthTicks, tickLabel, toDay, yearlyTicks } from "@/lib/dates";
+import { addDays, formatDate, fromDay, monthTicks, tickLabel, toDay, yearlyTicks } from "@/lib/dates";
 import { formatNumber, formatPercent, unitLabel } from "@/lib/format";
 import { sourceLine } from "@/volcano/sourceLine";
+
+import { markersFor } from "./markers";
 
 const LINE_H = 56;
 const BAR_H = 44;
@@ -45,7 +47,7 @@ function makeScale(from: string, to: string, w: number): Scale {
   return { from: a, days, w, dayW, x: (iso) => (toDay(iso) - a) * dayW };
 }
 
-function TrackPlot({ track, s, from, to, cursor, lang, highlight }: { track: Track; s: Scale; from: string; to: string; cursor: string; lang: "en" | "ja"; highlight?: [string, string] }) {
+function TrackPlot({ track, s, from, to, cursor, lang, highlight, markers }: { track: Track; s: Scale; from: string; to: string; cursor: string; lang: "en" | "ja"; highlight?: [string, string]; markers?: EventMarker[] }) {
   const h = heightOf(track);
   const fromD = toDay(from);
   const toD = toDay(to);
@@ -176,9 +178,16 @@ function TrackPlot({ track, s, from, to, cursor, lang, highlight }: { track: Tra
   return (
     <svg width={s.w} height={h} className="block overflow-visible" role="group" aria-label={track.title[lang]}>
       {els}
+      {markers?.length ? <EventMarkerGroup placed={placeMarkers(markers, s)} height={h} /> : null}
       {toDay(cursor) >= fromD && toDay(cursor) <= toD ? <line x1={cx} x2={cx} y1={0} y2={h} stroke="var(--primary)" strokeWidth={1.5} strokeDasharray="3 2" pointerEvents="none" /> : null}
     </svg>
   );
+}
+
+/** Dated rules and spans (Akari event markers) on the shared x scale; a span covers its last day too. One label row. */
+function placeMarkers(markers: EventMarker[], s: Scale) {
+  const drawn = markers.map((m) => (m.end === undefined ? m : { ...m, end: addDays(String(m.end), 1) }));
+  return layoutEventMarkers(drawn, (at) => (typeof at === "string" ? s.x(at) : null), { width: s.w, rows: 1 });
 }
 
 function coverageText(track: Track, from: string, to: string, lang: "en" | "ja"): string | null {
@@ -241,6 +250,7 @@ export function Timeline({ tracks, from, to, cursor, onCursor, dataAsOf, highlig
             .filter((tr) => tr.group === g.id)
             .map((tr) => {
               const cov = coverageText(tr, from, to, lang);
+              const mk = markersFor(tr, tracks, lang);
               return (
                 <figure key={tr.id} className={`m-0 grid gap-x-4 gap-y-1 py-2 ${cols}`} data-track={tr.id}>
                   <figcaption className="flex flex-col gap-0.5">
@@ -260,6 +270,7 @@ export function Timeline({ tracks, from, to, cursor, onCursor, dataAsOf, highlig
                         {tr.note ? <span className="italic">{tr.note[lang]}</span> : null}
                       </div>
                     </details>
+                    {mk.length ? <span className="sr-only">{eventMarkersSummary(mk, { lang, format: (d) => formatDate(String(d), lang) })}</span> : null}
                     <DataThrough date={dataAsOf} />
                   </figcaption>
                   <div
@@ -275,7 +286,7 @@ export function Timeline({ tracks, from, to, cursor, onCursor, dataAsOf, highlig
                     onPointerUp={() => (dragging.current = false)}
                     onPointerLeave={() => (dragging.current = false)}
                   >
-                    {w > 0 ? <TrackPlot track={tr} s={s} from={from} to={to} cursor={cursor} lang={lang} highlight={highlight} /> : <div style={{ height: heightOf(tr) }} />}
+                    {w > 0 ? <TrackPlot track={tr} s={s} from={from} to={to} cursor={cursor} lang={lang} highlight={highlight} markers={mk} /> : <div style={{ height: heightOf(tr) }} />}
                   </div>
                 </figure>
               );
