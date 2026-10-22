@@ -1,24 +1,23 @@
 /* /embed only. The desktop frame (1280×800) is shown scaled down to about half on krtmtthw.dev: markers and labels
    are drawn about twice their app size there so they stay legible. The compact frame keeps the app's sizes. */
 [data-embed-layout="desktop"] .volcano-marker {
-  font-size: var(--ak-font-size-xl);
-}
-[data-embed-layout="desktop"] .volcano-marker .stats {
+  /* One size for the whole label, as on Replay's map. */
   font-size: var(--ak-font-size-lg);
 }
+[data-embed-layout="desktop"] .volcano-marker .label {
+  padding: 3px 9px;
+}
+/* The marker is anchored 12px into its box: dots stay centred on the volcano (the embed is inert, no tap targets). */
 [data-embed-layout="desktop"] .volcano-marker .dot {
-  margin: 8px;
-  width: 20px;
-  height: 20px;
-  border-width: 3px;
+  margin: 5px;
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
 }
 [data-embed-layout="desktop"] .volcano-marker[data-coverage="deep"] .dot {
-  margin: 4px;
-  width: 28px;
-  height: 28px;
-}
-[data-embed-layout="compact"] .volcano-marker .name {
-  font-size: var(--ak-font-size-2xs);
+  margin: 3px;
+  width: 18px;
+  height: 18px;
 }
 /* Phones: the map is about 360×180 px, so labels would cover the islands; smaller dots and halos, no labels. */
 @media (max-width: 600px) {
