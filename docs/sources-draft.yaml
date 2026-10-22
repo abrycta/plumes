@@ -412,7 +412,7 @@ sources:
 
   - id: viirs-vnp14a1
     # chosen: true   # source 10 of 24, M1 (DECISIONS.md Q30)
-    description: "[M1] NASA LP DAAC VIIRS S-NPP thermal anomalies and fire daily L3 1 km (NASA/VIIRS/002/VNP14A1), 2012-01-19 onward, reduced per ring in Earth Engine. S-NPP deliveries end 2026-11-02; NOAA-20 (VJ114A1) is the continuity series and is checked by the spike. Format: EE. Auth: Earth Engine service account."
+    description: "[M1] NASA LP DAAC VIIRS S-NPP thermal anomalies and fire daily L3 1 km (NASA/VIIRS/002/VNP14A1), 2012-01-19 onward, reduced per ring in Earth Engine. S-NPP deliveries end 2026-11-01; NOAA-20 (VJ114A1) is the continuity series and is checked by the spike. Format: EE. Auth: Earth Engine service account."
     kind: remote-dataset
     licence: "open: NASA open data (LP DAAC); cite when publishing"
     attribution: "Schroeder, W., Giglio, L. (2018). VIIRS/NPP Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V002, NASA EOSDIS LP DAAC. Processed in Google Earth Engine."
@@ -1427,7 +1427,7 @@ sources:
     kind: remote-dataset
     licence: "open: NASA open data; no restrictions"
     attribution: "Roman, M.O., et al. NASA Black Marble VIIRS/NPP Gap-Filled Lunar BRDF-Adjusted Nighttime Lights Daily L3 Global 500m Linear Lat Lon Grid, VNP46A2 v002, doi:10.5067/VIIRS/VNP46A2.002. Processed in Google Earth Engine."
-    cadence: daily; S-NPP deliveries end 2026-11-02 (continuity via NOAA-20 VJ146A2)
+    cadence: daily; S-NPP deliveries end 2026-11-01 (continuity via NOAA-20 VJ146A2)
     links:
       - id: earth-engine
         url: ee://NASA/VIIRS/002/VNP46A2

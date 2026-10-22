@@ -4,7 +4,7 @@ import type { Track } from "@/data/tracks";
 
 import { markersFor, SNPP_END } from "./markers";
 
-const base = { title: { en: "", ja: "" }, instrument: { en: "", ja: "" }, unit: "", sources: [], coverage: "not-reported", linked: false } as const;
+const base = { title: { en: "", ja: "" }, instrument: { en: "", ja: "" }, unit: "", sources: [] as string[], coverage: "not-reported" as const, linked: false };
 const line = (id: string, start: string, values: (number | null)[]): Track => ({
   ...base,
   id,
@@ -17,9 +17,11 @@ const line = (id: string, start: string, values: (number | null)[]): Track => ({
 const eruptions: Track = { ...base, id: "eruptions", group: "eruptions", kind: "spans", points: [{ date: "2020-01-12", end: "2020-01-22", value: null, mark: "VEI 4" }] };
 
 describe("timeline event markers", () => {
-  it("puts the NOAA-20 sensor change on VIIRS rows only", () => {
+  it("puts the NOAA-20 sensor change on VIIRS rows only, once the page has data from that day", () => {
     const viirs = { ...line("fire_viirs_15km", "2026-10-01", [1]), kind: "bars" as const };
-    expect(markersFor(viirs, [viirs], "en")).toEqual([expect.objectContaining({ at: SNPP_END, kind: "sensor-change", label: "NOAA-20" })]);
+    expect(markersFor(viirs, [viirs], "en")).toEqual([]);
+    const later = line("frp_viirs_noaa20_15km", SNPP_END, [1]);
+    expect(markersFor(viirs, [viirs, later], "en")).toEqual([expect.objectContaining({ at: SNPP_END, kind: "sensor-change", label: "NOAA-20" })]);
     expect(markersFor(line("frp_modis_15km", "2026-10-01", [1]), [], "en")).toEqual([]);
   });
   it("puts GVP eruption dates on deformation and rain rows, not on SO₂", () => {

@@ -7,8 +7,12 @@ import { familyOf, type Track } from "@/data/tracks";
 
 type Lang = "en" | "ja";
 
-/** S-NPP VIIRS deliveries stop on this day; NOAA-20 VIIRS continues as its own series (L5), never spliced in. */
-export const SNPP_END = "2026-11-02";
+/**
+ * S-NPP data delivery ends on this day (13:00 UTC; "subject to change"), per NASA Earthdata, 2026-08-07:
+ * https://www.earthdata.nasa.gov/data/alerts-outages/suomi-npp-data-product-delivery-cease-november-1-2026
+ * NOAA-20 VIIRS continues as its own series (L5), never spliced in.
+ */
+export const SNPP_END = "2026-11-01";
 
 const VIIRS = /^(fire|frp)_viirs/;
 const ERUPTION_ROWS = /^(los_|rain_)/; // deformation and rain charts carry GVP eruption dates
@@ -23,7 +27,9 @@ export function markersFor(track: Track, tracks: readonly Track[], lang: Lang): 
   const fam = familyOf(track.id);
   const out: EventMarker[] = [];
 
-  if (VIIRS.test(fam))
+  // Only once the page has data on or after that day: before it, the rule falls off the axis and is not drawn, but the
+  // screen-reader summary would still announce a scheduled end as if it had happened.
+  if (VIIRS.test(fam) && tracks.some((t) => t.kind !== "spans" && (lastDay(t) ?? "") >= SNPP_END))
     out.push({
       at: SNPP_END,
       label: "NOAA-20",

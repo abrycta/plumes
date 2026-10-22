@@ -115,7 +115,7 @@ Kurt's answers to the nine questions of [LAYERS-PLAN.md](LAYERS-PLAN.md) §5 (wr
 | L2 | **COMET LiCSBAS series for all 18 covered volcanoes at M2. This supersedes Q8's Taal-only crop** and the ARIA S1 GUNW route noted in "Q19 to Q31" | ARIA GUNW covers only Taal, Pinatubo and Banahaw and ends 2025-09-15 |
 | L3 | **Deformation: a LOS chart per volcano and a velocity map layer**, new layer id `deformation-velocity` (contract change in `contracts/schemas/layers.schema.json` and `contracts/ts/readmodels.ts`, approved by Kurt before it is built; spec in LAYERS-PLAN.md §3.1) | the per-volcano series needs no contract change |
 | L4 | **IMERG rain on Earth Engine**, one month measured before the backfill | simplest route; 1–3 EECU-h estimated |
-| L5 | **NOAA-20 VIIRS thermal as its own series** with a sensor-change marker at the S-NPP → NOAA-20 switch. Akari has no dated marker on its charts, so an Akari addition is a prerequisite (LAYERS-PLAN.md §6) | S-NPP deliveries end 2026-11-02 |
+| L5 | **NOAA-20 VIIRS thermal as its own series** with a sensor-change marker at the S-NPP → NOAA-20 switch. Akari has no dated marker on its charts, so an Akari addition is a prerequisite (LAYERS-PLAN.md §6) | S-NPP deliveries end 2026-11-01 |
 | L6 | **Lahar rivers excluded** (moved to the rejections) | too close to a hazard map for a site that is not a warning service |
 | L7 | **OSM school and hospital counts at M3 only with a clear "as of <date>" label** | a snapshot of today, not history |
 | L8 | **ISC licence: checked by hand later; not needed for M2.** Stays open | its site returned 404 on 2026-10-22 |
