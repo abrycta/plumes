@@ -1,5 +1,5 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, Page, Scrollytelling, T, useLang, useT } from "@abrycta/akari/react";
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import type { Story, StoryStep, VolcanoReadModel } from "@contracts/readmodels";
 
@@ -31,6 +31,15 @@ function nearbyStep(model: VolcanoReadModel, story: Story): StoryStep | null {
     figures: [],
   };
 }
+
+/** Akari's Scrollytelling breakpoint (md, 48rem): beside the text from here up, stacked inside each step below it. */
+const WIDE = "(min-width: 48rem)";
+const subscribeWide = (cb: () => void) => {
+  const mq = window.matchMedia(WIDE);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
+const useWide = () => useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => true);
 
 function StepVisual({ story, model, step, tracks }: { story: Story; model: VolcanoReadModel; step: StoryStep; tracks: Track[] }) {
   const { lang } = useLang();
@@ -82,6 +91,10 @@ function StoryView({ story }: { story: Story }) {
     const extra = model ? nearbyStep(model, story) : null;
     return extra ? [...story.steps, extra] : story.steps;
   }, [model, story]);
+  // Phones: the story visual (several timelines, or two pictures) is far taller than the 45svh panel Scrollytelling
+  // pins above the text, so pinned it covered every step while scrolling. Below md each step carries its own visual
+  // inline, after its text, and the pinned panel is not rendered.
+  const wide = useWide();
   useEffect(() => {
     document.title = `${story.title[lang]} · Plumes`;
   }, [story, lang]);
@@ -112,6 +125,7 @@ function StoryView({ story }: { story: Story }) {
       </p>
       <Scrollytelling
         idPrefix="step"
+        className={wide ? undefined : "[&_[data-slot=scrollytelling-step]]:scroll-mt-[calc(var(--scrolly-top)+1rem)] [&>[data-slot=scrollytelling-visual]]:hidden"}
         stepsLabel={t("Story steps", "ストーリーの段階")}
         steps={steps.map((s) => ({
           id: s.id,
@@ -120,12 +134,14 @@ function StoryView({ story }: { story: Story }) {
               <p className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{formatRange(s.start, s.end, lang)}</p>
               <h2 className="m-0 font-heading text-xl font-semibold">{s.title[lang]}</h2>
               <p className="m-0">{s.text[lang]}</p>
+              {wide ? null : <StepVisual story={story} model={model} step={s} tracks={tracks} />}
               <DraftBadge status={s.status} />
               <FigureList figures={s.figures} />
             </div>
           ),
         }))}
         visual={({ step }) => {
+          if (!wide) return null;
           const s = steps[step] ?? steps[0]!;
           return <StepVisual key={s.id} story={story} model={model} step={s} tracks={tracks} />;
         }}
