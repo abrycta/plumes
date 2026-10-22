@@ -10,7 +10,7 @@
 // (the still view). It pauses while the parent says so (off-screen, or another embed is the one moving on a touch
 // device), while the frame is out of sight, and while the tab is hidden. Phones get their own layout (layout.ts).
 
-import { AkariProvider, Sparkline, useLang, useT } from "@abrycta/akari/react";
+import { AkariProvider, useLang } from "@abrycta/akari/react";
 import { lazy, Suspense, use, useEffect, useMemo, useRef, useState } from "react";
 
 import { ErrorBoundary } from "@/app/ErrorBoundary";
@@ -18,9 +18,7 @@ import { parseUrl } from "@/app/url";
 import { loadConfig, loadLayers, loadRoot, loadVolcano, loadVolcanoes, resolveUrl } from "@/data/load";
 import { layerMonths } from "@/data/layers";
 import { formatDate } from "@/lib/dates";
-import { formatNumber } from "@/lib/format";
 import { WINDOW_MONTHS, windowMonths } from "@/map/density";
-import { LAYER_BG, LAYER_TEXT } from "@/map/layerColors";
 import { loadAllQuakes } from "@/map/points";
 import { loadWindow } from "@/map/windowData";
 
@@ -199,20 +197,7 @@ function useTour(ends: readonly string[], frame: React.RefObject<HTMLDivElement 
   return shown;
 }
 
-/** One fact per line: a layer swatch (a dot in the layer's colour, sized by the text) or its blank place, then the text. */
-function Fact({ swatch, children }: { swatch?: string; children: React.ReactNode }) {
-  return (
-    <li className="flex min-w-0 items-baseline gap-ak-0-5">
-      <span aria-hidden="true" className={swatch ?? "invisible"}>
-        ●
-      </span>
-      <span className="truncate">{children}</span>
-    </li>
-  );
-}
-
 function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) {
-  const t = useT();
   const { lang } = useLang();
   const compact = useCompact();
   const index = use(loadVolcanoes());
@@ -250,116 +235,20 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
 
   const s = cur?.state;
   const eruptionMap = useMemo(() => new Map((s?.eruptions ?? []).map((e) => [e.id, e.month])), [s]);
-  const nameOf = (id: string) => index.features.find((f) => f.properties.id === id)?.properties.name[lang] ?? id;
-  const names = (s?.eruptions ?? []).map((e) => nameOf(e.id));
-  const months = s ? windowMonths(s.end, WINDOW_MONTHS) : [];
-  const d = cur;
-  const focus = d?.focus;
-  const fname = focus ? nameOf(focus.id) : "";
-  const headline = s ? (names.length ? t(`${names.join(" and ")} ${names.length > 1 ? "erupt" : "erupts"}`, `${names.join("・")}の噴火`) : t("The latest 12 months", "直近12か月")) : "";
-  const range = s ? `${formatDate(months[0]!, lang)} – ${formatDate(s.end, lang)}` : "";
-  const n = (v: number) => formatNumber(v, lang);
-  const notObserved = t("Not observed: outside this instrument's record", "観測なし(この観測機器の記録の範囲外)");
-  const gaps = !!d?.counts.some((c) => c.thermalObserved === false || c.quakesObserved === false);
-  const cMax = d ? Math.max(1, ...d.counts.map((c) => Math.max(c.thermalNear + c.thermalFar, c.quakes))) : 1;
-
   return (
-    <div ref={content} className="flex h-full bg-background text-foreground" data-embed-content>
-      <div className="relative min-h-0 min-w-0 flex-1">
+    <div ref={content} className="h-full bg-background text-foreground" data-embed-content>
+      <div className="relative h-full" data-window-end={cur?.state.end ?? ""}>
         <InteractiveMap
           index={index}
           styleUrl={config.basemap?.style ?? "https://tiles.openfreemap.org/styles/positron"}
           coastUrl={resolveUrl("/", config.basemap?.fallback ?? "/basemap/coast.geojson")}
           data={cur?.geojson ?? null}
-          activity={d?.activity}
+          activity={cur?.activity}
           eruptions={eruptionMap}
           formatMonth={(m) => formatDate(m, lang)}
           embed={embed}
         />
       </div>
-      <aside className={`flex w-1/2 shrink-0 flex-col justify-center border-l border-border leading-tight tabular sm:w-2/5 lg:w-1/3 ${compact ? "gap-ak-0-5 px-ak-1 py-ak-1" : "gap-ak-2 px-ak-4 py-ak-4"}`} data-testid="embed-caption">
-        {d && s ? (
-          <>
-            <h1 className={`m-0 line-clamp-2 font-heading font-semibold ${compact ? "text-ak-sm" : "text-ak-3xl"}`} data-window-end={s.end}>
-              {headline}
-            </h1>
-            <p className={`m-0 truncate text-muted-foreground ${compact ? "text-ak-xs" : "text-ak-xl"}`}>{range}</p>
-            <ul className={`m-0 flex list-none flex-col p-0 ${compact ? "gap-0 text-ak-xs" : "gap-ak-0-5 text-ak-xl"}`} data-embed-facts>
-              <Fact swatch={LAYER_TEXT.thermal}>{t(`${n(d.totals.thermal)} thermal detections`, `熱異常 ${n(d.totals.thermal)}件`)}</Fact>
-              <Fact>{compact ? t(`${n(d.totals.near)} near volcanoes`, `火山付近 ${n(d.totals.near)}件`) : t(`${n(d.totals.near)} within 15 km of a volcano`, `うち火山15 km以内 ${n(d.totals.near)}件`)}</Fact>
-              <Fact swatch={LAYER_TEXT.quakes}>{t(`${n(d.totals.quakes)} earthquakes`, `地震 ${n(d.totals.quakes)}件`)}</Fact>
-              {d.totals.maxMag ? <Fact>{t(`Largest M${d.totals.maxMag.toFixed(1)}`, `最大 M${d.totals.maxMag.toFixed(1)}`)}</Fact> : null}
-              {focus?.viirs ? (
-                <Fact>{compact ? t(`${fname} VIIRS: ${n(focus.viirs.days)} days`, `${fname} VIIRS ${n(focus.viirs.days)}日`) : t(`${fname}: VIIRS heat on ${n(focus.viirs.days)} days`, `${fname}:VIIRS熱異常 ${n(focus.viirs.days)}日`)}</Fact>
-              ) : null}
-              {focus?.so2 ? (
-                <Fact>
-                  {compact
-                    ? t(`${fname} SO₂: max ${n(focus.so2.peak)} t`, `${fname} SO₂最大 ${n(focus.so2.peak)} t`)
-                    : t(`${fname}: SO₂ peak ${n(focus.so2.peak)} t, ${formatDate(focus.so2.peakDate, lang)}`, `${fname}:SO₂最大 ${n(focus.so2.peak)} t(${formatDate(focus.so2.peakDate, lang)})`)}
-                </Fact>
-              ) : null}
-            </ul>
-            {focus?.so2 ? (
-              <div className="min-w-0" data-embed-sparkline>
-                <Sparkline
-                  values={focus.so2.weeks}
-                  height={compact ? 24 : 48}
-                  zero
-                  marker="none"
-                  className={compact ? "h-ak-3" : "h-ak-8"}
-                  markers={focus.eruptionWeeks.map((w) => ({
-                    at: w,
-                    label: t("Eruption", "噴火"),
-                  }))}
-                  markerLabels={false}
-                  label={t(`SO₂ near ${fname}, weekly peak (TROPOMI, ${focus.so2.ringKm} km)`, `${fname}付近のSO₂(週最大、TROPOMI、${focus.so2.ringKm} km)`)}
-                />
-                {!compact ? <p className="m-0 truncate text-ak-base text-muted-foreground">{t(`SO₂ near ${fname}, weekly peak`, `${fname}付近のSO₂(週最大)`)}</p> : null}
-              </div>
-            ) : null}
-            {!compact ? (
-              <div className="min-w-0">
-                <div className="flex h-ak-8 items-end gap-ak-0-5" aria-hidden="true" data-embed-months>
-                  {d.counts.map((c) => (
-                    <div key={c.month} className="flex h-full flex-1 items-end gap-px" data-not-observed={[c.thermalObserved === false && "thermal", c.quakesObserved === false && "quakes"].filter(Boolean).join(" ") || undefined}>
-                      {c.thermalObserved === false ? (
-                        <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} />
-                      ) : (
-                        <div className="flex h-full flex-1 flex-col justify-end">
-                          <div className={`${LAYER_BG.thermal} opacity-30`} style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
-                          <div className={LAYER_BG.thermal} style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
-                        </div>
-                      )}
-                      {c.quakesObserved === false ? <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} /> : <div className={`flex-1 ${LAYER_BG.quakes}`} style={{ height: `${(100 * c.quakes) / cMax}%` }} />}
-                    </div>
-                  ))}
-                </div>
-                <p className="m-0 flex items-baseline gap-ak-0-5 truncate text-ak-base text-muted-foreground">
-                  {t("Per month:", "月別:")}
-                  <span aria-hidden="true" className={LAYER_TEXT.thermal}>
-                    ●
-                  </span>
-                  {t("thermal", "熱異常")}
-                  <span aria-hidden="true" className={LAYER_TEXT.quakes}>
-                    ●
-                  </span>
-                  {t("earthquakes", "地震")}
-                </p>
-                {gaps ? (
-                  <p className="m-0 flex items-baseline gap-ak-0-5 truncate text-ak-base text-muted-foreground" data-embed-not-observed>
-                    <span aria-hidden="true" className="text-muted opacity-70">
-                      ■
-                    </span>
-                    {notObserved}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-            <p className={`m-0 text-muted-foreground ${compact ? "truncate text-ak-2xs" : "text-ak-base"}`}>© OpenMapTiles © OpenStreetMap · NASA FIRMS · USGS · Copernicus Sentinel-5P</p>
-          </>
-        ) : null}
-      </aside>
     </div>
   );
 }
