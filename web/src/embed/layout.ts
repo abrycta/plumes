@@ -19,3 +19,17 @@ export function useCompact(): boolean {
     () => matchMedia(COMPACT_QUERY).matches,
   );
 }
+
+export const PHONE_QUERY = "(max-width: 600px)";
+
+/** Phone-sized frames (the krtmtthw.dev slot on a phone): the tour keeps to the screens legible there. */
+export function usePhone(): boolean {
+  return useSyncExternalStore(
+    (on) => {
+      const m = matchMedia(PHONE_QUERY);
+      m.addEventListener("change", on);
+      return () => m.removeEventListener("change", on);
+    },
+    () => matchMedia(PHONE_QUERY).matches,
+  );
+}

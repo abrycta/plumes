@@ -329,7 +329,8 @@ function SourcesForView({ model, f }: { model: VolcanoReadModel | null; f: Featu
   );
 }
 
-export default function VolcanoPage({ id }: { id: string }) {
+/** `part="deeptime"`: only the deep-time strip (an /embed screen on phones, src/embed/EmbedApp.tsx). */
+export default function VolcanoPage({ id, part }: { id: string; part?: "deeptime" }) {
   const t = useT();
   const { lang } = useLang();
   const index = use(loadVolcanoes());
@@ -339,6 +340,7 @@ export default function VolcanoPage({ id }: { id: string }) {
     if (f) document.title = `${f.properties.name[lang]} · Plumes`;
   }, [f, lang]);
   if (!f) return <NotFoundPage />;
+  if (part === "deeptime") return <DeepTimeStrip volcanoId={f.properties.id} />;
   const p = f.properties;
   return (
     <Page

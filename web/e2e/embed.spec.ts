@@ -3,12 +3,12 @@ import { expect, test } from "./fixtures";
 
 const ready = () => "embedReady" in document.documentElement.dataset;
 
-test("desktop frame: map and caption, no chrome, no links, inert", async ({ page }) => {
+test("desktop frame: the app's map page, no header or footer, no links, inert", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/embed.html?lang=en&pr=1&paused=1");
   await page.waitForFunction(ready, null, { timeout: 30_000 });
   await expect(page.locator("canvas")).toBeVisible();
-  expect(await page.locator("header, footer, a, button, .maplibregl-ctrl").count()).toBe(0);
+  expect(await page.locator("header, footer, a[href], .maplibregl-ctrl").count()).toBe(0);
   expect(await page.getByTestId("embed-frame").evaluate((e) => (e as HTMLElement).inert)).toBe(true);
   expect(await page.evaluate(() => document.documentElement.dataset.embedLayout)).toBe("desktop");
 });
@@ -25,7 +25,7 @@ test("phone frame: its own compact layout, the map fills the frame, nothing scro
   expect(got).toEqual({ layout: "compact", overflow: false, canvas: true });
 });
 
-test("tour: 2.2 s on each window, a fade between, looping; reduced motion stays on the densest", async ({ page }) => {
+test("tour: 2.2 s on each screen, a fade between, looping", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/embed.html?lang=en&pr=1");
   await page.waitForFunction(ready, null, { timeout: 30_000 });
@@ -33,7 +33,7 @@ test("tour: 2.2 s on each window, a fade between, looping; reduced motion stays 
     () =>
       new Promise<string[]>((resolve) => {
         const seen: string[] = [];
-        const read = () => document.querySelector("[data-window-end]")?.getAttribute("data-window-end") ?? "";
+        const read = () => document.querySelector("[data-screen]")?.getAttribute("data-screen") ?? "";
         seen.push(read());
         const id = setInterval(() => {
           const e = read();
@@ -42,7 +42,7 @@ test("tour: 2.2 s on each window, a fade between, looping; reduced motion stays 
         setTimeout(() => (clearInterval(id), resolve(seen)), 7_000);
       }),
   );
-  // The fixtures hold at least two windows: 7 s covers two transitions (2.2 s dwell plus the fades).
+  // 7 s covers two transitions (2.2 s dwell plus the fades).
   expect(new Set(windows).size).toBeGreaterThan(1);
   expect(windows.length).toBeGreaterThanOrEqual(3);
 });

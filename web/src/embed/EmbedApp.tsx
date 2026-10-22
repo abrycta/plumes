@@ -1,38 +1,36 @@
-// /embed: the portfolio's live picture of Plumes (workspace rule 27: animated and data-dense). The national map (the
-// app's own InteractiveMap and data) tours the richest 12-month windows of the record, chosen from the data
-// (states.ts): each shows thermal-detection density, detections near and far from a volcano, earthquakes by magnitude
-// and depth and the volcanoes' activity, beside a panel with one fact per line (the volcano in focus, the window, its
-// counts, SO₂ and VIIRS heat at the volcano, a sparkline). No Header, footer, controls or links (live embeds carry no
-// link: the portfolio around the frame links to the app); the frame is inert and the map is non-interactive, so a
-// touch on it scrolls the parent page.
-// The tour matches Lights: DWELL_MS on each window, then a fade out, the next window drawn, a fade in (Akari's slow
-// duration and its exit and standard easings). It opens on the densest window and stays there under reduced motion
-// (the still view). It pauses while the parent says so (off-screen, or another embed is the one moving on a touch
-// device), while the frame is out of sight, and while the tab is hidden. Phones get their own layout (layout.ts).
+// /embed: the portfolio's live picture of Plumes, as Lights' and Replay's embeds show their apps: the real map page
+// (pages/MapPage: controls, window summary, map, timeline, legend, volcano list) without the Header or footer, fed
+// from the build-time pack (pack.ts) and wholly inert, with no links (the portfolio around the frame links to the app).
+// It tours the densest 12-month windows of the record (states.ts), densest first: DWELL_MS on each, then the map
+// fades out, the next window is drawn and the map fades back in (Akari's slow duration, exit and standard easings).
+// Reduced motion keeps the densest window still. It pauses while the parent says so (off-screen, or another embed is
+// the one moving on a touch device), while the frame is out of sight, and while the tab is hidden. Phones get the
+// map over the window summary (layout.ts), never the page scaled down.
 
 import { AkariProvider, useLang } from "@abrycta/akari/react";
 import { lazy, Suspense, use, useEffect, useMemo, useRef, useState } from "react";
 
 import { ErrorBoundary } from "@/app/ErrorBoundary";
 import { parseUrl } from "@/app/url";
-import { loadConfig, loadLayers, loadRoot, loadVolcano, loadVolcanoes, resolveUrl } from "@/data/load";
+import { loadLayers, loadRoot, loadVolcano, loadVolcanoes } from "@/data/load";
 import { layerMonths } from "@/data/layers";
-import { formatDate } from "@/lib/dates";
 import { WINDOW_MONTHS, windowMonths } from "@/map/density";
 import { loadAllQuakes } from "@/map/points";
 import { loadWindow } from "@/map/windowData";
 
-import { PADDING, useCompact } from "./layout";
+import { FitScreen } from "./FitScreen";
+import { PADDING, useCompact, usePhone } from "./layout";
 import { fromPack, PACK_DIR, packState, withFocus, type PackIndex, type PackState, type ShownWindow } from "./pack";
 import { COOKIE_DOMAIN, listenToParent, onPauseChange, pausedByParent, postReady } from "./parent-bridge";
 import { chooseStates } from "./states";
 
-const InteractiveMap = lazy(() => import("@/map/InteractiveMap"));
+const MapPage = lazy(() => import("@/pages/MapPage"));
+const VolcanoPage = lazy(() => import("@/pages/VolcanoPage"));
+const VolcanoesPage = lazy(() => import("@/pages/VolcanoesPage"));
 
 /** Time on each window between transitions: Lights' DWELL_MS. */
 export const DWELL_MS = 2200;
 /** Longest wait for the map to draw a window before fading back in anyway. */
-const DRAW_CAP_MS = 1500;
 
 const urlLang = parseUrl(location.pathname, location.search).lang;
 
@@ -106,7 +104,7 @@ function useStates(): ShownWindow[] {
  * allowed, every DWELL_MS the content fades out, the next window (time order, wrapping) is selected and drawn, and
  * the content fades back in. Returns the shown window's end month: null = the densest (the start and the still view).
  */
-function useTour(ends: readonly string[], frame: React.RefObject<HTMLDivElement | null>, content: React.RefObject<HTMLDivElement | null>, drawn: React.RefObject<(() => void) | null>): string | null {
+function useTour(ends: readonly string[], frame: React.RefObject<HTMLDivElement | null>, content: React.RefObject<HTMLDivElement | null>): string | null {
   const [shown, setShown] = useState<string | null>(null);
   const latest = useRef({ ends, shown });
   useEffect(() => {
@@ -121,18 +119,22 @@ function useTour(ends: readonly string[], frame: React.RefObject<HTMLDivElement 
     const ready = () => "embedReady" in document.documentElement.dataset;
     const running = () => inView && document.visibilityState === "visible" && !pausedByParent() && !reducedMotion();
     const fade = (to: number) => {
-      const node = content.current;
-      if (!node) return Promise.resolve();
-      return node
-        .animate(
-          { opacity: to },
-          {
-            duration: durationMs(motionToken("--ak-duration-slow")),
-            easing: motionToken(to === 0 ? "--ak-ease-exit" : "--ak-ease-standard") || "ease",
-            fill: "forwards",
-          },
-        )
-        .finished.then(() => undefined)
+      const nodes = content.current ? [content.current] : [];
+      if (!nodes.length) return Promise.resolve();
+      return Promise.all(
+        nodes.map(
+          (node) =>
+            node.animate(
+              { opacity: to },
+              {
+                duration: durationMs(motionToken("--ak-duration-slow")),
+                easing: motionToken(to === 0 ? "--ak-ease-exit" : "--ak-ease-standard") || "ease",
+                fill: "forwards",
+              },
+            ).finished,
+        ),
+      )
+        .then(() => undefined)
         .catch(() => undefined);
     };
     const schedule = () => {
@@ -150,22 +152,16 @@ function useTour(ends: readonly string[], frame: React.RefObject<HTMLDivElement 
       await fade(0);
       // The next window, drawn while hidden: wait for the map's idle after the new data (capped), then fade in.
       const next = all[(all.indexOf(cur ?? densestEnd()) + 1) % all.length]!;
-      await new Promise<void>((resolve) => {
-        const cap = window.setTimeout(resolve, DRAW_CAP_MS);
-        drawn.current = () => {
-          clearTimeout(cap);
-          resolve();
-        };
-        setShown(next);
-      });
-      drawn.current = null;
+      // Every screen stays mounted (drawn and measured while hidden): two frames for React to swap them.
+      setShown(next);
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       document.documentElement.dataset.tourPhase = "in";
       await fade(1);
       document.documentElement.dataset.tourPhase = "dwell";
       busy = false;
       schedule();
     }
-    const densestEnd = () => document.documentElement.dataset.embedDensest ?? latest.current.ends[0]!;
+    const densestEnd = () => latest.current.ends[0]!;
     const io = new IntersectionObserver(([e]) => {
       inView = !!e?.isIntersecting;
       schedule();
@@ -193,62 +189,109 @@ function useTour(ends: readonly string[], frame: React.RefObject<HTMLDivElement 
       window.removeEventListener("plumes:embed-ready", schedule);
       offPause();
     };
-  }, [frame, content, drawn]);
+  }, [frame, content]);
   return shown;
 }
 
-function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) {
-  const { lang } = useLang();
+/** The tour's screens, in order: the map page first (the still view under reduced motion). */
+const SCREENS = ["map", "volcano", "record", "volcanoes"] as const;
+/** Phones (the slot is about 358×224): the screens that stay legible at that size. */
+const PHONE_SCREENS = ["map", "deeptime"] as const;
+type Screen = (typeof SCREENS)[number] | (typeof PHONE_SCREENS)[number];
+
+function EmbedScreens({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) {
   const compact = useCompact();
+  const phone = usePhone();
   const index = use(loadVolcanoes());
-  const config = use(loadConfig());
   const loaded = useStates();
   const content = useRef<HTMLDivElement>(null);
-  const drawn = useRef<(() => void) | null>(null);
+  const shown = (useTour(phone ? PHONE_SCREENS : SCREENS, frame, content) ?? "map") as Screen;
+  // The map screen: the densest window, zoomed to its volcano.
   const densest = loaded.reduce<ShownWindow | null>((best, l) => (l.points > (best?.points ?? -1) ? l : best), null);
-  useEffect(() => {
-    if (densest) document.documentElement.dataset.embedDensest = densest.state.end;
-  }, [densest]);
-  const ends = useMemo(() => loaded.map((l) => l.state.end), [loaded]);
-  const shownEnd = useTour(ends, frame, content, drawn);
-  const cur = loaded.find((l) => l.state.end === shownEnd) ?? densest;
+  // The volcano screens: the two deep-record volcanoes with the latest eruptions (Mayon, Kanlaon in v2).
+  const [top, record] = useMemo(
+    () =>
+      index.features
+        .filter((f) => f.properties.coverage === "deep" && f.properties.lastEruption?.start)
+        .sort((a, b) => (b.properties.lastEruption?.start ?? "").localeCompare(a.properties.lastEruption?.start ?? ""))
+        .map((f) => f.properties.id),
+    [index],
+  );
 
   // Fixed for the map's life: a mode change resizes the same map (it refits), it never recreates it.
   const embed = useMemo(
     () => ({
       pixelRatio: pixelRatio(),
       padding: matchMedia("(max-width: 1100px)").matches ? PADDING.compact : PADDING.desktop,
-      scale: matchMedia("(max-width: 600px)").matches ? 0.6 : matchMedia("(max-width: 1100px)").matches ? 1 : 2,
+      scale: matchMedia("(max-width: 600px)").matches ? 0.6 : 1,
       onReady: () => {
         if ("embedReady" in document.documentElement.dataset) return;
         document.documentElement.dataset.embedReady = "";
         window.dispatchEvent(new Event("plumes:embed-ready"));
         postReady();
       },
-      onDrawn: () => drawn.current?.(),
     }),
     [],
   );
   useEffect(() => {
     document.documentElement.dataset.embedLayout = compact ? "compact" : "desktop";
   }, [compact]);
+  // No links in the frame (rule 6c): the app's links keep their look, without an href.
+  useEffect(() => {
+    const el = content.current;
+    if (!el) return;
+    const strip = () => el.querySelectorAll("a[href]").forEach((a) => a.removeAttribute("href"));
+    strip();
+    const mo = new MutationObserver(strip);
+    mo.observe(el, { subtree: true, childList: true, attributes: true, attributeFilter: ["href"] });
+    return () => mo.disconnect();
+  }, []);
 
-  const s = cur?.state;
-  const eruptionMap = useMemo(() => new Map((s?.eruptions ?? []).map((e) => [e.id, e.month])), [s]);
+  const screen = (id: Screen, el: React.ReactNode) => (
+    <div key={id} className={`absolute inset-0 ${shown === id ? "" : "invisible"}`} data-embed-screen={id} aria-hidden={shown !== id}>
+      <ErrorBoundary>
+        <Suspense fallback={null}>{el}</Suspense>
+      </ErrorBoundary>
+    </div>
+  );
   return (
-    <div ref={content} className="h-full bg-background text-foreground" data-embed-content>
-      <div className="relative h-full" data-window-end={cur?.state.end ?? ""}>
-        <InteractiveMap
-          index={index}
-          styleUrl={config.basemap?.style ?? "https://tiles.openfreemap.org/styles/positron"}
-          coastUrl={resolveUrl("/", config.basemap?.fallback ?? "/basemap/coast.geojson")}
-          data={cur?.geojson ?? null}
-          activity={cur?.activity}
-          eruptions={eruptionMap}
-          formatMonth={(m) => formatDate(m, lang)}
-          embed={embed}
-        />
-      </div>
+    <div ref={content} className="relative h-full overflow-hidden bg-background text-foreground" data-embed-content data-screen={shown} data-window-end={densest?.state.end ?? ""}>
+      {screen(
+        "map",
+        <MapPage embed={{ end: densest?.state.end ?? "", window: densest ? { geojson: densest.geojson, counts: densest.counts, activity: densest.activity, totals: densest.totals } : null, map: embed, compact, focus: densest?.focus?.id ?? null }} />,
+      )}
+      {top && phone
+        ? screen(
+            "deeptime",
+            <FitScreen align="bottom">
+              <VolcanoPage id={top} part="deeptime" />
+            </FitScreen>,
+          )
+        : null}
+      {top && !phone
+        ? screen(
+            "volcano",
+            <FitScreen>
+              <VolcanoPage id={top} />
+            </FitScreen>,
+          )
+        : null}
+      {record && !phone
+        ? screen(
+            "record",
+            <FitScreen at='[aria-labelledby="record-title"]'>
+              <VolcanoPage id={record} />
+            </FitScreen>,
+          )
+        : null}
+      {phone
+        ? null
+        : screen(
+            "volcanoes",
+            <FitScreen>
+              <VolcanoesPage />
+            </FitScreen>,
+          )}
     </div>
   );
 }
@@ -272,7 +315,7 @@ export function EmbedApp() {
       <div ref={frame} inert className="h-dvh overflow-hidden bg-background" data-testid="embed-frame">
         <ErrorBoundary>
           <Suspense fallback={null}>
-            <EmbedMap frame={frame} />
+            <EmbedScreens frame={frame} />
           </Suspense>
         </ErrorBoundary>
       </div>
