@@ -22,6 +22,7 @@ import { HEX_BREAKS, type Activity } from "./density";
 import { PH_BOUNDS } from "./geo";
 import { LAYER_TOKENS, layerVar } from "./layerColors";
 import { MapGlyph } from "./MapGlyph";
+import { removeSo2, showSo2 } from "./so2Overlay";
 import { type DeformationOverlay, useDeformation } from "./useDeformation";
 import type { MapGeojson } from "./windowData";
 
@@ -65,6 +66,8 @@ export interface InteractiveMapProps {
   formatMonth?: (m: string) => string;
   /** The deformation-velocity frames (drawn from the layer's minzoom, below the overlays). */
   deformation?: DeformationOverlay;
+  /** The national SO₂ month (so2-monthly): its file URL and legend stops; drawn below every other data layer. */
+  so2?: { url: string; stops: number[] };
   /** The /embed krtmtthw.dev frames: a non-interactive map with no links, controls or attribution box. */
   embed?: EmbedOptions;
   /** /embed tour stop: the map centred on a volcano at this zoom (null: the whole country). */
@@ -88,7 +91,7 @@ const EMPTY: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: 
 const LAYERS = ["hexes", "thermal", "quakes"] as const;
 
 /** The interactive overview map (loaded only when rule 6b allows): basemap, density, points, volcano links. */
-export default function InteractiveMap({ index, styleUrl, coastUrl, data, show = { hexes: true, thermal: true, quakes: true }, activity, eruptions, formatMonth, deformation, embed, focus = null }: InteractiveMapProps) {
+export default function InteractiveMap({ index, styleUrl, coastUrl, data, show = { hexes: true, thermal: true, quakes: true }, activity, eruptions, formatMonth, deformation, so2, embed, focus = null }: InteractiveMapProps) {
   const focusRef = useRef(focus);
   useEffect(() => {
     focusRef.current = focus;
@@ -260,6 +263,27 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
   }, [ready, data, embed]);
 
   useDeformation(map, ready > 0, deformation, key);
+
+  // SO₂ month: below the deformation frames, hexagons, fires and quakes, so they stay readable.
+  const so2Key = so2 ? `${so2.url}|${so2.stops.join()}` : "";
+  const so2Want = useRef("");
+  useEffect(() => {
+    const map = mapRef.current;
+    so2Want.current = so2Key;
+    if (!map || !ready) return;
+    if (!so2) {
+      removeSo2(map);
+      return;
+    }
+    const below = map.getStyle().layers.find((l) => l.id.startsWith("deformation-") || (LAYERS as readonly string[]).includes(l.id) || l.id === "quakes-halo")?.id;
+    showSo2(map, so2.url, key, so2.stops, below)
+      .then(() => {
+        // Switched off while this month was loading: take it away again.
+        if (!so2Want.current) removeSo2(map);
+      })
+      .catch(() => removeSo2(map));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, so2Key, key]);
 
   // Layer toggles.
   const showKey = `${show.hexes}${show.thermal}${show.quakes}`;

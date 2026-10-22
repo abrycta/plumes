@@ -12,6 +12,7 @@ import type { EmbedOptions, LayerToggles } from "@/map/InteractiveMap";
 import { MapTimeline } from "@/map/MapTimeline";
 import { LAYER_TOKENS, layerVar, legendFill } from "@/map/layerColors";
 import { MapGlyph } from "@/map/MapGlyph";
+import { so2Stops } from "@/data/so2Map";
 import { StaticMap } from "@/map/StaticMap";
 import { dataStamp } from "@/map/firstWindow";
 import { recordMonths, recordQuakeCounts, toGeojson, useWindowData, type MapGeojson } from "@/map/windowData";
@@ -58,6 +59,9 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
     () => (defo && showDefo ? { layer: defo, urlOf: (f: Parameters<typeof framePath>[1]) => resolveUrl(root.versionBase, framePath(defo, f)) } : undefined),
     [defo, showDefo, root.versionBase],
   );
+  // SO₂ monthly mean (so2-monthly): on by default, interactive map only; shows the window's last month with data.
+  const so2Layer = layers.layers.find((l) => l.id === "so2-monthly");
+  const [showSo2, setShowSo2] = useState(true);
   // Every month any national layer offers, up to the data's last day.
   const record = useMemo(() => recordMonths(layers, root.latest.dataAsOf), [layers, root]);
   // The default window: the 12 months up to the data's last month.
@@ -65,6 +69,17 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
   const embedEnd = embed ? record.indexOf(embed.end) : -1;
   const end = embed ? (embedEnd >= 0 ? embedEnd : record.length - 1) : ownEnd;
   const months = useMemo(() => (record[end] ? windowMonths(record[end], WINDOW_MONTHS) : []), [record, end]);
+  const so2Month = useMemo(() => {
+    const last = months.at(-1);
+    const time = so2Layer?.time;
+    if (!last || !time?.start || !time.end) return null;
+    const m = last < time.end ? last : time.end;
+    return m >= time.start && m >= months[0]! ? m : null;
+  }, [months, so2Layer]);
+  const so2 = useMemo(
+    () => (so2Layer && showSo2 && so2Month ? { url: resolveUrl(root.versionBase, so2Layer.url.replace("{month}", so2Month)), stops: so2Stops(so2Layer) } : undefined),
+    [so2Layer, showSo2, so2Month, root.versionBase],
+  );
   // The first window and the timeline strip come from the build-time pack when it matches this data version.
   const stamp = dataStamp(root.latest);
   // The embed brings its own window data: nothing to load here.
@@ -145,6 +160,7 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
             eruptions={eruptions}
             formatMonth={(m) => formatMonth(m, lang)}
             deformation={deformation}
+            so2={so2}
             embed={embed?.map}
             focus={focus}
           />
@@ -191,6 +207,14 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
               </Label>
             </div>
           ) : null}
+          {so2Layer && rich ? (
+            <div className="flex items-center gap-2">
+              <Checkbox id="layer-so2" checked={showSo2} onCheckedChange={(v) => setShowSo2(v === true)} />
+              <Label htmlFor="layer-so2" className="text-ak-sm font-normal">
+                {so2Layer.title[lang]}
+              </Label>
+            </div>
+          ) : null}
           <DataThrough date={root.latest.dataAsOf} />
         </div>
         {summary}
@@ -203,6 +227,13 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
               scale="sequential"
               title={t("Thermal detections per hexagon (about 30 km across)", "六角形ごとの熱異常検知数(差し渡し約30 km)")}
               labels={[`1–${HEX_BREAKS[0] - 1}`, `${HEX_BREAKS[0]}–${HEX_BREAKS[1] - 1}`, `${HEX_BREAKS[1]}–${HEX_BREAKS[2] - 1}`, `${HEX_BREAKS[2]}–${HEX_BREAKS[3] - 1}`, `${HEX_BREAKS[3]}+`]}
+            />
+          ) : null}
+          {so2 && so2Month && rich && !embed ? (
+            <MapLegend
+              scale="sequential"
+              title={t(`SO₂, monthly mean, ${fmt(so2Month)} (${so2Layer!.legend?.unit ?? "µmol/m²"})`, `SO₂月平均、${fmt(so2Month)}(${so2Layer!.legend?.unit ?? "µmol/m²"})`)}
+              labels={so2Layer!.legend?.stops?.map((st) => String(st[1])) ?? so2.stops.map((v) => `≥ ${v}`)}
             />
           ) : null}
           <MapLegendKey
