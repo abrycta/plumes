@@ -7,10 +7,10 @@ import * as maplibregl from "maplibre-gl";
 
 maplibregl.setWorkerUrl(workerUrl);
 
-import { applyBasemapTheme, stepColor } from "@abrycta/akari/maps";
+import { applyBasemapTheme, coastlineLayer, stepColor } from "@abrycta/akari/maps";
 import { useContrast, useLang, useT, useTheme } from "@abrycta/akari/react";
 import { flat } from "@abrycta/akari/tokens";
-import type { ExpressionSpecification, GeoJSONSource, Map as MlMap, StyleSpecification } from "maplibre-gl";
+import type { ExpressionSpecification, GeoJSONSource, LayerSpecification, Map as MlMap, StyleSpecification } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
 
 import type { VolcanoesIndex } from "@contracts/readmodels";
@@ -39,8 +39,8 @@ function fallbackStyle(coastUrl: string, key: ThemeKey): StyleSpecification {
     version: 8,
     sources: { coast: { type: "geojson", data: coastUrl, attribution: "Natural Earth" } },
     layers: [
-      { id: "background", type: "background", paint: { "background-color": tokenColor("color.bg", key) } },
-      { id: "coastline", type: "line", source: "coast", paint: { "line-color": tokenColor("color.text-muted", key), "line-width": 0.8 } },
+      { id: "background", type: "background", paint: { "background-color": tokenColor("map.background", key) } },
+      { id: "coastline", type: "line", source: "coast", paint: { "line-color": tokenColor("map.coast", key), "line-width": 0.8 } },
     ],
   };
 }
@@ -151,15 +151,26 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
       loaded = true;
       window.clearTimeout(timer);
       for (const id of LAYERS) if (!map.getSource(id)) map.addSource(id, { type: "geojson", data: EMPTY, ...(id === "thermal" ? { attribution: "NASA FIRMS" } : id === "quakes" ? { attribution: "USGS" } : {}) });
-      map.addLayer({ id: "hexes", type: "fill", source: "hexes", paint: { "fill-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.7, 9, 0.2] } });
+      map.addLayer({ id: "hexes", type: "fill", source: "hexes", paint: { "fill-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.7, 9, 0.45] } });
       map.addLayer({
         id: "thermal",
         type: "circle",
         source: "thermal",
         paint: {
           "circle-radius": ["*", k, ["interpolate", ["linear"], ["zoom"], 5, ["case", ["==", ["get", "near"], 1], 2.5, 1.4], 10, ["case", ["==", ["get", "near"], 1], 5, 3]]],
-          "circle-opacity": ["case", ["==", ["get", "near"], 1], 0.9, 0.22],
-          "circle-stroke-width": ["case", ["==", ["get", "near"], 1], 0.75 * k, 0],
+          "circle-opacity": ["case", ["==", ["get", "near"], 1], 0.9, 0.5],
+          "circle-stroke-width": ["case", ["==", ["get", "near"], 1], 0.75 * k, 0.5 * k],
+        },
+      });
+      // A halo ring under each quake ring (Akari map.halo), so the rings read on the density hexagons too.
+      map.addLayer({
+        id: "quakes-halo",
+        type: "circle",
+        source: "quakes",
+        paint: {
+          "circle-radius": ["*", k, ["interpolate", ["linear"], ["get", "mag"], 2.5, 1.2, 4, 1.75, 5, 3, 6, 5, 7.5, 8]],
+          "circle-opacity": 0,
+          "circle-stroke-width": 2.25 * k,
         },
       });
       map.addLayer({
@@ -167,7 +178,7 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
         type: "circle",
         source: "quakes",
         paint: {
-          "circle-radius": ["*", k, ["interpolate", ["linear"], ["get", "mag"], 2.5, 2, 4, 3.5, 5, 6, 6, 10, 7.5, 16]],
+          "circle-radius": ["*", k, ["interpolate", ["linear"], ["get", "mag"], 2.5, 1.2, 4, 1.75, 5, 3, 6, 5, 7.5, 8]],
           "circle-opacity": 0.25,
           "circle-stroke-width": 0.75 * k,
           "circle-stroke-opacity": 0.9,
@@ -192,10 +203,19 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     const map = mapRef.current;
     if (!map || !ready) return;
     if (fallback.current) {
-      if (map.getLayer("background")) map.setPaintProperty("background", "background-color", tokenColor("color.bg", key));
-      if (map.getLayer("coastline")) map.setPaintProperty("coastline", "line-color", tokenColor("color.text-muted", key));
-    } else applyBasemapTheme(map, resolvedTheme);
-    const bg = tokenColor("color.bg", key);
+      if (map.getLayer("background")) map.setPaintProperty("background", "background-color", tokenColor("map.background", key));
+      if (map.getLayer("coastline")) map.setPaintProperty("coastline", "line-color", tokenColor("map.coast", key));
+    } else {
+      applyBasemapTheme(map, key);
+      // A coastline on the water polygons' edges (OpenMapTiles "water"), above the water fill.
+      const coast = coastlineLayer({ id: "akari-coastline", source: "openmaptiles", theme: key });
+      if (map.getSource("openmaptiles") && !map.getLayer(coast.id)) {
+        const layers = map.getStyle().layers ?? [];
+        const i = layers.map((l) => l.id).lastIndexOf("water");
+        map.addLayer(coast as unknown as LayerSpecification, i >= 0 ? layers[i + 1]?.id : undefined);
+      } else if (map.getLayer(coast.id)) map.setPaintProperty(coast.id, "line-color", coast.paint["line-color"]);
+    }
+    const bg = tokenColor("map.halo", key);
     const depth = ["match", ["get", "depth"], 1, tokenColor(LAYER_TOKENS.depth[1], key), 2, tokenColor(LAYER_TOKENS.depth[2], key), tokenColor(LAYER_TOKENS.depth[0], key)] as ExpressionSpecification;
     map.setPaintProperty("hexes", "fill-color", stepColor("count", HEX_BREAKS, { scale: "seq", theme: resolvedTheme }) as ExpressionSpecification);
     map.setPaintProperty("hexes", "fill-outline-color", bg);
@@ -203,6 +223,7 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     map.setPaintProperty("thermal", "circle-stroke-color", bg);
     map.setPaintProperty("quakes", "circle-color", depth);
     map.setPaintProperty("quakes", "circle-stroke-color", depth);
+    map.setPaintProperty("quakes-halo", "circle-stroke-color", bg);
   }, [ready, key, resolvedTheme]);
 
   // The window's data.
@@ -228,6 +249,7 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     const map = mapRef.current;
     if (!map || !ready) return;
     for (const id of LAYERS) if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", show[id] ? "visible" : "none");
+    if (map.getLayer("quakes-halo")) map.setLayoutProperty("quakes-halo", "visibility", show.quakes ? "visible" : "none");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, showKey]);
 

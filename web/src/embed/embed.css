@@ -37,7 +37,7 @@
     height: 10px;
   }
   [data-embed-layout="compact"] .volcano-marker[data-activity] .dot {
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--seal) 35%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--ak-map-track) 22%, transparent);
   }
   [data-embed-layout="compact"] .volcano-marker[data-activity="0"] .dot {
     box-shadow: none;
