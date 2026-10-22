@@ -107,7 +107,8 @@ def _token() -> str:
 def submit(c: httpx.Client, start: str, end: str) -> str:
     q = [("variable", v) for v in VARS] + [
         ("subset", f"lat({BOX[1]}:{BOX[3]})"), ("subset", f"lon({BOX[0]}:{BOX[2]})"),
-        ("subset", f'time("{start}T00:00:00Z":"{end}T23:59:59Z")'), ("format", "application/x-netcdf4"), ("forceAsync", "true")]
+        ("subset", f'time("{start}T00:00:00Z":"{end}T23:59:59Z")'), ("format", "application/x-netcdf4"), ("forceAsync", "true"),
+        ("skipPreview", "true")]  # a full year (about 365 granules) is over Harmony's preview threshold: without this the job pauses
     url = f"{HARMONY}/{COLLECTION}/ogc-api-coverages/1.0.0/collections/parameter_vars/coverage/rangeset?" + urllib.parse.urlencode(q)
     r = c.get(url, follow_redirects=False)
     if r.status_code in (301, 302, 303):
@@ -123,7 +124,7 @@ def wait(c: httpx.Client, job: str, timeout_s: int = 3600) -> list[str]:
         st = c.get(f"{HARMONY}/jobs/{job}").raise_for_status().json()
         if st["status"] in ("successful", "complete_with_errors"):
             break
-        if st["status"] in ("failed", "canceled"):
+        if st["status"] in ("failed", "canceled", "paused"):
             raise RuntimeError(f"Harmony job {job}: {st['status']}: {st.get('message', '')[:200]}")
         if time.monotonic() - t0 > timeout_s:
             raise TimeoutError(f"Harmony job {job} still {st['status']} after {timeout_s} s")
