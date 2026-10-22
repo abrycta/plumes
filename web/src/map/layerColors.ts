@@ -18,3 +18,9 @@ export const LAYER_TEXT = {
   thermal: "text-ak-cat-4",
   quakes: "text-ak-div-7",
 } as const;
+
+/** A layer token's Akari scale name for MapLegendKey's `fill` ("data.cat.4" -> "cat-4"). */
+export const legendFill = (token: string): string => token.replace(/^data\./, "").replace(".", "-");
+
+/** A layer token as a CSS colour (for SVG fills): "data.div.7" -> "var(--ak-div-7)". */
+export const layerVar = (token: string): string => `var(--ak-${legendFill(token)})`;
