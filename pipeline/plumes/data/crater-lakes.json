@@ -1,0 +1,40 @@
+{
+  "description": "Crater lakes measured by Earth Engine run A (LAYERS-PLAN §7 steps 4-5). 'core' is a disc well inside the lake, used for surface temperature so the lake edge (mixed land and water pixels) is left out; 'crater' is a disc inside the crater rim, used for water area and colour, kept clear of any surrounding lake. Centres and radii were set by hand and checked on 2026-10-22 with the single-image smoke test (JRC GSW, March 2019): water share of the core disc 0.99 at Taal and 1.00 at Pinatubo; water in the crater disc 1.12 km² (22 %) at Taal and 1.74 km² (25 %) at Pinatubo, so neither crater disc reaches Taal Lake or the caldera walls' runoff. 'gone' lists spans when the lake was absent: no temperature is reported there, and the charts show the span. An 'end' of null means the span ends at the first Sentinel-2 scene that sees the lake again (derived from the area series, not typed by hand).",
+  "lakes": [
+    {
+      "id": "taal-main-crater",
+      "volcano": "taal",
+      "name": {
+        "en": "Taal Main Crater Lake",
+        "ja": "タール火山主火口湖"
+      },
+      "lat": 14.0106,
+      "lon": 120.9975,
+      "coreM": 350,
+      "craterM": 1300,
+      "gone": [
+        {
+          "start": "2020-01-12",
+          "end": null,
+          "label": {
+            "en": "Lake drained in the January 2020 eruption",
+            "ja": "2020年1月の噴火で湖が干上がった"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pinatubo-crater",
+      "volcano": "pinatubo",
+      "name": {
+        "en": "Lake Pinatubo",
+        "ja": "ピナツボ湖"
+      },
+      "lat": 15.1427,
+      "lon": 120.3497,
+      "coreM": 450,
+      "craterM": 1500,
+      "gone": []
+    }
+  ]
+}

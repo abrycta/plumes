@@ -610,3 +610,55 @@ sources:
         url: https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/1.0.0/WMTSCapabilities.xml
         automatic: false                   # map backdrop tiles only, not a data route
     archived: { enabled: false }
+
+  - id: s5p-offl-aer-ai
+    # chosen: true   # source 7 of 24, M2 (DECISIONS.md Q30); built in Earth Engine run A (LAYERS-PLAN §7 step 6)
+    description: >-
+      [M2] Copernicus / ESA Sentinel-5P TROPOMI UV aerosol index (COPERNICUS/S5P/OFFL/L3_AER_AI), 2018-07-04 onward,
+      1,113 m; band absorbing_aerosol_index. Reduced in Earth Engine to the daily mean, max and valid-pixel count per
+      volcano (15 km ring and 50 km box), one aggregation a month, only for months touched by an eruption window
+      (plumes.ee_run_a uvai --windows). Format: EE ImageCollection; outputs CSV rows (kB). Auth: Earth Engine service account.
+    kind: remote-dataset
+    licence: "open: Copernicus Sentinel Data Legal Notice"
+    attribution: "Contains modified Copernicus Sentinel data [Year]. Processed in Google Earth Engine."
+    cadence: daily (OFFL latency about a week)
+    links:
+      - id: earth-engine
+        url: ee://COPERNICUS/S5P/OFFL/L3_AER_AI
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS/COPERNICUS_S5P_OFFL_L3_AER_AI.json
+        probe_contains: "AER_AI"
+      - id: earth-engine-nrti
+        url: ee://COPERNICUS/S5P/NRTI/L3_AER_AI
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/COPERNICUS/COPERNICUS_S5P_NRTI_L3_AER_AI.json
+        probe_contains: "AER_AI"
+      - id: cdse-stac                       # independent of Earth Engine: Copernicus Data Space (L2 OFFL granules)
+        url: https://stac.dataspace.copernicus.eu/v1/collections/sentinel-5p-l2-aer-ai-offl
+        probe_contains: "sentinel-5p-l2-aer-ai-offl"
+    archived: { enabled: false }
+
+  - id: jrc-global-surface-water
+    # M2 run A (LAYERS-PLAN §1 item 7, §7 step 5): crater-lake water history before Sentinel-2
+    description: >-
+      [M2] European Commission JRC / Google Global Surface Water v1.4 (JRC/GSW1_4/MonthlyHistory; band water: 0 no
+      data, 1 not water, 2 water), 30 m, 1984-03 to 2021-12: monthly water area of the Taal and Pinatubo crater lakes
+      (crater discs in plumes/data/crater-lakes.json), 2000-01 to 2021-12, reduced in Earth Engine. Covers Taal 2020,
+      nothing after 2021. Format: EE; outputs one CSV of monthly rows (kB). Auth: Earth Engine service account.
+    kind: remote-dataset
+    licence: "open: Copernicus programme data 'provided free of charge, without restriction of use'"
+    attribution: "Pekel, J.-F., Cottam, A., Gorelick, N., Belward, A.S. (2016), High-resolution mapping of global surface water and its long-term changes, Nature 540, 418-422, doi:10.1038/nature20584. Source: EC JRC/Google. Processed in Google Earth Engine."
+    cadence: static release (v1.4)
+    links:
+      - id: earth-engine-monthly
+        url: ee://JRC/GSW1_4/MonthlyHistory
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/JRC/JRC_GSW1_4_MonthlyHistory.json
+        probe_contains: "MonthlyHistory"
+      - id: earth-engine-v1-3                # the previous release (1984-2020): same method, one year shorter
+        url: ee://JRC/GSW1_3/MonthlyHistory
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/JRC/JRC_GSW1_3_MonthlyHistory.json
+        probe_contains: "MonthlyHistory"
+      - id: jrc-download                    # independent of Earth Engine: JRC's own tiles (GeoTIFF), runbook only
+        url: https://global-surface-water.appspot.com/download
+        probe_html: true
+        probe_contains: "Global Surface Water"
+        automatic: false
+    archived: { enabled: false }
