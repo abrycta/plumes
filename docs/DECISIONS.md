@@ -130,3 +130,22 @@ Kurt's answers to the nine questions of [LAYERS-PLAN.md](LAYERS-PLAN.md) §5 (wr
 | L9a | **Agents may install `h5py` in the plumes environment**, for reading the `MSAQSO2L4` per-year values at M3. Nothing is run now | the earlier install was refused by the permission check |
 | T1 | **The Taal reading on the volcano page is reviewed** (`status: reviewed`, published with the next data version). Its Japanese height gloss reads （約16.8 km） in full-width brackets instead of the English "(about 16.8 km)"; the story's other Japanese glosses use full-width brackets too. The version check now also rejects half-width brackets and English left in the reading's Japanese text | `pipeline/plumes/readmodels.py` (`fl_gloss`, `ja_leftovers`), `pipeline/tests/test_text.py` |
 
+
+## 2026-10-22: stories plan ST1 to ST11; phone embed P1
+
+Kurt's answers to the 11 open questions of [STORIES-PLAN.md](STORIES-PLAN.md) (written there as questions 1–11; they were not in OPEN-QUESTIONS.md). Stories are generated from data with fixed EN/JA templates; nothing is built yet. Answers that differ from the plan's recommendation are marked **(not the default)**.
+
+| # | Decision | Note |
+|---|---|---|
+| ST1 | **Stories stay hidden on the site until every step is reviewed.** Drafts stay in the data files, marked `draft`, for the review page | STORIES-PLAN §B6 |
+| ST2 | **The Smithsonian/USGS Weekly Volcanic Activity Reports are crawled from Wayback snapshots** while volcano.si.edu refuses scripts (403 on 2026-10-22). PHIVOLCS figures quoted in them may be used, attributed **"as reported by PHIVOLCS, via Smithsonian/USGS"** (JA 「（PHIVOLCS発表、スミソニアン/USGS経由）」), each with the report's link | Q5 (ii) satisfied by citing the weekly report's link |
+| ST3 | **Steps: before → onset → course → after**; the peak is a highlighted figure, not a step | STORIES-PLAN §B2 |
+| ST4 | **Taal's "lake drained" line is sourced from the weekly report** (15–21 January 2020, "Satellite images showed that the Main Crater lake was gone"): a `lake_gone` extraction rule and template WEEKLY-LAKE-GONE. The reviewed Taal crater step changes once and is reviewed again | replaces the hand-written sentence |
+| ST5 | **Story-worthy = at least 4 fact kinds with sentences in before, onset and after; pre-2000 events get deep-time cards**, not stories | 25 → 44 episodes with the shortlist (STORIES-PLAN §A3) |
+| ST6 | **A GVP eruption and its overlapping alert window merge into one story** (42 events since 2000) | STORIES-PLAN §B1 |
+| ST7 | **Shared story code moves to a new private `abrycta/story-kit` when a second project needs it.** The workspace-level `STORY-FORMAT.md` is a planned item only, not written now | until then STORIES-PLAN.md is the specification |
+| ST8 | **ReliefWeb stays out for now** (its API needs an approved appname) | — |
+| ST9 | **(not the default) Rain is shown whenever IMERG data exists**, not only beside a reported lahar. It is worded as context without implying a cause: its own sentences (RAIN-TOTAL, RAIN-WETTEST), never joined to an eruption, ash or lahar fact; the checks reject causal words in them. It does not count towards the story-worthy score | STORIES-PLAN §B3, §B4, §B6 |
+| ST10 | **GDACS is not used at all**, not even its GLIDE ids as links | its content is an alert colour from a warning system |
+| ST11 | **`pdfplumber` may be added to the pipeline** for the DROMIC PDF reports | DROMIC generalised to 16 events |
+| P1 | **The Plumes phone embed stays Luzon–Visayas with the data layers** | Kurt, 2026-10-22 |
