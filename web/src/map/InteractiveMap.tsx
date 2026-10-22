@@ -20,7 +20,6 @@ import { formatNumber } from "@/lib/format";
 
 import { HEX_BREAKS, type Activity } from "./density";
 import { PH_BOUNDS } from "./geo";
-import { MapGlyph } from "./MapGlyph";
 import { type DeformationOverlay, useDeformation } from "./useDeformation";
 import type { MapGeojson } from "./windowData";
 
@@ -102,8 +101,6 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
   const [map, setMap] = useState<MlMap | null>(null);
   const fallback = useRef(false);
   const signalled = useRef(false);
-  // The glyph still covers the map until its first full frame with data (MapGlyph).
-  const [drawn, setDrawn] = useState(false);
   const k = embed?.scale ?? 1;
 
   useEffect(() => {
@@ -213,13 +210,9 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     const map = mapRef.current;
     if (!map || !ready) return;
     for (const id of LAYERS) (map.getSource(id) as GeoJSONSource | undefined)?.setData(data?.[id] ?? EMPTY);
-    // The first idle with the window's data drawn: the glyph still lifts, and the embed is ready.
-    if (data && !signalled.current) {
+    if (embed && data && !signalled.current) {
       signalled.current = true;
-      map.once("idle", () => {
-        setDrawn(true);
-        embed?.onReady();
-      });
+      map.once("idle", () => embed.onReady());
     }
   }, [ready, data, embed]);
 
@@ -309,10 +302,5 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, lang, activityKey, eruptionKey]);
 
-  return (
-    <>
-      <div ref={box} className={embed ? "h-full w-full" : "h-full min-h-90 w-full"} role="region" aria-label={t("Interactive map of the 24 volcanoes", "24火山のインタラクティブ地図")} data-interactive-map />
-      {drawn ? null : <MapGlyph />}
-    </>
-  );
+  return <div ref={box} className={embed ? "h-full w-full" : "h-full min-h-90 w-full"} role="region" aria-label={t("Interactive map of the 24 volcanoes", "24火山のインタラクティブ地図")} data-interactive-map />;
 }

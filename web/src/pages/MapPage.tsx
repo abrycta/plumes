@@ -10,7 +10,6 @@ import { DeformationKey } from "@/map/DeformationKey";
 import { HEX_BREAKS, quakesPerMonth, WINDOW_MONTHS, windowMonths } from "@/map/density";
 import type { LayerToggles } from "@/map/InteractiveMap";
 import { MapTimeline } from "@/map/MapTimeline";
-import { MapGlyph } from "@/map/MapGlyph";
 import { StaticMap } from "@/map/StaticMap";
 import { dataStamp } from "@/map/firstWindow";
 import { recordMonths, recordQuakeCounts, toGeojson, useWindowData } from "@/map/windowData";
@@ -129,7 +128,7 @@ export default function MapPage() {
         </p>
         <div className="relative h-[min(72vh,760px)] min-h-90 overflow-hidden rounded-sm border border-border bg-background max-md:h-auto" aria-busy={loading}>
           {rich ? (
-            <Suspense fallback={<MapGlyph />}>
+            <Suspense fallback={<StaticMap index={index} data={data} />}>
               <InteractiveMap
                 index={index}
                 styleUrl={config.basemap?.style ?? "https://tiles.openfreemap.org/styles/positron"}
@@ -143,10 +142,7 @@ export default function MapPage() {
               />
             </Suspense>
           ) : (
-            <>
-              <StaticMap index={index} data={data} />
-              {data ? null : <MapGlyph />}
-            </>
+            <StaticMap index={index} data={data} />
           )}
         </div>
         {deformation ? <DeformationKey layer={deformation.layer} names={Object.fromEntries(index.features.map((f) => [f.properties.id, f.properties.name[lang]]))} /> : null}
