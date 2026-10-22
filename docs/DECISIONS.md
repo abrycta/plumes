@@ -161,3 +161,9 @@ Kurt's decisions on the first generated drafts (Kanlaon 2024 and Taal 2020, PR #
 | ST12 | **A generated step renders as a list, one short line per fact** (and one per missing-record line), not as a paragraph | compact, workspace rule 28; hand-built steps keep their paragraph |
 | ST13 | **No "people nearby" sentence in stories** (template POP-RING removed, with the population-ring override) | the volcano page already shows the WorldPop rings |
 | ST14 | **The Japanese templates keep the plain form** (〜した／だった), as in the reviewed Taal text | not です・ます |
+
+## 2026-10-23: OMI SO₂ dropped
+
+| # | Decision | Note |
+|---|---|---|
+| L-OMI | **OMI SO₂ (`omi-omso2e`, series `so2_omi_box`) is dropped** (Kurt, 2026-10-23): no OMI data is published; `plumes.omi`, its `data.yml` step and the web wording are removed, and the registry entry is marked rejected | SO₂ stays TROPOMI (`s5p-offl-so2`, from 2018-12) and MSVOLSO2L4 (`nasa-msvolso2l4`, eruption masses); the backfill was slow (about 20 min a year in Harmony) and never reached a version |

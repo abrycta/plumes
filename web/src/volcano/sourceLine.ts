@@ -4,7 +4,6 @@ import type { LocalText } from "@contracts/readmodels";
  *  stay one tap away in the caption's disclosure (data/tracks.ts INSTRUMENTS), never removed. */
 const SHORT: Record<string, LocalText> = {
   "s5p-offl-so2": { en: "Sentinel-5P TROPOMI", ja: "Sentinel-5P TROPOMI" },
-  "omi-omso2e": { en: "OMI on Aura", ja: "Aura衛星OMI" },
   "modis-mod14a1": { en: "MODIS on Terra", ja: "Terra衛星MODIS" },
   "viirs-vnp14a1": { en: "VIIRS on S-NPP", ja: "S-NPP衛星VIIRS" },
   "firms-modis": { en: "NASA FIRMS", ja: "NASA FIRMS" },

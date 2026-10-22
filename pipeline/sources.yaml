@@ -677,40 +677,8 @@ sources:
     archived: { enabled: false }
 
 
-  - id: omi-omso2e
-    # chosen: true   # source 21 of 24, M1 (DECISIONS.md Q31); built at M2 step 2 (LAYERS-PLAN.md §7)
-    description: >-
-      [M2] NASA GES DISC OMI/Aura Sulfur Dioxide Total Column Daily L3 Best Pixel 0.25 deg, OMSO2e **v004**
-      (C3756242136-GES_DISC), 2004-10-01 onward: the SO2 track before TROPOMI for every volcano
-      (NASA-EE-CANDIDATES.md A1). v003 stopped at 2026-03-22; v004's ColumnAmountSO2 uses a GEOS-5 profile (one
-      column, not v003's PBL/TRL/STL family). Access: one Harmony request per calendar year over the Philippine box
-      (HOSS bbox and variable subset, about 25 kB a day), reduced at once to rows per volcano (50 km box, cloud
-      radiance fraction at most 0.3) by plumes/omi.py; the raw subsets are discarded and the reduced table
-      data/tables/omi-so2/<year>.csv is adopted into abrycta/plumes-archive (restored before the run). Format: netCDF4
-      subsets in, CSV out. Size: about 200 MB returned for 22 years [U]; about 8,000 daily rows per volcano, under
-      0.3 MB. Auth: NASA Earthdata token (CI mints it from the login).
-    kind: remote-dataset
-    licence: "open: NASA EOSDIS data use policy (no restriction; citation requested)"
-    attribution: "Li, C., Krotkov, N. A., Leonard, P., OMI/Aura Sulfur Dioxide (SO2) Total Column Daily L3 1 day Best Pixel in 0.25 degree x 0.25 degree V4, Greenbelt, MD, USA, Goddard Earth Sciences Data and Information Services Center (GES DISC), doi:10.5067/AURA/OMI/DATA3408"
-    cadence: daily
-    links:
-      - id: harmony
-        url: https://harmony.earthdata.nasa.gov/C3756242136-GES_DISC/ogc-api-coverages/1.0.0/collections/parameter_vars/coverage/rangeset
-        probe: https://harmony.earthdata.nasa.gov/capabilities?collectionId=C3756242136-GES_DISC
-        probe_contains: "OMSO2e"
-      - id: harmony-v003                   # the M1 route: same host, v003 (ends 2026-03-22), a different column definition
-        url: https://harmony.earthdata.nasa.gov/C1266136112-GES_DISC/ogc-api-coverages/1.0.0/collections/parameter_vars/coverage/rangeset
-        automatic: false
-        probe: https://harmony.earthdata.nasa.gov/capabilities?collectionId=C1266136112-GES_DISC
-        probe_contains: "OMSO2e"
-      - id: cmr
-        url: https://cmr.earthdata.nasa.gov/search/collections.umm_json?short_name=OMSO2e&version=004
-        probe: https://cmr.earthdata.nasa.gov/search/collections.json?short_name=OMSO2e&version=004
-        probe_contains: "OMSO2e"
-      - id: gibs-omi-so2
-        url: https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/1.0.0/WMTSCapabilities.xml
-        automatic: false                   # map backdrop tiles only, not a data route
-    archived: { enabled: false }
+  # omi-omso2e (OMI/Aura OMSO2e v004 SO2, 2004 onward): rejected, dropped by Kurt 2026-10-23. Plumes keeps TROPOMI
+  # (s5p-offl-so2) and MSVOLSO2L4 (nasa-msvolso2l4) for SO2; plumes.omi and its data.yml step were removed.
 
   - id: s5p-offl-aer-ai
     # chosen: true   # source 7 of 24, M2 (DECISIONS.md Q30); built in Earth Engine run A (LAYERS-PLAN §7 step 6)

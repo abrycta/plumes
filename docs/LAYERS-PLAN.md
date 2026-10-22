@@ -25,7 +25,7 @@ Effort: S = under 2 days, M = 2–5 days, L = more than a week. EECU-h = Earth E
 
 | # | Layer | Source and access | Span, cadence, resolution | Licence | Helps | Backfill cost | Effort | Verdict |
 |---|---|---|---|---|---|---|---|---|
-| 1 | **SO₂ before TROPOMI** (`so2_omi_box`, already in the contract) | `OMSO2e` v003, GES DISC; Harmony HOSS subset (in place). Reg. `omi-omso2e` | 2004-10 →; daily; 0.25° | NASA open | all 24; Mayon 2006–14, Bulusan, Kanlaon | no EE; about 10–20 Actions min | S | **M2** |
+| 1 | ~~**SO₂ before TROPOMI** (`so2_omi_box`)~~ **Dropped by Kurt 2026-10-23** (DECISIONS L-OMI): not built; TROPOMI and MSVOLSO2L4 cover SO₂. | `OMSO2e` v003, GES DISC; Harmony HOSS subset (in place). Reg. `omi-omso2e` | 2004-10 →; daily; 0.25° | NASA open | all 24; Mayon 2006–14, Bulusan, Kanlaon | no EE; about 10–20 Actions min | S | **M2** |
 | 2 | **Thermal after S-NPP ends** (S-NPP deliveries end 2026-11-01) | FIRMS area API `VIIRS_NOAA20_SP` (and `VIIRS_NOAA21_SP`), the existing client; CMR `VJ114A1` v002 as the second link | NOAA-20 2018 → (`VJ114A1` 2018-01-01 →); daily; 375 m / 1 km | NASA open (FIRMS) | all 24 | no EE; about 30–60 Actions min (rate limit) | S | **M2** |
 | 3 | **Crater-lake temperature** (`lake_temp_landsat`, already in the contract) | Landsat C2 L2 `ST_B10` / `ST_B6` on EE. Reg. `landsat-surface-temperature` | 2000 →; 8–16 days; 30 m (100 m native) | US public domain | Taal Main Crater Lake (none from 2020-01-12 to its return), Pinatubo's crater lake | about 0.5 EECU-h | S–M | **M2** |
 | 4 | **Ground deformation, LOS series** | COMET Volcano Portal LiCSBAS JSON `https://comet-volcanodb.org/data/disp_data_gacos/southeast_asia/<volcano>_<frame>_web_x100.json` (HTTP download) | 2014-10/2016 → 2026-08; 6–12 days; about 500 m grid (100 × 100 over 50 km) | LiCSAR: Copernicus-derived, OGL v3 on CEDA; portal: "CC BY-NC 4.0", treated as covering the JSON too (L1a) | 18 of 24 (not Babuyan Claro, Bud Dajo, Cagua, Hibok-hibok, Iraya, Smith) | no EE; about 0.7 GB downloaded once, about 15 Actions min | M (series) + M (velocity layer) | **M2 (L1)** |
@@ -33,7 +33,7 @@ Effort: S = under 2 days, M = 2–5 days, L = more than a week. EECU-h = Earth E
 | 6 | **Rain before lahars** | `NASA/GPM_L3/IMERG_V07` on EE (half-hourly to daily sum); GES DISC `GPM_3IMERGDF` v07 as the second link | 1998 →; daily; 0.1° | NASA open (CC0) | Mayon (2006 Durian lahars), Pinatubo, Kanlaon, Bulusan, Taal | 1–3 EECU-h **[U; measure one month first]** | S | **M2 (Earth Engine route, L4)** |
 | 7 | **Crater-lake area and colour** | Sentinel-2 L2A and Landsat on EE (Reg.); `JRC/GSW1_4/MonthlyHistory` (new) for water present/absent | GSW 1984-03 → 2021-12, monthly, 30 m; S2 2017 →, 10 m | GSW: "free of charge, without restriction"; Copernicus | Taal (gone in 2020, back in 2021), Pinatubo | under 0.5 EECU-h | S–M | **M2** |
 | 8 | **Deep-time strip**: eruptions before 2000 with deaths and damage | `gvp-eruptions-ph` (Reg., already archived) plus NOAA NCEI HazEL API `.../hazel/hazard-service/api/v1/volcanoes?country=PHILIPPINES` | Holocene → now; per eruption | GVP non-commercial with citation; NCEI unrestricted | Taal 1911/1965, Mayon 1814/1993, Pinatubo 1991, Hibok-hibok 1951 | none; under 100 kB | S | **M2** |
-| 9 | National monthly SO₂ map | S5P on EE (Reg.) plus OMI before 2018 | 2004-10 →; monthly | as 1 and S5P | map | about 1 EECU-h; tiles under 100 MB | S–M | M2 (last) |
+| 9 | National monthly SO₂ map | S5P on EE (Reg.); OMI before 2018 dropped 2026-10-23 | 2004-10 →; monthly | as 1 and S5P | map | about 1 EECU-h; tiles under 100 MB | S–M | M2 (last) |
 | 10 | Night land-surface temperature (slow heating) | `MODIS/061/MOD21A1N`, `MYD21A1N`, `NASA/VIIRS/002/VNP21A1N` on EE | 2000 / 2012 →; daily; 1 km | LP DAAC: no restrictions | Taal, Kanlaon, Mayon, Bulusan | 2.5–5 EECU-h **[U]** | M | M3 |
 | 11 | Crater heat at 70 m | `NASA/ECOSTRESS/L2T_LSTE/V2` on EE | 2018-07 →; irregular overpasses; 70 m | LP DAAC open | Taal, Kanlaon, Mayon | about 0.05 EECU-h a volcano | M | M3 |
 | 12 | Aerosol index before 2018 | `OMAERUVd` v003, GES DISC, Harmony (same client as 1) | 2004-10 →; daily; 1° | NASA open | all 24 | no EE | S–M | M3 |
@@ -68,7 +68,7 @@ Total cost of all nine: about **4–6.5 EECU-hours** of backfill (§7), in two r
 
 | Rank | Layer | Why now | Honesty notes for the page |
 |---|---|---|---|
-| 1 | **OMI SO₂ daily** (`so2_omi_box`) | Already registered, already in the contract, no Earth Engine cost. Without it, the SO₂ track starts in 2018, which breaks the "2000 to now" promise (Q7). | 0.25° pixels are larger than most volcanoes; there are row-anomaly gaps from 2008; PBL column; label "OMI" and "TROPOMI" separately where they overlap; show coverage per day. |
+| 1 | ~~**OMI SO₂ daily** (`so2_omi_box`)~~ **Dropped by Kurt 2026-10-23** (DECISIONS L-OMI): not built; TROPOMI and MSVOLSO2L4 cover SO₂. | Already registered, already in the contract, no Earth Engine cost. Without it, the SO₂ track starts in 2018, which breaks the "2000 to now" promise (Q7). | 0.25° pixels are larger than most volcanoes; there are row-anomaly gaps from 2008; PBL column; label "OMI" and "TROPOMI" separately where they overlap; show coverage per day. |
 | 2 | **NOAA-20 VIIRS thermal continuity** | S-NPP deliveries stop on 2026-11-01, so the VIIRS track would silently end. The FIRMS client already exists; adding the `VIIRS_NOAA20_SP` source name is a small change. | **Its own series (L5)**, never spliced into S-NPP, with a dated sensor-change marker at the switch (needs the Akari marker, §6). Counts include vegetation fires (FIRMS `type` 1 = active volcano). |
 | 3 | **Landsat crater-lake temperature** (`lake_temp_landsat`) | Registered and in the contract. A distinctive "lake heated before 2020" story for Taal. Cheap. | Satellite skin temperature, not PHIVOLCS's in-lake readings. Show each PHIVOLCS bulletin value beside it, cited. Mask clouds and the lake edge. Show a gap while the lake was gone. The Landsat 7 stripe gap applies from 2003. |
 | 4 | **COMET deformation: series and velocity map layer** (18 volcanoes; L2, L3) | The cheapest route to the deformation track Q8 wanted, for 18 volcanoes instead of only Taal (supersedes Q8's Taal crop). No InSAR processing. A per-volcano LOS chart plus a national `deformation-velocity` map layer (§3.1). Published under the portal's CC BY-NC 4.0 notice with attribution (L1a; no email). | Line-of-sight, not vertical. Movement is relative to COMET's reference area. Atmospheric noise remains after GACOS. Vegetated slopes lose coherence (Mayon, Kanlaon), so mask with COMET's `coh` and `mask`. Say "processed by COMET, not by Plumes". Show the frame and track. |
@@ -96,7 +96,7 @@ Total cost of all nine: about **4–6.5 EECU-hours** of backfill (§7), in two r
 
 | Layer | Route | Archive strategy (rule 1) | New contract ids [U] |
 |---|---|---|---|
-| OMI SO₂ | Harmony HOSS subset per volcano box, Earthdata token minted in CI | Query results adopted into `plumes-archive`; links: Harmony, OPeNDAP, CMR | `so2_omi_box` (exists) |
+| ~~OMI SO₂~~ (dropped 2026-10-23) | Harmony HOSS subset per volcano box, Earthdata token minted in CI | Query results adopted into `plumes-archive`; links: Harmony, OPeNDAP, CMR | `so2_omi_box` (exists) |
 | NOAA-20 thermal | FIRMS area API, `VIIRS_NOAA20_SP` (and `VIIRS_NOAA21_SP` later) | Adopted API results (as for S-NPP); `VJ114A1` in CMR as the second link | `fire_viirs_n20_15km` (own series; a `sensor_change` event dated at the switch) |
 | Lake temperature | EE reduction over a lake polygon (repo file) | Remote dataset: EE plus USGS STAC (already 2 links) | `lake_temp_landsat` (exists) |
 | COMET deformation | Download the GACOS JSON per volcano and frame; reduce to a summit-minus-reference LOS series and one velocity grid per frame (§3.1). Published with attribution to COMET plus "LiCSAR contains modified Copernicus Sentinel data [years]", and the notice "CC BY-NC 4.0" with a link to the licence (L1a) | Raw JSON adopted as a release (`comet-licsbas-<date>`); second link: the uncorrected `disp_data/` files (`automatic: false`, different correction); third: LiCSAR products on JASMIN (health check only) | series `los_comet_<frame>`; layer `deformation-velocity` (§3.1) |
@@ -173,7 +173,7 @@ Akari's chart primitives have no dated vertical marker: `akari/react/components/
 
 - **What it draws:** a thin vertical rule at a date (or a shaded span for a start–end window) across the plot, with a short label or glyph at the top and the full text in the tooltip and in the chart's text summary (screen readers).
 - **API sketch:** `markers?: { at: string | number; end?: string | number; label: string; kind: "event" | "sensor-change" | "gap" }[]` on `Sparkline`, and a `ChartEventMarker` part for `chart.tsx` charts (wrapping Recharts' `ReferenceLine` / `ReferenceArea`). Colours from tokens (`--border` strong for events, dashed for sensor changes); no pointer capture; labels collide gracefully (stagger, then tooltip only); works in light, dark and high contrast.
-- **Used by M2:** the NOAA-20 sensor change (L5), GVP eruption dates on the deformation and rain charts, the "lake gone" span on the crater-lake charts, and OMI/TROPOMI overlap on the SO₂ chart.
+- **Used by M2:** the NOAA-20 sensor change (L5), GVP eruption dates on the deformation and rain charts, the "lake gone" span on the crater-lake charts, and (until OMI was dropped on 2026-10-23) the OMI/TROPOMI overlap on the SO₂ chart.
 - **Release:** an Akari PR with a changeset and a minor version; Plumes picks it up by version bump. Effort S (1–2 days with stories and tests).
 
 ## 7. Final M2 build order
@@ -184,7 +184,7 @@ The order follows the gates: ungated layers first, the S-NPP deadline first of a
 |---|---|---|---|---|
 | 0 | Akari event marker (Akari repo, §6) | S | — | none; in parallel with steps 1–3 |
 | 1 | NOAA-20 VIIRS thermal series (data first; the sensor-change marker once step 0 ships) | S | 0 | none for the data: S-NPP ends 2026-11-01 |
-| 2 | OMI SO₂ daily (`so2_omi_box`) | S | 0 | none |
+| 2 | ~~OMI SO₂ daily (`so2_omi_box`)~~ dropped 2026-10-23 | S | 0 | none |
 | 3 | Deep-time strip and HazEL impacts | S | 0 | none |
 | 4 | Landsat crater-lake temperature | S–M | about 0.5 | EE run A |
 | 5 | Crater-lake area and colour (S2/Landsat, JRC GSW) | S–M | about 0.3–0.5 | EE run A |

@@ -1764,7 +1764,7 @@ sources:
 
 
   - id: omi-omso2e
-    # chosen: true   # source 21 of 24, M1 (DECISIONS.md Q31)
+    # rejected: dropped by Kurt 2026-10-23 (was source 21 of 24, M1, DECISIONS.md Q31); Plumes keeps TROPOMI and MSVOLSO2L4 for SO2
     description: >-
       [M1] NASA GES DISC OMI/Aura Sulfur Dioxide Total Column Daily L3 Best Pixel 0.25 deg (OMSO2e v003), 2004-10-01
       onward: the SO2 track before TROPOMI for every volcano (NASA-EE-CANDIDATES.md A1). Access: one Harmony request

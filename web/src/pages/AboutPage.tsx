@@ -84,8 +84,8 @@ export default function AboutPage() {
           <li>
             <strong>{t("SO₂ from satellites", "衛星のSO₂")}</strong>:{" "}
             <T
-              en="TROPOMI (from 2018) and OMI (from 2004) measure a column amount over an area on clear days at one overpass, not the flux a ground instrument measures. A low value on a cloudy day means “not enough data”, so coverage is shown beside every value."
-              ja="TROPOMI(2018年から)とOMI(2004年から)は、晴天日の通過時に一定範囲のカラム量を測るもので、地上観測の放出量とは異なります。曇りの日の低い値は「データ不足」を意味するため、すべての値に被覆率を併記します。"
+              en="TROPOMI (from 2018) measures a column amount over an area on clear days at one overpass, not the flux a ground instrument measures. A low value on a cloudy day means “not enough data”, so coverage is shown beside every value."
+              ja="TROPOMI(2018年から)は、晴天日の通過時に一定範囲のカラム量を測るもので、地上観測の放出量とは異なります。曇りの日の低い値は「データ不足」を意味するため、すべての値に被覆率を併記します。"
             />
           </li>
           <li>

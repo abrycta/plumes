@@ -12,7 +12,6 @@ Python (uv). Builds Plumes' data versions from the 22 M1 registry entries in [`s
 | FIRMS area API | `plumes.firms` | `firms-modis` | MODIS_SP and VIIRS_SNPP_SP, 5-day windows (needs `FIRMS_MAP_KEY`) |
 | FIRMS NOAA-20 (M2) | `plumes.thermal_n20` | `firms-viirs-noaa20` | `VIIRS_NOAA20_SP` windows, then the SP/NRT tail to today in `recent.csv`; the S-NPP successor, its own series |
 | MSVOLSO2L4 | `plumes.nasa` | `nasa-msvolso2l4` | needs `EARTHDATA_TOKEN` |
-| OMI SO₂ (M2) | `plumes.omi` | `omi-omso2e` | OMSO2e v004 via Harmony, one job per year, reduced per volcano box; needs `EARTHDATA_TOKEN` and `h5py` |
 | COD-AB | `plumes.codab` | `cod-ab-phl-gdb` | range read of `phl_admin3.dbf` only (B3) |
 | Earth Engine | `plumes.ee_series so2 / fire / exposure / thumbs-taal` | S5P, MOD14A1, VNP14A1, FIRMS, WorldPop, Sentinel-2 | one aggregation per month; Plumes cap 50 EECU-h a month, 10 a run (B4); needs `EE_SA_KEY` or `EE_KEY_FILE` |
 | Earth Engine run A | `plumes.ee_run_a laketemp / lakegsw / lakes2 / uvai` | `landsat-surface-temperature`, `jrc-global-surface-water`, `s2-sr-harmonized`, `s5p-offl-aer-ai` | crater-lake temperature, area and colour (Taal, Pinatubo) and the UV aerosol index in eruption windows; `readmodels` adds them through `run_a.apply` when `ee-laketemp/`, `ee-lakegsw/`, `ee-lakes2/`, `ee-uvai/` exist; the tables are adopted into plumes-archive and come back with `plumes.state restore`. Not in `data.yml` (one-off backfill) |

@@ -47,7 +47,7 @@ test("story: steps in order, the visual follows keyboard focus, figures link to 
 
 test("about: licences and notices", async ({ page }) => {
   await page.goto("/about");
-  await expect(page.locator("tr[id^='source-']")).toHaveCount(27);
+  await expect(page.locator("tr[id^='source-']")).toHaveCount(26);
   await expect(page.getByText(/^Contains modified Copernicus Sentinel data \(2018/)).toBeVisible();
   await expect(page.getByText(/provided ‘as is’/)).toBeVisible();
 });

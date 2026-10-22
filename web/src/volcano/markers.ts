@@ -17,7 +17,6 @@ export const SNPP_END = "2026-11-01";
 const VIIRS = /^(fire|frp)_viirs/;
 const ERUPTION_ROWS = /^(los_|rain_)/; // deformation and rain charts carry GVP eruption dates
 const LAKE = /^lake_/;
-const SO2 = { omi: /^so2_omi/, s5p: /^so2_s5p/ };
 
 const lastDay = (t: Track) => t.end ?? [...t.points].reverse().find((p) => p.value != null)?.date;
 
@@ -63,22 +62,6 @@ export function markersFor(track: Track, tracks: readonly Track[], lang: Lang): 
     if (start) out.push(lakeGone(start, last, lang));
   }
 
-  if (SO2.omi.test(fam) || SO2.s5p.test(fam)) {
-    const omi = tracks.find((x) => SO2.omi.test(familyOf(x.id)) && x.start);
-    const s5p = tracks.find((x) => SO2.s5p.test(familyOf(x.id)) && x.start);
-    const [a, b] = [omi && lastDay(omi), s5p && lastDay(s5p)];
-    if (omi?.start && s5p?.start && a && b) {
-      const from = omi.start > s5p.start ? omi.start : s5p.start;
-      const to = a < b ? a : b;
-      if (from <= to)
-        out.push({
-          at: from,
-          end: to,
-          label: "OMI + TROPOMI",
-          description: lang === "ja" ? "OMIとTROPOMIの観測が重なる期間(別々に表示)" : "OMI and TROPOMI overlap (shown separately, not merged)",
-        });
-    }
-  }
   return out;
 }
 

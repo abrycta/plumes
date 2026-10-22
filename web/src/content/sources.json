@@ -225,15 +225,6 @@
   "link": "https://measures.gesdisc.eosdis.nasa.gov/data/SO2/MSVOLSO2L4.4/MSVOLSO2L4_v04-00-2026m0513.txt"
  },
  {
-  "id": "omi-omso2e",
-  "milestone": "M1",
-  "title": "NASA GES DISC OMI/Aura Sulfur Dioxide Total Column Daily L3 Best Pixel 0.25 deg (OMSO2e v003), 2004-10-01 onward",
-  "verdict": "open",
-  "licence": "open: NASA EOSDIS data use policy (no restriction; citation requested)",
-  "attribution": "Li, C., Krotkov, N. A., Leonard, P. (2020), OMI/Aura Sulfur Dioxide (SO2) Total Column Daily L3 Best Pixel in 0.25 degree x 0.25 degree V3, GES DISC, doi:10.5067/Aura/OMI/DATA3008 [U: copy the exact citation from the GES DISC page when built]",
-  "link": null
- },
- {
   "id": "open-buildings-temporal",
   "milestone": "M1.1",
   "title": "Google Research Open Buildings 2.5D Temporal (GOOGLE/Research/open-buildings-temporal/v1 on Earth Engine), annual 2016-06-30 to 2023-06-30, effective 4 m",

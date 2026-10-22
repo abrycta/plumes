@@ -34,9 +34,4 @@ describe("timeline event markers", () => {
     const temp = line("lake_temp_landsat", "2020-01-10", [30, null, null, null, null, 31]);
     expect(markersFor(temp, [temp, area], "en")).toEqual([expect.objectContaining({ at: "2020-01-11", end: "2020-01-14", kind: "gap", label: "Lake gone" })]);
   });
-  it("marks the OMI / TROPOMI overlap on both SO₂ rows", () => {
-    const omi = line("so2_omi_box", "2020-01-01", [1, 1, 1, 1, 1]);
-    const s5p = line("so2_s5p_15km", "2020-01-03", [2, 2, 2, 2, 2]);
-    for (const t of [omi, s5p]) expect(markersFor(t, [omi, s5p], "en")).toEqual([expect.objectContaining({ at: "2020-01-03", end: "2020-01-05", label: "OMI + TROPOMI" })]);
-  });
 });
