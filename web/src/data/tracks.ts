@@ -61,10 +61,17 @@ export const INSTRUMENTS: Record<string, LocalText> = {
     en: "Sentinel-5P TROPOMI (satellite, early-afternoon overpass, clear days only); a column amount, not a flux",
     ja: "Sentinel-5P TROPOMI(衛星、午後の通過時、晴天日のみ)。放出量ではなくカラム量",
   },
-  "omi-omso2e": { en: "OMI on Aura (satellite, from Oct 2004, cloud-limited); planetary boundary layer column", ja: "Aura衛星OMI(2004年10月から、雲の影響あり)。境界層カラム量" },
+  "omi-omso2e": {
+    en: "OMI on Aura (satellite, from Oct 2004, 0.25° cells, clear cells only, partial rows since 2008); a column amount, not a flux",
+    ja: "Aura衛星OMI(2004年10月から、0.25°格子、晴天の格子のみ、2008年以降は一部の列が欠測)。放出量ではなくカラム量",
+  },
   "modis-mod14a1": { en: "MODIS on Terra (satellite, 1 km daily); may include vegetation fires", ja: "Terra衛星MODIS(1 km、日別)。植生火災を含む場合あり" },
   "viirs-vnp14a1": { en: "VIIRS on S-NPP (satellite, 1 km daily); may include vegetation fires", ja: "S-NPP衛星VIIRS(1 km、日別)。植生火災を含む場合あり" },
   "firms-modis": { en: "NASA FIRMS active-fire detections (satellite); may include vegetation fires", ja: "NASA FIRMS 熱異常検知(衛星)。植生火災を含む場合あり" },
+  "firms-viirs-noaa20": {
+    en: "VIIRS on NOAA-20 via NASA FIRMS (satellite, 375 m, from Apr 2018; its own series, not joined to S-NPP); may include vegetation fires",
+    ja: "NOAA-20衛星VIIRS(NASA FIRMS経由、375 m、2018年4月から。S-NPPとは接続しない独立系列)。植生火災を含む場合あり",
+  },
   "usgs-comcat-ph-2010": { en: "USGS ComCat (global network; small local earthquakes are missed)", ja: "USGS ComCat(全球観測網。小さな地元の地震は捉えられない)" },
   "usgs-comcat-ph-1900-2009": { en: "USGS ComCat (global network; small local earthquakes are missed)", ja: "USGS ComCat(全球観測網。小さな地元の地震は捉えられない)" },
   "landsat-surface-temperature": { en: "Landsat thermal band (satellite, every 8–16 days, clear scenes only)", ja: "Landsat熱赤外バンド(衛星、8〜16日ごと、晴天時のみ)" },
@@ -146,6 +153,7 @@ const COLUMN_LABELS: Record<string, LocalText> = {
   n: { en: "count", ja: "件数" },
   maxMag: { en: "largest magnitude", ja: "最大マグニチュード" },
   maxFrpMw: { en: "max radiative power", ja: "最大放射電力" },
+  nVolcano: { en: "flagged volcanic by FIRMS", ja: "FIRMSの火山フラグ" },
 };
 
 export function eventsTrack(id: string, s: SparseSeries): Track {
