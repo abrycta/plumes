@@ -1,34 +1,40 @@
 // /embed: the portfolio's live picture of Plumes (workspace rule 27: animated and data-dense). The national map (the
-// app's own InteractiveMap and data) steps through the richest 12-month windows of the record, chosen from the data
+// app's own InteractiveMap and data) tours the richest 12-month windows of the record, chosen from the data
 // (states.ts): each shows thermal-detection density, detections near and far from a volcano, earthquakes by magnitude
-// and depth and the volcanoes' activity, over a caption that names the window and its counts. No Header, footer,
-// controls or links (live embeds carry no link: the portfolio around the frame links to the app); the frame is inert
-// and the map is non-interactive, so a touch on it scrolls the parent page.
-// It opens on the densest window and stays there under reduced motion (the still view). The steps pause while the
-// parent says so (off-screen, or another embed is the one moving on a touch device), while the frame is out of
-// sight, and while the tab is hidden. Phones get their own layout: Luzon to the Visayas (decision P1).
+// and depth and the volcanoes' activity, beside a panel with one fact per line (the volcano in focus, the window, its
+// counts, SO₂ and VIIRS heat at the volcano, a sparkline). No Header, footer, controls or links (live embeds carry no
+// link: the portfolio around the frame links to the app); the frame is inert and the map is non-interactive, so a
+// touch on it scrolls the parent page.
+// The tour matches Lights: DWELL_MS on each window, then a fade out, the next window drawn, a fade in (Akari's slow
+// duration and its exit and standard easings). It opens on the densest window and stays there under reduced motion
+// (the still view). It pauses while the parent says so (off-screen, or another embed is the one moving on a touch
+// device), while the frame is out of sight, and while the tab is hidden. Phones get their own layout (layout.ts).
 
-import { AkariProvider, useLang, useT } from "@abrycta/akari/react";
+import { AkariProvider, Sparkline, useLang, useT } from "@abrycta/akari/react";
 import { lazy, Suspense, use, useEffect, useMemo, useRef, useState } from "react";
 
 import { ErrorBoundary } from "@/app/ErrorBoundary";
 import { parseUrl } from "@/app/url";
-import { loadConfig, loadLayers, loadRoot, loadVolcanoes, resolveUrl } from "@/data/load";
+import { loadConfig, loadLayers, loadRoot, loadVolcano, loadVolcanoes, resolveUrl } from "@/data/load";
 import { layerMonths } from "@/data/layers";
+import { formatDate } from "@/lib/dates";
 import { formatNumber } from "@/lib/format";
 import { WINDOW_MONTHS, windowMonths } from "@/map/density";
+import { LAYER_BG, LAYER_TEXT } from "@/map/layerColors";
 import { loadAllQuakes } from "@/map/points";
 import { loadWindow } from "@/map/windowData";
 
 import { PADDING, useCompact } from "./layout";
+import { fromPack, PACK_DIR, packState, withFocus, type PackIndex, type PackState, type ShownWindow } from "./pack";
 import { COOKIE_DOMAIN, listenToParent, onPauseChange, pausedByParent, postReady } from "./parent-bridge";
-import { fromPack, PACK_DIR, packState, type PackIndex, type PackState, type ShownWindow } from "./pack";
 import { chooseStates } from "./states";
 
 const InteractiveMap = lazy(() => import("@/map/InteractiveMap"));
 
-/** Time on each window: long enough to read the caption. */
-const DWELL_MS = 7000;
+/** Time on each window between transitions: Lights' DWELL_MS. */
+export const DWELL_MS = 2200;
+/** Longest wait for the map to draw a window before fading back in anyway. */
+const DRAW_CAP_MS = 1500;
 
 const urlLang = parseUrl(location.pathname, location.search).lang;
 
@@ -41,9 +47,9 @@ function pixelRatio(): number {
 
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function formatMonth(m: string, lang: "en" | "ja"): string {
-  const [y, mo] = m.split("-").map(Number) as [number, number];
-  return lang === "ja" ? `${y}年${mo}月` : `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][mo - 1]} ${y}`;
+/** An Akari motion token's value (duration in ms, or an easing), read from the page's CSS. */
+function motionToken(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
 /** The windows in time order, loaded one after another with the densest-ranked first, so the first is ready soonest.
@@ -78,8 +84,9 @@ function useStates(): ShownWindow[] {
       const all = quakes ? await loadAllQuakes(quakes, root.versionBase, record).catch(() => []) : [];
       for (const s of chooseStates(index, record, all).sort((a, b) => b.quakes - a.quakes)) {
         const data = await loadWindow(layers, root.versionBase, index, windowMonths(s.end, WINDOW_MONTHS));
+        const p = await withFocus(packState(s, data, phone), index, loadVolcano);
         if (!live) return;
-        add(fromPack(packState(s, data, phone)));
+        add(fromPack(p));
       }
     })();
     return () => {
@@ -89,30 +96,71 @@ function useStates(): ShownWindow[] {
   return loaded;
 }
 
-/** Index of the shown state: the densest one first (the still view), then a step every DWELL_MS while allowed. */
-function useStep(count: number, densest: number, frame: React.RefObject<HTMLDivElement | null>): number {
-  const [step, setStep] = useState<number | null>(null);
-  const shown = step ?? densest;
-  const latest = useRef({ count, densest });
+/**
+ * The tour (Lights' timing): while the frame is in sight, the tab visible, the parent has not paused it and motion is
+ * allowed, every DWELL_MS the content fades out, the next window (time order, wrapping) is selected and drawn, and
+ * the content fades back in. Returns the shown window's end month: null = the densest (the start and the still view).
+ */
+function useTour(ends: readonly string[], frame: React.RefObject<HTMLDivElement | null>, content: React.RefObject<HTMLDivElement | null>, drawn: React.RefObject<(() => void) | null>): string | null {
+  const [shown, setShown] = useState<string | null>(null);
+  const latest = useRef({ ends, shown });
   useEffect(() => {
-    latest.current = { count, densest };
-  }, [count, densest]);
-  const many = count > 1;
+    latest.current = { ends, shown };
+  }, [ends, shown]);
   useEffect(() => {
     const el = frame.current;
     if (!el) return;
     let timer: number | undefined;
     let inView = true;
-    const running = () => inView && document.visibilityState === "visible" && !pausedByParent() && !reducedMotion() && "embedReady" in document.documentElement.dataset;
+    let busy = false;
+    const ready = () => "embedReady" in document.documentElement.dataset;
+    const running = () => inView && document.visibilityState === "visible" && !pausedByParent() && !reducedMotion();
+    const fade = (to: number) => {
+      const node = content.current;
+      if (!node) return Promise.resolve();
+      return node
+        .animate(
+          { opacity: to },
+          {
+            duration: parseFloat(motionToken("--ak-duration-slow")) || 0,
+            easing: motionToken(to === 0 ? "--ak-ease-exit" : "--ak-ease-standard") || "ease",
+            fill: "forwards",
+          },
+        )
+        .finished.then(() => undefined)
+        .catch(() => undefined);
+    };
     const schedule = () => {
       clearTimeout(timer);
       timer = undefined;
-      if (running() && latest.current.count > 1)
-        timer = window.setTimeout(() => {
-          setStep((s) => ((s ?? latest.current.densest) + 1) % latest.current.count);
-          schedule();
-        }, DWELL_MS);
+      if (!busy && running() && latest.current.ends.length > 1) timer = window.setTimeout(advance, DWELL_MS);
     };
+    async function advance() {
+      if (!running()) return;
+      if (!ready()) return schedule(); // the first window is still drawing
+      const { ends: all, shown: cur } = latest.current;
+      if (all.length < 2) return schedule();
+      busy = true;
+      document.documentElement.dataset.tourPhase = "out";
+      await fade(0);
+      // The next window, drawn while hidden: wait for the map's idle after the new data (capped), then fade in.
+      const next = all[(all.indexOf(cur ?? densestEnd()) + 1) % all.length]!;
+      await new Promise<void>((resolve) => {
+        const cap = window.setTimeout(resolve, DRAW_CAP_MS);
+        drawn.current = () => {
+          clearTimeout(cap);
+          resolve();
+        };
+        setShown(next);
+      });
+      drawn.current = null;
+      document.documentElement.dataset.tourPhase = "in";
+      await fade(1);
+      document.documentElement.dataset.tourPhase = "dwell";
+      busy = false;
+      schedule();
+    }
+    const densestEnd = () => document.documentElement.dataset.embedDensest ?? latest.current.ends[0]!;
     const io = new IntersectionObserver(([e]) => {
       inView = !!e?.isIntersecting;
       schedule();
@@ -121,7 +169,10 @@ function useStep(count: number, densest: number, frame: React.RefObject<HTMLDivE
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
     const onMotion = () => {
       // Reduced motion: back to the densest window, statically.
-      if (motion.matches) setStep(null);
+      if (motion.matches) {
+        setShown(null);
+        content.current?.getAnimations().forEach((a) => a.cancel());
+      }
       schedule();
     };
     motion.addEventListener("change", onMotion);
@@ -137,12 +188,20 @@ function useStep(count: number, densest: number, frame: React.RefObject<HTMLDivE
       window.removeEventListener("plumes:embed-ready", schedule);
       offPause();
     };
-  }, [frame, many]);
-  return Math.min(shown, Math.max(0, count - 1));
+  }, [frame, content, drawn]);
+  return shown;
 }
 
-function Swatch({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return <span aria-hidden="true" className={`inline-block size-[0.75em] shrink-0 rounded-full ${className ?? ""}`} style={style} />;
+/** One fact per line: a layer swatch (a dot in the layer's colour, sized by the text) or its blank place, then the text. */
+function Fact({ swatch, children }: { swatch?: string; children: React.ReactNode }) {
+  return (
+    <li className="flex min-w-0 items-baseline gap-ak-0-5">
+      <span aria-hidden="true" className={swatch ?? "invisible"}>
+        ●
+      </span>
+      <span className="truncate">{children}</span>
+    </li>
+  );
 }
 
 function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) {
@@ -152,9 +211,15 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
   const index = use(loadVolcanoes());
   const config = use(loadConfig());
   const loaded = useStates();
-  const densest = loaded.reduce((best, l, i) => (l.points > (loaded[best]?.points ?? -1) ? i : best), 0);
-  const step = useStep(loaded.length, densest, frame);
-  const cur = loaded[step] ?? null;
+  const content = useRef<HTMLDivElement>(null);
+  const drawn = useRef<(() => void) | null>(null);
+  const densest = loaded.reduce<ShownWindow | null>((best, l) => (l.points > (best?.points ?? -1) ? l : best), null);
+  useEffect(() => {
+    if (densest) document.documentElement.dataset.embedDensest = densest.state.end;
+  }, [densest]);
+  const ends = useMemo(() => loaded.map((l) => l.state.end), [loaded]);
+  const shownEnd = useTour(ends, frame, content, drawn);
+  const cur = loaded.find((l) => l.state.end === shownEnd) ?? densest;
 
   // Fixed for the map's life: a mode change resizes the same map (it refits), it never recreates it.
   const embed = useMemo(
@@ -168,6 +233,7 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
         window.dispatchEvent(new Event("plumes:embed-ready"));
         postReady();
       },
+      onDrawn: () => drawn.current?.(),
     }),
     [],
   );
@@ -177,22 +243,20 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
 
   const s = cur?.state;
   const eruptionMap = useMemo(() => new Map((s?.eruptions ?? []).map((e) => [e.id, e.month])), [s]);
-  const names = (s?.eruptions ?? []).map((e) => index.features.find((f) => f.properties.id === e.id)?.properties.name[lang] ?? e.id);
+  const nameOf = (id: string) => index.features.find((f) => f.properties.id === id)?.properties.name[lang] ?? id;
+  const names = (s?.eruptions ?? []).map((e) => nameOf(e.id));
   const months = s ? windowMonths(s.end, WINDOW_MONTHS) : [];
-  const range = s ? `${formatMonth(months[0]!, lang)} – ${formatMonth(s.end, lang)}` : "";
-  const headline = s
-    ? names.length
-      ? t(`${names.join(" and ")} ${names.length > 1 ? "erupt" : "erupts"} · ${range}`, `${names.join("・")}の噴火 · ${range}`)
-      : t(`The latest 12 months · ${range}`, `直近12か月 · ${range}`)
-    : "";
   const d = cur;
-  const near = d?.totals.near ?? 0;
-  const maxMag = d?.totals.maxMag ?? 0;
+  const focus = d?.focus;
+  const fname = focus ? nameOf(focus.id) : "";
+  const headline = s ? (names.length ? t(`${names.join(" and ")} ${names.length > 1 ? "erupt" : "erupts"}`, `${names.join("・")}の噴火`) : t("The latest 12 months", "直近12か月")) : "";
+  const range = s ? `${formatDate(months[0]!, lang)} – ${formatDate(s.end, lang)}` : "";
+  const n = (v: number) => formatNumber(v, lang);
   const cMax = d ? Math.max(1, ...d.counts.map((c) => Math.max(c.thermalNear + c.thermalFar, c.quakes))) : 1;
 
   return (
-    <div className="flex h-full flex-col bg-background text-foreground">
-      <div className="relative min-h-0 flex-1">
+    <div ref={content} className="flex h-full bg-background text-foreground" data-embed-content>
+      <div className="relative min-h-0 min-w-0 flex-1">
         <InteractiveMap
           index={index}
           styleUrl={config.basemap?.style ?? "https://tiles.openfreemap.org/styles/positron"}
@@ -200,41 +264,81 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
           data={cur?.geojson ?? null}
           activity={d?.activity}
           eruptions={eruptionMap}
-          formatMonth={(m) => formatMonth(m, lang)}
+          formatMonth={(m) => formatDate(m, lang)}
           embed={embed}
         />
       </div>
-      <div className={compact ? "flex shrink-0 flex-col gap-0.5 border-t border-border px-2 py-1.5 leading-tight" : "flex shrink-0 items-end gap-8 border-t border-border px-8 py-5 leading-tight"} data-testid="embed-caption">
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <p className={`m-0 truncate font-heading font-semibold ${compact ? "text-ak-sm" : "text-ak-2xl"}`} data-window-end={s?.end ?? ""}>
-            {headline}
-          </p>
-          <p className={`m-0 flex items-center gap-[0.5em] truncate text-muted-foreground tabular ${compact ? "text-ak-xs" : "text-ak-xl"}`}>
-            {d ? (
-              <>
-                <Swatch className="bg-chart-4" />
-                <span className="shrink-0">{t(`${formatNumber(d.totals.thermal, lang)} thermal (${formatNumber(near, lang)} near volcanoes)`, `熱異常${formatNumber(d.totals.thermal, lang)}件(火山付近${formatNumber(near, lang)}件)`)}</span>
-                <Swatch style={{ background: "var(--ak-div-7)" }} />
-                <span className="shrink-0">{t(`${formatNumber(d.totals.quakes, lang)} earthquakes${maxMag ? `, max M${maxMag.toFixed(1)}` : ""}`, `地震${formatNumber(d.totals.quakes, lang)}件${maxMag ? `(最大M${maxMag.toFixed(1)})` : ""}`)}</span>
-                <span className="truncate">· NASA FIRMS · USGS · © OpenMapTiles © OpenStreetMap</span>
-              </>
-            ) : null}
-          </p>
-        </div>
-        {!compact && d ? (
-          <div className="flex h-16 w-80 shrink-0 items-end gap-1" aria-hidden="true" data-embed-months>
-            {d.counts.map((c) => (
-              <div key={c.month} className="flex h-full flex-1 items-end gap-px">
-                <div className="flex h-full flex-1 flex-col justify-end">
-                  <div className="bg-chart-4 opacity-30" style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
-                  <div className="bg-chart-4" style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
-                </div>
-                <div className="flex-1" style={{ height: `${(100 * c.quakes) / cMax}%`, background: "var(--ak-div-7)" }} />
+      <aside className={`flex w-1/2 shrink-0 flex-col justify-center border-l border-border leading-tight tabular sm:w-2/5 lg:w-1/3 ${compact ? "gap-ak-0-5 px-ak-1 py-ak-1" : "gap-ak-2 px-ak-4 py-ak-4"}`} data-testid="embed-caption">
+        {d && s ? (
+          <>
+            <h1 className={`m-0 line-clamp-2 font-heading font-semibold ${compact ? "text-ak-sm" : "text-ak-3xl"}`} data-window-end={s.end}>
+              {headline}
+            </h1>
+            <p className={`m-0 truncate text-muted-foreground ${compact ? "text-ak-xs" : "text-ak-xl"}`}>{range}</p>
+            <ul className={`m-0 flex list-none flex-col p-0 ${compact ? "gap-0 text-ak-xs" : "gap-ak-0-5 text-ak-xl"}`} data-embed-facts>
+              <Fact swatch={LAYER_TEXT.thermal}>{t(`${n(d.totals.thermal)} thermal detections`, `熱異常 ${n(d.totals.thermal)}件`)}</Fact>
+              <Fact>{compact ? t(`${n(d.totals.near)} near volcanoes`, `火山付近 ${n(d.totals.near)}件`) : t(`${n(d.totals.near)} within 15 km of a volcano`, `うち火山15 km以内 ${n(d.totals.near)}件`)}</Fact>
+              <Fact swatch={LAYER_TEXT.quakes}>{t(`${n(d.totals.quakes)} earthquakes`, `地震 ${n(d.totals.quakes)}件`)}</Fact>
+              {d.totals.maxMag ? <Fact>{t(`Largest M${d.totals.maxMag.toFixed(1)}`, `最大 M${d.totals.maxMag.toFixed(1)}`)}</Fact> : null}
+              {focus?.viirs ? (
+                <Fact>{compact ? t(`${fname} VIIRS: ${n(focus.viirs.days)} days`, `${fname} VIIRS ${n(focus.viirs.days)}日`) : t(`${fname}: VIIRS heat on ${n(focus.viirs.days)} days`, `${fname}:VIIRS熱異常 ${n(focus.viirs.days)}日`)}</Fact>
+              ) : null}
+              {focus?.so2 ? (
+                <Fact>
+                  {compact
+                    ? t(`${fname} SO₂: max ${n(focus.so2.peak)} t`, `${fname} SO₂最大 ${n(focus.so2.peak)} t`)
+                    : t(`${fname}: SO₂ peak ${n(focus.so2.peak)} t, ${formatDate(focus.so2.peakDate, lang)}`, `${fname}:SO₂最大 ${n(focus.so2.peak)} t(${formatDate(focus.so2.peakDate, lang)})`)}
+                </Fact>
+              ) : null}
+            </ul>
+            {focus?.so2 ? (
+              <div className="min-w-0" data-embed-sparkline>
+                <Sparkline
+                  values={focus.so2.weeks}
+                  height={compact ? 24 : 48}
+                  zero
+                  marker="none"
+                  className={compact ? "h-ak-3" : "h-ak-8"}
+                  markers={focus.eruptionWeeks.map((w) => ({
+                    at: w,
+                    label: t("Eruption", "噴火"),
+                  }))}
+                  markerLabels={false}
+                  label={t(`SO₂ near ${fname}, weekly peak (TROPOMI, ${focus.so2.ringKm} km)`, `${fname}付近のSO₂(週最大、TROPOMI、${focus.so2.ringKm} km)`)}
+                />
+                {!compact ? <p className="m-0 truncate text-ak-base text-muted-foreground">{t(`SO₂ near ${fname}, weekly peak`, `${fname}付近のSO₂(週最大)`)}</p> : null}
               </div>
-            ))}
-          </div>
+            ) : null}
+            {!compact ? (
+              <div className="min-w-0">
+                <div className="flex h-ak-8 items-end gap-ak-0-5" aria-hidden="true" data-embed-months>
+                  {d.counts.map((c) => (
+                    <div key={c.month} className="flex h-full flex-1 items-end gap-px">
+                      <div className="flex h-full flex-1 flex-col justify-end">
+                        <div className={`${LAYER_BG.thermal} opacity-30`} style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
+                        <div className={LAYER_BG.thermal} style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
+                      </div>
+                      <div className={`flex-1 ${LAYER_BG.quakes}`} style={{ height: `${(100 * c.quakes) / cMax}%` }} />
+                    </div>
+                  ))}
+                </div>
+                <p className="m-0 flex items-baseline gap-ak-0-5 truncate text-ak-base text-muted-foreground">
+                  {t("Per month:", "月別:")}
+                  <span aria-hidden="true" className={LAYER_TEXT.thermal}>
+                    ●
+                  </span>
+                  {t("thermal", "熱異常")}
+                  <span aria-hidden="true" className={LAYER_TEXT.quakes}>
+                    ●
+                  </span>
+                  {t("earthquakes", "地震")}
+                </p>
+              </div>
+            ) : null}
+            <p className={`m-0 text-muted-foreground ${compact ? "truncate text-ak-2xs" : "text-ak-base"}`}>© OpenMapTiles © OpenStreetMap · NASA FIRMS · USGS · Copernicus Sentinel-5P</p>
+          </>
         ) : null}
-      </div>
+      </aside>
     </div>
   );
 }
@@ -255,7 +359,7 @@ export function EmbedApp() {
   return (
     <AkariProvider defaultLang={urlLang ?? "en"} toaster={false} sharedCookieDomain={COOKIE_DOMAIN} inlineScript={false}>
       <LangFromUrl />
-      <div ref={frame} inert className="h-dvh overflow-hidden" data-testid="embed-frame">
+      <div ref={frame} inert className="h-dvh overflow-hidden bg-background" data-testid="embed-frame">
         <ErrorBoundary>
           <Suspense fallback={null}>
             <EmbedMap frame={frame} />
