@@ -75,7 +75,12 @@ jobs:
           for pair in "volcanoes=volcanoes.geojson" "volcanoes/taal=volcano/taal.json"; do
             set -- "${pair%%=*}" "${pair#*=}"
             for _ in $(seq 1 72); do
-              if cmp -s <(curl -fsS "$SITE/api/v1/$1" | jq -S .) <(curl -fsS "$base$2" | jq -S .); then echo "/v1/$1 equals $want/$2"; continue 2; fi
+              curl -fsS "$SITE/api/v1/$1" -o api.json || true
+              curl -fsS "$base$2" -o pub.json
+              # Equal as JSON values (the published files write 1064.0 where the API writes 1064).
+              if python3 -c 'import json,sys; sys.exit(json.load(open("api.json")) != json.load(open("pub.json")))' 2>/dev/null; then
+                echo "/v1/$1 equals $want/$2"; continue 2
+              fi
               sleep 10
             done
             echo "::error::/v1/$1 differs from $want/$2"; exit 1
