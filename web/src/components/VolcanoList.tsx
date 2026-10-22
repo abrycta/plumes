@@ -32,7 +32,7 @@ export function VolcanoList({ index, compact }: { index: VolcanoesIndex; compact
                 <AppLink to="volcano" id={p.id} className="font-medium underline-offset-4 hover:underline">
                   {p.name[lang]}
                 </AppLink>
-                <span className={`text-[11px] ${p.coverage === "deep" ? "text-seal-text" : "text-muted-foreground"}`}>
+                <span className={`text-ak-2xs ${p.coverage === "deep" ? "text-seal-text" : "text-muted-foreground"}`}>
                   {p.coverage === "deep" ? t("Bulletins + satellites", "火山情報+衛星") : t("Satellites + history", "衛星+噴火史")}
                 </span>
               </div>
