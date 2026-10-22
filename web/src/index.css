@@ -76,91 +76,89 @@
 }
 
 /* Volcano markers on the interactive map (HTML markers: real links, keyboard reachable). */
+/* Volcano markers: a small dot and, for labelled volcanoes, Replay's map label (ReplayMap's seal
+   label): crisp DOM text in Akari mono, one size, on a 90 % background with even padding. */
 .volcano-marker {
   display: flex;
   align-items: center;
   gap: 2px;
   color: var(--foreground);
-  font-size: var(--ak-font-size-xs);
-  line-height: 1;
+  font-size: var(--ak-font-size-2xs);
   text-decoration: none;
   white-space: nowrap;
 }
 .volcano-marker .dot {
   display: block;
   flex: none;
-  /* 12px dot in a 24px target (WCAG 2.2 target size). */
-  margin: 6px;
-  width: 12px;
-  height: 12px;
+  /* A 10px dot centred in a 24px target (WCAG 2.2 target size); the marker is anchored 12px in. */
+  margin: 7px;
+  width: 10px;
+  height: 10px;
   border-radius: var(--ak-radius-pill);
-  border: 2px solid var(--background);
+  border: 1.5px solid var(--background);
   background: var(--muted-foreground);
 }
 .volcano-marker[data-coverage="deep"] .dot {
-  margin: 3px;
-  width: 18px;
-  height: 18px;
+  margin: 6px;
+  width: 12px;
+  height: 12px;
   background: var(--seal);
 }
 /* Activity halo: the order of magnitude of the window's thermal detections and earthquakes around the volcano. */
 .volcano-marker[data-activity="1"] .dot {
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--seal) 35%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--seal) 30%, transparent);
 }
 .volcano-marker[data-activity="2"] .dot {
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--seal) 35%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--seal) 30%, transparent);
 }
 .volcano-marker[data-activity="3"] .dot {
-  box-shadow: 0 0 0 7px color-mix(in oklab, var(--seal) 35%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--seal) 30%, transparent);
 }
 .volcano-marker[data-activity="4"] .dot {
-  box-shadow: 0 0 0 11px color-mix(in oklab, var(--seal) 35%, transparent);
+  box-shadow: 0 0 0 7px color-mix(in oklab, var(--seal) 30%, transparent);
 }
 /* An eruption began inside the window: a ring in the text colour. */
 .volcano-marker[data-erupted] .dot {
-  outline: 2px solid var(--foreground);
+  outline: 1.5px solid var(--foreground);
   outline-offset: 1px;
 }
+/* Replay's label: rounded, bg-background/90, px-1.5 py-0.5, font-mono text-ak-2xs leading-tight. */
 .volcano-marker .label {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 2px 4px;
+  padding: 2px 6px;
   border-radius: var(--ak-radius-control);
-  background: color-mix(in oklab, var(--background) 85%, transparent);
-}
-.volcano-marker .name {
-  font-weight: var(--ak-font-weight-semibold);
+  background: color-mix(in oklab, var(--background) 90%, transparent);
+  font-family: var(--font-mono);
+  font-weight: var(--ak-font-weight-regular, 400);
+  line-height: var(--ak-leading-tight);
+  font-variant-numeric: tabular-nums;
 }
 .volcano-marker .stats {
   display: flex;
-  gap: 6px;
-  font-size: var(--ak-font-size-2xs);
-  font-variant-numeric: tabular-nums;
+  align-items: baseline;
+  gap: 0.5ch;
   color: var(--muted-foreground);
 }
-.volcano-marker .stat {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
+/* Legend-coloured marks at the text's cap height, sitting on the baseline. */
 .volcano-marker .stat.thermal::before,
 .volcano-marker .stat.quakes::before {
   content: "";
+  display: inline-block;
   width: 0.7em;
   height: 0.7em;
+  margin-right: 0.35ch;
   border-radius: var(--ak-radius-pill);
+  vertical-align: baseline;
 }
 .volcano-marker .stat.thermal::before {
-  background: var(--ak-cat-4);
+  background: var(--mk-thermal);
 }
 .volcano-marker .stat.quakes::before {
-  border: 1.5px solid var(--ak-div-7);
-  background: color-mix(in oklab, var(--ak-div-7) 35%, transparent);
+  background: var(--mk-quakes);
 }
 .volcano-marker .stat.erupted {
   color: var(--seal-text);
-  font-weight: var(--ak-font-weight-semibold);
 }
 .volcano-marker:hover .name,
 .volcano-marker:focus-visible .name {

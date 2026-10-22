@@ -74,10 +74,10 @@ export function StaticMap({ index, data, selected }: { index: VolcanoesIndex; da
         const level = total ? Math.min(4, 1 + Math.floor(Math.log10(total))) : 0;
         return (
           <AppLink key={f.properties.id} to="volcano" id={f.properties.id} aria-label={name}>
-            {level ? <circle cx={x} cy={y} r={(deep ? 7 : 5) + 2.5 * level} fill="var(--seal)" opacity={0.3} aria-hidden="true" /> : null}
-            <circle cx={x} cy={y} r={deep ? 7 : 5} fill={deep ? "var(--seal)" : "var(--muted-foreground)"} stroke={on ? "var(--foreground)" : "var(--background)"} strokeWidth={on ? 2.5 : 1.5} />
+            {level ? <circle cx={x} cy={y} r={(deep ? 6 : 5) + 1.75 * level} fill="var(--seal)" opacity={0.3} aria-hidden="true" /> : null}
+            <circle cx={x} cy={y} r={deep ? 6 : 5} fill={deep ? "var(--seal)" : "var(--muted-foreground)"} stroke={on ? "var(--foreground)" : "var(--background)"} strokeWidth={on ? 2.5 : 1.5} />
             {deep || on ? (
-              <text x={x + 10} y={y + 4} fontSize={13} fontWeight={600} fill="var(--foreground)" stroke="var(--background)" strokeWidth={3} paintOrder="stroke">
+              <text x={x + 10} y={y + 4} fontSize={12} fontFamily="var(--font-mono)" fill="var(--foreground)" stroke="var(--background)" strokeWidth={3} paintOrder="stroke">
                 {name}
               </text>
             ) : null}

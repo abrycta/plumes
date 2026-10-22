@@ -20,7 +20,7 @@ import { formatNumber } from "@/lib/format";
 
 import { HEX_BREAKS, type Activity } from "./density";
 import { PH_BOUNDS } from "./geo";
-import { LAYER_TOKENS } from "./layerColors";
+import { LAYER_TOKENS, layerVar } from "./layerColors";
 import { MapGlyph } from "./MapGlyph";
 import { type DeformationOverlay, useDeformation } from "./useDeformation";
 import type { MapGeojson } from "./windowData";
@@ -248,11 +248,14 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
       const href = formatUrl({ page: "volcano", id, lang: null, date: null, from: null, to: null, ring: null });
       if (el instanceof HTMLAnchorElement) el.href = href;
       el.className = "volcano-marker";
+      // The count marks use the layers' own tokens, so they follow layerColors.ts.
+      el.style.setProperty("--mk-thermal", layerVar(LAYER_TOKENS.thermal));
+      el.style.setProperty("--mk-quakes", layerVar(LAYER_TOKENS.depth[0]));
       el.dataset.coverage = f.properties.coverage;
-      if (erupted) el.dataset.erupted = "";
+      if (erupted) el.dataset.erupted = erupted;
+      el.dataset.total = String(total);
       // Activity halo: 0 to 4 steps, by the order of magnitude of the window's counts around the volcano.
       el.dataset.activity = String(total ? Math.min(4, 1 + Math.floor(Math.log10(total))) : 0);
-      const stats = a && total ? `${formatNumber(a.thermal, lang)} · ${formatNumber(a.quakes, lang)}` : "";
       const said = [
         name,
         erupted && formatMonth ? t(`eruption began ${formatMonth(erupted)}`, `${formatMonth(erupted)}に噴火開始`) : "",
@@ -270,24 +273,26 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
         n.className = "name";
         n.textContent = name;
         label.append(n);
-        if (stats || erupted) {
+        // One short mono line: "104 fires · 1 quake · erupted Mar 2024", each count led by a legend-coloured mark.
+        const parts: HTMLElement[] = [];
+        const stat = (kind: string, text: string) => {
+          const sp = document.createElement("span");
+          sp.className = `stat ${kind}`;
+          sp.textContent = text;
+          parts.push(sp);
+        };
+        if (a && total) {
+          stat("thermal", t(`${formatNumber(a.thermal, lang)} ${a.thermal === 1 ? "fire" : "fires"}`, `熱異常 ${formatNumber(a.thermal, lang)}`));
+          stat("quakes", t(`${formatNumber(a.quakes, lang)} ${a.quakes === 1 ? "quake" : "quakes"}`, `地震 ${formatNumber(a.quakes, lang)}`));
+        }
+        if (erupted && formatMonth) stat("erupted", t(`erupted ${formatMonth(erupted)}`, `${formatMonth(erupted)}噴火`));
+        if (parts.length) {
           const s = document.createElement("span");
           s.className = "stats";
-          if (a && total) {
-            const fire = document.createElement("span");
-            fire.className = "stat thermal";
-            fire.textContent = formatNumber(a.thermal, lang);
-            const quake = document.createElement("span");
-            quake.className = "stat quakes";
-            quake.textContent = formatNumber(a.quakes, lang);
-            s.append(fire, quake);
-          }
-          if (erupted && formatMonth) {
-            const e = document.createElement("span");
-            e.className = "stat erupted";
-            e.textContent = t(`erupted ${formatMonth(erupted)}`, `${formatMonth(erupted)}噴火`);
-            s.append(e);
-          }
+          parts.forEach((sp, i) => {
+            if (i) s.append(" · ");
+            s.append(sp);
+          });
           label.append(s);
         }
         el.append(label);
@@ -301,7 +306,41 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
         });
       return new maplibregl.Marker({ element: el, anchor: "left", offset: [-12, 0] }).setLngLat(f.geometry.coordinates.slice(0, 2) as [number, number]).addTo(map);
     });
-    return () => markers.forEach((m) => m.remove());
+    // Labels never overlap: on a collision the lower-priority label hides (its dot stays, with a hover title).
+    // Priority: the most recent eruption first, then the highest activity, then deep coverage.
+    const els = markers.map((m) => m.getElement());
+    const ranked = els
+      .filter((e) => e.querySelector(".label"))
+      .sort((x, y) => (y.dataset.erupted ?? "").localeCompare(x.dataset.erupted ?? "") || Number(y.dataset.total) - Number(x.dataset.total) || Number(y.dataset.coverage === "deep") - Number(x.dataset.coverage === "deep"));
+    let frame = 0;
+    const declutter = () => {
+      frame = 0;
+      const kept: DOMRect[] = [];
+      for (const e of ranked) {
+        const label = e.querySelector<HTMLElement>(".label")!;
+        const r = label.getBoundingClientRect();
+        const hit = kept.some((k) => r.left < k.right + 2 && r.right + 2 > k.left && r.top < k.bottom + 2 && r.bottom + 2 > k.top);
+        label.style.visibility = hit ? "hidden" : "";
+        if (hit) e.title = e.getAttribute("aria-label") ?? "";
+        else {
+          e.removeAttribute("title");
+          kept.push(r);
+        }
+      }
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(declutter);
+    };
+    schedule();
+    map.on("move", schedule);
+    map.on("resize", schedule);
+    void document.fonts?.ready.then(schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      map.off("move", schedule);
+      map.off("resize", schedule);
+      markers.forEach((m) => m.remove());
+    };
     // embed and formatMonth are fixed for the map's life; activity and eruptions are compared by value.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, lang, activityKey, eruptionKey]);
