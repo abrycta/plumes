@@ -214,7 +214,12 @@ public final class Loader {
         String header = text.lines().findFirst().orElse("");
         String body = text.substring(header.length()).replace(header, "\n");
         List<Map<String, String>> rows = Csv.read(header + body);
+        // The FIRMS product: the file name (firms_VIIRS_SNPP_SP.csv) or, for the pipeline's per-year files
+        // (data/raw/firms/VIIRS_SNPP_SP/2020.csv), the folder name, as in the thermal layer's `sensor` property.
         String sensorHint = p.getFileName().toString().replaceFirst("^firms_", "").replaceFirst("\\.csv$", "");
+        if (sensorHint.matches("\\d{4}") && p.toAbsolutePath().getParent() != null) {
+            sensorHint = p.toAbsolutePath().getParent().getFileName().toString();
+        }
         for (Map<String, String> r : rows) {
             String type = r.get("type");
             addThermal(v, LocalDate.parse(r.get("acq_date")), Double.parseDouble(r.get("latitude")),

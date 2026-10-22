@@ -50,7 +50,7 @@ docker run -p 8080:8080 -e DATABASE_URL=… plumes-api
 
 ## Loading a data version
 
-`plumes-api load <data root>` reads `latest.json`, then `volcanoes.geojson`, every `volcano/<id>.json` and the GeoJSON months of the `thermal-detections` layer, and replaces the catalogue in one transaction (readers see the old or the new version, never a mix). Earthquakes are not in the read models at M1, so they come from USGS ComCat CSV files (`--usgs`, the FDSN `format=csv` columns); FIRMS area-API CSVs can be added with `--firms`. The data root is a folder or an HTTPS base URL (the published one is `https://krtmtthw.dev/plumes/data/`).
+`plumes-api load <data root>` reads `latest.json`, then `volcanoes.geojson`, every `volcano/<id>.json` and the GeoJSON months of the `thermal-detections` layer, and replaces the catalogue in one transaction (readers see the old or the new version, never a mix). Earthquakes are not in the read models at M1, so they come from USGS ComCat CSV files (`--usgs`, the FDSN `format=csv` columns); FIRMS area-API CSVs can be added with `--firms`. The data root is a folder or an HTTPS base URL (the published one is `https://krtmtthw.dev/plumes/data/`). `.github/workflows/api-load.yml` runs it after every successful Data run (and by hand) with the latest archived ComCat and FIRMS snapshots from `abrycta/plumes-archive` (secrets `ARCHIVE_READ_TOKEN`, `NEON_DATABASE_URL`); a FIRMS file named by year takes its product from its folder (`raw/firms/VIIRS_SNPP_SP/2020.csv`).
 
 ## Deployment and free-tier rules (DATA-PLAN §8)
 

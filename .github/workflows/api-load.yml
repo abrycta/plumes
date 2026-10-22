@@ -1,0 +1,71 @@
+name: API load
+# Reload the API's Neon database from the published data version (api/README.md "Loading a data version"), after
+# every successful Data run and by hand. One transaction: the API serves the old version or the new one, never a mix.
+# Earthquakes and thermal detections are not in the read models as points, so they come from the latest archived
+# snapshots in abrycta/plumes-archive (usgs-comcat-ph-*, firms-modis), the same files the version was built from.
+on:
+  workflow_run:
+    workflows: [Data]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      root: { description: "Data root (holds latest.json)", type: string, default: "https://krtmtthw.dev/plumes/data/" }
+permissions: { contents: read, packages: read }
+concurrency: { group: api-load, cancel-in-progress: false }
+env:
+  IMAGE: ghcr.io/abrycta/plumes-api:latest
+  ROOT: ${{ inputs.root || 'https://krtmtthw.dev/plumes/data/' }}
+  SITE: ${{ vars.PLUMES_SITE || 'https://plumes.krtmtthw.dev' }}
+jobs:
+  load:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - id: secrets
+        env:
+          ARCHIVE_READ_TOKEN: ${{ secrets.ARCHIVE_READ_TOKEN }}
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          if [ -z "$ARCHIVE_READ_TOKEN" ] || [ -z "$NEON_DATABASE_URL" ]; then
+            echo "::notice title=API load skipped::ARCHIVE_READ_TOKEN or NEON_DATABASE_URL is not set"; echo "ok=false" >> "$GITHUB_OUTPUT"
+          else echo "ok=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Latest archived USGS and FIRMS snapshots
+        if: steps.secrets.outputs.ok == 'true'
+        env: { GH_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}" }
+        run: |
+          mkdir -p in && cd in
+          gh release list -R abrycta/plumes-archive -L 300 --json tagName,createdAt,isDraft > releases.json
+          for id in usgs-comcat-ph-1900-2009 usgs-comcat-ph-2010 firms-modis; do
+            tag=$(jq -r --arg id "$id" '[.[] | select((.isDraft | not) and (.tagName | test("^" + $id + "-[0-9]{4}-[0-9]{2}-[0-9]{2}(\\.[0-9]+)?$")))] | sort_by(.createdAt) | last | .tagName' releases.json)
+            [ "$tag" != "null" ] || { echo "::error::no release for $id"; exit 1; }
+            mkdir "$id" && gh release download "$tag" -R abrycta/plumes-archive -D "$id"
+            (cd "$id" && sha256sum -c SHA256SUMS --ignore-missing --quiet)
+            echo "$id: $tag" | tee -a "$GITHUB_STEP_SUMMARY"
+          done
+          for f in usgs-comcat-ph-*/*.csv.zst; do zstd -dq "$f"; done
+          tar --zstd -xf firms-modis/firms-modis.tar.zst -C firms-modis
+          find . -name "*.csv" | wc -l
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        if: steps.secrets.outputs.ok == 'true'
+        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - name: Load the published version (one transaction)
+        if: steps.secrets.outputs.ok == 'true'
+        env: { DATABASE_URL: "${{ secrets.NEON_DATABASE_URL }}" }
+        run: |
+          args=(load "$ROOT")
+          for f in in/usgs-comcat-ph-*/*.csv; do args+=(--usgs "/${f}"); done
+          for f in in/firms-modis/raw/firms/*/*.csv; do args+=(--firms "/${f}"); done
+          docker run --rm -e DATABASE_URL -v "$PWD/in:/in:ro" "$IMAGE" "${args[@]}"
+      - name: The API reports the published version (through the edge)
+        if: steps.secrets.outputs.ok == 'true'
+        run: |
+          want=$(curl -fsS "${ROOT}latest.json" | jq -r .current)
+          for _ in $(seq 1 18); do
+            got=$(curl -s "$SITE/api/v1/meta" | jq -r '.dataVersion // empty' 2>/dev/null || true)
+            echo "meta: ${got:-waiting} (want $want)"
+            if [ "$got" = "$want" ]; then exit 0; fi
+            sleep 10
+          done
+          echo "::warning::the edge still serves an older /v1/meta; it revalidates by ETag on the next request"

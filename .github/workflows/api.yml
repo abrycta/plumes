@@ -101,7 +101,7 @@ jobs:
       - name: Fetch through the edge (waits out a cold start)
         run: |
           get() {
-            for i in $(seq 1 12); do
+            for _ in $(seq 1 12); do
               code=$(curl -s -o "$2" -w '%{http_code}' "$SITE/api$1")
               [ "$code" = 200 ] && return 0
               echo "$1: HTTP $code, retrying"; sleep 10
