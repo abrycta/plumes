@@ -106,3 +106,17 @@ def test_water_test_keeps_lake_water_and_drops_wet_ash_and_haze():
     assert all(run_a.is_water(*p) for p in LAKE_PIXELS)
     assert not any(run_a.is_water(*p) for p in NOT_WATER)
     assert all((p[0] - p[1]) / (p[0] + p[1]) > 0 for p in NOT_WATER)  # the old test (NDWI > 0) let every one through
+
+
+def test_apply_adds_events_provenance_and_assets():
+    from plumes.readmodels import REG
+
+    models = {"taal": json.loads(TAAL_V0.read_text()), "mayon": {"events": {}, "provenance": {"sources": []}}}
+    n = run_a.apply(models, tables(), {"taal": [("2019-12-13", "2020-02-21")]}, REG)
+    assert n == 1 and models["mayon"] == {"events": {}, "provenance": {"sources": []}}
+    taal = models["taal"]
+    assert {"lake_temp_landsat", "uvai_s5p_15km"} <= set(taal["events"])
+    ids = [s["id"] for s in taal["provenance"]["sources"]]
+    assert {"landsat-surface-temperature", "s5p-offl-aer-ai"} <= set(ids) and len(ids) == len(set(ids))
+    assert run_a.S5P_AER_AI in taal["provenance"]["earthEngine"]["assets"]
+    assert errors(taal) == []
