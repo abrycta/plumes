@@ -1,6 +1,7 @@
 import { AkariProvider } from "@abrycta/akari/react";
 import { lazy, Suspense } from "react";
 
+import { useCanonical } from "./canonical";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { PageGlyph } from "./PageGlyph";
 import { Shell } from "./Shell";
@@ -24,7 +25,8 @@ function initialLang(): "en" | "ja" {
 }
 
 function Pages() {
-  const { page, id } = useUrlState();
+  const { page, id, lang } = useUrlState();
+  useCanonical({ page, id, lang });
   let el;
   switch (page) {
     case "map":
