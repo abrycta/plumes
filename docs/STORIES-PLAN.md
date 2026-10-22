@@ -43,7 +43,7 @@ The shortlist adds these families:
 - GVP Weekly Report figures;
 - HazEL impacts;
 - DROMIC for more events;
-- OMI SO₂;
+- ~~OMI SO₂~~ (dropped 2026-10-23, DECISIONS L-OMI);
 - Tokyo VAAC 2006–2009;
 - COMET deformation.
 
@@ -54,7 +54,7 @@ Context that is always present does not count: population, imagery and winds. (P
 
 The score was computed from the v2 files with a throwaway script; it is not committed, because this PR is docs only. The method is above, so it can be rerun. The shortlist columns are **simulated** from the probes:
 - a GVP Weekly Report counts when its week overlaps a step;
-- OMI SO₂ counts for every step from 2004-10;
+- ~~OMI SO₂ counts for every step from 2004-10~~ (dropped 2026-10-23);
 - DROMIC counts when an event post's date falls in the onset or course;
 - HazEL counts when the GVP number and year match;
 - COMET counts for the before and after steps from 2016 at its 18 volcanoes.
@@ -75,7 +75,7 @@ These are upper bounds **[U]**. The real yield depends on how many figures can a
 
 What moves the numbers:
 - The **GVP Weekly Reports** overlap 50 of the 51 episodes since 2000. The exception is Mayon 2000-07-16, because the reports start in November 2000.
-- **OMI SO₂** reaches 43 of them.
+- ~~**OMI SO₂** reaches 43 of them~~ (dropped 2026-10-23).
 - **COMET** reaches 29.
 - **DROMIC** beyond Taal 2020 reaches 15.
 
@@ -96,7 +96,7 @@ Effort: S = under 2 days, M = 2–5 days, L = more than a week. "Story step" nam
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | **Smithsonian/USGS Weekly Volcanic Activity Reports** (GVP) | PHIVOLCS-cited figures before 2017-09: alert changes with dates, SO₂ t/d, plume heights, evacuee counts citing DROMIC or NDRRMC, lake and crater observations (before, onset, course, after) | 50 of 51 episodes since 2000. Report counts in the Wayback snapshots (Dec 2025 – Feb 2026): Mayon 187 (2001–2026), Kanlaon 120, Taal 114, Bulusan 100, Pinatubo 9 | Per-volcano page `https://volcano.si.edu/volcano.cfm?vn=<n>&vtab=Weekly`. **On 2026-10-22 volcano.si.edu answered 403 ("Smithsonian site temporarily unavailable") to every scripted request**; the GVP WFS still worked. Wayback snapshots, e.g. `http://web.archive.org/web/20260212045835/https://volcano.si.edu/volcano.cfm?vn=273070&vtab=Weekly`, load with no login | Smithsonian terms: non-commercial with citation, already accepted for `gvp-eruptions-ph` (LICENCES.md; the terms page itself stays **[U]**, Q27). Plumes takes typed numbers and dates only, never prose, each linked to its report | About 3.3 MB of HTML for the five volcanoes; no Earth Engine | `update-input`: crawled pages bundled and adopted (B8 path). Links: volcano.si.edu (primary), Wayback (fallback), archive | M | **Shortlist #1** |
 | 2 | **DSWD DROMIC, generalised** (registered; the M2 promise in `sources.yaml`) | People affected, people inside and outside evacuation centres, with report number and date (course, after) | 16 event posts found by the site search: Mayon 2018, 2022, 2023, 2026; Taal 2020, 2021, 2022 (two), 2026; Kanlaon 2022, 2024 (two), 2026 (two); Bulusan 2022, 2025. Reaches 15 episodes since 2000 | No login. Event posts list their files: Kanlaon 2024-12 has 271 PDF and 1 docx; Mayon 2023 has 88 PDF; Bulusan 2022 has 45 PDF and 17 docx; Taal 2021 has 22 docx. **The Mayon 2018 post links no files in its HTML [U where they are]** | Open, government work (LICENCES.md) | About 2.4 MB a report; about 1 GB for all events **[U]**; Actions only | As now: `update-input`, files adopted as releases | M–L (PDF tables) | **Shortlist #2** |
-| 3 | **OMI SO₂ `OMSO2e`** (registered; LAYERS-PLAN M2 rank 1) | An SO₂ baseline and peak before TROPOMI (before, onset) | 43 episodes, 2004-10 → 2018 | Harmony, Earthdata token minted in CI | NASA open | No Earth Engine; 10–20 Actions minutes | Already planned | S (with M2) | **Shortlist #3** (already in M2) |
+| 3 | ~~**OMI SO₂ `OMSO2e`**~~ **dropped by Kurt 2026-10-23** (DECISIONS L-OMI) | An SO₂ baseline and peak before TROPOMI (before, onset) | 43 episodes, 2004-10 → 2018 | Harmony, Earthdata token minted in CI | NASA open | No Earth Engine; 10–20 Actions minutes | Already planned | S (with M2) | **Shortlist #3** (already in M2) |
 | 4 | **NOAA NCEI HazEL** (LICENCES.md; LAYERS-PLAN M2 rank 8) | Deaths, houses destroyed, damage in US$ millions (after) | 50 Philippine records. 8 since 2000: Mayon 2006, 2013, 2018; Bulusan 2006, 2011; Taal 2020; Kanlaon 2024 (two). 32 pre-2000 episodes match | `https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/volcanoes?country=PHILIPPINES` (one page, 25 kB; needs a browser User-Agent) | Open: "Access to this dataset is unrestricted." | Under 100 kB | `file`; archivekit snapshot | S | **Shortlist #4** (already in M2) |
 | 5 | **Before/after imagery, generalised** (registered: `s2-sr-harmonized`, `landsat-c2-l2`) | One before and one after scene per event (before, after) | Every event since 2000 where a clear scene exists. Landsat 5/7/8/9 from 2000; Sentinel-2 from 2017-03-28 | Earth Engine thumbnails, as `taal-s2.json` | Copernicus notice; US public domain | About 0.05 EECU-h for 42 events **[U]**; 3 × 640 px JPEG ≈ 150 kB an event | `remote-dataset` (Earth Engine, plus STAC as second link) | S–M | **Shortlist #5** |
 | 6 | **COMET LiCSBAS deformation** (L2, planned M2) | Line-of-sight change across the event (before, after) | 29 episodes (2016 →, at the five volcanoes; 18 volcanoes in all) | As LAYERS-PLAN §3 | CC BY-NC 4.0 with attribution (L1a) | As planned | As planned | — (M2) | **Shortlist #6** (reuse, no new work) |
@@ -315,7 +315,7 @@ All changes are additive; v2 files stay valid. They land in one contract PR, app
 | 4 | Review page (CI artifact) and `review.yaml` flow | S | 2 |
 | 5 | Imagery rule generalised (§B5) | S–M | 2 |
 | 6 | Kanlaon 2024 as the first generated story; Kurt reviews (Q29) | S | 2–5 |
-| 7 | Sources: OMI SO₂ and HazEL (already in the M2 order); Tokyo VAAC 2006–2009 | S each | — |
+| 7 | Sources: HazEL (already in the M2 order; OMI SO₂ dropped 2026-10-23); Tokyo VAAC 2006–2009 | S each | — |
 | 8 | GVP Weekly Reports crawler and extractor (typed patterns, each with a test from a real sentence) | M | ST2: Wayback snapshots as the primary link while volcano.si.edu refuses scripts |
 | 9 | DROMIC generalised to the 16 events (docx and PDF tables; `pdfplumber` allowed, ST11) | M–L | — |
 | 10 | Generate all story-worthy events (44 episodes, 35 events); Kurt reviews in batches of about 5 | S per batch | 3–9 |
