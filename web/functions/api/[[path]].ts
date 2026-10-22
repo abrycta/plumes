@@ -11,6 +11,11 @@
 // While the origin sleeps and nothing is stored, the list and the per-volcano files (equal to the published files by
 // the contract) are answered from the published data root instead of a 503.
 // Pages only invokes Functions for /api/* (the routes are generated from this folder); static assets never run it.
+// Abuse guards (no Cloudflare zone, so no WAF rule can do this): every /api request takes a token from a per-IP
+// bucket (RATE_PER_MINUTE, burst RATE_BURST; over it: 429 with Retry-After), only routes in contracts/openapi.yaml
+// are proxied (others: 404 at the edge), and the query string is cut down to the parameters the contract lists for
+// the route, in a fixed order, before it builds the cache key and the origin URL, so junk parameters can't miss the
+// cache and wake Render. Every /api response carries X-Robots-Tag: noindex.
 // Settings (Pages project variables): API_ORIGIN (default below), DATA_ROOT (the published data root, holds
 // latest.json), EDGE_SECRET (secret, also set on Render as PLUMES_EDGE_SECRET: the origin answers /v1 only to
 // requests that carry it).
@@ -44,6 +49,22 @@ const STORED_AT = "X-Edge-Stored-At";
 const VERSION_TTL_S = 60;
 const VERSION_TIMEOUT_MS = 1500;
 const FORWARD = ["accept", "accept-language", "user-agent"];
+/** Per-IP token bucket (as Replay's edge/src/ratelimit.ts): best effort, per isolate. */
+const RATE_PER_MINUTE = 120;
+const RATE_BURST = 60;
+const RATE_MAX_KEYS = 10_000;
+/** The contract's routes (contracts/openapi.yaml) and the query parameters each one takes; first match wins. */
+const ROUTES: ReadonlyArray<readonly [RegExp, readonly string[]]> = [
+  [/^\/healthz$/, []],
+  [/^\/readyz$/, []],
+  [/^\/v1\/meta$/, []],
+  [/^\/v1\/openapi\.yaml$/, []],
+  [/^\/v1\/volcanoes$/, []],
+  [/^\/v1\/volcanoes\/nearest$/, ["lat", "lon", "limit"]],
+  [/^\/v1\/volcanoes\/[a-z0-9-]{1,64}$/, []],
+  [/^\/v1\/events$/, ["volcano", "lat", "lon", "radiusKm", "from", "to", "kind", "limit"]],
+  [/^\/v1\/eruptions\/precursors$/, ["minVei", "days", "radiusKm", "since"]],
+];
 
 type Label = "HIT" | "MISS" | "STALE" | "BYPASS" | "REVALIDATED" | "FALLBACK";
 
@@ -60,10 +81,24 @@ export const onRequest = async (context: Context): Promise<Response> => {
   const origin = (env.API_ORIGIN || DEFAULT_ORIGIN).replace(/\/$/, "");
   const done = (r: Response, label: Label) => decorate(r, label, t0);
 
+  const ip = request.headers.get("CF-Connecting-IP");
+  const rate = ip ? takeToken(ip, Date.now()) : 0;
+  if (rate > 0) {
+    return done(
+      problem("rate-limited", 429, "Too many requests", {
+        detail: "This address sent too many API requests in a short time. Wait a moment and try again.",
+        headers: { "Retry-After": String(rate) },
+      }),
+      "BYPASS",
+    );
+  }
   if (request.method !== "GET" && request.method !== "HEAD") {
     return done(problem("method-not-allowed", 405, "Method not allowed", { headers: { Allow: "GET, HEAD" } }), "BYPASS");
   }
-  const target = new URL(origin + rest + url.search);
+  const route = ROUTES.find(([re]) => re.test(rest));
+  if (!route) return done(problem("not-found", 404, "Not found"), "BYPASS");
+  const search = normalQuery(url.search, route[1]);
+  const target = new URL(origin + rest + search);
 
   if (rest === "/healthz" || rest === "/readyz") {
     const r = await originFetch(target, request, env, HEALTH_TIMEOUT_MS);
@@ -71,14 +106,12 @@ export const onRequest = async (context: Context): Promise<Response> => {
     if (r instanceof Error) return done(problem("bad-gateway", 502, "Bad gateway"), "BYPASS");
     return done(passthrough(r), "BYPASS");
   }
-  if (!rest.startsWith("/v1/")) return done(problem("not-found", 404, "Not found"), "BYPASS");
-
   const cache = (caches as unknown as { default: Cache }).default;
   const key = new Request(target.toString(), { method: "GET" });
   const [cached, published] = await Promise.all([cache.match(key), publishedVersion(env)]);
   const inm = request.headers.get("If-None-Match");
   const cold = async (fallback: Response) => {
-    const file = await publishedFile(rest, url.search, published);
+    const file = await publishedFile(rest, search, published);
     return file ? done(file, "FALLBACK") : done(fallback, "MISS");
   };
 
@@ -133,6 +166,36 @@ export const onRequest = async (context: Context): Promise<Response> => {
 };
 
 // -----------------------------------------------------------------------------------------------------------------
+
+const buckets = new Map<string, { tokens: number; at: number }>();
+
+/** Take one token from this IP's bucket: 0 when allowed, else the seconds until a token is free (Retry-After). */
+function takeToken(key: string, now: number): number {
+  const perMs = RATE_PER_MINUTE / 60_000;
+  const prev = buckets.get(key);
+  let tokens = prev ? Math.min(RATE_BURST, prev.tokens + (now - prev.at) * perMs) : RATE_BURST;
+  if (prev) buckets.delete(key); // re-inserted below: Map order doubles as LRU order
+  if (tokens < 1) {
+    buckets.set(key, { tokens, at: now });
+    return Math.max(1, Math.ceil((1 - tokens) / perMs / 1000));
+  }
+  tokens -= 1;
+  buckets.set(key, { tokens, at: now });
+  if (buckets.size > RATE_MAX_KEYS) buckets.delete(buckets.keys().next().value!);
+  return 0;
+}
+
+/** Only the parameters the route takes, sorted by name, first value of each (as the origin reads them). */
+function normalQuery(search: string, allowed: readonly string[]): string {
+  const q = new URLSearchParams(search);
+  const out = new URLSearchParams();
+  for (const name of [...allowed].sort()) {
+    const v = q.get(name);
+    if (v !== null) out.set(name, v);
+  }
+  const s = out.toString();
+  return s ? "?" + s : "";
+}
 
 async function originFetch(target: URL, request: Request, env: Env, ms: number, etag?: string | null): Promise<Response | Error | "timeout"> {
   const headers = new Headers();
@@ -323,6 +386,7 @@ function problem(code: string, status: number, title: string, o: { detail?: stri
 function decorate(r: Response, label: Label, t0: number): Response {
   const headers = new Headers(r.headers);
   headers.set("X-Edge-Cache", label);
+  headers.set("X-Robots-Tag", "noindex");
   headers.append("Server-Timing", `edge;dur=${Date.now() - t0}`);
   return new Response(r.body, { status: r.status, statusText: r.statusText, headers });
 }

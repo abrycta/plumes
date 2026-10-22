@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /data/
+Disallow: /embed
+
+Sitemap: https://plumes.krtmtthw.dev/sitemap.xml
