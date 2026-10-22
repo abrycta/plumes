@@ -140,6 +140,13 @@ export function dailyTrack(id: string, s: DailySeries): Track {
   };
 }
 
+/** Readout labels of the extra columns of event series. */
+const COLUMN_LABELS: Record<string, LocalText> = {
+  n: { en: "count", ja: "件数" },
+  maxMag: { en: "largest magnitude", ja: "最大マグニチュード" },
+  maxFrpMw: { en: "max radiative power", ja: "最大放射電力" },
+};
+
 export function eventsTrack(id: string, s: SparseSeries): Track {
   // The first numeric column is drawn; the others go into the readout.
   const valueCol = s.cols.find((_, i) => i > 0 && s.rows.some((r) => typeof r[i] === "number")) ?? s.cols[1] ?? "value";
@@ -150,7 +157,7 @@ export function eventsTrack(id: string, s: SparseSeries): Track {
     extra: s.cols
       .map((c, i) => [c, i] as const)
       .filter(([c, i]) => i > 0 && c !== valueCol && r[i] != null)
-      .map(([c, i]) => ({ label: { en: c, ja: c }, value: `${r[i]}${s.units[c] ? ` ${s.units[c]}` : ""}` })),
+      .map(([c, i]) => ({ label: COLUMN_LABELS[c] ?? { en: c, ja: c }, value: `${r[i]}${s.units[c] ? ` ${s.units[c]}` : ""}` })),
   }));
   return {
     id,
