@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
+import { embedPack } from "./scripts/vite-embed-pack.ts";
 import { fixtureData } from "./scripts/vite-fixture-data.ts";
 import { akariThemeInit } from "./scripts/vite-theme-init.ts";
 
@@ -27,6 +28,8 @@ export default defineConfig({
     akariThemeInit(),
     // PLUMES_FIXTURES=1 (e2e, offline dev): the contract fixtures at /data/ and a config.json pointing there.
     fixtureData(fileURLToPath(new URL("../contracts/fixtures/data", import.meta.url))),
+    // /embed's precomputed windows (small files instead of whole yearly layers), from the published data.
+    embedPack(fileURLToPath(new URL("./public/config.json", import.meta.url))),
   ],
   define: {
     __COMMIT_SHA__: JSON.stringify(commitSha()),

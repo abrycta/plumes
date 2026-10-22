@@ -5,8 +5,8 @@
 
 import type { VolcanoesIndex } from "@contracts/readmodels";
 
-import { addMonths, WINDOW_MONTHS } from "@/map/density";
-import type { QuakePt } from "@/map/points";
+import { addMonths, WINDOW_MONTHS } from "../map/density";
+import type { QuakePt } from "../map/points";
 
 export interface EmbedState {
   /** The window's last month. */

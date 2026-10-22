@@ -11,8 +11,8 @@ import { FetchSource, PMTiles, type RangeResponse, type Source } from "pmtiles";
 
 import type { Layer } from "@contracts/readmodels";
 
-import { resolveUrl } from "@/data/load";
-import { layerMonths, layerPath } from "@/data/layers";
+import { resolveUrl } from "../data/load";
+import { layerMonths, layerPath } from "../data/layers";
 
 export interface ThermalPt {
   lon: number;

@@ -56,6 +56,7 @@ export function depthClass(depth: number | null): 0 | 1 | 2 {
 }
 
 export interface Hex {
+  center: [number, number];
   /** Ring of [lon, lat], closed. */
   ring: [number, number][];
   count: number;
@@ -85,15 +86,19 @@ export function hexbin(points: readonly { lon: number; lat: number }[], km = HEX
     else bins.set(key, { q, r, count: 1 });
   }
   return [...bins.values()].map(({ q, r, count }) => {
-    const cx = w * (q + r / 2);
-    const cy = 1.5 * km * r;
-    const ring: [number, number][] = [];
-    for (let i = 0; i <= 6; i++) {
-      const a = ((60 * (i % 6) - 30) * Math.PI) / 180;
-      ring.push([(cx + km * Math.cos(a)) / KM_LON, (cy + km * Math.sin(a)) / KM_LAT]);
-    }
-    return { ring, count };
+    const center: [number, number] = [(w * (q + r / 2)) / KM_LON, (1.5 * km * r) / KM_LAT];
+    return { center, ring: hexRing(center, km), count };
   });
+}
+
+/** The closed ring of the hexagon of size `km` centred on [lon, lat]. */
+export function hexRing([lon, lat]: [number, number], km = HEX_KM): [number, number][] {
+  const ring: [number, number][] = [];
+  for (let i = 0; i <= 6; i++) {
+    const a = ((60 * (i % 6) - 30) * Math.PI) / 180;
+    ring.push([lon + (km * Math.cos(a)) / KM_LON, lat + (km * Math.sin(a)) / KM_LAT]);
+  }
+  return ring;
 }
 
 export interface Activity {

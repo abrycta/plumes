@@ -18,11 +18,12 @@ import { layerMonths } from "@/data/layers";
 import { formatNumber } from "@/lib/format";
 import { WINDOW_MONTHS, windowMonths } from "@/map/density";
 import { loadAllQuakes } from "@/map/points";
-import { loadWindow, toGeojson, type MapGeojson, type WindowData } from "@/map/windowData";
+import { loadWindow } from "@/map/windowData";
 
 import { PADDING, useCompact } from "./layout";
 import { COOKIE_DOMAIN, listenToParent, onPauseChange, pausedByParent, postReady } from "./parent-bridge";
-import { chooseStates, type EmbedState } from "./states";
+import { fromPack, PACK_DIR, packState, type PackIndex, type PackState, type ShownWindow } from "./pack";
+import { chooseStates } from "./states";
 
 const InteractiveMap = lazy(() => import("@/map/InteractiveMap"));
 
@@ -45,44 +46,47 @@ function formatMonth(m: string, lang: "en" | "ja"): string {
   return lang === "ja" ? `${y}年${mo}月` : `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][mo - 1]} ${y}`;
 }
 
-interface Loaded {
-  state: EmbedState;
-  data: WindowData;
-  geojson: MapGeojson;
-  /** Points drawn: thermal detections and earthquakes (the densest window is the still view). */
-  points: number;
-}
-
-/** Loads the chosen windows one after another, densest-ranked first, so the first state is ready soonest. */
-function useStates(): { loaded: Loaded[]; total: number } {
+/** The windows in time order, loaded one after another with the densest-ranked first, so the first is ready soonest.
+ *  From the build-time pack (pack.ts: a few hundred kB, a smaller file per window on phones); without a pack (an
+ *  offline build), computed in the browser from the published layers. */
+function useStates(): ShownWindow[] {
   const index = use(loadVolcanoes());
   const layers = use(loadLayers());
   const root = use(loadRoot());
-  const [states, setStates] = useState<EmbedState[] | null>(null);
-  const [loaded, setLoaded] = useState<Loaded[]>([]);
+  const [loaded, setLoaded] = useState<ShownWindow[]>([]);
   useEffect(() => {
     let live = true;
-    const thermal = layers.layers.find((l) => l.id === "thermal-detections");
-    const quakes = layers.layers.find((l) => l.id === "earthquakes-usgs");
-    const record = [...new Set([...layerMonths(thermal), ...layerMonths(quakes)])].filter((m) => m <= root.latest.dataAsOf.slice(0, 7)).sort();
+    const add = (w: ShownWindow) => live && setLoaded((l) => [...l, w].sort((a, b) => a.state.end.localeCompare(b.state.end)));
+    const phone = matchMedia("(max-width: 600px)").matches;
     void (async () => {
+      const pack = await fetch(`/${PACK_DIR}/index.json`)
+        .then((r) => (r.ok && (r.headers.get("content-type") ?? "").includes("json") ? (r.json() as Promise<PackIndex>) : null))
+        .catch(() => null);
+      if (pack?.states.length) {
+        for (const s of [...pack.states].sort((a, b) => b.points - a.points)) {
+          const p = await fetch(`/${PACK_DIR}/${phone ? s.compact : s.file}`)
+            .then((r) => (r.ok ? (r.json() as Promise<PackState>) : null))
+            .catch(() => null);
+          if (!live) return;
+          if (p) add(fromPack(p));
+        }
+        return;
+      }
+      const thermal = layers.layers.find((l) => l.id === "thermal-detections");
+      const quakes = layers.layers.find((l) => l.id === "earthquakes-usgs");
+      const record = [...new Set([...layerMonths(thermal), ...layerMonths(quakes)])].filter((m) => m <= root.latest.dataAsOf.slice(0, 7)).sort();
       const all = quakes ? await loadAllQuakes(quakes, root.versionBase, record).catch(() => []) : [];
-      const chosen = chooseStates(index, record, all);
-      if (!live) return;
-      setStates(chosen);
-      // Ranked order (chooseStates returns time order): the busiest window loads first.
-      for (const s of [...chosen].sort((a, b) => b.quakes - a.quakes)) {
+      for (const s of chooseStates(index, record, all).sort((a, b) => b.quakes - a.quakes)) {
         const data = await loadWindow(layers, root.versionBase, index, windowMonths(s.end, WINDOW_MONTHS));
         if (!live) return;
-        const item = { state: s, data, geojson: toGeojson(data), points: data.thermal.length + data.quakes.length };
-        setLoaded((l) => [...l, item].sort((a, b) => a.state.end.localeCompare(b.state.end)));
+        add(fromPack(packState(s, data, phone)));
       }
     })();
     return () => {
       live = false;
     };
   }, [index, layers, root]);
-  return { loaded, total: states?.length ?? 0 };
+  return loaded;
 }
 
 /** Index of the shown state: the densest one first (the still view), then a step every DWELL_MS while allowed. */
@@ -147,7 +151,7 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
   const compact = useCompact();
   const index = use(loadVolcanoes());
   const config = use(loadConfig());
-  const { loaded } = useStates();
+  const loaded = useStates();
   const densest = loaded.reduce((best, l, i) => (l.points > (loaded[best]?.points ?? -1) ? i : best), 0);
   const step = useStep(loaded.length, densest, frame);
   const cur = loaded[step] ?? null;
@@ -181,9 +185,9 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
       ? t(`${names.join(" and ")} ${names.length > 1 ? "erupt" : "erupts"} · ${range}`, `${names.join("・")}の噴火 · ${range}`)
       : t(`The latest 12 months · ${range}`, `直近12か月 · ${range}`)
     : "";
-  const d = cur?.data;
-  const near = d ? d.thermal.filter((p) => p.near).length : 0;
-  const maxMag = d ? d.quakes.reduce((m, q) => Math.max(m, q.mag ?? 0), 0) : 0;
+  const d = cur;
+  const near = d?.totals.near ?? 0;
+  const maxMag = d?.totals.maxMag ?? 0;
   const cMax = d ? Math.max(1, ...d.counts.map((c) => Math.max(c.thermalNear + c.thermalFar, c.quakes))) : 1;
 
   return (
@@ -209,9 +213,9 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
             {d ? (
               <>
                 <Swatch className="bg-chart-4" />
-                <span className="shrink-0">{t(`${formatNumber(d.thermal.length, lang)} thermal (${formatNumber(near, lang)} near volcanoes)`, `熱異常${formatNumber(d.thermal.length, lang)}件(火山付近${formatNumber(near, lang)}件)`)}</span>
+                <span className="shrink-0">{t(`${formatNumber(d.totals.thermal, lang)} thermal (${formatNumber(near, lang)} near volcanoes)`, `熱異常${formatNumber(d.totals.thermal, lang)}件(火山付近${formatNumber(near, lang)}件)`)}</span>
                 <Swatch style={{ background: "var(--ak-div-7)" }} />
-                <span className="shrink-0">{t(`${formatNumber(d.quakes.length, lang)} earthquakes${maxMag ? `, max M${maxMag.toFixed(1)}` : ""}`, `地震${formatNumber(d.quakes.length, lang)}件${maxMag ? `(最大M${maxMag.toFixed(1)})` : ""}`)}</span>
+                <span className="shrink-0">{t(`${formatNumber(d.totals.quakes, lang)} earthquakes${maxMag ? `, max M${maxMag.toFixed(1)}` : ""}`, `地震${formatNumber(d.totals.quakes, lang)}件${maxMag ? `(最大M${maxMag.toFixed(1)})` : ""}`)}</span>
                 <span className="truncate">· NASA FIRMS · USGS · © OpenMapTiles © OpenStreetMap</span>
               </>
             ) : null}
