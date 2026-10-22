@@ -5,6 +5,7 @@ import { DataThrough } from "@/components/DataThrough";
 import { GROUPS, observedShare, type Track, valuesIn } from "@/data/tracks";
 import { formatDate, fromDay, monthTicks, tickLabel, toDay, yearlyTicks } from "@/lib/dates";
 import { formatNumber, formatPercent, unitLabel } from "@/lib/format";
+import { sourceLine } from "@/volcano/sourceLine";
 
 const LINE_H = 56;
 const BAR_H = 44;
@@ -244,14 +245,18 @@ export function Timeline({ tracks, from, to, cursor, onCursor, dataAsOf, highlig
                       {tr.title[lang]}
                       {tr.unit && tr.kind !== "spans" ? <span className="font-normal text-muted-foreground"> ({unitLabel(tr.unit, lang)})</span> : null}
                     </span>
-                    <span className="text-xs text-muted-foreground">{tr.instrument[lang]}</span>
-                    {cov ? <span className="text-xs text-muted-foreground">{cov}</span> : null}
-                    {tr.start && tr.kind === "bars" ? (
-                      <span className="text-xs text-muted-foreground">
-                        {t(`Instrument record from ${formatDate(tr.start, "en")}; an empty day means nothing detected`, `${formatDate(tr.start, "ja")}から観測。空白の日は検知なし`)}
-                      </span>
-                    ) : null}
-                    {tr.note ? <span className="text-xs text-muted-foreground italic">{tr.note[lang]}</span> : null}
+                    {/* One short source line; the instrument wording, coverage and notes one tap away (rule 28b). "Data through" stays visible on every chart (RESEARCH.md §9). */}
+                    <details className="text-xs text-muted-foreground" data-track-notes>
+                      <summary className="cursor-pointer">{t(`Source: ${sourceLine(tr.sources, "en")}`, `出典:${sourceLine(tr.sources, "ja")}`)}</summary>
+                      <div className="flex flex-col gap-0.5 pt-0.5">
+                        <span>{tr.instrument[lang]}</span>
+                        {cov ? <span>{cov}</span> : null}
+                        {tr.start && tr.kind === "bars" ? (
+                          <span>{t(`Instrument record from ${formatDate(tr.start, "en")}; an empty day means nothing detected`, `${formatDate(tr.start, "ja")}から観測。空白の日は検知なし`)}</span>
+                        ) : null}
+                        {tr.note ? <span className="italic">{tr.note[lang]}</span> : null}
+                      </div>
+                    </details>
                     <DataThrough date={dataAsOf} />
                   </figcaption>
                   <div
