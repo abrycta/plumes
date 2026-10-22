@@ -4,16 +4,15 @@ import { lazy, Suspense, use, useEffect, useMemo, useState } from "react";
 import { DataThrough } from "@/components/DataThrough";
 import { VolcanoList } from "@/components/VolcanoList";
 import { loadConfig, loadLayers, loadRoot, loadVolcanoes, resolveUrl } from "@/data/load";
-import { layerMonths } from "@/data/layers";
 import { useRichMedia } from "@/lib/richMedia";
 import { framePath } from "@/map/deformation";
 import { DeformationKey } from "@/map/DeformationKey";
 import { HEX_BREAKS, quakesPerMonth, WINDOW_MONTHS, windowMonths } from "@/map/density";
 import type { LayerToggles } from "@/map/InteractiveMap";
 import { MapTimeline } from "@/map/MapTimeline";
-import { loadAllQuakes, type QuakePt } from "@/map/points";
 import { StaticMap } from "@/map/StaticMap";
-import { toGeojson, useWindowData } from "@/map/windowData";
+import { dataStamp } from "@/map/firstWindow";
+import { recordMonths, recordQuakeCounts, toGeojson, useWindowData } from "@/map/windowData";
 
 const InteractiveMap = lazy(() => import("@/map/InteractiveMap"));
 
@@ -44,25 +43,30 @@ export default function MapPage() {
     [defo, showDefo, root.versionBase],
   );
   // Every month any national layer offers, up to the data's last day.
-  const record = useMemo(() => [...new Set([...layerMonths(thermalLayer), ...layerMonths(quakeLayer)])].filter((m) => m <= root.latest.dataAsOf.slice(0, 7)).sort(), [thermalLayer, quakeLayer, root]);
+  const record = useMemo(() => recordMonths(layers, root.latest.dataAsOf), [layers, root]);
   // The default window: the 12 months up to the data's last month.
   const [end, setEnd] = useState(record.length - 1);
   const months = useMemo(() => (record[end] ? windowMonths(record[end], WINDOW_MONTHS) : []), [record, end]);
-  const { data, loading } = useWindowData(layers, root.versionBase, index, months);
+  // The first window and the timeline strip come from the build-time pack when it matches this data version.
+  const stamp = dataStamp(root.latest);
+  const { data, loading } = useWindowData(layers, root.versionBase, index, months, stamp);
   const geojson = useMemo(() => (data ? toGeojson(data) : null), [data]);
   const [show, setShow] = useState<LayerToggles>({ hexes: true, thermal: true, quakes: true });
   const fmt = (m: string, style: "short" | "long" = "short") => formatMonth(m, lang, style);
 
   // The whole record's earthquakes per month (the timeline strip); the same cached file as the window's.
-  const [allQuakes, setAllQuakes] = useState<QuakePt[] | null>(null);
+  const [recordQuakes, setRecordQuakes] = useState<number[] | null>(null);
   useEffect(() => {
     let live = true;
-    if (quakeLayer) void loadAllQuakes(quakeLayer, root.versionBase, record).then((q) => live && setAllQuakes(q), () => live && setAllQuakes([]));
+    if (quakeLayer)
+      void recordQuakeCounts(layers, root.versionBase, record, stamp).then(
+        (q) => live && setRecordQuakes(q),
+        () => live && setRecordQuakes(quakesPerMonth(record, [])),
+      );
     return () => {
       live = false;
     };
-  }, [quakeLayer, root, record]);
-  const recordQuakes = useMemo(() => (allQuakes ? quakesPerMonth(record, allQuakes) : null), [allQuakes, record]);
+  }, [quakeLayer, layers, root, record, stamp]);
 
   // Volcanoes whose last eruption began inside the window.
   const eruptions = useMemo(() => {
