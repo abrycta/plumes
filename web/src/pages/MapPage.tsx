@@ -128,7 +128,7 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
 
   // The embed's volcano: the map centred on it (its surroundings fill the map, as Lights zooms to a province).
   const focusFeature = embed?.focus ? index.features.find((f) => f.properties.id === embed.focus) : undefined;
-  const focus = focusFeature ? { center: focusFeature.geometry.coordinates as [number, number], zoom: 6.5 } : null;
+  const focus = focusFeature ? { center: focusFeature.geometry.coordinates as [number, number], zoom: 5.5 } : null;
 
   const summary = (
     <p className="m-0 text-ak-sm tabular" aria-live="polite" data-window-summary>
