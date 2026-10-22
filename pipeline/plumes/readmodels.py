@@ -26,7 +26,7 @@ from plumes import comet, deeptime, omi, run_a, run_b, thermal_n20
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
-from plumes.paths import BUILD, CROSSWALK, DATA, RAW, REGISTRY, TABLES
+from plumes.paths import BUILD, CROSSWALK, EE_LEDGER, RAW, REGISTRY, TABLES
 from plumes.stories.generate import generate as generate_stories
 from plumes.stories.text import date_en, date_ja, fl_gloss, ja_leftovers, neg, share_txt  # noqa: F401 (moved there, STORIES-PLAN §B8)
 
@@ -630,9 +630,8 @@ def build(version: int, as_of: str) -> dict:
     files = [{"path": str(p.relative_to(v_dir)), "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
              for p in sorted(v_dir.rglob("*")) if p.is_file()]
     manifest = {**hdr, "kind": "manifest", "files": files, "checks": {"passed": passed, "results": checks}}
-    usage = DATA / "state" / "ee-usage.json"
-    if usage.exists():
-        manifest["earthEngineUsage"] = json.loads(usage.read_text())
+    if EE_LEDGER.exists():
+        manifest["earthEngineUsage"] = json.loads(EE_LEDGER.read_text())
     (v_dir / "manifest.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False))
     if passed:
         (site / "latest.json").write_text(json.dumps({"schemaVersion": "1", "kind": "latest", "current": f"v{version}", "base": f"v{version}/", "dataAsOf": as_of,

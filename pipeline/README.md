@@ -34,7 +34,7 @@ CI: `.github/workflows/checks.yml` (lint, tests, registry) on every push; `.gith
 |---|---|---|
 | A check fails | `latest.json` is not written; the previous version keeps being served | read `vN/manifest.json` → `checks.results`, fix, rebuild the same N |
 | Bad data was published | — | point `data/latest.json` on gh-pages (and the HF mirror) back to the previous version; it is kept for rollback |
-| Earth Engine cap reached | `BudgetExceeded`: the run stops, months already written are kept | wait for the next month or the next run; see `data/ee-usage.json` |
+| Earth Engine cap reached | `BudgetExceeded`: the run stops, months already written are kept | wait for the next month or the next run; see `uv run python -m plumes.ee_ledger show` (one ledger for every worktree) |
 | A Lights data run is in progress | `data.yml` skips the Earth Engine steps | nothing |
 | LAVA TLS fails after 2026-11-19 | the LAVA crawl errors | fetch the new issuer from the leaf's AIA URL into `plumes/certs/` (B2) |
 | A crawler's page format changes | parsers return `None` for missing fields; the "1,500 bulletin days" and Taal checks fail | add a fixture under `tests/` and update `plumes/parse.py` |

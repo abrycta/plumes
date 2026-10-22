@@ -186,7 +186,7 @@ if __name__ == "__main__":
     ap.add_argument("--end", default=(dt.date.today().replace(day=1) - dt.timedelta(days=1)).strftime("%Y-%m"))
     a = ap.parse_args()
     init()
-    budget = Budget(DATA / "state" / "ee-usage.json")
+    budget = Budget()
     try:
         if a.step in ("so2", "fire"):
             res = run_monthly(a.step, a.start or {"so2": "2018-12", "fire": "2000-11"}[a.step], a.end, budget)

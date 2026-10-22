@@ -1,9 +1,11 @@
 """Earth Engine budget guard for the shared lgu-lights project (DATA-PLAN §7, DECISIONS Q11, Q22, S8).
 
 Plumes' own ceiling: 50 EECU-hours a calendar month and 10 per run. Every interactive call runs under the EE profiler;
-its EECU-seconds are summed into a state file (`ee-usage.json`, published with each data version so the next run and
-Kurt can read the month-to-date). A call that would start above either ceiling raises BudgetExceeded: the run fails
-clearly and nothing else is affected. The project's monthly total can only be read in the Cloud console (S8), so this
+its EECU-seconds are summed into one ledger (`paths.EE_LEDGER`: the main checkout's data/state/ee-usage.json, shared by
+every worktree; published with each data version so the next run and Kurt can read the month-to-date). The ledger is
+a list of runs, each with an id; month totals are derived from the runs, so merging ledgers (worktrees, the Pages copy)
+never double-counts (`plumes.ee_ledger`). A call that would start above either ceiling raises BudgetExceeded: the run
+fails clearly and nothing else is affected. The project's monthly total can only be read in the Cloud console (S8), so this
 counts Plumes' own use only.
 """
 
@@ -16,8 +18,12 @@ import pathlib
 import re
 import tempfile
 import time
+import uuid
 
 import ee
+
+from plumes.ee_ledger import merge_into, read
+from plumes.paths import EE_LEDGER
 
 MONTH_CAP_S = 50 * 3600
 RUN_CAP_S = 10 * 3600
@@ -57,10 +63,10 @@ def _eecu_seconds(profile_text: str) -> float:
 
 
 class Budget:
-    def __init__(self, state: pathlib.Path):
+    def __init__(self, state: pathlib.Path = EE_LEDGER):
         self.state = state
         self.month = dt.date.today().strftime("%Y-%m")
-        self.data = json.loads(state.read_text()) if state.exists() else {"months": {}, "runs": []}
+        self.data = read(state)
         self.run_s = 0.0
         self.calls = 0
         self.saved = False
@@ -102,13 +108,9 @@ class Budget:
         return out
 
     def save(self, label: str) -> dict:
-        rec = {"date": dt.date.today().isoformat(), "label": label, "eecu_s": round(self.run_s, 1), "calls": self.calls}
-        # re-read and merge, so concurrent runs (e.g. so2 and fire chunks) don't overwrite each other
-        cur = json.loads(self.state.read_text()) if self.state.exists() else {"months": {}, "runs": []}
-        cur["months"][self.month] = cur["months"].get(self.month, 0.0) + self.run_s
-        cur["runs"].append(rec)
-        self.data = cur
-        self.state.parent.mkdir(parents=True, exist_ok=True)
-        self.state.write_text(json.dumps(self.data, indent=1))
+        rec = {"id": uuid.uuid4().hex[:12], "date": dt.date.today().isoformat(), "label": label,
+               "eecu_s": round(self.run_s, 1), "calls": self.calls}
+        # merge under a lock, so concurrent runs (so2 and fire chunks, other worktrees) never overwrite each other
+        self.data = merge_into(self.state, {"runs": [rec]})
         self.saved = True
         return {**rec, "month_to_date_eecu_h": round(self.month_s / 3600, 3)}
