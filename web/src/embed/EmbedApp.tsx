@@ -1,32 +1,34 @@
-// /embed: the portfolio's live picture of Plumes. The national map (the app's own InteractiveMap and data) with
-// thermal detections and earthquakes, stepping month by month through the year up to the most recent eruption GVP
-// records (the month the map page opens on), over a two-line caption. No Header, footer, controls or links (live
-// embeds carry no link: the portfolio around the frame links to the app); the frame is inert and the map is
-// non-interactive, so a touch on it scrolls the parent page.
-// It starts on the eruption month and stays there under reduced motion (the still view). The steps pause while the
+// /embed: the portfolio's live picture of Plumes (workspace rule 27: animated and data-dense). The national map (the
+// app's own InteractiveMap and data) steps through the richest 12-month windows of the record, chosen from the data
+// (states.ts): each shows thermal-detection density, detections near and far from a volcano, earthquakes by magnitude
+// and depth and the volcanoes' activity, over a caption that names the window and its counts. No Header, footer,
+// controls or links (live embeds carry no link: the portfolio around the frame links to the app); the frame is inert
+// and the map is non-interactive, so a touch on it scrolls the parent page.
+// It opens on the densest window and stays there under reduced motion (the still view). The steps pause while the
 // parent says so (off-screen, or another embed is the one moving on a touch device), while the frame is out of
-// sight, and while the tab is hidden.
+// sight, and while the tab is hidden. Phones get their own layout: Luzon to the Visayas (decision P1).
 
 import { AkariProvider, useLang, useT } from "@abrycta/akari/react";
 import { lazy, Suspense, use, useEffect, useMemo, useRef, useState } from "react";
 
-import type { Layer, VolcanoesIndex } from "@contracts/readmodels";
-
 import { ErrorBoundary } from "@/app/ErrorBoundary";
 import { parseUrl } from "@/app/url";
 import { loadConfig, loadLayers, loadRoot, loadVolcanoes, resolveUrl } from "@/data/load";
-import { filtersByMonth, layerMonths, layerPath } from "@/data/layers";
-import type { Overlay } from "@/map/InteractiveMap";
+import { layerMonths } from "@/data/layers";
+import { formatNumber } from "@/lib/format";
+import { WINDOW_MONTHS, windowMonths } from "@/map/density";
+import { loadAllQuakes } from "@/map/points";
+import { loadWindow } from "@/map/windowData";
 
 import { PADDING, useCompact } from "./layout";
 import { COOKIE_DOMAIN, listenToParent, onPauseChange, pausedByParent, postReady } from "./parent-bridge";
+import { fromPack, PACK_DIR, packState, type PackIndex, type PackState, type ShownWindow } from "./pack";
+import { chooseStates } from "./states";
 
 const InteractiveMap = lazy(() => import("@/map/InteractiveMap"));
 
-/** Time on each month. */
-const DWELL_MS = 1800;
-/** Months shown, ending on the eruption month. */
-const SPAN = 12;
+/** Time on each window: long enough to read the caption. */
+const DWELL_MS = 7000;
 
 const urlLang = parseUrl(location.pathname, location.search).lang;
 
@@ -41,36 +43,73 @@ const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").match
 
 function formatMonth(m: string, lang: "en" | "ja"): string {
   const [y, mo] = m.split("-").map(Number) as [number, number];
-  return lang === "ja" ? `${y}年${mo}月` : `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][mo - 1]} ${y}`;
+  return lang === "ja" ? `${y}年${mo}月` : `${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][mo - 1]} ${y}`;
 }
 
-/** The months to step through and the eruption that ends them (the map page's opening month). */
-function tourOf(index: VolcanoesIndex, layers: Layer[]): { months: string[]; eruption: { month: string; id: string } | null } {
-  const all = [...new Set(layers.flatMap((l) => layerMonths(l)))].sort();
-  const eruptions = index.features
-    .map((f) => ({ id: f.properties.id, month: (f.properties.lastEruption?.start ?? "").slice(0, 7) }))
-    .filter((e) => /^\d{4}-\d{2}$/.test(e.month))
-    .sort((a, b) => a.month.localeCompare(b.month));
-  const last = eruptions.at(-1);
-  const end = last && all.includes(last.month) ? all.indexOf(last.month) : all.length - 1;
-  return { months: all.slice(Math.max(0, end - SPAN + 1), end + 1), eruption: last && all.includes(last.month) ? last : null };
+/** The windows in time order, loaded one after another with the densest-ranked first, so the first is ready soonest.
+ *  From the build-time pack (pack.ts: a few hundred kB, a smaller file per window on phones); without a pack (an
+ *  offline build), computed in the browser from the published layers. */
+function useStates(): ShownWindow[] {
+  const index = use(loadVolcanoes());
+  const layers = use(loadLayers());
+  const root = use(loadRoot());
+  const [loaded, setLoaded] = useState<ShownWindow[]>([]);
+  useEffect(() => {
+    let live = true;
+    const add = (w: ShownWindow) => live && setLoaded((l) => [...l, w].sort((a, b) => a.state.end.localeCompare(b.state.end)));
+    const phone = matchMedia("(max-width: 600px)").matches;
+    void (async () => {
+      const pack = await fetch(`/${PACK_DIR}/index.json`)
+        .then((r) => (r.ok && (r.headers.get("content-type") ?? "").includes("json") ? (r.json() as Promise<PackIndex>) : null))
+        .catch(() => null);
+      if (pack?.states.length) {
+        for (const s of [...pack.states].sort((a, b) => b.points - a.points)) {
+          const p = await fetch(`/${PACK_DIR}/${phone ? s.compact : s.file}`)
+            .then((r) => (r.ok ? (r.json() as Promise<PackState>) : null))
+            .catch(() => null);
+          if (!live) return;
+          if (p) add(fromPack(p));
+        }
+        return;
+      }
+      const thermal = layers.layers.find((l) => l.id === "thermal-detections");
+      const quakes = layers.layers.find((l) => l.id === "earthquakes-usgs");
+      const record = [...new Set([...layerMonths(thermal), ...layerMonths(quakes)])].filter((m) => m <= root.latest.dataAsOf.slice(0, 7)).sort();
+      const all = quakes ? await loadAllQuakes(quakes, root.versionBase, record).catch(() => []) : [];
+      for (const s of chooseStates(index, record, all).sort((a, b) => b.quakes - a.quakes)) {
+        const data = await loadWindow(layers, root.versionBase, index, windowMonths(s.end, WINDOW_MONTHS));
+        if (!live) return;
+        add(fromPack(packState(s, data, phone)));
+      }
+    })();
+    return () => {
+      live = false;
+    };
+  }, [index, layers, root]);
+  return loaded;
 }
 
-/** The month shown: the last of `months` (the still view), then a step every DWELL_MS while allowed. */
-function useStep(count: number, frame: React.RefObject<HTMLDivElement | null>): number {
-  const [step, setStep] = useState(count - 1);
+/** Index of the shown state: the densest one first (the still view), then a step every DWELL_MS while allowed. */
+function useStep(count: number, densest: number, frame: React.RefObject<HTMLDivElement | null>): number {
+  const [step, setStep] = useState<number | null>(null);
+  const shown = step ?? densest;
+  const latest = useRef({ count, densest });
+  useEffect(() => {
+    latest.current = { count, densest };
+  }, [count, densest]);
+  const many = count > 1;
   useEffect(() => {
     const el = frame.current;
-    if (!el || count < 2) return;
+    if (!el) return;
     let timer: number | undefined;
     let inView = true;
     const running = () => inView && document.visibilityState === "visible" && !pausedByParent() && !reducedMotion() && "embedReady" in document.documentElement.dataset;
     const schedule = () => {
       clearTimeout(timer);
       timer = undefined;
-      if (running())
+      if (running() && latest.current.count > 1)
         timer = window.setTimeout(() => {
-          setStep((s) => (s + 1) % count);
+          setStep((s) => ((s ?? latest.current.densest) + 1) % latest.current.count);
           schedule();
         }, DWELL_MS);
     };
@@ -81,8 +120,8 @@ function useStep(count: number, frame: React.RefObject<HTMLDivElement | null>): 
     io.observe(el);
     const motion = matchMedia("(prefers-reduced-motion: reduce)");
     const onMotion = () => {
-      // Reduced motion: back to the eruption month, statically.
-      if (motion.matches) setStep(count - 1);
+      // Reduced motion: back to the densest window, statically.
+      if (motion.matches) setStep(null);
       schedule();
     };
     motion.addEventListener("change", onMotion);
@@ -98,12 +137,12 @@ function useStep(count: number, frame: React.RefObject<HTMLDivElement | null>): 
       window.removeEventListener("plumes:embed-ready", schedule);
       offPause();
     };
-  }, [count, frame]);
-  return step;
+  }, [frame, many]);
+  return Math.min(shown, Math.max(0, count - 1));
 }
 
-function Swatch({ color }: { color: string }) {
-  return <span aria-hidden="true" className="inline-block size-[0.75em] shrink-0 rounded-full" style={{ background: color }} />;
+function Swatch({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return <span aria-hidden="true" className={`inline-block size-[0.75em] shrink-0 rounded-full ${className ?? ""}`} style={style} />;
 }
 
 function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) {
@@ -111,25 +150,18 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
   const { lang } = useLang();
   const compact = useCompact();
   const index = use(loadVolcanoes());
-  const layers = use(loadLayers());
   const config = use(loadConfig());
-  const root = use(loadRoot());
-  const thermal = layers.layers.find((l) => l.id === "thermal-detections");
-  const quakes = layers.layers.find((l) => l.id === "earthquakes-usgs");
-  const { months, eruption } = useMemo(() => tourOf(index, [thermal, quakes].filter((l): l is Layer => !!l)), [index, thermal, quakes]);
-  const step = useStep(months.length, frame);
-  const month = months[step] ?? null;
-
-  const overlays: Overlay[] = [];
-  for (const [layer, id] of [[quakes, "earthquakes"], [thermal, "thermal"]] as const)
-    if (layer && month && layerMonths(layer).includes(month))
-      overlays.push({ id, url: resolveUrl(root.versionBase, layerPath(layer, month)), sourceLayer: layer.sourceLayer, month: filtersByMonth(layer) ? month : undefined, attribution: id === "thermal" ? "NASA FIRMS" : "USGS" });
+  const loaded = useStates();
+  const densest = loaded.reduce((best, l, i) => (l.points > (loaded[best]?.points ?? -1) ? i : best), 0);
+  const step = useStep(loaded.length, densest, frame);
+  const cur = loaded[step] ?? null;
 
   // Fixed for the map's life: a mode change resizes the same map (it refits), it never recreates it.
   const embed = useMemo(
     () => ({
       pixelRatio: pixelRatio(),
       padding: matchMedia("(max-width: 1100px)").matches ? PADDING.compact : PADDING.desktop,
+      scale: matchMedia("(max-width: 600px)").matches ? 0.6 : matchMedia("(max-width: 1100px)").matches ? 1 : 2,
       onReady: () => {
         if ("embedReady" in document.documentElement.dataset) return;
         document.documentElement.dataset.embedReady = "";
@@ -143,10 +175,20 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
     document.documentElement.dataset.embedLayout = compact ? "compact" : "desktop";
   }, [compact]);
 
-  const volcano = eruption ? index.features.find((f) => f.properties.id === eruption.id) : undefined;
-  const headline = month
-    ? `${formatMonth(month, lang)}${volcano && month === eruption?.month ? t(` · ${volcano.properties.name.en} erupts`, ` · ${volcano.properties.name.ja}が噴火`) : ""}`
-    : t("Philippine volcanoes", "フィリピンの火山");
+  const s = cur?.state;
+  const eruptionMap = useMemo(() => new Map((s?.eruptions ?? []).map((e) => [e.id, e.month])), [s]);
+  const names = (s?.eruptions ?? []).map((e) => index.features.find((f) => f.properties.id === e.id)?.properties.name[lang] ?? e.id);
+  const months = s ? windowMonths(s.end, WINDOW_MONTHS) : [];
+  const range = s ? `${formatMonth(months[0]!, lang)} – ${formatMonth(s.end, lang)}` : "";
+  const headline = s
+    ? names.length
+      ? t(`${names.join(" and ")} ${names.length > 1 ? "erupt" : "erupts"} · ${range}`, `${names.join("・")}の噴火 · ${range}`)
+      : t(`The latest 12 months · ${range}`, `直近12か月 · ${range}`)
+    : "";
+  const d = cur;
+  const near = d?.totals.near ?? 0;
+  const maxMag = d?.totals.maxMag ?? 0;
+  const cMax = d ? Math.max(1, ...d.counts.map((c) => Math.max(c.thermalNear + c.thermalFar, c.quakes))) : 1;
 
   return (
     <div className="flex h-full flex-col bg-background text-foreground">
@@ -155,28 +197,43 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
           index={index}
           styleUrl={config.basemap?.style ?? "https://tiles.openfreemap.org/styles/positron"}
           coastUrl={resolveUrl("/", config.basemap?.fallback ?? "/basemap/coast.geojson")}
-          overlays={overlays}
+          data={cur?.geojson ?? null}
+          activity={d?.activity}
+          eruptions={eruptionMap}
+          formatMonth={(m) => formatMonth(m, lang)}
           embed={embed}
         />
       </div>
-      <div
-        className={
-          compact
-            ? "flex shrink-0 flex-col gap-0.5 border-t border-border px-2 py-1.5 leading-tight"
-            : "flex shrink-0 flex-col gap-2 border-t border-border px-8 py-5 leading-tight"
-        }
-        data-testid="embed-caption"
-      >
-        <p className={`m-0 truncate font-heading font-semibold ${compact ? "text-[14px]" : "text-[30px]"}`} data-month={month ?? ""}>
-          {headline}
-        </p>
-        <p className={`m-0 flex items-center gap-[0.5em] truncate text-muted-foreground ${compact ? "text-[12px]" : "text-[22px]"}`}>
-          <Swatch color="var(--chart-4)" />
-          <span className="shrink-0">{t("Thermal (NASA FIRMS)", "熱異常(NASA FIRMS)")}</span>
-          <Swatch color="var(--chart-2)" />
-          <span className="shrink-0">{t("Earthquakes (USGS)", "地震(USGS)")}</span>
-          <span className="truncate">· © OpenMapTiles © OpenStreetMap</span>
-        </p>
+      <div className={compact ? "flex shrink-0 flex-col gap-0.5 border-t border-border px-2 py-1.5 leading-tight" : "flex shrink-0 items-end gap-8 border-t border-border px-8 py-5 leading-tight"} data-testid="embed-caption">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <p className={`m-0 truncate font-heading font-semibold ${compact ? "text-ak-sm" : "text-ak-2xl"}`} data-window-end={s?.end ?? ""}>
+            {headline}
+          </p>
+          <p className={`m-0 flex items-center gap-[0.5em] truncate text-muted-foreground tabular ${compact ? "text-ak-xs" : "text-ak-xl"}`}>
+            {d ? (
+              <>
+                <Swatch className="bg-chart-4" />
+                <span className="shrink-0">{t(`${formatNumber(d.totals.thermal, lang)} thermal (${formatNumber(near, lang)} near volcanoes)`, `熱異常${formatNumber(d.totals.thermal, lang)}件(火山付近${formatNumber(near, lang)}件)`)}</span>
+                <Swatch style={{ background: "var(--ak-div-7)" }} />
+                <span className="shrink-0">{t(`${formatNumber(d.totals.quakes, lang)} earthquakes${maxMag ? `, max M${maxMag.toFixed(1)}` : ""}`, `地震${formatNumber(d.totals.quakes, lang)}件${maxMag ? `(最大M${maxMag.toFixed(1)})` : ""}`)}</span>
+                <span className="truncate">· NASA FIRMS · USGS · © OpenMapTiles © OpenStreetMap</span>
+              </>
+            ) : null}
+          </p>
+        </div>
+        {!compact && d ? (
+          <div className="flex h-16 w-80 shrink-0 items-end gap-1" aria-hidden="true" data-embed-months>
+            {d.counts.map((c) => (
+              <div key={c.month} className="flex h-full flex-1 items-end gap-px">
+                <div className="flex h-full flex-1 flex-col justify-end">
+                  <div className="bg-chart-4 opacity-30" style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
+                  <div className="bg-chart-4" style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
+                </div>
+                <div className="flex-1" style={{ height: `${(100 * c.quakes) / cMax}%`, background: "var(--ak-div-7)" }} />
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -1,7 +1,10 @@
 /* /embed only. The desktop frame (1280×800) is shown scaled down to about half on krtmtthw.dev: markers and labels
    are drawn about twice their app size there so they stay legible. The compact frame keeps the app's sizes. */
 [data-embed-layout="desktop"] .volcano-marker {
-  font-size: 22px;
+  font-size: var(--ak-font-size-xl);
+}
+[data-embed-layout="desktop"] .volcano-marker .stats {
+  font-size: var(--ak-font-size-lg);
 }
 [data-embed-layout="desktop"] .volcano-marker .dot {
   margin: 8px;
@@ -15,11 +18,11 @@
   height: 28px;
 }
 [data-embed-layout="compact"] .volcano-marker .name {
-  font-size: 11px;
+  font-size: var(--ak-font-size-2xs);
 }
-/* Phones: the map is about 360×180 px, so labels would cover the islands; smaller dots, no names. */
+/* Phones: the map is about 360×180 px, so labels would cover the islands; smaller dots and halos, no labels. */
 @media (max-width: 600px) {
-  [data-embed-layout="compact"] .volcano-marker .name {
+  [data-embed-layout="compact"] .volcano-marker .label {
     display: none;
   }
   [data-embed-layout="compact"] .volcano-marker .dot {
@@ -33,5 +36,11 @@
     margin: 7px;
     width: 10px;
     height: 10px;
+  }
+  [data-embed-layout="compact"] .volcano-marker[data-activity] .dot {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--seal) 35%, transparent);
+  }
+  [data-embed-layout="compact"] .volcano-marker[data-activity="0"] .dot {
+    box-shadow: none;
   }
 }

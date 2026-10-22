@@ -81,18 +81,19 @@
   align-items: center;
   gap: 2px;
   color: var(--foreground);
-  font-size: 12px;
+  font-size: var(--ak-font-size-xs);
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
 }
 .volcano-marker .dot {
   display: block;
+  flex: none;
   /* 12px dot in a 24px target (WCAG 2.2 target size). */
   margin: 6px;
   width: 12px;
   height: 12px;
-  border-radius: 999px;
+  border-radius: var(--ak-radius-pill);
   border: 2px solid var(--background);
   background: var(--muted-foreground);
 }
@@ -102,13 +103,64 @@
   height: 18px;
   background: var(--seal);
 }
-.volcano-marker .name {
+/* Activity halo: the order of magnitude of the window's thermal detections and earthquakes around the volcano. */
+.volcano-marker[data-activity="1"] .dot {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--seal) 35%, transparent);
+}
+.volcano-marker[data-activity="2"] .dot {
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--seal) 35%, transparent);
+}
+.volcano-marker[data-activity="3"] .dot {
+  box-shadow: 0 0 0 7px color-mix(in oklab, var(--seal) 35%, transparent);
+}
+.volcano-marker[data-activity="4"] .dot {
+  box-shadow: 0 0 0 11px color-mix(in oklab, var(--seal) 35%, transparent);
+}
+/* An eruption began inside the window: a ring in the text colour. */
+.volcano-marker[data-erupted] .dot {
+  outline: 2px solid var(--foreground);
+  outline-offset: 1px;
+}
+.volcano-marker .label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   padding: 2px 4px;
-  border-radius: 2px;
+  border-radius: var(--ak-radius-control);
   background: color-mix(in oklab, var(--background) 85%, transparent);
 }
-.volcano-marker[data-coverage="deep"] .name {
-  font-weight: 600;
+.volcano-marker .name {
+  font-weight: var(--ak-font-weight-semibold);
+}
+.volcano-marker .stats {
+  display: flex;
+  gap: 6px;
+  font-size: var(--ak-font-size-2xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+}
+.volcano-marker .stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.volcano-marker .stat.thermal::before,
+.volcano-marker .stat.quakes::before {
+  content: "";
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: var(--ak-radius-pill);
+}
+.volcano-marker .stat.thermal::before {
+  background: var(--ak-cat-4);
+}
+.volcano-marker .stat.quakes::before {
+  border: 1.5px solid var(--ak-div-7);
+  background: color-mix(in oklab, var(--ak-div-7) 35%, transparent);
+}
+.volcano-marker .stat.erupted {
+  color: var(--seal-text);
+  font-weight: var(--ak-font-weight-semibold);
 }
 .volcano-marker:hover .name,
 .volcano-marker:focus-visible .name {
@@ -118,7 +170,7 @@
 /* MapLibre controls in Akari colours. Unlayered and scoped to .maplibregl-map so they win over
    MapLibre's own (unlayered, later-loaded) stylesheet. */
 .maplibregl-map .maplibregl-ctrl-attrib {
-  font-size: 11px;
+  font-size: var(--ak-font-size-2xs);
 }
 .maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-attrib,
 .maplibregl-map .maplibregl-ctrl-attrib.maplibregl-compact-show,
