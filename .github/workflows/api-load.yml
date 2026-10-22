@@ -54,10 +54,11 @@ jobs:
         if: steps.secrets.outputs.ok == 'true'
         env: { DATABASE_URL: "${{ secrets.NEON_DATABASE_URL }}" }
         run: |
-          args=(load "$ROOT")
+          # The image's entrypoint caps the heap for Render (-Xmx160m); the loader holds the whole version in memory.
+          args=(-Xmx6g load "$ROOT")
           for f in in/usgs-comcat-ph-*/*.csv; do args+=(--usgs "/${f}"); done
           for f in in/firms-modis/raw/firms/*/*.csv; do args+=(--firms "/${f}"); done
-          docker run --rm -e DATABASE_URL -v "$PWD/in:/in:ro" "$IMAGE" "${args[@]}"
+          docker run --rm -e DATABASE_URL -v "$PWD/in:/in:ro" --entrypoint /app/plumes-api "$IMAGE" "${args[@]}"
       - name: The API reports the published version (through the edge)
         if: steps.secrets.outputs.ok == 'true'
         run: |
