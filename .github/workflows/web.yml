@@ -18,7 +18,7 @@ permissions:
 
 # Branches and PRs: a newer push cancels the older run. main: never cancelled or replaced (each run has its own
 # group), so every merged commit gets a finished check; the deploy job (one at a time) always ships main's newest
-# covered commit once its check is green (.github/scripts/deploy-gate.sh; "Merged means deployed", rule 23).
+# covered commit once its check is green (.github/scripts/deploy-gate.sh; "Merged means deployed", rule 24).
 concurrency:
   group: web-${{ github.ref == 'refs/heads/main' && github.run_id || github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
