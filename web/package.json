@@ -20,7 +20,7 @@
     "sources": "uv run --no-project --with pyyaml python scripts/extract_sources.py"
   },
   "dependencies": {
-    "@abrycta/akari": "^0.10.1",
+    "@abrycta/akari": "^0.12.0",
     "maplibre-gl": "^6.15.0",
     "pmtiles": "^4.5.0",
     "react": "^19.3.1",
