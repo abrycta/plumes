@@ -3,7 +3,10 @@ on:
   push: { branches: [main] }
   pull_request:
 permissions: { contents: read }
-concurrency: { group: "checks-${{ github.ref }}", cancel-in-progress: true }
+# main runs are never cancelled (own group per run); branches and PRs cancel superseded runs.
+concurrency:
+  group: checks-${{ github.ref == 'refs/heads/main' && github.run_id || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
   pipeline:
     runs-on: ubuntu-24.04
