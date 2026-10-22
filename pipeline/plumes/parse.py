@@ -61,21 +61,28 @@ def wp_slug_meta(url: str) -> dict:
             day = dt.date(int(y), MONTHS[mon], int(d)).isoformat()
         except ValueError:
             day = None
-    h = re.search(r"(\d{1,2})-(\d{2})-(a-m|p-m|am|pm)", slug)
-    hour = None
+    h = re.search(r"(\d{1,2})-(\d{2})-?(a-m|p-m|am|pm)", slug)
+    hour = minute = None
     if h:
         hour = int(h.group(1)) % 12 + (12 if h.group(3).startswith("p") else 0)
-    return {"volcano": vid, "date": day, "hour": hour, "slug": slug}
+        minute = int(h.group(2))
+    return {"volcano": vid, "date": day, "hour": hour, "minute": minute, "slug": slug}
 
 
 def wp_fields(t: str) -> dict:
     f: dict = {}
-    m = re.search(r"Alert Level (\d)", t, re.IGNORECASE)
+    # A notice of change ("raising ... from Alert Level 3 (magmatic unrest) to Alert Level 4") reports the new level.
+    m = (re.search(r"from\s+Alert Level \d\b[^.]{0,120}?\bto\s+Alert Level (\d)", t, re.IGNORECASE)
+         or re.search(r"Alert Level (\d)", t, re.IGNORECASE))
     f["alert"] = int(m.group(1)) if m else None
     m = (re.search(r"(?:recorded|detected)\s+(?:a total of\s+)?(?:\w+\s+)?\(?(\d[\d,]*)\)?\s+(?:volcanic|low[- ]frequency|volcano-tectonic)?\s*(?:volcanic\s+)?earthquakes?", t, re.IGNORECASE)
          or re.search(r"(\w+) \((\d+)\) volcanic earthquakes?", t, re.IGNORECASE)
          or re.search(r"\b(no|zero|not detect any) volcanic earthquake", t, re.IGNORECASE))
     f["eq"] = (0 if m.group(1).lower() in ("no", "zero", "not detect any") else ival(m.groups()[-1])) if m else None
+    # "Since raising the alert ... on 28 March 2019, the network has recorded 4857 volcanic earthquakes": a running
+    # total over months, not the bulletin's count, so it is not reported as one.
+    if m and re.search(r"\bsince\b", t[t.rfind(".", 0, m.start()) + 1: m.end()], re.IGNORECASE):
+        f["eq"] = None
     m = re.search(r"\((\d+)\)\s+(?:episodes? of\s+)?(?:volcanic\s+)?tremor", t, re.IGNORECASE)
     f["tremor"] = int(m.group(1)) if m else None
     m = (re.search(r"(?:averaged|measured at|emission(?: rate)?(?: was)?(?: measured)?(?: at)?|flux of|was)\s+(?:an average of\s+)?" + NUM
@@ -95,7 +102,9 @@ def parse_wp(url: str, entry_html: str) -> dict | None:
     t = text(entry_html)
     if len(t) < 200:
         return None
-    return {**wp_slug_meta(url), **wp_fields(t), "url": url}
+    # The Filipino edition of a bulletin repeats the English one at the same hour ("Ipinapabatid ng DOST-PHIVOLCS ...").
+    filipino = len(re.findall(r"\b(?:ng|ang|mga|Bulkang)\b", t)) >= 5
+    return {**wp_slug_meta(url), **wp_fields(t), "filipino": filipino, "url": url}
 
 
 # ---------- PHIVOLCS-LAVA (2022 ->) ----------

@@ -17,6 +17,7 @@ Python (uv). Builds Plumes' data versions from the 22 M1 registry entries in [`s
 | Read models | `plumes.readmodels --version N` | — | writes `data/build/site/vN/`; `latest.json` only if every check passes |
 | Publish | `plumes.publish --version N --pages --hf` | — | gh-pages `data/` (krtmtthw.dev/plumes/data/), then the HF mirror; latest.json last |
 | Archive | `plumes.adopt [--changed-only]` | crawled and queried ids | releases in `abrycta/plumes-archive` (B8) |
+| API reload | `.github/workflows/api-load.yml` | — | after every successful Data run: the API's Neon database from the published root (B16) |
 
 CI: `.github/workflows/checks.yml` (lint, tests, registry) on every push; `.github/workflows/data.yml` weekly (Sundays 02:00 PHT) and by hand. It needs `ARCHIVE_READ_TOKEN` and, for adoption, `ARCHIVE_WRITE_TOKEN` (DECISIONS B9); without them it skips with a notice.
 

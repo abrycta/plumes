@@ -71,6 +71,8 @@ sources:
       - id: wfs-csv
         url: "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Volcanoes&outputFormat=csv&CQL_FILTER=Country%3D%27Philippines%27"
         probe_size: false
+        # GeoServer generates the FID column anew on every request; dropped so unchanged data is not re-snapshotted
+        transform: { name: csv-drop-columns, columns: [FID] }
       - id: wfs-geojson
         url: "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Volcanoes&outputFormat=json&CQL_FILTER=Country%3D%27Philippines%27"
         automatic: false                   # same rows as GeoJSON: a different container
@@ -105,6 +107,8 @@ sources:
       - id: wfs-csv
         url: "https://webservices.volcano.si.edu/geoserver/GVP-VOTW/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=GVP-VOTW:Smithsonian_VOTW_Holocene_Eruptions&outputFormat=csv&CQL_FILTER=Volcano_Number%20BETWEEN%20271000%20AND%20274999"
         probe_size: false
+        # GeoServer generates the FID column anew on every request; dropped so unchanged data is not re-snapshotted
+        transform: { name: csv-drop-columns, columns: [FID] }
       - id: archive
         archive: true
     checks:
