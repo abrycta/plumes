@@ -3,20 +3,19 @@
 // month's file URL and the theme key, and removeSo2() when the layer is switched off. The decoded grid is cached per
 // URL, so a theme change only recolours.
 
-import { flat } from "@abrycta/akari/tokens";
 import type { ImageSource, Map as MlMap } from "maplibre-gl";
 
 import { corners, decodeSo2, type So2Grid, so2Rgba } from "@/data/so2Map";
+import { type ThemeKey, tokenColour } from "@/lib/tokens";
 
-export type ThemeKey = "light" | "dark" | "light-hc" | "dark-hc";
+export type { ThemeKey };
 
 const ID = "so2-monthly";
 const cache = new Map<string, Promise<So2Grid>>();
 
 /** Akari's five sequential data colours for the theme (low to high). */
 export function so2Colours(key: ThemeKey): string[] {
-  const tokens = flat as unknown as Record<string, Record<string, string>>;
-  return [1, 2, 3, 4, 5].map((i) => tokens[`data.seq.${i}`]?.[key] ?? tokens[`data.seq.${i}`]?.light ?? "#888888");
+  return [1, 2, 3, 4, 5].map((i) => tokenColour(`data.seq.${i}`, key));
 }
 
 export function loadSo2(url: string): Promise<So2Grid> {

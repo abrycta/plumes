@@ -35,5 +35,5 @@ export function FigureList({ figures }: { figures: Figure[] }) {
 export function DraftBadge({ status }: { status?: "draft" | "reviewed" }) {
   const t = useT();
   if (status !== "draft") return null;
-  return <span className="self-start rounded-sm border border-dashed border-border px-1.5 text-[11px] text-muted-foreground">{t("Draft text, not yet reviewed", "下書き(未レビュー)")}</span>;
+  return <span className="self-start rounded-sm border border-dashed border-border px-1.5 text-ak-2xs text-muted-foreground">{t("Draft text, not yet reviewed", "下書き(未レビュー)")}</span>;
 }

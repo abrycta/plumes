@@ -2,15 +2,14 @@
 // fetched once (one GET of a ~5-15 kB file), decoded, coloured from the theme's diverging ramp and shown as a MapLibre
 // image source at the frame's bounds. COMET's reference areas are drawn as small rings.
 
-import { flat } from "@abrycta/akari/tokens";
 import type { GeoJSONSource, ImageSource, Map as MlMap } from "maplibre-gl";
 import { useEffect, useRef } from "react";
 
+import { type ThemeKey, tokenColour } from "@/lib/tokens";
 import type { DeformationFrame, Layer } from "@contracts/readmodels";
 
 import { colourise, decodeFrame, type DecodedFrame, framesInView, imageCoordinates, velocityDomain } from "./deformation";
 
-type ThemeKey = "light" | "dark" | "light-hc" | "dark-hc";
 
 export interface DeformationOverlay {
   layer: Layer;
@@ -22,8 +21,7 @@ const REF = "deformation-ref";
 const PREFIX = "deformation-";
 
 function token(id: string, key: ThemeKey): string {
-  const t = (flat as unknown as Record<string, Record<string, string>>)[id];
-  return t?.[key] ?? t?.light ?? "#888888";
+  return tokenColour(id, key);
 }
 
 export function rampFor(key: ThemeKey): string[] {
@@ -92,7 +90,7 @@ export function useDeformation(map: MlMap | null, ready: boolean, overlay: Defor
         minzoom,
         paint: {
           "circle-radius": 4,
-          "circle-color": "rgba(0,0,0,0)",
+          "circle-color": "transparent",
           "circle-stroke-width": 1.5,
           "circle-stroke-color": token("color.text", key),
         },

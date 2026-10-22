@@ -72,7 +72,7 @@ function Strip({ dt, volcanoId }: { dt: DeepTime; volcanoId: string }) {
 
   return (
     <section aria-labelledby="deeptime-title" className="flex flex-col gap-3" data-deeptime>
-      <h2 id="deeptime-title" className="m-0 font-heading text-2xl font-semibold">
+      <h2 id="deeptime-title" className="m-0 font-heading text-ak-subsection font-semibold">
         <T en="Deep time" ja="長い時間軸" />
       </h2>
       <p className="m-0 max-w-prose text-sm text-muted-foreground">
@@ -149,7 +149,7 @@ function Strip({ dt, volcanoId }: { dt: DeepTime; volcanoId: string }) {
             {t(`${rows.length} events with deaths or damage recorded by NOAA NCEI`, `NOAA NCEIが死者や被害を記録した${rows.length}件`)}
           </summary>
           <p className="mt-2 mb-0 max-w-prose text-xs text-muted-foreground">{dt.notes.impacts[lang]}</p>
-          <ul className="m-0 mt-2 flex max-h-[32rem] list-none flex-col overflow-auto p-0 text-sm">
+          <ul className="m-0 mt-2 flex max-h-128 list-none flex-col overflow-auto p-0 text-sm">
             {rows.map(({ impact: i, eruption: e }) => (
               <li key={i.id} className="flex flex-col gap-0.5 border-t border-border py-2">
                 <div className="flex flex-wrap items-baseline gap-x-2">
