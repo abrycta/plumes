@@ -358,14 +358,6 @@ templates:
     en: "The wettest day in this period was {date}, with {x} mm."
     ja: "この期間で最も雨が多かったのは{date}で、{x} mmだった。"
 
-  - id: POP-RING
-    steps: [after]
-    family: context
-    source: [worldpop-100m]
-    types: { n: int, r: km, year: year }
-    en: "WorldPop estimates {n} people lived within {r} km in {year}."
-    ja: "WorldPopの推計では{year}年に{r} km圏内に{n}人が住んでいた。"
-
   - id: IMAGE-CAPTION
     steps: [before, after]
     family: caption

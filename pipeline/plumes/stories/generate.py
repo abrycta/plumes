@@ -30,7 +30,6 @@ REVIEW = HERE / "review.yaml"
 GENERATOR = {"name": "plumes.stories", "version": "1"}
 COUNTED = {"alert", "bulletin", "vaac", "so2", "thermal", "usgs", "dromic", "vei", "so2mass", "hazel", "deformation", "weekly"}
 STORY_FAMILIES, READING_FAMILIES = 4, 2
-DEFAULT_RING_KM = 10
 CREDITS = {"s2-sr-harmonized": "Contains modified Copernicus Sentinel data {year}", "landsat-c2-l2": "Landsat imagery courtesy of the U.S. Geological Survey"}
 
 
@@ -81,7 +80,6 @@ def build_story(m: dict, deep_v: dict | None, ev: Event, wins: dict, cat: dict, 
     errs: list[str] = []
     ctx_unrest = {"unrest": ev.unrest}
     vol = m["volcano"]
-    ring = int(ov.get("ring_km", DEFAULT_RING_KM))
     images = {}
     for role, spec in (ov.get("images") or {}).items():
         cap = rd.render(cat["IMAGE-CAPTION"], {"sensor": V(spec["sensor"], spec["source"]), "date": V(spec["date"], spec["source"])})
@@ -94,7 +92,7 @@ def build_story(m: dict, deep_v: dict | None, ev: Event, wins: dict, cat: dict, 
             continue
         w = wins[kind]
         sentences, figures, series, prev = [], [], [], None
-        for c in facts.step_candidates(m, deep_v, ev, kind, w, ring):
+        for c in facts.step_candidates(m, deep_v, ev, kind, w):
             t = cat[c.template]
             if kind not in t.steps:
                 continue

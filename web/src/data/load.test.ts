@@ -43,8 +43,8 @@ describe("storyRefs (ST1: drafts hidden unless ?preview)", () => {
   it("lists only reviewed stories without the preview parameter", () => {
     expect(storyRefs(index, false)).toEqual([{ id: "taal-2020", volcanoId: "taal", file: "story/taal-2020.json", status: "reviewed" }]);
   });
-  it("adds drafts in preview, a draft replacing the reviewed file of the same id; readings have no file", () => {
-    expect(storyRefs(index, true).map((s) => s.file)).toEqual(["story/drafts/taal-2020.json", "story/drafts/kanlaon-2024-06.json"]);
+  it("adds drafts in preview, by rank, a draft replacing the reviewed file of the same id; readings have no file", () => {
+    expect(storyRefs(index, true).map((s) => s.file)).toEqual(["story/drafts/kanlaon-2024-06.json", "story/drafts/taal-2020.json"]);
   });
   it("falls back to the built-in list for versions without stories.json", () => {
     expect(storyRefs(null, true)).toEqual([{ id: "taal-2020", volcanoId: "taal", file: "story/taal-2020.json", status: "reviewed" }]);

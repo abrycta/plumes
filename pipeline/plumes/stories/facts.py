@@ -328,18 +328,7 @@ def rain(m: dict, kind: str, w: tuple[str, str]) -> list[Candidate]:
     return out
 
 
-def population(m: dict, kind: str, ring_km: int) -> list[Candidate]:
-    if kind != "after":
-        return []
-    r = next((x for x in m["exposure"]["rings"] if x["radiusKm"] == ring_km), None)
-    if not r:
-        return []
-    src = r["source"]
-    return [Candidate("POP-RING", {"n": V(int(r["population"]), src), "r": V(int(r["radiusKm"]), src), "year": V(int(r["year"]), src)},
-                      [_fig(lt(f"People within {ring_km} km (WorldPop {r['year']})", f"{ring_km} km圏内の人口（WorldPop {r['year']}年）"), int(r["population"]), src)])]
-
-
-def step_candidates(m: dict, deep: dict | None, ev: Event, kind: str, w: tuple[str, str], ring_km: int) -> list[Candidate]:
+def step_candidates(m: dict, deep: dict | None, ev: Event, kind: str, w: tuple[str, str]) -> list[Candidate]:
     """Every candidate sentence for one step, in reading order (rain last, ST9)."""
     return (alert(m, kind, w) + bulletin_numbers(m, kind, w) + so2(m, kind, w) + usgs(m, kind, w, ev) + vaac(m, kind, w) + thermal(m, kind, w)
-            + gvp(ev, kind, w) + dromic(m, kind, w, ev) + hazel(deep, ev, kind) + deformation(m, kind, w) + population(m, kind, ring_km) + rain(m, kind, w))
+            + gvp(ev, kind, w) + dromic(m, kind, w, ev) + hazel(deep, ev, kind) + deformation(m, kind, w) + rain(m, kind, w))

@@ -147,7 +147,11 @@ export function storyRefs(index: StoriesIndex | null, preview: boolean): StoryRe
     const prev = out.get(e.id);
     if (!prev || (preview && e.status === "draft")) out.set(e.id, { id: e.id, volcanoId: e.volcanoId, file: e.file, status: e.status });
   }
-  return [...out.values()];
+  const refs = [...out.values()];
+  if (!preview) return refs;
+  // Preview lists stories in review order (the index's rank); unranked hand-built stories last.
+  const rank = new Map(index.stories.filter((e) => e.file && e.rank != null).map((e) => [e.file!, e.rank!]));
+  return refs.sort((a, b) => (rank.get(a.file) ?? Infinity) - (rank.get(b.file) ?? Infinity));
 }
 
 const storyFiles = new Map<string, Promise<Story | null>>();

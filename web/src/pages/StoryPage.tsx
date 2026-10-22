@@ -49,6 +49,22 @@ function nearbyStep(model: VolcanoReadModel, story: Story): StoryStep | null {
   };
 }
 
+/** A generated step reads as a list, one short line per fact (and per missing record); a hand-built step stays one paragraph. */
+function StepText({ step }: { step: StoryStep }) {
+  const { lang } = useLang();
+  const lines = [...(step.sentences ?? []).map((x) => ({ key: x.template, text: x.text, absent: false })), ...(step.absent ?? []).map((x) => ({ key: x.why, text: x.text, absent: true }))];
+  if (!lines.length) return <p className="m-0">{step.text[lang]}</p>;
+  return (
+    <ul className="m-0 flex list-disc flex-col gap-1 pl-5" data-step-lines>
+      {lines.map((l, i) => (
+        <li key={`${l.key}-${i}`} className={l.absent ? "text-muted-foreground" : undefined}>
+          {l.text[lang]}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** Akari's Scrollytelling breakpoint (md, 48rem): beside the text from here up, stacked inside each step below it. */
 const WIDE = "(min-width: 48rem)";
 const subscribeWide = (cb: () => void) => {
@@ -161,7 +177,7 @@ function StoryView({ story }: { story: Story }) {
             <div className="flex flex-col gap-2">
               <p className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{formatRange(s.start, s.end, lang)}</p>
               <h2 className="m-0 font-heading text-xl font-semibold">{s.title[lang]}</h2>
-              <p className="m-0">{s.text[lang]}</p>
+              <StepText step={s} />
               {wide ? null : <StepVisual story={story} model={model} step={s} tracks={tracks} />}
               <DraftBadge status={s.status} />
               <FigureList figures={s.figures} />

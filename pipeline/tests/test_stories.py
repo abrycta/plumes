@@ -204,6 +204,7 @@ def test_generation_on_the_fixture_writes_valid_drafts_and_an_index(tmp_path):
         assert not tx.ja_leftovers(st["text"]["ja"] + st["title"]["ja"])
         for s in st["sentences"]:
             assert s["sources"] and all(0 <= i < len(st["figures"]) for i in s["figures"])
+            assert s["template"] != "POP-RING" and "worldpop-100m" not in s["sources"]  # people nearby stays on the volcano page
     assert [s["kind"] for s in story["steps"]][0] == "before" and story["steps"][-1]["kind"] == "after"
 
 

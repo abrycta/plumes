@@ -1,7 +1,7 @@
 # Story overrides (STORIES-PLAN §B1.5): data only, never prose. Each entry carries the reason it exists.
 #
 # first: story ids generated and reviewed first, in this order (Q29: Kanlaon 2024 at M1.1).
-# events.<id>: before_start, after_end (pin the outer ends of the before and after steps), ring_km (the population ring for POP-RING),
+# events.<id>: before_start, after_end (pin the outer ends of the before and after steps),
 #   images.<before|after>: a scene pinned by hand while the imagery rule (§B5) is not built.
 first: [kanlaon-2024-06]
 
@@ -14,10 +14,8 @@ events:
     after_end: "2024-12-08"
   taal-2020:
     reason: >-
-      Keeps the reviewed Taal story's span (1 December 2019 onward) and its 14 km ring (Volcano Island and the lake
-      shore); the Sentinel-2 pair is the one the reviewed story shows, already in the data version.
+      Keeps the reviewed Taal story's span (1 December 2019 onward); the Sentinel-2 pair is the one the reviewed story shows, already in the data version.
     before_start: "2019-12-01"
-    ring_km: 14
     images:
       before: { url: assets/taal-s2-2019-11.jpg, date: "2019-11-19", sensor: Sentinel-2, source: s2-sr-harmonized }
       after: { url: assets/taal-s2-2020-03.jpg, date: "2020-03-23", sensor: Sentinel-2, source: s2-sr-harmonized }

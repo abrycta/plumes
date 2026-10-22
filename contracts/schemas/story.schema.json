@@ -100,7 +100,7 @@
       "type": "object",
       "required": ["families", "steps", "tier"],
       "properties": {
-        "families": { "type": "integer", "minimum": 0, "description": "Fact families with at least one sentence; rain and population are context and do not count" },
+        "families": { "type": "integer", "minimum": 0, "description": "Fact families with at least one sentence; rain is context and does not count" },
         "steps": { "type": "integer", "minimum": 0, "description": "Steps with at least one fact sentence" },
         "tier": { "enum": ["story", "reading", "none"] }
       },
