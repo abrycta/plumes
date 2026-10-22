@@ -46,6 +46,8 @@ export default defineConfig({
     sourcemap: true,
     target: "es2023",
     chunkSizeWarningLimit: 1100, // maplibre-gl is one ~1 MB chunk, loaded only with the interactive map
+    // Two pages, one build: /embed (the view krtmtthw.dev frames) shares the app's hashed chunks.
+    rollupOptions: { input: { main: "index.html", embed: "embed.html" } },
   },
   test: {
     include: ["src/**/*.test.{ts,tsx}"],

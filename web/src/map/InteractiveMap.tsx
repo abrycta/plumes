@@ -63,10 +63,21 @@ export interface InteractiveMapProps {
   /** Layers to draw, bottom first; an empty list shows the basemap and the volcanoes only. */
   overlays: Overlay[];
   lang: "en" | "ja";
+  /** The /embed krtmtthw.dev frames: a still, non-interactive map with no links, controls or attribution box. */
+  embed?: EmbedOptions;
+}
+
+export interface EmbedOptions {
+  /** Device pixels per CSS pixel for the canvas (`?pr=` from the parent, capped at 2). */
+  pixelRatio: number;
+  /** Padding around the Philippines when the map fits it. */
+  padding: number;
+  /** Called once, when the first full frame with its overlays is drawn. */
+  onReady: () => void;
 }
 
 /** The interactive overview map (loaded only when rule 6b allows): basemap, thermal detections, volcano links. */
-export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: Omit<InteractiveMapProps, "lang">) {
+export default function InteractiveMap({ index, styleUrl, coastUrl, overlays, embed }: Omit<InteractiveMapProps, "lang">) {
   const t = useT();
   const { lang } = useLang();
   const { resolvedTheme } = useTheme();
@@ -76,6 +87,9 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: 
   const mapRef = useRef<MlMap | null>(null);
   const [ready, setReady] = useState(false);
   const fallback = useRef(false);
+  /** The URL each overlay source was added with: a month change on the same file only swaps the filter. */
+  const sourceUrls = useRef<Record<string, string>>({});
+  const signalled = useRef(false);
 
   useEffect(() => {
     if (!box.current) return;
@@ -87,14 +101,32 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: 
         [PH_BOUNDS[0], PH_BOUNDS[1]],
         [PH_BOUNDS[2], PH_BOUNDS[3]],
       ],
-      fitBoundsOptions: { padding: 24 },
-      attributionControl: { compact: true },
-      fadeDuration: reduced ? 0 : 300,
+      fitBoundsOptions: { padding: embed?.padding ?? 24 },
+      // The embed names its sources in its own caption (no links out of the frame).
+      attributionControl: embed ? false : { compact: true },
+      fadeDuration: reduced || embed ? 0 : 300,
       dragRotate: false,
       pitchWithRotate: false,
+      // The national layers' PMTiles start at zoom 4: a phone-sized frame would fit the islands below it and draw no
+      // detections, so the embed never goes under 4. A phone then shows Luzon to the Visayas (Taal, Mayon, Bulusan,
+      // Kanlaon); tablets and the desktop frame fit the whole country at 4 or more.
+      ...(embed ? { interactive: false, pixelRatio: embed.pixelRatio, minZoom: 4 } : {}),
     });
-    map.touchZoomRotate.disableRotation();
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    if (embed)
+      // A rotation or a mode change resizes the frame: fit the Philippines again (never a cropped or scaled view).
+      map.on("resize", () =>
+        map.fitBounds(
+          [
+            [PH_BOUNDS[0], PH_BOUNDS[1]],
+            [PH_BOUNDS[2], PH_BOUNDS[3]],
+          ],
+          { padding: embed.padding, animate: false },
+        ),
+      );
+    else {
+      map.touchZoomRotate.disableRotation();
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    }
     let loaded = false;
     const toFallback = () => {
       if (loaded || fallback.current) return;
@@ -105,6 +137,7 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: 
     map.on("error", () => toFallback());
     map.on("load", () => {
       loaded = true;
+      sourceUrls.current = {};
       window.clearTimeout(timer);
       setReady(true);
     });
@@ -138,11 +171,21 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: 
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
+    const kept = new Set<string>();
     for (const id of ["earthquakes", "thermal"] as const) {
+      const want = overlays.find((o) => o.id === id);
+      if (want?.month && map.getLayer(id) && sourceUrls.current[id] === want.url) {
+        map.setFilter(id, ["==", ["get", "month"], want.month]);
+        kept.add(id);
+        continue;
+      }
       if (map.getLayer(id)) map.removeLayer(id);
       if (map.getSource(id)) map.removeSource(id);
+      delete sourceUrls.current[id];
     }
     for (const o of overlays) {
+      if (kept.has(o.id)) continue;
+      sourceUrls.current[o.id] = o.url;
       const pm = o.url.endsWith(".pmtiles");
       map.addSource(o.id, pm ? { type: "vector", url: `pmtiles://${o.url}`, attribution: o.attribution } : { type: "geojson", data: o.url, attribution: o.attribution });
       map.addLayer({
@@ -163,6 +206,10 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: 
         },
       });
     }
+    if (embed && !signalled.current) {
+      signalled.current = true;
+      map.once("idle", () => embed.onReady());
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, overlayKey]);
 
@@ -171,9 +218,10 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: 
     const map = mapRef.current;
     if (!map) return;
     const markers = index.features.map((f) => {
-      const el = document.createElement("a");
+      // The embed's markers are plain labels: live embeds carry no links (workspace rule 6c).
+      const el: HTMLElement = document.createElement(embed ? "span" : "a");
       const href = formatUrl({ page: "volcano", id: f.properties.id, lang: null, date: null, from: null, to: null, ring: null });
-      el.href = href;
+      if (el instanceof HTMLAnchorElement) el.href = href;
       el.className = "volcano-marker";
       el.dataset.coverage = f.properties.coverage;
       el.setAttribute("aria-label", f.properties.name[lang]);
@@ -186,7 +234,7 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: 
         name.textContent = f.properties.name[lang];
         el.append(name);
       } else el.title = f.properties.name[lang];
-      el.addEventListener("click", (e) => {
+      if (!embed) el.addEventListener("click", (e) => {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
         e.preventDefault();
         navigateHref(href);
@@ -195,7 +243,9 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays }: 
       return new maplibregl.Marker({ element: el, anchor: "left", offset: [-12, 0] }).setLngLat(f.geometry.coordinates.slice(0, 2) as [number, number]).addTo(map);
     });
     return () => markers.forEach((m) => m.remove());
+    // embed is fixed for the map's life.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, lang]);
 
-  return <div ref={box} className="h-full min-h-[360px] w-full" role="region" aria-label={t("Interactive map of the 24 volcanoes", "24火山のインタラクティブ地図")} data-interactive-map />;
+  return <div ref={box} className={embed ? "h-full w-full" : "h-full min-h-[360px] w-full"} role="region" aria-label={t("Interactive map of the 24 volcanoes", "24火山のインタラクティブ地図")} data-interactive-map />;
 }

@@ -12,6 +12,10 @@ The Plumes front end: Vite + React 19 + TypeScript, `@abrycta/akari` (Header, Pa
 | `/stories`, `/story/taal-2020` | Taal, January 2020 (Akari Scrollytelling) |
 | `/about` | What Plumes is and is not, how to read it, every source's licence and attribution, required notices |
 
+## Embed (`/embed`)
+
+`embed.html` (served at `/embed`; `src/embed/`) is the live picture krtmtthw.dev frames on its Plumes project page (workspace rules 6b, 6c; `LIVE-EMBEDS-PLAN.md`). The national map with thermal detections and earthquakes steps month by month through the year up to the most recent eruption GVP records, over a two-line caption. Two layouts by the frame's width: the desktop frame (1280×800, scaled down by the parent; larger type and markers) and compact (≤ 1100 px, the slot's real size; 14/12 px caption, phones get small unlabelled markers). No Header, controls, attribution box or links; the frame is inert and the map non-interactive, so touches scroll the parent. `?pr=` caps the canvas pixel ratio (≤ 2), `?paused=1` starts it still; `parent-bridge.ts` posts `akari:embed-ready` and accepts `akari:embed-pause` / `-resume` / `akari:theme` only from `https://krtmtthw.dev`. Reduced motion stays on the eruption month. `_headers` detaches `X-Frame-Options` and the CSP for `/embed` only and sets `frame-ancestors https://krtmtthw.dev`.
+
 ## Data
 
 Data contract: [`../contracts/`](../contracts/README.md). Types come straight from `../contracts/ts/readmodels.ts` (alias `@contracts/*`); never copy them.

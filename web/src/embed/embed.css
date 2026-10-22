@@ -1,0 +1,37 @@
+/* /embed only. The desktop frame (1280×800) is shown scaled down to about half on krtmtthw.dev: markers and labels
+   are drawn about twice their app size there so they stay legible. The compact frame keeps the app's sizes. */
+[data-embed-layout="desktop"] .volcano-marker {
+  font-size: 22px;
+}
+[data-embed-layout="desktop"] .volcano-marker .dot {
+  margin: 8px;
+  width: 20px;
+  height: 20px;
+  border-width: 3px;
+}
+[data-embed-layout="desktop"] .volcano-marker[data-coverage="deep"] .dot {
+  margin: 4px;
+  width: 28px;
+  height: 28px;
+}
+[data-embed-layout="compact"] .volcano-marker .name {
+  font-size: 11px;
+}
+/* Phones: the map is about 360×180 px, so labels would cover the islands; smaller dots, no names. */
+@media (max-width: 600px) {
+  [data-embed-layout="compact"] .volcano-marker .name {
+    display: none;
+  }
+  [data-embed-layout="compact"] .volcano-marker .dot {
+    /* The marker is anchored 12px into its box: the margins keep each dot centred on its volcano. */
+    margin: 8px;
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+  }
+  [data-embed-layout="compact"] .volcano-marker[data-coverage="deep"] .dot {
+    margin: 7px;
+    width: 10px;
+    height: 10px;
+  }
+}
