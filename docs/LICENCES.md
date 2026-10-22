@@ -161,7 +161,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Sentinel-1 InSAR (COMET LiCSAR)
 
-- **Verdict:** open-with-conditions (derived works of Copernicus Sentinel data; acknowledgement required). Quote: products are "Derived Works of Copernicus data"; acknowledgement "LiCSAR contains modified Copernicus Sentinel data [year]" — https://comet.nerc.ac.uk/comet-lics-portal/ (research/volcanoes.md). The COMET Volcano Portal's *images* are CC BY-NC 4.0 and are linked, not embedded. Access as in [sources-draft.yaml](sources-draft.yaml) (`licsar-taal-032d`; milestone 2).
+- **Verdict:** open-with-conditions (derived works of Copernicus Sentinel data; acknowledgement required). Quote: products are "Derived Works of Copernicus data"; acknowledgement "LiCSAR contains modified Copernicus Sentinel data [year]" — https://comet.nerc.ac.uk/comet-lics-portal/ (research/volcanoes.md). The COMET Volcano Portal's *images* are CC BY-NC 4.0 and are linked, not embedded. The portal's LiCSBAS JSON files carry no licence of their own: Plumes asks COMET before publishing anything derived from them (DECISIONS L1, 2026-10-22; draft in research/comet-licence-email.md). Access as in [sources-draft.yaml](sources-draft.yaml) (`licsar-taal-032d`; milestone 2).
 
 ### Sentinel-2 and Landsat (before/after strip, crater lake, NDVI)
 

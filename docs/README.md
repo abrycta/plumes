@@ -13,7 +13,8 @@ Reading order:
 7. [sources-draft.yaml](sources-draft.yaml): the registry draft (92 entries, the chosen 24+1 marked `# chosen: true`, one per source, with publisher, access, format, size, cadence, auth and licence), validated with `archivekit validate-registry` (kit v1.1.0) on 2026-10-21; moves to `pipeline/sources.yaml`.
 8. [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md): Q1–Q31 as history (all answered), the actions for Kurt, what to verify by hand.
 9. [SPIKE-PLAN.md](SPIKE-PLAN.md): the one-day measurement spike before building (items 13–18 for the Java slice, the shared quota and the M1 sources; 19–27 for the 24 sources); results in [SPIKE-RESULTS.md](SPIKE-RESULTS.md).
-10. [DECISIONS.md](DECISIONS.md): the log: Q1–Q31 answered on 2026-10-21; spike addenda and build notes are appended there.
+10. [DECISIONS.md](DECISIONS.md): the log: Q1–Q31 answered on 2026-10-21; spike addenda, build notes and the layers-plan answers (L1–L9) are appended there.
 11. [`research/`](research/): the raw research notes per candidate and the platform-limits check, with a URL and access date on every claim (`volcanoes.md`, `subsidence-insar.md`, `air-quality.md`, `coastal-ecosystems.md`, `rice-drought.md`, `earthquakes-faults.md`, `platform-limits.md`).
+12. [LAYERS-PLAN.md](LAYERS-PLAN.md): the layers after data v1: every candidate, the M2 and M3 shortlists, the deformation velocity layer spec, the Akari event-marker prerequisite, the M2 build order and its "ready to start" checklist.
 
 Conventions: plain English, facts with sources, dates in full, **[U]** for unverified items; other projects' documents are referenced by relative path (`../../lgu-lights/docs/`, `../../typhoon-replay/docs/architecture/`, `../../DATA-ARCHIVING.md`), never copied.
