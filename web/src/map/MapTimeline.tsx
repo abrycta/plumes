@@ -8,6 +8,7 @@ import { useId } from "react";
 import { formatNumber } from "@/lib/format";
 
 import type { MonthCount } from "./density";
+import { LAYER_BG, LAYER_TOKENS, layerVar } from "./layerColors";
 
 const ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function monthAbbr(m: string, lang: "en" | "ja"): string {
@@ -54,7 +55,7 @@ export function MapTimeline({ record, recordQuakes, end, span, onEnd, counts, fo
       </figcaption>
       <svg viewBox={`0 0 ${n} 40`} preserveAspectRatio="none" className="block h-10 w-full" aria-hidden="true">
         <rect x={start} y={0} width={end - start + 1} height={40} fill="var(--primary)" opacity={0.12} />
-        {recordQuakes?.map((q, i) => (q ? <rect key={i} x={i + 0.1} y={40 - 36 * Math.sqrt(q / qMax)} width={0.8} height={36 * Math.sqrt(q / qMax)} fill={i >= start && i <= end ? "var(--ak-div-7)" : "var(--muted-foreground)"} /> : null))}
+        {recordQuakes?.map((q, i) => (q ? <rect key={i} x={i + 0.1} y={40 - 36 * Math.sqrt(q / qMax)} width={0.8} height={36 * Math.sqrt(q / qMax)} fill={i >= start && i <= end ? layerVar(LAYER_TOKENS.depth[0]) : "var(--muted-foreground)"} /> : null))}
       </svg>
       <div className="relative h-4 text-ak-2xs text-muted-foreground" aria-hidden="true">
         {years.map(([m, i]) => (
@@ -92,13 +93,13 @@ export function MapTimeline({ record, recordQuakes, end, span, onEnd, counts, fo
               <div className="flex h-12 items-end gap-0.5" aria-hidden="true">
                 {thermalSeen ? (
                   <div className="flex h-full flex-1 flex-col justify-end">
-                    <div className="bg-chart-4 opacity-30" style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
-                    <div className="bg-chart-4" style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
+                    <div className={`${LAYER_BG.thermal} opacity-30`} style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
+                    <div className={LAYER_BG.thermal} style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
                   </div>
                 ) : (
                   <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} />
                 )}
-                {quakesSeen ? <div className="flex-1" style={{ height: `${(100 * c.quakes) / cMax}%`, background: "var(--ak-div-7)" }} /> : <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} />}
+                {quakesSeen ? <div className={`flex-1 ${LAYER_BG.quakes}`} style={{ height: `${(100 * c.quakes) / cMax}%` }} /> : <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} />}
               </div>
               <span className="truncate text-center font-mono text-ak-2xs text-muted-foreground">{monthAbbr(c.month, lang)}</span>
               <span className="sr-only">
