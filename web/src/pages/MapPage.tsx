@@ -10,7 +10,7 @@ import { DeformationKey } from "@/map/DeformationKey";
 import { HEX_BREAKS, quakesPerMonth, WINDOW_MONTHS, windowMonths } from "@/map/density";
 import type { LayerToggles } from "@/map/InteractiveMap";
 import { MapTimeline } from "@/map/MapTimeline";
-import { LAYER_TOKENS, legendFill } from "@/map/layerColors";
+import { LAYER_TOKENS, layerVar, legendFill } from "@/map/layerColors";
 import { MapGlyph } from "@/map/MapGlyph";
 import { StaticMap } from "@/map/StaticMap";
 import { dataStamp } from "@/map/firstWindow";
@@ -166,14 +166,14 @@ export default function MapPage() {
               ...(thermalLayer
                 ? [
                     { fill: legendFill(LAYER_TOKENS.thermal), label: t("Thermal detection within 15 km of a volcano, or flagged volcanic by FIRMS", "火山から15 km以内、またはFIRMSが火山と判定した熱異常") },
-                    { fill: legendFill(LAYER_TOKENS.thermal), opacity: 0.25, label: t("Thermal detection farther away (mostly vegetation fires)", "それ以外の熱異常(多くは植生火災)") },
+                    { fill: legendFill(LAYER_TOKENS.thermal), opacity: 0.5, label: t("Thermal detection farther away (mostly vegetation fires)", "それ以外の熱異常(多くは植生火災)") },
                   ]
                 : []),
               ...(quakeLayer
                 ? [
-                    { fill: legendFill(LAYER_TOKENS.depth[0]), label: t("Earthquake, shallow (under 70 km); size by magnitude", "地震・浅発(70 km未満)、大きさはマグニチュード") },
-                    { fill: legendFill(LAYER_TOKENS.depth[1]), label: t("Earthquake, intermediate (70–300 km)", "地震・やや深発(70〜300 km)") },
-                    { fill: legendFill(LAYER_TOKENS.depth[2]), label: t("Earthquake, deep (300 km and more)", "地震・深発(300 km以上)") },
+                    { fill: layerVar(LAYER_TOKENS.depth[0]), label: t("Earthquake, shallow (under 70 km); size by magnitude", "地震・浅発(70 km未満)、大きさはマグニチュード") },
+                    { fill: layerVar(LAYER_TOKENS.depth[1]), label: t("Earthquake, intermediate (70–300 km)", "地震・やや深発(70〜300 km)") },
+                    { fill: layerVar(LAYER_TOKENS.depth[2]), label: t("Earthquake, deep (300 km and more)", "地震・深発(300 km以上)") },
                   ]
                 : []),
             ]}
@@ -181,9 +181,9 @@ export default function MapPage() {
           <MapLegendKey
             title={t("Volcanoes", "火山")}
             items={[
-              { fill: "var(--seal)", label: t("Deep record: PHIVOLCS bulletins, satellites, earthquakes", "詳細な記録:PHIVOLCS火山情報・衛星・地震") },
+              { fill: "var(--ak-map-track)", label: t("Deep record: PHIVOLCS bulletins, satellites, earthquakes", "詳細な記録:PHIVOLCS火山情報・衛星・地震") },
               { fill: "muted", label: t("Satellite and eruption-history record", "衛星と噴火史の記録") },
-              { fill: "var(--seal)", opacity: 0.35, label: t("Halo: the window's thermal detections (15 km) and earthquakes (30 km); numbers on the label", "光輪:期間内の熱異常(15 km)と地震(30 km)、数はラベルに表示") },
+              { fill: "var(--ak-map-track)", opacity: 0.22, label: t("Halo: the window's thermal detections (15 km) and earthquakes (30 km); numbers on the label", "光輪:期間内の熱異常(15 km)と地震(30 km)、数はラベルに表示") },
               { fill: "none", label: t("Outlined: an eruption began in the window", "縁取り:期間内に噴火開始") },
             ]}
           />

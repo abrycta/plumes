@@ -95,27 +95,27 @@
   width: 10px;
   height: 10px;
   border-radius: var(--ak-radius-pill);
-  border: 1.5px solid var(--background);
+  border: 1.5px solid var(--ak-map-halo);
   background: var(--muted-foreground);
 }
 .volcano-marker[data-coverage="deep"] .dot {
   margin: 6px;
   width: 12px;
   height: 12px;
-  background: var(--seal);
+  background: var(--ak-map-track);
 }
 /* Activity halo: the order of magnitude of the window's thermal detections and earthquakes around the volcano. */
 .volcano-marker[data-activity="1"] .dot {
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--seal) 30%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ak-map-track) 22%, transparent);
 }
 .volcano-marker[data-activity="2"] .dot {
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--seal) 30%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ak-map-track) 22%, transparent);
 }
 .volcano-marker[data-activity="3"] .dot {
-  box-shadow: 0 0 0 5px color-mix(in oklab, var(--seal) 30%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--ak-map-track) 22%, transparent);
 }
 .volcano-marker[data-activity="4"] .dot {
-  box-shadow: 0 0 0 7px color-mix(in oklab, var(--seal) 30%, transparent);
+  box-shadow: 0 0 0 7px color-mix(in oklab, var(--ak-map-track) 22%, transparent);
 }
 /* An eruption began inside the window: a ring in the text colour. */
 .volcano-marker[data-erupted] .dot {
