@@ -221,3 +221,7 @@ def test_a_matching_review_hash_publishes_the_story_and_a_changed_number_reopens
     changed = copy.deepcopy(story["steps"][0])
     changed["figures"].append({"label": {"en": "x", "ja": "x"}, "value": 1, "source": "x"})
     assert step_hash(changed) != step_hash(story["steps"][0])
+
+
+def test_omi_is_gone_from_the_catalogue():  # Kurt dropped OMI SO₂ on 2026-10-23
+    assert not [t for t in CAT if t.endswith("-OMI")] and all("omi-omso2e" not in t.source for t in CAT.values())

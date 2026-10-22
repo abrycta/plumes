@@ -17,7 +17,7 @@ from plumes.stories.text import lt
 BUL = "phivolcs-bulletins"
 LAVA = "phivolcs-lava-bulletins"
 HAZEL = "noaa-hazel-volcanoes-ph"
-TROPOMI_ID, OMI_ID, RAIN_ID = "so2_s5p_15km", "so2_omi_box", "rain_imerg_15km"
+TROPOMI_ID, RAIN_ID = "so2_s5p_15km", "rain_imerg_15km"
 THERMAL = [("frp_viirs_15km", "VIIRS", "viirs-vnp14a1"), ("frp_modis_15km", "MODIS", "modis-mod14a1")]
 MIN_CLEAR_DAYS = 5
 
@@ -146,27 +146,23 @@ def _median(xs: list[float]) -> float:
 
 
 def so2(m: dict, kind: str, w: tuple[str, str]) -> list[Candidate]:
-    for sid, src, sensor in ((TROPOMI_ID, "s5p-offl-so2", "TROPOMI"), (OMI_ID, "omi-omso2e", "OMI")):
-        days = _daily(m, sid, w)
-        clear = [(d, x, c) for d, x, c in days if x is not None]
-        if not days:
-            continue
-        omi = sensor == "OMI"
-        if kind == "before":
-            if len(clear) < MIN_CLEAR_DAYS:
-                continue
-            vals = {"med": V(_median([x for _, x, _ in clear]), src), "span": V((days[0][0], days[-1][0]), src), "n": V(len(clear), src), "N": V(len(days), src)}
-            if not omi:
-                vals |= {"sensor": V(sensor, src), "r": V(int(m["daily"][sid]["ringKm"]), src)}
-            return [Candidate("SO2-BASELINE-OMI" if omi else "SO2-BASELINE", vals, series=[sid])]
-        if kind in ("onset", "course") and clear:
-            d, x, c = _first_max(clear, lambda r: r[1])
-            unit = "DU" if omi else "µmol/m²"
-            vals = {"x": V(x, src), "date": V(d, src), "cov": V(c, src)}
-            if not omi:
-                vals |= {"sensor": V(sensor, src), "r": V(int(m["daily"][sid]["ringKm"]), src)}
-            label = lt("OMI SO₂ column, 50 km box (highest)", "OMI SO₂カラム量、50 km範囲（最大）") if omi else lt("TROPOMI SO₂ column within 15 km (highest)", "TROPOMI SO₂カラム量、15 km圏（最大）")
-            return [Candidate("SO2-PEAK-OMI" if omi else "SO2-PEAK", vals, [_fig(label, x, src, d, unit=unit)], [sid])]
+    src, sensor = "s5p-offl-so2", "TROPOMI"
+    days = _daily(m, TROPOMI_ID, w)
+    clear = [(d, x, c) for d, x, c in days if x is not None]
+    if not days:
+        return []
+    ring = V(int(m["daily"][TROPOMI_ID]["ringKm"]), src)
+    if kind == "before":
+        if len(clear) < MIN_CLEAR_DAYS:
+            return []
+        vals = {"med": V(_median([x for _, x, _ in clear]), src), "span": V((days[0][0], days[-1][0]), src), "n": V(len(clear), src), "N": V(len(days), src),
+                "sensor": V(sensor, src), "r": ring}
+        return [Candidate("SO2-BASELINE", vals, series=[TROPOMI_ID])]
+    if kind in ("onset", "course") and clear:
+        d, x, c = _first_max(clear, lambda r: r[1])
+        vals = {"x": V(x, src), "date": V(d, src), "cov": V(c, src), "sensor": V(sensor, src), "r": ring}
+        label = lt("TROPOMI SO₂ column within 15 km (highest)", "TROPOMI SO₂カラム量、15 km圏（最大）")
+        return [Candidate("SO2-PEAK", vals, [_fig(label, x, src, d, unit="µmol/m²")], [TROPOMI_ID])]
     return []
 
 
