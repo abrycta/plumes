@@ -1,6 +1,6 @@
 # Open questions and decisions for Kurt
 
-Status: 2026-10-21. **Q1–Q31 are all answered** (see [DECISIONS.md](DECISIONS.md); Q3, Q4, Q5, Q11 and Q15 differ from the defaults below; Q19–Q31 took the recommendations, "go ahead with everything", with Q23–Q28 re-read against the 24 sources of Q30/Q31). Both tables are kept as written history. No question is open; the remaining actions for Kurt are below.
+Status: 2026-10-21. **Q1–Q31 are all answered** (see [DECISIONS.md](DECISIONS.md); Q3, Q4, Q5, Q11 and Q15 differ from the defaults below; Q19–Q31 took the recommendations, "go ahead with everything", with Q23–Q28 re-read against the 24 sources of Q30/Q31). Both tables are kept as written history. The layers plan's questions L1–L9 were answered on 2026-10-22 ([LAYERS-PLAN.md](LAYERS-PLAN.md) §5, DECISIONS.md "L1 to L9"); **one item stays open: L8, the ISC licence, checked by hand later (not needed for M2).** The remaining actions for Kurt are below.
 
 ## 1. Q1–Q18 (answered 2026-10-21; kept as history)
 
@@ -53,6 +53,12 @@ Raised by the source canvas, the decided architecture, the 20-source proposal an
 4. Give the go-ahead for the throwaway free-plan Render service and Neon project of spike items 13–15 (Q20, Q21), deleted after the measurement.
 5. When the repo exists: create the second Earth Engine service account and save its key as `earth-engine-sa-key-plumes` (Q22); add it (or the `lgu-lights` key), the FIRMS MAP_KEY and the Earthdata login as GitHub secrets.
 
+6. **Send the COMET licence email** (L1): draft at [research/comet-licence-email.md](research/comet-licence-email.md), via https://comet.nerc.ac.uk/comet-volcano-portal/contact; pass on the reply so it can be recorded. COMET data stays unpublished until then.
+7. **Approve the `deformation-velocity` contract change** (L3; [LAYERS-PLAN.md](LAYERS-PLAN.md) §3.1) before M2 step 9 is built.
+8. Later, by hand: the ISC Bulletin licence (L8), for a possible second earthquake catalogue at M3.
+
+Action 3 is partly done: the one `MSAQSO2L4` read was allowed and made on 2026-10-22 (L9); `MSVOLSO2L4` is already a source.
+
 The earlier action items for a new Earth Engine project (old Q11) and the PHIVOLCS email (old Q5) are withdrawn by Kurt's answers.
 
 ## Verification still to do by hand or in the spike
@@ -65,7 +71,8 @@ The earlier action items for a new Earth Engine project (old Q11) and the PHIVOL
 - The Render cold start, the Neon catalogue size and the edge-cache hit rate (spike items 13–15).
 - The Tokyo VAAC advisory parse rate and the DROMIC docx tables (spike item 17); the Sentinel-2 and Landsat thumbnails and the ERA5 pressure-level read (spike item 18); the new checks for the 24 sources (spike items 19–27).
 - ~~Whether OpenAQ has any Philippine station with data for January 2020~~ (OpenAQ is out of scope under Q30).
-- LiCSAR pair file sizes once the October 2025 storage migration settles (milestone 2 only).
+- ~~LiCSAR pair file sizes once the October 2025 storage migration settles~~ (moot: L2 uses COMET's ready-made LiCSBAS series, not LiCSAR pairs).
+- `MSAQSO2L4`: the per-year values for Mayon, Bulusan, Kanlaon and "Taai", and whether "Taai" is Taal (L9; M3).
 - The NOVAC Mayon SO2 flux dataset (CC BY 4.0 per the catalogue record): URL, years, format.
 - The Smithsonian weekly reports as a 2000–2017 source for PHIVOLCS figures (milestone 2 only).
 - Akari: whether synchronised multi-series charts with a shared time scrubber need a new Akari composite (an Akari change, not an app fork).

@@ -81,6 +81,8 @@ Sizes (**[U]** for Parquet; the PostGIS and JSON figures are measured, spike S5,
 
 ## 6. InSAR at milestone 2 (outline)
 
+**Superseded on 2026-10-22 (DECISIONS L2, L3):** M2 uses COMET's ready-made LiCSBAS series for all 18 covered volcanoes plus a `deformation-velocity` map layer, published only after COMET's reply (L1); see [LAYERS-PLAN.md](LAYERS-PLAN.md) §3.1. The outline below is kept as history.
+
 Crop the Taal frame `032D_07536_111313` to a 60 × 60 km window; download only unwrapped phase and coherence for pairs 2019-07 → 2020-07 (about 150 pairs × 2 files **[U]**) in staged Actions jobs; run LiCSBAS (GPL-3, run as a tool, not linked) to a LOS time series with `vstd`; publish the series at a few hundred points plus a velocity raster; show the reference point, LOS geometry and the atmospheric caveat. Acknowledgement "LiCSAR contains modified Copernicus Sentinel data [year]" and the LiCSBAS citation. At M3 the NGL GNSS series for PTGY (Tagaytay) and PLEG (Legazpi) sit beside it.
 
 ## 7. Cadence, the shared Earth Engine quota, CI budget [U]
@@ -150,7 +152,8 @@ InSAR stays as links (COMET portal, PHIVOLCS deformation sentences; not counted 
 | Milestone | Theme | Sources | Notes |
 |---|---|---|---|
 | M1.1 | the Lights link, the second story | Black Marble VNP46A2 on Earth Engine (19), the Lights poverty join (20), **Google Open Buildings 2.5D Temporal** (25, `open-buildings-temporal`); the Kanlaon 2024 story on the M1 sources (Q29); national layers if deferred by the spike (Q9) | 25 sources in all; no new registration |
-| M2 | the plume and the ground | the S5P aerosol index (7), GPM IMERG (18); the Taal InSAR crop (Q8), preferably by ARIA S1 GUNW range reads (NASA-EE-CANDIDATES.md B6) | a new source only if Kurt adds one |
+| M2 | the plume and the ground ([LAYERS-PLAN.md](LAYERS-PLAN.md) §7) | nine layers: NOAA-20 VIIRS thermal (own series), OMI SO₂ daily, the deep-time strip with NCEI HazEL, Landsat crater-lake temperature, crater-lake area and colour (adds JRC GSW), the S5P aerosol index (7), GPM IMERG on Earth Engine (18), the national monthly SO₂ map, and **COMET LiCSBAS deformation for 18 volcanoes (series and a `deformation-velocity` layer)**, which supersedes the Taal InSAR crop of Q8 and the ARIA GUNW route (L2) | new sources: COMET LiCSBAS, NCEI HazEL, JRC GSW, FIRMS `VIIRS_NOAA20_SP`. Ready when COMET has replied (L1), the Akari event marker is released (§6 there) and Kurt approves the contract change (§8 there); about 4–6.5 EECU-h |
+| M3 | context and slow signals ([LAYERS-PLAN.md](LAYERS-PLAN.md) §2) | night LST, Dynamic World and dNBR around eruptions, OMI aerosol index, GHSL built-up, ECOSTRESS, OMPS SO₂ and `MSAQSO2L4` (four Philippine volcanoes, L9), OSM schools and hospitals per ring labelled "as of <date>" (L7), ERA5-Land rain and S5P plume height; the ISC/EMSC catalogue only if its licence checks out (L8) | lahar rivers excluded (L6) |
 | out of scope (Q30) | — | MIROVA, GHSL, WorldCover, PSGC, GEM faults, the PHIVOLCS earthquake tables, Himawari, the attention track, hand downloads and every former M3/M4 context source | kept in the registry and LICENCES.md as history; NO-DOWNLOAD-ALTERNATIVES.md lists query routes if one is wanted back |
 | dropped at the licence check | — | WWLLN (paid), OpenSky (unusable), LaMEVE (permission needed), PhilGEPS (link-only, portal down) | listed on the About page with the reason |
 

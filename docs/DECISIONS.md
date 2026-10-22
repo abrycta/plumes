@@ -105,3 +105,18 @@ Kurt approved the same day: the site and the API switch from the fixtures to the
 | B17 | **The archive no longer re-snapshots unchanged GVP data.** GeoServer's WFS CSV starts with an `FID` column of feature ids generated on every request (`…fid-5949073e_1a16163f341_-673`), so each run hashed different bytes and published `.2`, `.3` releases. archivekit 1.2.0 adds the built-in `csv-drop-columns` transform; both GVP links drop `FID` | `sources.yaml`, data-archive-kit v1.2.0 |
 | B18 | **Volcano pages say why a series is empty** ("Nothing to show, and why"): no bulletins issued, no VAAC advisory since 2010 (or no GVP number to match), not in GVP's Holocene list, DROMIC for Taal 2020 only, nothing detected within the ring since the instrument record starts. Long spans draw dense markers as a tick strip and the axis in years. The map reads the published layers as they are (`{year}` PMTiles filtered on `month`; the earthquake layer added beside thermal detections) and opens on the month of the most recent GVP eruption | `web/src/data/tracks.ts` `absentRecords`, `web/src/volcano/Timeline.tsx` |
 
+## 2026-10-22: layers plan L1 to L9
+
+Kurt's answers to the nine questions of [LAYERS-PLAN.md](LAYERS-PLAN.md) §5 (written as L1–L9 there; they were not in OPEN-QUESTIONS.md). The plan's build order (§7) and its "ready to start" checklist (§8) follow from them.
+
+| # | Decision | Note |
+|---|---|---|
+| L1 | **Email COMET before publishing any COMET-derived data.** The draft is [research/comet-licence-email.md](research/comet-licence-email.md); Kurt sends it. No COMET file is published until the reply is recorded here | The portal's CC BY-NC 4.0 covers its images; the JSON files carry no licence of their own |
+| L2 | **COMET LiCSBAS series for all 18 covered volcanoes at M2. This supersedes Q8's Taal-only crop** and the ARIA S1 GUNW route noted in "Q19 to Q31" | ARIA GUNW covers only Taal, Pinatubo and Banahaw and ends 2025-09-15 |
+| L3 | **Deformation: a LOS chart per volcano and a velocity map layer**, new layer id `deformation-velocity` (contract change in `contracts/schemas/layers.schema.json` and `contracts/ts/readmodels.ts`, approved by Kurt before it is built; spec in LAYERS-PLAN.md §3.1) | the per-volcano series needs no contract change |
+| L4 | **IMERG rain on Earth Engine**, one month measured before the backfill | simplest route; 1–3 EECU-h estimated |
+| L5 | **NOAA-20 VIIRS thermal as its own series** with a sensor-change marker at the S-NPP → NOAA-20 switch. Akari has no dated marker on its charts, so an Akari addition is a prerequisite (LAYERS-PLAN.md §6) | S-NPP deliveries end 2026-11-02 |
+| L6 | **Lahar rivers excluded** (moved to the rejections) | too close to a hazard map for a site that is not a warning service |
+| L7 | **OSM school and hospital counts at M3 only with a clear "as of <date>" label** | a snapshot of today, not history |
+| L8 | **ISC licence: checked by hand later; not needed for M2.** Stays open | its site returned 404 on 2026-10-22 |
+| L9 | **One read of `MSAQSO2L4` allowed; done.** It lists 7 Philippine sources: Mayon, Bulusan, Kanlaon and "Taai" (presumably Taal) **[U]**, plus three power plants (Sual, Masinloc, Mariveles). Per-year values not yet read | the one 1.7 MB file, read with the Earthdata token; nothing else downloaded |
