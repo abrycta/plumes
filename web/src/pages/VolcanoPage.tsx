@@ -105,7 +105,7 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
     <>
       <section aria-labelledby="record-title" className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h2 id="record-title" className="m-0 font-heading text-ak-subsection font-semibold">
+          <h2 id="record-title" className="m-0 font-heading text-2xl font-semibold">
             <T en="Every record on one time axis" ja="すべての記録を一つの時間軸に" />
           </h2>
           <p className="m-0 max-w-prose text-sm text-muted-foreground">
@@ -137,7 +137,7 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
           ) : null}
         </div>
 
-        <div className="sticky top-20 z-10 max-sm:top-28 -mx-ak-gutter border-y border-border bg-background/95 px-ak-gutter py-2 backdrop-blur-sm">
+        <div className="sticky top-[5rem] z-10 max-[639px]:top-[7rem] -mx-ak-gutter border-y border-border bg-background/95 px-ak-gutter py-2 backdrop-blur-sm">
           <div className="grid items-center gap-x-4 gap-y-1 md:grid-cols-[220px_minmax(0,1fr)]">
             <label htmlFor="scrubber" className="text-sm">
               <T en="Day" ja="日付" />: <strong className="tabular">{formatDate(cursor, lang)}</strong>
@@ -172,7 +172,7 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
         </div>
         {absent.length ? (
           <div className="flex flex-col gap-2" data-absent-records>
-            <h3 className="m-0 font-mono text-ak-2xs tracking-wide text-muted-foreground uppercase">{t("Nothing to show, and why", "記録がない系列とその理由")}</h3>
+            <h3 className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{t("Nothing to show, and why", "記録がない系列とその理由")}</h3>
             <dl className="m-0 grid max-w-4xl gap-x-6 gap-y-2 text-sm md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
               {absent.map((a) => (
                 <div key={a.id} className="contents" data-absent={a.id}>
@@ -187,7 +187,7 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
 
       {model.readings.length ? (
         <section aria-labelledby="readings-title" className="flex flex-col gap-4">
-          <h2 id="readings-title" className="m-0 font-heading text-ak-subsection font-semibold">
+          <h2 id="readings-title" className="m-0 font-heading text-2xl font-semibold">
             <T en="What the records show" ja="記録が示すこと" />
           </h2>
           {model.readings.map((r) => (
@@ -218,7 +218,7 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
       ) : null}
 
       <section aria-labelledby="nearby-title" className="flex flex-col gap-3">
-        <h2 id="nearby-title" className="m-0 font-heading text-ak-subsection font-semibold">
+        <h2 id="nearby-title" className="m-0 font-heading text-2xl font-semibold">
           <T en="Who lives nearby" ja="周辺に住む人々" />
         </h2>
         {model.exposure.rings.length ? (
@@ -263,7 +263,7 @@ function EruptionHistory({ model }: { model: VolcanoReadModel }) {
   if (!eruptions.length) return null;
   return (
     <section aria-labelledby="history-title" className="flex flex-col gap-3">
-      <h2 id="history-title" className="m-0 font-heading text-ak-subsection font-semibold">
+      <h2 id="history-title" className="m-0 font-heading text-2xl font-semibold">
         <T en="Eruption history (GVP)" ja="噴火史(GVP)" />
       </h2>
       <details>
@@ -300,7 +300,7 @@ function SourcesForView({ model, f }: { model: VolcanoReadModel | null; f: Featu
   const links = model?.volcano.links;
   return (
     <section aria-labelledby="sources-title" className="flex flex-col gap-3">
-      <h2 id="sources-title" className="m-0 font-heading text-ak-subsection font-semibold">
+      <h2 id="sources-title" className="m-0 font-heading text-2xl font-semibold">
         <T en="Sources for this view" ja="このページの出典" />
       </h2>
       {model ? (
@@ -356,26 +356,23 @@ export default function VolcanoPage({ id }: { id: string }) {
           : t("A satellite and eruption-history record. PHIVOLCS publishes daily bulletins only for observatory volcanoes and during unrest.", "衛星と噴火史の記録。PHIVOLCSの日々の火山情報は観測所のある火山と活動時のみ。")
       }
     >
-      {/* Major sections sit layout.section-gap apart (80px from md, 64px on phones); the facts open the first. */}
-      <div className="grid gap-16 md:gap-ak-section-gap" data-sections>
-        <Facts f={f} model={model} />
-        <DeepTimeStrip volcanoId={p.id} />
-        {model ? (
-          <Record model={model} f={f} />
-        ) : (
-          <>
-            <section className="flex flex-col gap-2 rounded-sm border border-dashed border-border p-4">
-              <p className="m-0">
-                <T en="This data version has no per-volcano record for this volcano yet." ja="このデータ版には、この火山の個別の記録はまだありません。" />
-              </p>
-              <p className="m-0 text-sm text-muted-foreground">
-                <T en="The overview figures above come from the Smithsonian Global Volcanism Program." ja="上の概要はスミソニアン博物館グローバル火山活動プログラムによるものです。" />
-              </p>
-            </section>
-            <SourcesForView model={null} f={f} />
-          </>
-        )}
-      </div>
+      <Facts f={f} model={model} />
+      <DeepTimeStrip volcanoId={p.id} />
+      {model ? (
+        <Record model={model} f={f} />
+      ) : (
+        <>
+          <section className="flex flex-col gap-2 rounded-sm border border-dashed border-border p-4">
+            <p className="m-0">
+              <T en="This data version has no per-volcano record for this volcano yet." ja="このデータ版には、この火山の個別の記録はまだありません。" />
+            </p>
+            <p className="m-0 text-sm text-muted-foreground">
+              <T en="The overview figures above come from the Smithsonian Global Volcanism Program." ja="上の概要はスミソニアン博物館グローバル火山活動プログラムによるものです。" />
+            </p>
+          </section>
+          <SourcesForView model={null} f={f} />
+        </>
+      )}
     </Page>
   );
 }

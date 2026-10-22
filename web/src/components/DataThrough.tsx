@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/dates";
 export function DataThrough({ date, className }: { date: string; className?: string }) {
   const { lang } = useLang();
   return (
-    <span data-data-through className={className ?? "font-mono text-ak-2xs tracking-wide text-muted-foreground uppercase"}>
+    <span data-data-through className={className ?? "font-mono text-[11px] tracking-wide text-muted-foreground uppercase"}>
       <T en="Data through" ja="データの最終日" /> <time dateTime={date}>{formatDate(date, lang)}</time>
     </span>
   );
