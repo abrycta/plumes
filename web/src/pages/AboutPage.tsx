@@ -104,8 +104,8 @@ export default function AboutPage() {
           <li>
             <strong>{t("Gaps", "欠測")}</strong>:{" "}
             <T
-              en="Each series starts when its instrument does. A day without a valid observation is a gap, never a zero; before an instrument's start the record says “not observed”."
-              ja="各系列は観測機器の開始日から始まります。有効な観測のない日は欠測でありゼロではなく、観測開始前は「観測前」と表示します。"
+              en="Each series starts when its instrument does. A day without a valid observation is a gap, never a zero; before an instrument's start and after the last day its record covers, it says “not observed”."
+              ja="各系列は観測機器の開始日から始まります。有効な観測のない日は欠測でありゼロではなく、観測開始前と記録の最終日より後は「観測なし」と表示します。"
             />
           </li>
           <li>

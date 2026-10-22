@@ -39,7 +39,7 @@ BUNDLES = {
     "omi-omso2e": sorted(Path(p) for p in glob.glob(str(TABLES / "omi-so2" / "*.csv"))),
     "s5p-offl-so2": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-so2" / "*.csv")) + glob.glob(str(TABLES / "ee-so2-monthly" / "*.tif"))),
     "gpm-imerg-v07": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-rain" / "*.csv"))),
-    "modis-mod14a1": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-fire" / "*.csv"))),
+    "modis-mod14a1": sorted(Path(p) for g in ("*.csv", "*.coverage.json") for p in glob.glob(str(TABLES / "ee-fire" / g))),
     "worldpop-100m": [TABLES / "ee-exposure.csv"],
     "s2-sr-harmonized": sorted(Path(p) for p in glob.glob(str(BUILD / "assets" / "*")) + glob.glob(str(TABLES / "ee-lakes2" / "*.csv"))),
     "landsat-surface-temperature": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-laketemp" / "*.csv"))),

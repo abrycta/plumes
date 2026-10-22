@@ -156,6 +156,8 @@ export interface SparseSeries {
   ringKm?: number;
   /** First day the instrument could report. */
   start?: ISODate;
+  /** Last day the source covers: later days are not observed, never "nothing detected". */
+  end?: ISODate;
   rows: [ISODate, ...(number | string | null)[]][];
   note?: LocalText;
 }

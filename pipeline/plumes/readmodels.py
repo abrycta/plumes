@@ -22,7 +22,7 @@ import subprocess
 
 import yaml
 
-from plumes import comet, deeptime, omi, run_a, run_b, thermal_n20
+from plumes import comet, coverage, deeptime, omi, run_a, run_b, thermal_n20
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
@@ -208,7 +208,9 @@ FIRE_SERIES = {"modis-mod14a1": ("frp_modis_15km", lt("MODIS (Terra) max fire ra
                "firms-modis": ("fire_firms_15km", lt("FIRMS MODIS fire detections within 15 km", "FIRMS MODIS 熱異常検知(15 km圏)"), "2000-11-01")}
 
 
-def fire_series(vid: str, fire: list[dict]) -> dict:
+def fire_series(vid: str, fire: list[dict], ends: dict[str, str] | None = None) -> dict:
+    """Sparse daily rows per fire source; `end` is the last day the source covers (plumes.coverage.fire_ends), so days
+    after it read as not observed, never as "nothing detected"."""
     out = {}
     note = lt("Thermal anomalies include vegetation fires; a detection is not proof of volcanic heat.", "熱異常には植生火災も含まれ、検知が火山の熱を意味するとは限らない。")
     for src, (sid, label, start) in FIRE_SERIES.items():
@@ -219,6 +221,8 @@ def fire_series(vid: str, fire: list[dict]) -> dict:
         else:
             out[sid] = {"source": [src], "label": label, "cols": ["date", "maxFrpMw", "n"], "units": {"maxFrpMw": "MW", "n": "pixels"}, "ringKm": 15, "start": start,
                         "rows": [[r["date"], round(float(r["max_frp_mw"]), 1) if r["max_frp_mw"] else None, int(float(r["n"]))] for r in rs], "note": note}
+        if ends and src in ends:
+            out[sid]["end"] = ends[src]
     return out
 
 
@@ -432,6 +436,13 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
 
 # ---------------------------------------------------------------- layers
 
+def thermal_time(by_year: dict[str, list], as_of: str) -> dict:
+    """The months the detections cover: from the first month with a detection (MODIS starts in 2000-11, not with its
+    yearly file) to the last one, never past the data date, so the map shows no zero months outside the record."""
+    days = [r["acq_date"] for rs in by_year.values() for _, r in rs]
+    return {"step": "month", "start": min(days)[:7], "end": min(max(days)[:7], as_of[:7])}
+
+
 def thermal_layers(out_dir, as_of: str) -> dict | None:
     """National FIRMS detections (area API) as one PMTiles per year, a `month` property for the scrubber."""
     if not shutil.which("tippecanoe"):
@@ -467,7 +478,7 @@ def thermal_layers(out_dir, as_of: str) -> dict | None:
         return None
     return {"id": "thermal-detections", "title": lt("Thermal detections (NASA FIRMS)", "熱異常検知(NASA FIRMS)"), "format": "pmtiles",
             "url": "layers/thermal/{year}.pmtiles", "sourceLayer": "thermal",
-            "time": {"step": "month", "start": f"{years[0]}-01", "end": as_of[:7]}, "minzoom": 4, "maxzoom": 10, "bounds": [116, 4, 128, 22],
+            "time": thermal_time(by_year, as_of), "minzoom": 4, "maxzoom": 10, "bounds": [116, 4, 128, 22],
             "properties": {"month": "YYYY-MM", "date": "acquisition date", "frp": "MW", "sensor": "FIRMS product", "type": "FIRMS type: 0 vegetation fire, 1 active volcano, 2 other static source, 3 offshore"},
             "sources": ["firms-modis", "firms-viirs-noaa20"], "attribution": " ".join(" ".join(REG[i]["attribution"].split()) for i in ("firms-modis", "firms-viirs-noaa20")),
             "note": lt("All thermal detections in the Philippines, most of them vegetation fires; filter by type = 1 for FIRMS's active-volcano flag.",
@@ -567,6 +578,7 @@ def build(version: int, as_of: str) -> dict:
     msvol = json.loads((RAW / "nasa-msvolso2l4" / "philippines.json").read_text())["rows"]
     bulletins, vaac, dromic, usgs = load_bulletins(), load_vaac(), load_dromic(), load_usgs()
     so2, fire = load_ee("so2"), load_ee("fire")
+    fire_end = coverage.fire_ends(TABLES / "ee-fire", fire)
     expo = rows(TABLES / "ee-exposure.csv")
     lgus = rows(RAW / "cod-ab" / "phl_admin3.csv")
     fprov = file_provenance()
@@ -581,7 +593,7 @@ def build(version: int, as_of: str) -> dict:
                  | ({"gvp": f"https://volcano.si.edu/volcano.cfm?vn={v['gvpNumber']}"} if v["gvpNumber"] else {})},
               "span": {"start": SPAN_START, "end": as_of},
               "daily": {**so2_series(v["id"], so2, as_of), **omi_so2.get(v["id"], {})},
-              "events": {**fire_series(v["id"], fire), **n20.get(v["id"], {}), **eq_series(v, usgs), **defo.get(v["id"], {})},
+              "events": {**fire_series(v["id"], fire, fire_end), **n20.get(v["id"], {}), **eq_series(v, usgs), **defo.get(v["id"], {})},
               "bulletins": {"source": ["phivolcs-bulletins", "phivolcs-lava-bulletins"], "authority": "DOST-PHIVOLCS",
                             "cols": ["date", "alertLevel", "volcanicEq", "tremor", "so2FluxTpd", "so2FluxDate", "plumeM", "deformation", "url"],
                             "rows": list(b.values()),

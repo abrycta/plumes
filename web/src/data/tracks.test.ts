@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { VolcanoReadModel } from "@contracts/readmodels";
 
 import { periodsOf } from "./periods";
-import { absentRecords, buildTracks, compact, dayOf, pickByRing, readAt, ringOptions, tracksForStep } from "./tracks";
+import { absentRecords, buildTracks, compact, dayOf, eventsTrack, pickByRing, readAt, ringOptions, tracksForStep } from "./tracks";
 
 const taal = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../../contracts/fixtures/data/v0/volcano/taal.json"), "utf8")) as VolcanoReadModel;
 
@@ -92,5 +92,32 @@ describe("absentRecords", () => {
     expect(absent.find((a) => a.id === "advisories")!.reason.en).toContain("GVP number");
     expect(absent.find((a) => a.id === "eq_usgs_30km")!.reason.en).toMatch(/^Nothing detected within 30 km from /);
     expect(absentRecords(taal, buildTracks(taal, 15)).map((a) => a.id)).not.toContain("bulletins");
+  });
+});
+
+describe("fire series that end before the data date (partial coverage)", () => {
+  const s = {
+    source: ["modis-mod14a1"],
+    label: { en: "MODIS", ja: "MODIS" },
+    cols: ["date", "maxFrpMw", "n"] as ["date", ...string[]],
+    units: { maxFrpMw: "MW", n: "pixels" },
+    ringKm: 15,
+    start: "2000-11-01",
+    end: "2026-08-10",
+    rows: [["2026-08-01", 4.2, 1]] as [string, ...(number | null)[]][],
+  };
+
+  it("reads days after the last covered day as not observed, never as nothing detected", () => {
+    const t = eventsTrack("frp_modis_15km", s);
+    expect(readAt(t, "2026-08-05").status).toBe("nothing-detected");
+    expect(readAt(t, "2026-08-11").status).toBe("not-observed");
+    expect(readAt(t, "2026-09-20").status).toBe("not-observed");
+  });
+
+  it("says an empty series was checked only up to its last covered day", () => {
+    const empty = { ...taal, dataAsOf: "2026-10-22", events: { frp_modis_15km: { ...s, rows: [] } } } as VolcanoReadModel;
+    const reason = absentRecords(empty, buildTracks(empty, 15)).find((a) => a.id === "frp_modis_15km")!.reason.en;
+    expect(reason).toContain("to 10 Aug 2026.");
+    expect(reason).not.toContain("22 Oct 2026");
   });
 });

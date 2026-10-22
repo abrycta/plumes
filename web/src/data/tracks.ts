@@ -35,7 +35,7 @@ export interface Track {
   ringKm?: number;
   /** First day the instrument could report: before it, "not observed"; after it, an empty day means "nothing detected". */
   start?: string;
-  /** Last day covered by a daily series (start + length - 1). */
+  /** Last day the series covers: a daily series' last value, a sparse series' coverage end (later days are not observed). */
   end?: string;
   points: TrackPoint[];
   coverage: "per-day" | "not-reported" | "not-applicable";
@@ -181,7 +181,8 @@ export function eventsTrack(id: string, s: SparseSeries): Track {
     id,
     group: groupOf(id),
     kind: line ? "line" : "bars",
-    ...(line && s.rows.length ? { end: s.rows[s.rows.length - 1]![0] } : {}),
+    // A line ends at its last acquisition; bars end where the source's coverage ends (later days are not observed).
+    ...(line && s.rows.length ? { end: s.rows[s.rows.length - 1]![0] } : !line && s.end ? { end: s.end } : {}),
     title: s.label,
     instrument: instrumentOf(s.source),
     unit: s.units[valueCol] ?? "",
@@ -363,7 +364,7 @@ export function readAt(track: Track, date: string): Reading {
   const p = track.points.find((x) => x.date === date);
   if (p) return { status: "value", point: p };
   if (track.kind === "bars") {
-    if (track.start && d < toDay(track.start)) return { status: "not-observed" };
+    if ((track.start && d < toDay(track.start)) || (track.end && d > toDay(track.end))) return { status: "not-observed" };
     return { status: "nothing-detected" };
   }
   return { status: "no-report" };
@@ -451,8 +452,8 @@ export function absentRecords(model: VolcanoReadModel, tracks: Track[]): AbsentR
         id: t.id,
         title: t.title,
         reason: {
-          en: `Nothing detected${t.ringKm ? ` within ${t.ringKm} km` : ""} from ${formatDate(t.start ?? model.span.start, "en")}, when the instrument record starts, to ${formatDate(asOf, "en")}.`,
-          ja: `観測記録の始まる${formatDate(t.start ?? model.span.start, "ja")}から${formatDate(asOf, "ja")}まで、${t.ringKm ? `${t.ringKm} km圏で` : ""}検知なし。`,
+          en: `Nothing detected${t.ringKm ? ` within ${t.ringKm} km` : ""} from ${formatDate(t.start ?? model.span.start, "en")}, when the instrument record starts, to ${formatDate(t.end ?? asOf, "en")}.`,
+          ja: `観測記録の始まる${formatDate(t.start ?? model.span.start, "ja")}から${formatDate(t.end ?? asOf, "ja")}まで、${t.ringKm ? `${t.ringKm} km圏で` : ""}検知なし。`,
         },
       });
   return out;

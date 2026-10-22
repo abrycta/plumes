@@ -63,7 +63,10 @@ function TrackPlot({ track, s, from, to, cursor, lang, highlight }: { track: Tra
   if (track.kind === "line" && track.start && track.end) {
     if (toDay(track.start) > fromD) cover.push([fromD, Math.min(toDay(track.start), toD + 1)]);
     if (toDay(track.end) < toD) cover.push([Math.max(toDay(track.end) + 1, fromD), toD + 1]);
-  } else if (track.kind === "bars" && track.start && toDay(track.start) > fromD) cover.push([fromD, Math.min(toDay(track.start), toD + 1)]);
+  } else if (track.kind === "bars") {
+    if (track.start && toDay(track.start) > fromD) cover.push([fromD, Math.min(toDay(track.start), toD + 1)]);
+    if (track.end && toDay(track.end) < toD) cover.push([Math.max(toDay(track.end) + 1, fromD), toD + 1]);
+  }
   if (highlight) {
     const a = Math.max(toDay(highlight[0]), fromD);
     const b = Math.min(toDay(highlight[1]), toD);
