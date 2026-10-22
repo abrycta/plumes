@@ -151,3 +151,13 @@ Kurt's answers to the 11 open questions of [STORIES-PLAN.md](STORIES-PLAN.md) (w
 | ST10 | **GDACS is not used at all**, not even its GLIDE ids as links | its content is an alert colour from a warning system |
 | ST11 | **`pdfplumber` may be added to the pipeline** for the DROMIC PDF reports | DROMIC generalised to 16 events |
 | P1 | **The Plumes phone embed stays Luzon–Visayas with the data layers** | Kurt, 2026-10-22 |
+
+## 2026-10-23: story drafts ST12 to ST14
+
+Kurt's decisions on the first generated drafts (Kanlaon 2024 and Taal 2020, PR #27).
+
+| # | Decision | Note |
+|---|---|---|
+| ST12 | **A generated step renders as a list, one short line per fact** (and one per missing-record line), not as a paragraph | compact, workspace rule 28; hand-built steps keep their paragraph |
+| ST13 | **No "people nearby" sentence in stories** (template POP-RING removed, with the population-ring override) | the volcano page already shows the WorldPop rings |
+| ST14 | **The Japanese templates keep the plain form** (〜した／だった), as in the reviewed Taal text | not です・ます |

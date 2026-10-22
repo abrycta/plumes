@@ -47,7 +47,7 @@ The shortlist adds these families:
 - Tokyo VAAC 2006–2009;
 - COMET deformation.
 
-Context that is always present does not count: population, imagery and winds.
+Context that is always present does not count: population, imagery and winds. (Population is not a story sentence at all: ST13.)
 
 - **Story-worthy:** at least 4 fact families, with at least one sentence in each of before, onset and after.
 - **Rich:** at least 6 families, at least 2 of them event records (alert, bulletin numbers, VAAC, DROMIC, GVP Weekly, HazEL).
@@ -153,7 +153,7 @@ Nothing was archived and no data job was run.
    - **Reading** (story-worthy fails, but at least 2 families): one paragraph on the volcano page. This is today's `readings` model, built from the same templates.
    - **Deep-time card** (before 2000): GVP dates with their uncertainty, VEI, and HazEL impacts where they match. No steps.
 4. **Order of generation:** by score (families), then VEI, then most recent first. Kanlaon 2024 comes first (Q29, M1.1).
-5. **Overrides** are data, never prose. A small `pipeline/stories/overrides.yaml` may pin an event's span or step boundaries (Taal keeps 1 December 2019 → 31 March 2020), a population ring (Taal: 14 km), or a scene id. Each override carries a reason line.
+5. **Overrides** are data, never prose. A small `pipeline/stories/overrides.yaml` may pin an event's span or step boundaries (Taal keeps 1 December 2019 → 31 March 2020) or a scene id. (The population-ring pin went with POP-RING, ST13.) Each override carries a reason line.
 
 ### B2. Step structure: before → onset → course → after
 
@@ -186,7 +186,7 @@ The catalogue is a file (`pipeline/stories/templates.yaml`), versioned. Each ent
 
 Placeholders are typed (`date`, `range`, `week`, `int`, `num1`, `fl`, `level`, `km`, `name`). **No free text from any source ever enters a sentence:** weekly-report prose is parsed to typed values, and the prose itself is never quoted.
 
-**Wording rules**
+**Wording rules** (a generated step renders as a list, one line per sentence, ST12; Japanese stays in the plain form, ST14)
 - Dates: EN "12 January 2020", JA 「2020年1月12日」. Ranges: EN "1 to 11 January 2020", JA 「2020年1月1日から11日まで」. Weeks: EN "15–21 January 2020", JA 「2020年1月15日〜21日」. No ISO dates in text. Bulletin times: EN "7:30 PM", JA 「午後7時30分」.
 - Numbers: EN thousands separator "4,057"; JA keeps the comma 「4,057人」. One decimal only where the source has one. A typographic minus "−" (`neg()`). Shares go through `share_txt()`, so a non-zero share never rounds to 0 %.
 - Units: µmol/m², km, m, MW, kt, mm. Flight levels always carry a gloss: EN "FL550 (about 16.8 km)", JA 「FL550（約16.8 km）」.
@@ -231,7 +231,6 @@ Placeholders are typed (`date`, `range`, `week`, `int`, `num1`, `fl`, `level`, `
 | DEFORM-LOS | before, after | `los_comet_<frame>` | COMET's Sentinel-1 record shows {x} mm of movement {toward/away from} the satellite along its line of sight from {d1} to {d2}. | COMETのSentinel-1記録では、{d1}から{d2}までに視線方向で{x} mm（衛星に{近づく/遠ざかる}向き）の変位があった。 |
 | RAIN-TOTAL | any (ST9) | IMERG daily sums within 15 km, every day of the step present | GPM IMERG estimates {x} mm of rain within 15 km from {d1} to {d2}. | GPM IMERGの推定では、{d1}から{d2}までに15 km圏で{x} mmの雨が降った。 |
 | RAIN-WETTEST | course, after | as above, and the step has at least one day of 1 mm or more | The wettest day in this period was {date}, with {x} mm. | この期間で最も雨が多かったのは{date}で、{x} mmだった。 |
-| POP-RING | after | exposure ring (default 10 km; override allowed) | WorldPop estimates {n} people lived within {r} km in {year}. | WorldPopの推計では{year}年に{r} km圏内に{n}人が住んでいた。 |
 | IMAGE-CAPTION | before, after | a chosen scene (§B5) | {sensor}, {date} | {sensor}、{date} |
 
 Today's Taal "crater" step text ("the main crater lake on Volcano Island drained during the eruption") is a hand-written observation. **Kurt chose (ST4)** to source it from the weekly report for 15–21 January 2020 ("Satellite images showed that the Main Crater lake was gone"): the extractor gets a `lake_gone` rule, and the step renders WEEKLY-LAKE-GONE beside the Sentinel-2 captions. The reviewed text therefore changes once, and Kurt reviews it again.
@@ -296,7 +295,7 @@ All changes are additive; v2 files stay valid. They land in one contract PR, app
 ### B8. How `story_taal()` becomes the first instance
 
 1. Move the helpers `date_en`, `date_ja`, `fl_gloss`, `neg`, `share_txt`, `ja_leftovers` and `wp_slug_meta` unchanged into `pipeline/plumes/stories/text.py`.
-2. Express each Taal sentence as a catalogue template: ALERT-HELD, SO2-BASELINE (Taal's December median plus the 1–11 January range is a two-clause variant), EQ-QUIET, ALERT-RAISED with the bulletin time, VAAC-MAX, GVP-VEI, DROMIC-AFFECTED and POP-RING with the 14 km override.
+2. Express each Taal sentence as a catalogue template: ALERT-HELD, SO2-BASELINE (Taal's December median plus the 1–11 January range is a two-clause variant), EQ-QUIET, ALERT-RAISED with the bulletin time, VAAC-MAX, GVP-VEI, and DROMIC-AFFECTED. (Today's "WorldPop … within 14 km" sentence has no template: POP-RING was dropped, ST13.)
 3. Add a golden test: the generic generator, run on v2 data with Taal's overrides, renders `taal-2020` **byte for byte** like today's reviewed story, apart from the crater-step change Kurt chose (ST4, §B3) and the new additive fields. When the test passes, `story_taal()` is deleted and `build()` calls `generate_stories()`.
 4. The Taal reading on the volcano page is generated the same way. Its "within hours" phrase is not data-derived, so it becomes ALERT-RAISED's wording, after Kurt's review.
 
