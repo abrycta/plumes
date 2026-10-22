@@ -16,7 +16,6 @@ import {
 } from "@abrycta/akari/react";
 import { use, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
-import { COMPACT_PAGE } from "@/app/layout";
 import type { Story, StoryStep, VolcanoReadModel } from "@contracts/readmodels";
 
 import { AppLink } from "@/app/Link";
@@ -134,7 +133,6 @@ function StoryView({ story }: { story: Story }) {
   if (!model) return <NotFoundPage />;
   return (
     <Page
-      className={COMPACT_PAGE}
       eyebrow={
         <Breadcrumb>
           <BreadcrumbList>

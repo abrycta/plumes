@@ -1,7 +1,6 @@
 import { Alert, AlertDescription, AlertTitle, Page, useLang, useT } from "@abrycta/akari/react";
 import { use, useEffect } from "react";
 
-import { COMPACT_PAGE } from "@/app/layout";
 import { AppLink } from "@/app/Link";
 import { DraftBadge } from "@/components/FigureList";
 import { useUrlState } from "@/app/url";
@@ -32,7 +31,7 @@ export default function StoriesPage() {
     document.title = `${t("Stories", "ストーリー")} · Plumes`;
   }, [t]);
   return (
-    <Page className={COMPACT_PAGE} title={t("Stories", "ストーリー")} lede={t("Past eruptions told step by step, every number linked to its source and date.", "過去の噴火を一歩ずつ。すべての数値に出典と日付のリンク付き。")}>
+    <Page title={t("Stories", "ストーリー")} lede={t("Past eruptions told step by step, every number linked to its source and date.", "過去の噴火を一歩ずつ。すべての数値に出典と日付のリンク付き。")}>
       {preview ? (
         <Alert data-stories-preview>
           <AlertTitle>{t("Preview", "プレビュー")}</AlertTitle>

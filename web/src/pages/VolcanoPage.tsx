@@ -14,7 +14,6 @@ import {
 } from "@abrycta/akari/react";
 import { use, useEffect, useMemo } from "react";
 
-import { COMPACT_PAGE } from "@/app/layout";
 import type { VolcanoReadModel, VolcanoesIndex } from "@contracts/readmodels";
 
 import { AppLink, ExtLink } from "@/app/Link";
@@ -343,7 +342,6 @@ export default function VolcanoPage({ id }: { id: string }) {
   const p = f.properties;
   return (
     <Page
-      className={COMPACT_PAGE}
       eyebrow={<Breadcrumbs name={p.name[lang]} />}
       title={
         <>
