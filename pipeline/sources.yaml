@@ -537,6 +537,31 @@ sources:
         probe_contains: "sentinel-1"
     archived: { enabled: false }
 
+  - id: gpm-imerg-v07
+    # chosen: true   # source 18 of 24, M2 (DECISIONS.md Q30; LAYERS-PLAN.md §7 step 7, L4)
+    description: >-
+      [M2] NASA GPM IMERG V07 precipitation (NASA/GPM_L3/IMERG_V07 on Earth Engine: half-hourly, 0.1 degree, 1998
+      onward), Final run only (image property status = "permanent"; the Late/Early "provisional" images are skipped),
+      reduced in Earth Engine to daily rain (mm, UTC day) per volcano 15 km ring by plumes.ee_run_b: the lahar-context
+      rainfall track `rain_imerg_15km`. The Final run ended 2025-09-30 on both routes when checked (2026-10-22).
+      Access: Earth Engine; second route GES DISC daily Final files (GPM_3IMERGDF) via CMR. Format: EE ImageCollection;
+      output CSV per month. Size: 24 volcanoes x about 9,400 days, under 3 MB of rows [U]. Auth: Earth Engine service
+      account (GES DISC needs the Earthdata login).
+    kind: remote-dataset
+    licence: "open: CC0 ('All NASA-produced data from the GPM mission is made freely available for the public to use.')"
+    attribution: "Huffman, G.J. et al. (2019), GPM IMERG Final Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07, GES DISC, doi:10.5067/GPM/IMERG/3B-HH/07. Processed in Google Earth Engine."
+    cadence: half-hourly; Final run months behind
+    links:
+      - id: earth-engine
+        url: ee://NASA/GPM_L3/IMERG_V07
+        probe: https://earthengine-stac.storage.googleapis.com/catalog/NASA/NASA_GPM_L3_IMERG_V07.json
+        probe_contains: "IMERG"
+      - id: gesdisc-daily
+        url: https://cmr.earthdata.nasa.gov/search/granules.json?collection_concept_id=C2723754864-GES_DISC
+        probe: https://cmr.earthdata.nasa.gov/search/collections.json?short_name=GPM_3IMERGDF&version=07
+        probe_contains: "GPM_3IMERGDF"
+    archived: { enabled: false }
+
   - id: dswd-dromic-reports
     # chosen: true   # source 12 of 24, M1 (DECISIONS.md Q30)
     description: >-

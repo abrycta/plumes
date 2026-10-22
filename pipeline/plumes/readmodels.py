@@ -23,6 +23,7 @@ import subprocess
 
 import yaml
 
+from plumes import run_b
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
@@ -636,6 +637,7 @@ def build(version: int, as_of: str) -> dict:
                       "properties": {"id": v["id"], "name": v["name"], "gvpNumber": v["gvpNumber"], "elevationM": v["elevationM"], "observatory": v["observatory"],
                                      "coverage": v["coverage"], "lastEruption": {"start": last["start"], "vei": last["vei"]} if last else None,
                                      "eruptionsSince1900": sum(y >= 1900 for y in yr), "eruptionsSince2000": sum(y >= 2000 for y in yr), "file": f"volcano/{v['id']}.json"}})
+    run_b.apply(models, load_ee("rain"), REG)  # EE run B: IMERG rain (only once its tables exist)
     story, reading = story_taal(next(v for v in vols if v["id"] == "taal"), models["taal"], as_of, hdr)
     models["taal"]["readings"] = [reading]
     for vid, vm in models.items():
@@ -648,7 +650,8 @@ def build(version: int, as_of: str) -> dict:
     (v_dir / "assets").mkdir(exist_ok=True)
     for a in story["steps"][3]["assets"]:
         shutil.copy(BUILD / a["url"], v_dir / a["url"])
-    layers = [x for x in (thermal_layers(v_dir, as_of), quake_layer(v_dir, usgs)) if x]
+    so2_map = run_b.so2_monthly_layer(TABLES, v_dir, " ".join(REG["s5p-offl-so2"]["attribution"].split()))
+    layers = [x for x in (thermal_layers(v_dir, as_of), quake_layer(v_dir, usgs), so2_map) if x]
     (v_dir / "layers.json").write_text(json.dumps({**hdr, "kind": "layers", "layers": layers}, ensure_ascii=False))
     checks = run_checks(v_dir, vols, models, gvp_v, gvp_e)
     passed = all(c["passed"] for c in checks)
