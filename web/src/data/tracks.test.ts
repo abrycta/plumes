@@ -48,9 +48,9 @@ describe("buildTracks (Taal fixture)", () => {
     expect(p.value).toBe(550);
   });
 
-  it("orders groups: alert, earthquakes, SO2, heat, eruptions, ash, people", () => {
+  it("orders groups: alert, earthquakes, SO2, heat, ground motion, eruptions, ash, people", () => {
     const order = [...new Set(tracks.map((t) => t.group))];
-    expect(order).toEqual(["alert", "earthquakes", "so2", "thermal", "eruptions", "ash", "people"]);
+    expect(order).toEqual(["alert", "earthquakes", "so2", "thermal", "deformation", "eruptions", "ash", "people"]);
   });
 
   it("picks one series per family by ring", () => {

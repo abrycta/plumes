@@ -36,6 +36,76 @@
     "en": "Fixture holds the Taal box only. Published versions use PMTiles with the same id.",
     "ja": "フィクスチャはタール周辺のみ。公開版は同じIDのPMTiles。"
    }
+  },
+  {
+   "id": "deformation-velocity",
+   "title": {
+    "en": "Ground motion, line of sight (COMET LiCSBAS)",
+    "ja": "地表変位・衛星視線方向(COMET LiCSBAS)"
+   },
+   "format": "cog",
+   "url": "layers/deformation/{frame}.tif",
+   "time": {
+    "step": "none",
+    "start": "2014-10-19",
+    "end": "2026-08-12"
+   },
+   "minzoom": 7,
+   "bounds": [
+    120.741,
+    13.749,
+    121.245,
+    14.255
+   ],
+   "legend": {
+    "unit": "mm/yr",
+    "stops": [
+     [
+      -55,
+      "≤ −55"
+     ],
+     [
+      0,
+      "0"
+     ],
+     [
+      55,
+      "≥ 55"
+     ]
+    ]
+   },
+   "properties": {
+    "value": "mean line-of-sight velocity, mm/yr x 10 (Int16; nodata -32768); positive = toward the satellite"
+   },
+   "sources": [
+    "comet-licsbas"
+   ],
+   "attribution": "COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data 2014–2026. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
+   "frames": [
+    {
+     "id": "taal-032D_07536_111313",
+     "volcanoId": "taal",
+     "track": 32,
+     "pass": "descending",
+     "bounds": [
+      120.74148,
+      13.74947,
+      121.24452,
+      14.25453
+     ],
+     "reference": [
+      121.147,
+      14.08
+     ],
+     "start": "2014-10-19",
+     "end": "2026-08-12",
+     "dates": 374
+    }
+   ],
+   "note": {
+    "en": "Mean ground velocity along the satellite's line of sight over each frame's whole span, not a hazard map. Ascending and descending frames see the same ground differently; neither is uplift or subsidence by itself. Grey = no measurable motion. Processed by COMET, not by Plumes. Fixture: the Taal frame 032D only.",
+    "ja": "各フレームの全期間における衛星視線方向の平均変位速度で、ハザードマップではない。北行と南行の軌道では同じ地表の見え方が異なり、どちらもそれだけで隆起や沈降とは言えない。灰色は測定できる動きがないことを示す。解析はCOMETによる(Plumesではない)。フィクスチャはタールの032Dフレームのみ。"
+   }
   }
  ]
 }

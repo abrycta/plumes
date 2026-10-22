@@ -726,5 +726,39 @@ sources:
         url: https://global-surface-water.appspot.com/download
         probe_html: true
         probe_contains: "Global Surface Water"
+
+  # ------------------------------------------------------------------ ground deformation (M2 step 9; LAYERS-PLAN §3.1)
+  - id: comet-licsbas
+    # chosen: true   # M2 (DECISIONS L1a, L2, L3, L3a)
+    description: >-
+      [M2] COMET Volcano Portal (University of Leeds): ready-made GACOS-corrected LiCSBAS time series per volcano and
+      Sentinel-1 frame, 100 x 100 pixels (about 50 x 55 km) around the volcano, one JSON per frame
+      (https://comet-volcanodb.org/data/disp_data_gacos/southeast_asia/<volcano>_<frame>_web_x100.json; frame list in
+      volcanoes_frames.js). 18 of the 24 volcanoes, 31 frames on 2026-10-22 (Taal 032D_07536_111313: 374 dates,
+      2014-10-19 -> 2026-08-12). Reduced by plumes.comet to a summit-minus-reference LOS series per frame and one
+      Int16 velocity GeoTIFF per frame (the deformation-velocity layer). The weekly run re-downloads only frames whose
+      Last-Modified changed. Format: JSON. Size: 4.6-32 MB per frame, about 0.6 GB in all. Auth: none.
+    kind: update-input
+    licence: >-
+      noncommercial-only: the COMET Volcano Portal's CC BY-NC 4.0 notice, treated as covering the LiCSBAS data
+      (DECISIONS L1a, no email); LiCSAR is a derived work of Copernicus Sentinel data (free, full and open).
+      Published with attribution and the CC BY-NC 4.0 notice and link (https://creativecommons.org/licenses/by-nc/4.0/).
+    attribution: >-
+      COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus
+      Sentinel data [years]. CC BY-NC 4.0. Lazecky, M. et al. (2020), Remote Sensing 12(15), 2430; Morishita, Y. et al.
+      (2020), Remote Sensing 12(3), 424; Yu, C. et al. (2018), GACOS.
+    cadence: rebuilt by COMET every few weeks to months per frame
+    links:
+      - id: portal-gacos
+        url: https://comet-volcanodb.org/data/disp_data_gacos/southeast_asia/
+        probe: https://comet-volcanodb.org/data/volcanoes_frames/volcanoes_frames.js
+        probe_contains: "032D_07536_111313"
+      - id: portal-uncorrected               # the same series without the GACOS correction: a different product
+        url: https://comet-volcanodb.org/data/disp_data/southeast_asia/
+        automatic: false
+      - id: licsar-jasmin                    # the LiCSAR interferograms behind the series (health check only)
+        url: https://gws-access.jasmin.ac.uk/public/nceo_geohazards/LiCSAR_products/
+        probe: https://gws-access.jasmin.ac.uk/public/nceo_geohazards/LiCSAR_products/32/032D_07536_111313/metadata/metadata.txt
+        probe_contains: "032D_07536_111313"
         automatic: false
     archived: { enabled: false }

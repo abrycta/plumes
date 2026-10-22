@@ -25,6 +25,8 @@ ee = ["earthengine-api>=1.6"]
 publish = ["huggingface-hub>=0.35"]
 # ERA5 range reads (ARCO-ERA5 Blosc blocks)
 era5 = ["numpy>=2.3", "lz4>=4.4", "numcodecs>=0.15"]
+# COMET LiCSBAS series and the deformation-velocity layer (plumes.comet)
+comet = ["numpy>=2.3"]
 
 [tool.uv]
 default-groups = ["dev"]

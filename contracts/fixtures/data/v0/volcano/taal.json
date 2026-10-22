@@ -325,6 +325,81 @@
      4.5
     ]
    ]
+  },
+  "los_comet_032D_07536_111313": {
+   "source": [
+    "comet-licsbas"
+   ],
+   "label": {
+    "en": "Ground motion along the satellite's line of sight, Sentinel-1 track 32 descending (COMET LiCSBAS)",
+    "ja": "衛星視線方向の地表変位(Sentinel-1 トラック32・南行軌道、COMET LiCSBAS)"
+   },
+   "cols": [
+    "date",
+    "los_mm",
+    "los_std_mm"
+   ],
+   "units": {
+    "los_mm": "mm",
+    "los_std_mm": "mm"
+   },
+   "start": "2014-10-19",
+   "rows": [
+    [
+     "2019-12-04",
+     3.7,
+     59.4
+    ],
+    [
+     "2019-12-16",
+     6.8,
+     64.4
+    ],
+    [
+     "2019-12-28",
+     6.4,
+     62.4
+    ],
+    [
+     "2020-01-09",
+     11.1,
+     60.7
+    ],
+    [
+     "2020-01-15",
+     70.1,
+     76.6
+    ],
+    [
+     "2020-01-21",
+     41.7,
+     68.1
+    ],
+    [
+     "2020-01-27",
+     55.6,
+     67.1
+    ],
+    [
+     "2020-02-02",
+     66.7,
+     66.4
+    ],
+    [
+     "2020-02-08",
+     84.2,
+     65.1
+    ],
+    [
+     "2020-02-14",
+     68.1,
+     66.2
+    ]
+   ],
+   "note": {
+    "en": "Summit area (pixels within 2 km) minus COMET's reference area, relative to the first date. Positive = toward the satellite, negative = away; line-of-sight motion mixes vertical and east-west movement, so it is not uplift or subsidence by itself. los_std_mm is the spread of the summit pixels, not a formal error. Processed by COMET, not by Plumes. COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data 2014–2026. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
+    "ja": "山頂付近(2 km以内の画素)からCOMETの参照域を差し引いた値で、初回観測日を基準とする。正は衛星に近づく向き、負は遠ざかる向き。視線方向の変位は上下と東西の動きを含むため、それだけで隆起や沈降とは言えない。los_std_mm は山頂付近の画素のばらつきで、正式な誤差ではない。解析はCOMETによる(Plumesではない)。COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data 2014–2026. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+   }
   }
  },
  "bulletins": {
@@ -1178,6 +1253,13 @@
     "id": "worldpop-100m",
     "attribution": "WorldPop (www.worldpop.org, School of Geography and Environmental Science, University of Southampton) and CIESIN, Columbia University. Processed in Google Earth Engine.",
     "licence": "open: CC BY 4.0",
+    "snapshotDate": "2026-10-21",
+    "fromArchive": false
+   },
+   {
+    "id": "comet-licsbas",
+    "attribution": "COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data 2014–2026. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
+    "licence": "noncommercial-only: COMET Volcano Portal CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
     "snapshotDate": "2026-10-21",
     "fromArchive": false
    }

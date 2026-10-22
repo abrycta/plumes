@@ -256,13 +256,29 @@ export interface VolcanoReadModel extends Header {
 
 // ---------- <version>/layers.json ----------
 
-export type LayerId = "thermal-detections" | "earthquakes-usgs" | "so2-monthly" | "hillshade" | "rings";
+export type LayerId = "thermal-detections" | "earthquakes-usgs" | "so2-monthly" | "hillshade" | "rings" | "deformation-velocity";
+
+/** One InSAR frame cropped around one volcano (deformation-velocity): the file is url with {frame} = id. */
+export interface DeformationFrame {
+  id: string;
+  volcanoId: string;
+  track: number;
+  pass: "ascending" | "descending";
+  /** [w, s, e, n] of the pixel edges. */
+  bounds: [number, number, number, number];
+  /** [lon, lat] of the reference area the values are relative to. */
+  reference: [number, number];
+  start: ISODate;
+  end: ISODate;
+  /** Number of acquisitions. */
+  dates: number;
+}
 
 export interface Layer {
   id: LayerId;
   title: LocalText;
   format: "geojson" | "pmtiles" | "raster-xyz" | "cog";
-  /** Relative to the version root; may contain {month}, {year}, {z}/{x}/{y}. */
+  /** Relative to the version root; may contain {month}, {year}, {z}/{x}/{y}, {frame}. */
   url: string;
   sourceLayer?: string;
   time?: { step: "month" | "year" | "none"; start: string; end: string; available?: string[] };
@@ -274,6 +290,7 @@ export interface Layer {
   sources: SourceId[];
   attribution: string;
   note?: LocalText;
+  frames?: DeformationFrame[];
 }
 
 export interface Layers extends Header {

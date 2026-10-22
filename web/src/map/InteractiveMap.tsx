@@ -21,6 +21,7 @@ import type { VolcanoesIndex } from "@contracts/readmodels";
 import { formatUrl, navigateHref } from "@/app/url";
 
 import { PH_BOUNDS } from "./geo";
+import { type DeformationOverlay, useDeformation } from "./useDeformation";
 
 type ThemeKey = "light" | "dark" | "light-hc" | "dark-hc";
 
@@ -62,6 +63,8 @@ export interface InteractiveMapProps {
   coastUrl: string;
   /** Layers to draw, bottom first; an empty list shows the basemap and the volcanoes only. */
   overlays: Overlay[];
+  /** The deformation-velocity frames (drawn from the layer's minzoom, below the overlays). */
+  deformation?: DeformationOverlay;
   lang: "en" | "ja";
   /** The /embed krtmtthw.dev frames: a still, non-interactive map with no links, controls or attribution box. */
   embed?: EmbedOptions;
@@ -77,7 +80,7 @@ export interface EmbedOptions {
 }
 
 /** The interactive overview map (loaded only when rule 6b allows): basemap, thermal detections, volcano links. */
-export default function InteractiveMap({ index, styleUrl, coastUrl, overlays, embed }: Omit<InteractiveMapProps, "lang">) {
+export default function InteractiveMap({ index, styleUrl, coastUrl, overlays, deformation, embed }: Omit<InteractiveMapProps, "lang">) {
   const t = useT();
   const { lang } = useLang();
   const { resolvedTheme } = useTheme();
@@ -86,6 +89,7 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays, em
   const box = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MlMap | null>(null);
   const [ready, setReady] = useState(false);
+  const [map, setMap] = useState<MlMap | null>(null);
   const fallback = useRef(false);
   /** The URL each overlay source was added with: a month change on the same file only swaps the filter. */
   const sourceUrls = useRef<Record<string, string>>({});
@@ -140,12 +144,14 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays, em
       sourceUrls.current = {};
       window.clearTimeout(timer);
       setReady(true);
+      setMap(map);
     });
     mapRef.current = map;
     return () => {
       window.clearTimeout(timer);
       map.remove();
       mapRef.current = null;
+      setMap(null);
     };
     // Theme changes are applied below without recreating the map.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -212,6 +218,8 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, overlays, em
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, overlayKey]);
+
+  useDeformation(map, ready, deformation, key);
 
   // Volcano markers: real links (keyboard reachable), deep-record volcanoes labelled.
   useEffect(() => {

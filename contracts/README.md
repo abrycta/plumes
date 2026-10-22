@@ -11,6 +11,7 @@ v3/volcanoes.geojson         the 24 volcanoes, map index                        
 v3/volcano/<id>.json         one per volcano: series, bulletins, episodes, readings…    (volcano.schema.json)
 v3/layers.json               national layers by month                                   (layers.schema.json)
 v3/layers/…                  PMTiles / raster tiles (GeoJSON in the fixture)
+v3/layers/deformation/<f>.tif  deformation-velocity: one Int16 GeoTIFF per volcano and frame (mm/yr x 10, nodata -32768); ids in layers.json frames
 v3/story/<id>.json           Taal January 2020 at M1                                    (story.schema.json)
 v3/assets/…                  before/after thumbnails
 ```
@@ -38,6 +39,7 @@ Published base URL: `https://krtmtthw.dev/plumes/data/` (GitHub Pages, range req
 | `fire_viirs_n20_15km` (M2) | events | detections, FIRMS-flagged volcanic detections, MW; NOAA-20, its own series (never joined to S-NPP) | `firms-viirs-noaa20` (area API) |
 | `eq_usgs_30km`, `eq_usgs_10km` | events | count, max magnitude | `usgs-comcat-ph-*` |
 | `lake_temp_landsat` | events | °C | `landsat-surface-temperature` |
+| `los_comet_<frame>` | events | mm along the satellite's line of sight (cols `date`, `los_mm`, `los_std_mm`; positive = toward the satellite, relative to COMET's reference area and the first date) | `comet-licsbas` |
 | `bulletins` / `advisories` / `displacement` | tables | see schema | `phivolcs-*`, `vaac-tokyo-advisories`, `dswd-dromic-reports` |
 
 New series ids may appear; the UI should render any `daily`/`events` entry from its `label` and `unit`.

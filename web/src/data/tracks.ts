@@ -7,7 +7,7 @@ import type { DailySeries, Episode, LocalText, SparseSeries, VolcanoReadModel } 
 
 import { addDays, formatDate, toDay } from "@/lib/dates";
 
-export type GroupId = "alert" | "earthquakes" | "so2" | "thermal" | "eruptions" | "ash" | "people" | "other";
+export type GroupId = "alert" | "earthquakes" | "so2" | "thermal" | "deformation" | "eruptions" | "ash" | "people" | "other";
 export type TrackKind = "line" | "bars" | "markers" | "spans";
 
 export interface TrackPoint {
@@ -49,6 +49,7 @@ export const GROUPS: { id: GroupId; title: LocalText }[] = [
   { id: "earthquakes", title: { en: "Earthquakes", ja: "地震" } },
   { id: "so2", title: { en: "Sulfur dioxide (SO₂)", ja: "二酸化硫黄(SO₂)" } },
   { id: "thermal", title: { en: "Heat: thermal anomalies and radiative power", ja: "熱:熱異常と放射電力" } },
+  { id: "deformation", title: { en: "Ground motion (satellite radar, line of sight)", ja: "地表変位(衛星レーダー、視線方向)" } },
   { id: "eruptions", title: { en: "Eruptions", ja: "噴火" } },
   { id: "ash", title: { en: "Ash for aviation", ja: "航空向けの火山灰情報" } },
   { id: "people", title: { en: "People", ja: "人々" } },
@@ -80,6 +81,10 @@ export const INSTRUMENTS: Record<string, LocalText> = {
   "vaac-tokyo-advisories": { en: "Tokyo VAAC advisories for aviation (JMA), each linked; satellite and pilot reports", ja: "東京VAAC航空路火山灰情報(気象庁、各リンク付き)。衛星とパイロット報告" },
   "dswd-dromic-reports": { en: "DSWD DROMIC reports, each linked; counts as reported on each date", ja: "DSWD DROMIC報告(各リンク付き)。各日付時点の報告値" },
   "gvp-eruptions-ph": { en: "Smithsonian Global Volcanism Program; dates can be uncertain", ja: "スミソニアン博物館GVP。日付に不確かさあり" },
+  "comet-licsbas": {
+    en: "Sentinel-1 radar time series processed by COMET (LiCSBAS), every 6–12 days; along the satellite's line of sight, relative to a reference area",
+    ja: "COMETが解析したSentinel-1レーダー時系列(LiCSBAS、6〜12日ごと)。衛星視線方向、参照域からの相対値",
+  },
   "nasa-msvolso2l4": { en: "NASA MEaSUREs multi-satellite SO₂ mass per eruption", ja: "NASA MEaSUREs 多衛星による噴火ごとのSO₂量" },
   "gpm-imerg-v07": { en: "NASA GPM IMERG Final (satellites merged with gauges, 0.1° grid, UTC days); an area estimate, not a rain gauge", ja: "NASA GPM IMERG Final(複数衛星と雨量計の統合、0.1°格子、UTC日)。雨量計ではなく面的な推定" },
 };
@@ -99,6 +104,7 @@ function groupOf(id: string): GroupId {
   if (id.startsWith("so2")) return "so2";
   if (id.startsWith("eq")) return "earthquakes";
   if (id.startsWith("frp") || id.startsWith("fire")) return "thermal";
+  if (id.startsWith("los_")) return "deformation";
   return "other";
 }
 
@@ -154,6 +160,7 @@ const COLUMN_LABELS: Record<string, LocalText> = {
   maxMag: { en: "largest magnitude", ja: "最大マグニチュード" },
   maxFrpMw: { en: "max radiative power", ja: "最大放射電力" },
   nVolcano: { en: "flagged volcanic by FIRMS", ja: "FIRMSの火山フラグ" },
+  los_std_mm: { en: "spread of the summit pixels", ja: "山頂付近の画素のばらつき" },
 };
 
 export function eventsTrack(id: string, s: SparseSeries): Track {
@@ -168,10 +175,13 @@ export function eventsTrack(id: string, s: SparseSeries): Track {
       .filter(([c, i]) => i > 0 && c !== valueCol && r[i] != null)
       .map(([c, i]) => ({ label: COLUMN_LABELS[c] ?? { en: c, ja: c }, value: `${r[i]}${s.units[c] ? ` ${s.units[c]}` : ""}` })),
   }));
+  // A displacement series (COMET LOS, cols date, los_mm, …) is a line through its acquisitions, not bars per day.
+  const line = valueCol === "los_mm";
   return {
     id,
     group: groupOf(id),
-    kind: "bars",
+    kind: line ? "line" : "bars",
+    ...(line && s.rows.length ? { end: s.rows[s.rows.length - 1]![0] } : {}),
     title: s.label,
     instrument: instrumentOf(s.source),
     unit: s.units[valueCol] ?? "",

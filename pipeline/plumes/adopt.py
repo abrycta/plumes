@@ -43,8 +43,10 @@ BUNDLES = {
     "worldpop-100m": [TABLES / "ee-exposure.csv"],
     "s2-sr-harmonized": sorted(Path(p) for p in glob.glob(str(BUILD / "assets" / "*"))),
     "era5-pressure-levels": sorted(Path(p) for p in glob.glob(str(TABLES / "era5-*.json"))),
+    "comet-licsbas": sorted(Path(p) for p in glob.glob(str(RAW / "comet-licsbas" / "*"))),
 }
 NOTES = {
+    "comet-licsbas": "COMET Volcano Portal LiCSBAS JSON (GACOS-corrected) per volcano and frame, the frame list and the fetch log.",
     "modis-mod14a1": "Earth Engine reductions per volcano ring and day for MOD14A1, VNP14A1 and the FIRMS collection (query results).",
     "firms-modis": "NASA FIRMS area API results (MODIS_SP, VIIRS_SNPP_SP) over the Philippine box, 5-day windows.",
     "s2-sr-harmonized": "Sentinel-2 thumbnails rendered by Earth Engine for the Taal 2020 story.",
