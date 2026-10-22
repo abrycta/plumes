@@ -18,7 +18,7 @@ jobs:
       - name: Lint and test (without the private kit)
         working-directory: pipeline
         run: |
-          uv sync --locked --no-group sources
+          uv sync --locked --no-group sources --group comet
           uv run ruff check .
           uv run pytest -q
       - id: token

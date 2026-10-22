@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://plumes.krtmtthw.dev/schemas/layers.schema.json",
   "title": "National layer manifest: <version>/layers.json",
-  "description": "Map layers by month (thermal detections, earthquakes, SO2 mosaic, hillshade). url templates are relative to the version root and may contain {month} (YYYY-MM), {year}, {z}/{x}/{y}. Fixtures use GeoJSON; published versions use PMTiles and raster tiles with the same ids.",
+  "description": "Map layers by month (thermal detections, earthquakes, SO2 mosaic, hillshade) and per-frame rasters (deformation velocity). url templates are relative to the version root and may contain {month} (YYYY-MM), {year}, {z}/{x}/{y} and {frame} (an id from the layer's frames). Fixtures use GeoJSON; published versions use PMTiles and raster tiles with the same ids.",
   "allOf": [{ "$ref": "common.schema.json#/$defs/header" }],
   "type": "object",
   "required": ["kind", "layers"],
@@ -14,7 +14,7 @@
         "type": "object",
         "required": ["id", "title", "format", "url", "sources", "attribution"],
         "properties": {
-          "id": { "enum": ["thermal-detections", "earthquakes-usgs", "so2-monthly", "hillshade", "rings"] },
+          "id": { "enum": ["thermal-detections", "earthquakes-usgs", "so2-monthly", "hillshade", "rings", "deformation-velocity"] },
           "title": { "$ref": "common.schema.json#/$defs/localText" },
           "format": { "enum": ["geojson", "pmtiles", "raster-xyz", "cog"] },
           "url": { "type": "string" },
@@ -46,7 +46,27 @@
           },
           "sources": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" } },
           "attribution": { "type": "string" },
-          "note": { "$ref": "common.schema.json#/$defs/localText" }
+          "note": { "$ref": "common.schema.json#/$defs/localText" },
+          "frames": {
+            "type": "array",
+            "description": "Per-frame rasters ({frame} in url): one InSAR frame cropped around one volcano (deformation-velocity)",
+            "items": {
+              "type": "object",
+              "required": ["id", "volcanoId", "track", "pass", "bounds", "reference", "start", "end", "dates"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9-]+-[0-9]{3}[AD]_[0-9]{5}_[0-9]{6}$" },
+                "volcanoId": { "type": "string" },
+                "track": { "type": "integer", "minimum": 1, "maximum": 175 },
+                "pass": { "enum": ["ascending", "descending"] },
+                "bounds": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4, "description": "[w, s, e, n] of the pixel edges" },
+                "reference": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "[lon, lat] of the reference area the values are relative to" },
+                "start": { "$ref": "common.schema.json#/$defs/date" },
+                "end": { "$ref": "common.schema.json#/$defs/date" },
+                "dates": { "type": "integer", "minimum": 1, "description": "Number of acquisitions" }
+              },
+              "additionalProperties": false
+            }
+          }
         },
         "additionalProperties": false
       }

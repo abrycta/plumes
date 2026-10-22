@@ -1,5 +1,5 @@
 import { MapLegendKey, NativeSelect, NativeSelectOption, T, useLang, useT } from "@abrycta/akari/react";
-import { lazy, Suspense, use, useEffect, useId, useState } from "react";
+import { lazy, Suspense, use, useEffect, useId, useMemo, useState } from "react";
 
 import type { Layer } from "@contracts/readmodels";
 
@@ -8,6 +8,8 @@ import { VolcanoList } from "@/components/VolcanoList";
 import { loadConfig, loadFile, loadLayers, loadRoot, loadVolcanoes, resolveUrl } from "@/data/load";
 import { filtersByMonth, layerMonths, layerPath } from "@/data/layers";
 import { useRichMedia } from "@/lib/richMedia";
+import { framePath } from "@/map/deformation";
+import { DeformationKey } from "@/map/DeformationKey";
 import type { Overlay } from "@/map/InteractiveMap";
 import { StaticMap, type ThermalPoint } from "@/map/StaticMap";
 
@@ -55,6 +57,13 @@ export default function MapPage() {
   const [month, setMonth] = useState<string | null>(months.includes(lastEruption) ? lastEruption : (months.at(-1) ?? null));
   const [show, setShow] = useState(true);
   const [showQuakes, setShowQuakes] = useState(true);
+  // COMET deformation velocity (LAYERS-PLAN §3.1): off by default, interactive map only, drawn from zoom 7.
+  const defo = layers.layers.find((l) => l.id === "deformation-velocity" && l.frames?.length);
+  const [showDefo, setShowDefo] = useState(false);
+  const deformation = useMemo(
+    () => (defo && showDefo ? { layer: defo, urlOf: (f: Parameters<typeof framePath>[1]) => resolveUrl(root.versionBase, framePath(defo, f)) } : undefined),
+    [defo, showDefo, root.versionBase],
+  );
   const overlays: Overlay[] = [];
   for (const [layer, on, id] of [[quakes, showQuakes, "earthquakes"], [thermal, show, "thermal"]] as const)
     if (layer && on && month && layerMonths(layer).includes(month))
@@ -91,6 +100,12 @@ export default function MapPage() {
                   {quakes.title[lang]}
                 </label>
               ) : null}
+              {defo && rich ? (
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={showDefo} onChange={(e) => setShowDefo(e.target.checked)} className="size-4 accent-[var(--primary)]" />
+                  {defo.title[lang]}
+                </label>
+              ) : null}
               <div className="flex items-center gap-2">
                 <label htmlFor={selectId}>{t("Month", "月")}</label>
                 <NativeSelect id={selectId} value={month ?? ""} onChange={(e) => setMonth(e.target.value)} disabled={!show && !showQuakes}>
@@ -113,6 +128,7 @@ export default function MapPage() {
                 styleUrl={config.basemap?.style ?? "https://tiles.openfreemap.org/styles/positron"}
                 coastUrl={resolveUrl("/", config.basemap?.fallback ?? "/basemap/coast.geojson")}
                 overlays={overlays}
+                deformation={deformation}
               />
             </Suspense>
           ) : (
@@ -129,6 +145,7 @@ export default function MapPage() {
               ...(quakes ? [{ fill: "var(--chart-2)", label: t("Earthquake in the chosen month (USGS; size by magnitude)", "選んだ月の地震(USGS、大きさはマグニチュード)") }] : []),
             ]}
           />
+          {deformation ? <DeformationKey layer={deformation.layer} names={Object.fromEntries(index.features.map((f) => [f.properties.id, f.properties.name[lang]]))} /> : null}
           <p className="m-0 max-w-prose text-xs text-muted-foreground">
             <T
               en="Thermal detections: NASA FIRMS. Earthquakes: USGS ComCat. Basemap: OpenFreeMap © OpenMapTiles © OpenStreetMap contributors, or the Natural Earth coastline. A past record only."

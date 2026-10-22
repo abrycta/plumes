@@ -747,6 +747,9 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+comet = [
+    { name = "numpy" },
+]
 dev = [
     { name = "pytest" },
     { name = "ruff" },
@@ -779,6 +782,7 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+comet = [{ name = "numpy", specifier = ">=2.3" }]
 dev = [
     { name = "pytest", specifier = ">=8.4" },
     { name = "ruff", specifier = ">=0.13" },
