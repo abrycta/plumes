@@ -1,0 +1,7 @@
+Volcano_Number,StartDateYear,StartDateMonth,StartDateDay,EndDateYearModifier,EndDateYear,EndDateMonth,EndDateDay
+273070,2020,1,12,,2020,1,22
+273070,2021,7,1,,2021,7,
+273070,2017,1,1,,2017,2,1
+273030,2023,6,,,,,
+272020,2023,4,12,>,2023,6,1
+272020,1902,,,,,,
