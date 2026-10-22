@@ -45,6 +45,8 @@ const WAKE_RETRY_AFTER_S = 10;
 const DEFAULT_FRESH_S = 3600;
 const DEFAULT_STALE_S = 86_400;
 const STORED_AT = "X-Edge-Stored-At";
+/** The origin's Cache-Control, kept on a stored copy whose own Cache-Control sets how long the Cache API keeps it. */
+const ORIGIN_CC = "X-Edge-Origin-Cache-Control";
 /** How often the published version is re-read, and how often an outdated copy is re-checked with the origin. */
 const VERSION_TTL_S = 60;
 const VERSION_TIMEOUT_MS = 1500;
@@ -117,7 +119,7 @@ export const onRequest = async (context: Context): Promise<Response> => {
 
   if (cached) {
     const age = (Date.now() - Number(cached.headers.get(STORED_AT) || 0)) / 1000;
-    const { fresh, stale } = lifetimes(cached.headers.get("Cache-Control"));
+    const { fresh, stale } = lifetimes(originCc(cached));
     const held = versionOf(cached.headers.get("ETag"));
     if (published && held && held !== published.current) {
       // Built from an older version: ask the origin below (it may not hold the new one yet; then ask again later).
@@ -125,43 +127,42 @@ export const onRequest = async (context: Context): Promise<Response> => {
     } else {
       if (age < fresh) return done(answer(cached, inm, request), "HIT");
       if (age < fresh + stale) {
-        context.waitUntil(revalidate(cache, key, cached, target, request, env).catch(() => undefined));
+        context.waitUntil(fill(cache, key, cached, target, request, env).catch(() => undefined));
         return done(answer(cached, inm, request, "revalidating"), "STALE");
       }
     }
   }
 
-  const pending = originFetch(target, request, env, BACKGROUND_TIMEOUT_MS, cached?.headers.get("ETag"));
-  const first = await Promise.race([pending, sleep(ORIGIN_TIMEOUT_MS).then(() => "slow" as const)]);
-  if (first === "slow") {
-    // Cold start: keep going in the background (wakes Render, then fills the cache).
-    context.waitUntil(pending.then((r) => settle(cache, key, cached, r)).catch(() => undefined));
-    if (cached) return done(answer(cached, inm, request, "origin-slow"), "STALE");
+  // One origin request per key at a time (per isolate): concurrent misses wait for the same answer, which also fills
+  // the cache, instead of each waking Render.
+  const pending = fill(cache, key, cached, target, request, env);
+  context.waitUntil(pending.catch(() => undefined));
+  const got = await Promise.race([pending, sleep(ORIGIN_TIMEOUT_MS).then(() => "slow" as const)]);
+  if (got === "slow" || got === "timeout" || got instanceof Error) {
+    // Cold start (the fill keeps going in the background, waking Render) or an origin failure: serve the stored copy.
+    const note = got === "slow" ? "origin-slow" : "origin-error";
+    if (cached) return done(answer(cached, inm, request, note), "STALE");
+    return cold(got === "slow" || got === "timeout" ? waking() : problem("bad-gateway", 502, "Bad gateway"));
+  }
+  const first = toResponse(got);
+  if (first.status === 304) {
+    // The origin still holds the stored copy's version (the fill restarted its clock): keep serving it.
+    const held = cached ?? (await cache.match(key));
+    if (held) return done(answer(held, inm, request), "REVALIDATED");
     return cold(waking());
   }
-  if (first === "timeout" || first instanceof Error) {
-    if (cached) return done(answer(cached, inm, request, "origin-error"), "STALE");
-    return cold(first === "timeout" ? waking() : problem("bad-gateway", 502, "Bad gateway"));
-  }
-  if (first.status === 304 && cached) {
-    // The origin still holds the stored copy's version: keep it, and ask again after VERSION_TTL_S / its lifetime.
-    const reply = answer(cached, inm, request);
-    context.waitUntil(settle(cache, key, cached, first).catch(() => undefined));
-    return done(reply, "REVALIDATED");
-  }
   if (await isWaking(first)) {
-    // Render is up but Neon is resuming: one background retry fills the cache.
-    context.waitUntil(sleep(4000).then(() => originFetch(target, request, env, BACKGROUND_TIMEOUT_MS - 4000))
-      .then((r) => settle(cache, key, undefined, r)).catch(() => undefined));
+    // Render is up but Neon is resuming: one background retry (shared too) fills the cache.
+    context.waitUntil(
+      sleep(4000)
+        .then(() => fill(cache, key, undefined, target, request, env, BACKGROUND_TIMEOUT_MS - 4000))
+        .catch(() => undefined),
+    );
     if (cached) return done(answer(cached, inm, request, "origin-waking"), "STALE");
     return cold(waking());
   }
   if (first.status >= 500 && cached) return done(answer(cached, inm, request, "origin-error"), "STALE");
   if (first.status >= 500) return cold(passthrough(first));
-  if (first.status === 200 || first.status === 404) {
-    const copy = first.clone();
-    context.waitUntil(store(cache, key, copy).catch(() => undefined));
-  }
   return done(answer(first, inm, request), "MISS");
 };
 
@@ -197,6 +198,38 @@ function normalQuery(search: string, allowed: readonly string[]): string {
   return s ? "?" + s : "";
 }
 
+interface Fetched {
+  status: number;
+  headers: [string, string][];
+  body: ArrayBuffer;
+}
+
+const inflight = new Map<string, Promise<Fetched | Error | "timeout">>();
+
+/**
+ * Ask the origin for a key once per isolate however many requests want it, file the answer in the cache, and hand
+ * every waiting request the same buffered answer.
+ */
+function fill(cache: Cache, key: Request, cached: Response | undefined, target: URL, request: Request, env: Env, ms = BACKGROUND_TIMEOUT_MS) {
+  let p = inflight.get(key.url);
+  if (!p) {
+    p = (async () => {
+      const r = await originFetch(target, request, env, ms, cached?.headers.get("ETag"));
+      if (!(r instanceof Response)) return r;
+      const got: Fetched = { status: r.status, headers: [...r.headers], body: await r.arrayBuffer() };
+      await settle(cache, key, cached, toResponse(got)).catch(() => undefined);
+      return got;
+    })().finally(() => inflight.delete(key.url));
+    inflight.set(key.url, p);
+  }
+  return p;
+}
+
+function toResponse(f: Fetched): Response {
+  const body = f.status === 304 || f.status === 204 ? null : f.body.slice(0);
+  return new Response(body, { status: f.status, headers: f.headers });
+}
+
 async function originFetch(target: URL, request: Request, env: Env, ms: number, etag?: string | null): Promise<Response | Error | "timeout"> {
   const headers = new Headers();
   for (const h of FORWARD) {
@@ -226,26 +259,38 @@ async function store(cache: Cache, key: Request, response: Response): Promise<vo
     await response.body?.cancel();
     return;
   }
-  const headers = new Headers(response.headers);
-  const { fresh, stale } = lifetimes(headers.get("Cache-Control"));
+  const headers = keepFor(new Headers(response.headers));
   headers.set(STORED_AT, String(Date.now()));
-  headers.set("Cloudflare-CDN-Cache-Control", `max-age=${fresh + stale}`);
   headers.delete("Set-Cookie");
   await cache.put(key, new Response(response.body, { status: response.status, headers }));
 }
 
-async function revalidate(cache: Cache, key: Request, cached: Response, target: URL, request: Request, env: Env) {
-  const r = await originFetch(target, request, env, BACKGROUND_TIMEOUT_MS, cached.headers.get("ETag"));
-  await settle(cache, key, cached, r);
+/**
+ * The Cache API keeps an entry for its Cache-Control lifetime (s-maxage first) and ignores stale-while-revalidate, so
+ * a stored copy gets Cache-Control max-age = fresh + stale (the whole window this function serves it in) and the
+ * origin's own value moves to ORIGIN_CC. Without this a copy vanished after s-maxage (10 minutes for /v1/meta) and a
+ * sleeping origin left nothing to serve.
+ */
+function keepFor(headers: Headers): Headers {
+  if (!headers.has(ORIGIN_CC)) headers.set(ORIGIN_CC, headers.get("Cache-Control") ?? "");
+  const { fresh, stale } = lifetimes(headers.get(ORIGIN_CC));
+  headers.set("Cache-Control", `public, max-age=${fresh + stale}`);
+  headers.set("Cloudflare-CDN-Cache-Control", `max-age=${fresh + stale}`);
+  return headers;
+}
+
+/** The origin's Cache-Control for a stored copy (copies stored before ORIGIN_CC existed carry it as Cache-Control). */
+function originCc(r: Response): string | null {
+  return r.headers.has(ORIGIN_CC) ? r.headers.get(ORIGIN_CC) : r.headers.get("Cache-Control");
 }
 
 /** File an origin answer: a 304 restarts the stored copy's clock, a 200 or 404 replaces it, anything else is dropped. */
 async function settle(cache: Cache, key: Request, cached: Response | undefined, r: Response | Error | "timeout") {
   if (!(r instanceof Response)) return;
   if (r.status === 304 && cached) {
-    const headers = new Headers(cached.headers);
+    const headers = keepFor(new Headers(cached.headers));
     headers.set(STORED_AT, String(Date.now()));
-    await cache.put(key, new Response(cached.body, { status: cached.status, headers }));
+    await cache.put(key, new Response(cached.clone().body, { status: cached.status, headers }));
   } else if (r.status === 200 || r.status === 404) {
     await store(cache, key, r);
   } else {
@@ -333,6 +378,12 @@ function answer(r: Response, ifNoneMatch: string | null, request: Request, stale
   const headers = new Headers(r.headers);
   headers.delete(STORED_AT);
   headers.delete("Cloudflare-CDN-Cache-Control");
+  if (headers.has(ORIGIN_CC)) {
+    const cc = headers.get(ORIGIN_CC);
+    if (cc) headers.set("Cache-Control", cc);
+    else headers.delete("Cache-Control");
+    headers.delete(ORIGIN_CC);
+  }
   for (const h of ["x-render-origin-server", "rndr-id", "server"]) headers.delete(h);
   if (stale) headers.set("X-Edge-Stale", stale);
   if (r.status === 200 && etag && ifNoneMatch && matches(ifNoneMatch, etag)) {
