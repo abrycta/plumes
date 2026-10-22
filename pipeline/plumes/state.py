@@ -19,7 +19,8 @@ import httpx
 import zstandard
 
 from plumes.adopt import BUNDLES, REPO
-from plumes.paths import BUILD, DATA
+from plumes.ee_ledger import merge_into
+from plumes.paths import BUILD, DATA, EE_LEDGER
 
 PAGES = "https://krtmtthw.dev/plumes/data/"
 
@@ -45,9 +46,8 @@ def restore() -> dict:
         out[sid] = mine[-1]
     r = httpx.get(PAGES + "ee-usage.json", follow_redirects=True, timeout=30)
     if r.status_code == 200:
-        (DATA / "state").mkdir(parents=True, exist_ok=True)
-        (DATA / "state" / "ee-usage.json").write_text(r.text)
-        out["ee-usage"] = "restored"
+        # merge, never overwrite: runs logged here but not yet published stay counted
+        out["ee-usage"] = f"merged ({len(merge_into(EE_LEDGER, r.json())['runs'])} runs)"
     return out
 
 

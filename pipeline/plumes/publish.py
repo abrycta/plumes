@@ -14,7 +14,7 @@ import os
 import shutil
 import subprocess
 
-from plumes.paths import BUILD, DATA, REPO
+from plumes.paths import BUILD, DATA, EE_LEDGER, REPO
 
 PAGES_DIR = DATA / "publish" / "gh-pages"
 HF_REPO = "permission-alluring/plumes"
@@ -61,9 +61,8 @@ def pages(version: int) -> dict:
         if old.is_dir() and old.name not in keep:
             shutil.rmtree(old)
     shutil.copy(site / "latest.json", data / "latest.json")
-    usage = DATA / "state" / "ee-usage.json"
-    if usage.exists():
-        shutil.copy(usage, data / "ee-usage.json")
+    if EE_LEDGER.exists():
+        shutil.copy(EE_LEDGER, data / "ee-usage.json")
     (PAGES_DIR / "index.html").write_text('<!doctype html><meta charset="utf-8"><title>Plumes data</title>'
                                           '<p>Data files for <a href="https://github.com/abrycta/plumes">Plumes</a>. Start at <a href="data/latest.json">data/latest.json</a>.</p>\n')
     git("add", "-A")
