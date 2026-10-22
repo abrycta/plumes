@@ -228,7 +228,7 @@ for name, date, cap in (("taal-before-2019-11.jpg", "2019-11-19", lt("Before: Se
     w, h = (int(x) for x in subprocess.run(["sips", "-g", "pixelWidth", "-g", "pixelHeight", str(dst)], capture_output=True, text=True).stdout.split()[-3::2])
     thumbs.append({"kind": "image", "url": f"assets/{name}", "date": date, "sensor": "Sentinel-2 MSI", "source": "s2-sr-harmonized", "caption": cap,
                    "credit": f"Contains modified Copernicus Sentinel data {date[:4]}", "width": w, "height": h})
-step = lambda i, s, e, t, x, series, figs, **k: {"id": i, "start": s, "end": e, "title": t, "text": x, "status": "draft", "series": series, "figures": figs, **k}  # noqa: E731
+step = lambda i, s, e, t, x, series, figs, **k: {"id": i, "start": s, "end": e, "title": t, "text": x, "status": "reviewed", "series": series, "figures": figs, **k}  # noqa: E731
 story = {**HDR, "kind": "story", "id": "taal-2020", "volcanoId": "taal", "volcanoFile": "volcano/taal.json",
          "title": lt("Taal, January 2020", "タール火山 2020年1月"),
          "summary": lt("What the instruments recorded before, during and after the 12 January 2020 eruption.", "2020年1月12日の噴火の前後に観測機器が記録したこと。"),
@@ -248,6 +248,11 @@ story = {**HDR, "kind": "story", "id": "taal-2020", "volcanoId": "taal", "volcan
                    "rows": [[r["time"] + ":00Z", r["hPa"], r["u"], r["v"], r["speed"], r["dir_to_deg"]] for r in era5["rows"]]},
          "provenance": prov(["phivolcs-bulletins", "vaac-tokyo-advisories", "dswd-dromic-reports", "s2-sr-harmonized", "era5-pressure-levels", "nasa-msvolso2l4", "s5p-offl-so2", "usgs-comcat-ph-2010"])}
 dump(V / "story" / "taal-2020.json", story)
+
+# ---------- stories.json and story/drafts/ (the generator, on the fixture's own read models) ----------
+from plumes.stories.generate import generate  # noqa: E402
+
+generate(V)
 
 dump(OUT / "latest.json", {"schemaVersion": "1", "kind": "latest", "current": "v0", "base": "v0/", "dataAsOf": AS_OF, "generatedAt": GEN, "previous": None, "fixture": True})
 print("fixtures written to", OUT)

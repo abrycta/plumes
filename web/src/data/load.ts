@@ -2,7 +2,7 @@
 // current immutable version; every other file is fetched relative to that version's base. Promises are cached
 // per path so React's use() can suspend on them. Nothing is fetched at interaction time beyond these files.
 
-import type { Latest, Layers, Story, VolcanoesIndex, VolcanoReadModel } from "@contracts/readmodels";
+import type { Latest, Layers, StoriesIndex, Story, StoryIndexEntry, VolcanoesIndex, VolcanoReadModel } from "@contracts/readmodels";
 
 export interface AppConfig {
   siteUrl?: string;
@@ -113,20 +113,53 @@ export function loadVolcano(file: string): Promise<VolcanoReadModel | null> {
   }
   return p;
 }
-export const loadStory = (id: string) => loadFile<Story>(`story/${id}.json`);
-const storyOrNull = new Map<string, Promise<Story | null>>();
-/** The story, or null when this version has none. */
-export function loadStoryOrNull(id: string): Promise<Story | null> {
-  let p = storyOrNull.get(id);
+/** Stories known to versions without a stories.json (v1, v2): Taal January 2020, reviewed. */
+export const STORIES = [{ id: "taal-2020", volcanoId: "taal" }] as const;
+
+/** A story the site may show: its id, file and review status. */
+export interface StoryRef {
+  id: string;
+  volcanoId: string;
+  file: string;
+  status: "draft" | "reviewed";
+}
+
+let indexP: Promise<StoriesIndex | null> | null = null;
+/** <version>/stories.json, or null for versions made before the story generator. */
+export function loadStoriesIndex(): Promise<StoriesIndex | null> {
+  indexP ??= loadFile<StoriesIndex>("stories.json").catch((e) => {
+    if (e instanceof NotFoundError) return null;
+    throw e;
+  });
+  return indexP;
+}
+
+/**
+ * The stories to list, in the index's order. Reviewed stories always; drafts only in preview (ST1), where a draft
+ * replaces the reviewed file of the same id so Kurt reviews what the generator would publish.
+ */
+export function storyRefs(index: StoriesIndex | null, preview: boolean): StoryRef[] {
+  if (!index) return STORIES.map((s) => ({ ...s, file: `story/${s.id}.json`, status: "reviewed" as const }));
+  const out = new Map<string, StoryRef>();
+  for (const e of index.stories as StoryIndexEntry[]) {
+    if (!e.file) continue;
+    if (e.status === "draft" && !preview) continue;
+    const prev = out.get(e.id);
+    if (!prev || (preview && e.status === "draft")) out.set(e.id, { id: e.id, volcanoId: e.volcanoId, file: e.file, status: e.status });
+  }
+  return [...out.values()];
+}
+
+const storyFiles = new Map<string, Promise<Story | null>>();
+/** A story file, or null when this version has none. */
+export function loadStoryFile(file: string): Promise<Story | null> {
+  let p = storyFiles.get(file);
   if (!p) {
-    p = loadStory(id).catch((e) => {
+    p = loadFile<Story>(file).catch((e) => {
       if (e instanceof NotFoundError) return null;
       throw e;
     });
-    storyOrNull.set(id, p);
+    storyFiles.set(file, p);
   }
   return p;
 }
-
-/** Stories known to this front end (M1: Taal January 2020; Kanlaon 2024 arrives at M1.1). */
-export const STORIES = [{ id: "taal-2020", volcanoId: "taal" }] as const;

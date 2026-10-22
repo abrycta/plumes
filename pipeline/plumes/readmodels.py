@@ -17,7 +17,6 @@ import gzip
 import hashlib
 import json
 import math
-import re
 import shutil
 import subprocess
 
@@ -28,6 +27,8 @@ from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
 from plumes.paths import BUILD, CROSSWALK, DATA, RAW, REGISTRY, TABLES
+from plumes.stories.generate import generate as generate_stories
+from plumes.stories.text import date_en, date_ja, fl_gloss, ja_leftovers, neg, share_txt  # noqa: F401 (moved there, STORIES-PLAN §B8)
 
 SPAN_START = "2000-01-01"
 REG = {e["id"]: e for e in yaml.safe_load(REGISTRY.read_text())["sources"]}
@@ -303,45 +304,6 @@ def file_provenance() -> dict:
 
 
 # ---------------------------------------------------------------- story
-
-MONTHS_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-
-
-def date_en(iso: str) -> str:
-    """'2020-09-07' -> '7 September 2020' (the story's date style)."""
-    d = dt.date.fromisoformat(iso[:10])
-    return f"{d.day} {MONTHS_EN[d.month - 1]} {d.year}"
-
-
-def fl_gloss(fl: int) -> dict:
-    """A flight level with its height in km: EN "FL550 (about 16.8 km)", JA "FL550（約16.8 km）" (full-width brackets)."""
-    km = fl * 30.48 / 1000
-    return lt(f"FL{fl} (about {km:.1f} km)", f"FL{fl}（約{km:.1f} km）")
-
-
-# English words, ISO dates and half-width brackets that should not be left in Japanese text.
-_JA_LEFTOVERS = re.compile(r"\b(?:about|the|and|by|on|from|to|in|of|n/a)\b|\d{4}-\d{2}-\d{2}|[()]")
-
-
-def ja_leftovers(text: str) -> list[str]:
-    return _JA_LEFTOVERS.findall(text)
-
-
-def date_ja(iso: str) -> str:
-    """'2020-09-07' -> '2020年9月7日'."""
-    d = dt.date.fromisoformat(iso[:10])
-    return f"{d.year}年{d.month}月{d.day}日"
-
-
-def neg(x) -> str:
-    """A number with a typographic minus."""
-    return str(x).replace("-", "−")
-
-
-def share_txt(c: float) -> str:
-    """A coverage share that never rounds a non-zero share to 0%."""
-    return f"{c:.0%}" if c >= 0.01 or c == 0 else f"{c:.1%}"
-
 
 def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
     """The Taal January 2020 story (text reviewed by Kurt on 2026-10-22) and the Taal reading (reviewed by Kurt on 2026-10-22).
@@ -662,7 +624,8 @@ def build(version: int, as_of: str) -> dict:
     layers = [x for x in (thermal_layers(v_dir, as_of), quake_layer(v_dir, usgs), so2_map, defo_layer) if x]
     (v_dir / "layers.json").write_text(json.dumps({**hdr, "kind": "layers", "layers": layers}, ensure_ascii=False))
     deep_checks = deeptime.write(v_dir, hdr, vols, gvp_e, RAW / "hazel" / f"{deeptime.SOURCE_ID}.json", provenance([deeptime.GVP_ID, deeptime.SOURCE_ID], fprov))
-    checks = run_checks(v_dir, vols, models, gvp_v, gvp_e) + deep_checks
+    story_checks = generate_stories(v_dir)["checks"]  # generated drafts (story/drafts/) and stories.json; hidden until reviewed (ST1)
+    checks = run_checks(v_dir, vols, models, gvp_v, gvp_e) + deep_checks + story_checks
     passed = all(c["passed"] for c in checks)
     files = [{"path": str(p.relative_to(v_dir)), "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
              for p in sorted(v_dir.rglob("*")) if p.is_file()]

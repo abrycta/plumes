@@ -29,7 +29,8 @@ export default defineConfig({
     // Akari's pre-paint theme script (shared krtmtthw.dev theme cookie), served from our own origin.
     akariThemeInit(),
     // PLUMES_FIXTURES=1 (e2e, offline dev): the contract fixtures at /data/ and a config.json pointing there.
-    fixtureData(fileURLToPath(new URL("../contracts/fixtures/data", import.meta.url))),
+    // PLUMES_DATA_DIR serves another local data root the same way (e.g. a built version, to review story drafts).
+    fixtureData(process.env.PLUMES_DATA_DIR ?? fileURLToPath(new URL("../contracts/fixtures/data", import.meta.url))),
     // /embed's precomputed windows (small files instead of whole yearly layers), from the published data.
     embedPack(fileURLToPath(new URL("./public/config.json", import.meta.url))),
     // The map page's first window (map/firstWindow.ts): one small file instead of two yearly layers on first view.

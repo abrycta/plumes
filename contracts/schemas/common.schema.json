@@ -39,6 +39,7 @@
         "source": { "$ref": "#/$defs/sourceId" },
         "url": { "type": "string", "format": "uri" },
         "asOf": { "$ref": "#/$defs/date", "description": "The date the publisher reported the figure for" },
+        "reportedBy": { "type": "string", "description": "Whose number a second-hand figure is (e.g. \"PHIVOLCS\" when the source is a weekly report)" },
         "note": { "$ref": "#/$defs/localText" }
       },
       "additionalProperties": false
@@ -54,6 +55,7 @@
         "source": { "$ref": "#/$defs/sourceId" },
         "caption": { "$ref": "#/$defs/localText" },
         "credit": { "type": "string", "description": "Attribution line shown with the image" },
+        "role": { "enum": ["before", "after"], "description": "Pairs a story's before and after images" },
         "width": { "type": "integer" },
         "height": { "type": "integer" }
       },

@@ -30,6 +30,8 @@ export interface Figure {
   url?: string;
   asOf?: ISODate;
   note?: LocalText;
+  /** Whose number a second-hand figure is (e.g. "PHIVOLCS" via a weekly report). */
+  reportedBy?: string;
 }
 
 export interface Asset {
@@ -43,6 +45,8 @@ export interface Asset {
   credit: string;
   width?: number;
   height?: number;
+  /** Pairs a story's before and after images. */
+  role?: "before" | "after";
 }
 
 export interface Provenance {
@@ -298,10 +302,31 @@ export interface Layers extends Header {
   layers: Layer[];
 }
 
-// ---------- <version>/story/<id>.json ----------
+// ---------- <version>/story/<id>.json (and story/drafts/<id>.json) ----------
+
+export type StoryStepKind = "before" | "onset" | "course" | "after";
+
+/** One rendered template sentence (STORIES-PLAN §B3): text plus the figures and sources behind it. */
+export interface StorySentence {
+  template: string;
+  text: LocalText;
+  /** Indexes into the step's figures. */
+  figures: number[];
+  sources: SourceId[];
+}
+
+export interface StoryScore {
+  families: number;
+  steps: number;
+  tier: "story" | "reading" | "none";
+}
 
 export interface StoryStep {
   id: string;
+  kind?: StoryStepKind;
+  sentences?: StorySentence[];
+  /** Fixed reasons shown when the step has no fact sentence. */
+  absent?: { why: string; text: LocalText }[];
   start: ISODate;
   end: ISODate;
   title: LocalText;
@@ -322,6 +347,11 @@ export interface Story extends Header {
   title: LocalText;
   summary?: LocalText;
   span: { start: ISODate; end: ISODate };
+  /** Derived: reviewed only when every step is. Drafts are hidden unless the preview parameter is set (ST1). */
+  status?: "draft" | "reviewed";
+  generator?: { name: string; version: string; catalogueVersion: number };
+  episodeIds?: string[];
+  score?: StoryScore;
   steps: StoryStep[];
   winds?: {
     source: SourceId[];
@@ -330,4 +360,26 @@ export interface Story extends Header {
     rows: [string, number, number, number, number, number][];
   };
   provenance: Provenance;
+}
+
+// ---------- <version>/stories.json ----------
+
+export interface StoryIndexEntry {
+  id: string;
+  volcanoId: string;
+  title: LocalText;
+  span: { start: ISODate; end: ISODate };
+  episodeIds?: string[];
+  score?: StoryScore;
+  status: "draft" | "reviewed";
+  rank?: number;
+  /** Relative to the version root; absent for readings. */
+  file?: string;
+  sentences?: number;
+}
+
+export interface StoriesIndex extends Header {
+  kind: "stories";
+  stories: StoryIndexEntry[];
+  excluded?: { id: string; reason: string }[];
 }

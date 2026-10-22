@@ -33,7 +33,7 @@
     "en": "Alert Level 1. Satellite SO₂ near background; no USGS-located earthquakes within 30 km.",
     "ja": "警戒レベル1。衛星SO₂は背景値付近で、30 km圏にUSGSの震源はない。"
    },
-   "status": "draft",
+   "status": "reviewed",
    "series": [
     "so2_s5p_15km",
     "eq_usgs_30km",
@@ -60,7 +60,7 @@
     "en": "On 12 January 2020 PHIVOLCS raised Taal to Alert Level 4 within hours. Tokyo VAAC saw ash to about FL550 (16.8 km) on 12–13 January; TROPOMI measured an SO₂ column about 80 times the early-January background on 13 January, from only a few clear pixels. USGS located 35 earthquakes within 30 km on 12 January. GVP records the eruption as VEI 4.",
     "ja": "2020年1月12日、PHIVOLCSは数時間のうちにタール火山の警戒レベルを4に引き上げた。東京VAACは12〜13日に高度約FL550(16.8 km)の火山灰を観測し、13日のTROPOMI SO₂カラム量は1月初旬の背景値の約80倍だった(有効画素はわずか)。USGSは12日に30 km圏で35回の地震を観測した。GVPはこの噴火をVEI 4としている。"
    },
-   "status": "draft",
+   "status": "reviewed",
    "series": [
     "so2_s5p_15km",
     "eq_usgs_30km",
@@ -124,7 +124,7 @@
     "en": "DSWD DROMIC reports counted 504,265 people affected by 7 February 2020.",
     "ja": "DSWD DROMIC報告は2020年2月7日までに504,265人の被災者を数えた。"
    },
-   "status": "draft",
+   "status": "reviewed",
    "series": [
     "displacement"
    ],
@@ -153,7 +153,7 @@
     "en": "Sentinel-2 before and after: the main crater lake drained.",
     "ja": "Sentinel-2の前後比較:主火口湖は干上がった。"
    },
-   "status": "draft",
+   "status": "reviewed",
    "series": [],
    "figures": [],
    "assets": [

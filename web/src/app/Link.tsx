@@ -5,7 +5,7 @@ import { formatUrl, navigateHref, type Page, type UrlState, useUrlState } from "
 /** In-app link: a real href (open in a new tab works), client-side navigation on plain clicks. */
 export function AppLink({ to, id, query, onClick, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement> & { to: Exclude<Page, "notfound">; id?: string | null; query?: Partial<UrlState> }) {
   const url = useUrlState();
-  const href = formatUrl({ page: to, id: id ?? null, lang: url.lang, date: null, from: null, to: null, ring: null, ...query });
+  const href = formatUrl({ page: to, id: id ?? null, lang: url.lang, date: null, from: null, to: null, ring: null, preview: url.preview, ...query });
   const click = (e: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(e);
     if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
