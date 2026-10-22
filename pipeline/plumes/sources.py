@@ -13,7 +13,7 @@ from typing import Any
 
 from plumes.paths import CROSSWALK, PIPELINE, REGISTRY
 
-FILE_SOURCES = ["gvp-volcanoes-ph", "gvp-eruptions-ph", "usgs-comcat-ph-1900-2009", "usgs-comcat-ph-2010"]
+FILE_SOURCES = ["gvp-volcanoes-ph", "gvp-eruptions-ph", "usgs-comcat-ph-1900-2009", "usgs-comcat-ph-2010", "noaa-hazel-volcanoes-ph"]
 
 
 def _rows(path: Path) -> list[dict]:
