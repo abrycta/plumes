@@ -46,7 +46,7 @@ export function Readout({ tracks, date }: { tracks: Track[]; date: string }) {
               const words = {
                 "no-observation": t("No valid observation (cloud or no overpass), not zero", "有効な観測なし(雲・通過なし)。ゼロではない"),
                 "nothing-detected": t("Nothing detected", "検知なし"),
-                "not-observed": t("Not observed: before this instrument's record", "観測前(この観測機器の記録開始前)"),
+                "not-observed": t("Not observed: outside this instrument's record", "観測なし(この観測機器の記録の範囲外)"),
                 "no-report": t("No report on this day", "この日の報告なし"),
                 outside: t("Outside this series", "この系列の範囲外"),
               } as const;

@@ -85,6 +85,7 @@
         "units": { "type": "object", "additionalProperties": { "type": "string" } },
         "ringKm": { "type": "number" },
         "start": { "$ref": "common.schema.json#/$defs/date", "description": "First day the instrument could report (an empty series is not 'no activity' before this)" },
+        "end": { "$ref": "common.schema.json#/$defs/date", "description": "Last day the source covers; days after it are not observed, never 'nothing detected'" },
         "rows": { "type": "array", "items": { "type": "array", "minItems": 2 } },
         "note": { "$ref": "common.schema.json#/$defs/localText" }
       },

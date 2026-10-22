@@ -18,6 +18,7 @@ import urllib.request
 
 import ee
 
+from plumes import coverage
 from plumes.ee_budget import Budget, init
 from plumes.paths import BUILD, CROSSWALK, DATA, TABLES
 
@@ -103,13 +104,20 @@ def so2_month(month: str, budget: Budget) -> list[dict]:
     return rows
 
 
-def fire_month(month: str, budget: Budget) -> list[dict]:
-    """Daily fire pixels (FireMask >= 7) and max FRP per volcano ring for MOD14A1 and VNP14A1; FIRMS T21 detections."""
+def _days(col) -> ee.List:
+    return col.aggregate_array("system:time_start").map(lambda t: ee.Date(t).format("YYYY-MM-dd")).distinct().sort()
+
+
+def fire_month(month: str, budget: Budget) -> tuple[list[dict], dict]:
+    """Daily fire pixels (FireMask >= 7) and max FRP per volcano ring for MOD14A1 and VNP14A1; FIRMS T21 detections.
+    Also the days each collection has an image (plumes.coverage): a day without one is a gap, not "nothing detected"."""
     fc = ring_fc(FIRE_RINGS)
     a, b = month + "-01", ee.Date(month + "-01").advance(1, "month")
     out = ee.FeatureCollection([])
+    days = {}
     for sid, (asset, frp, mask) in FIRE.items():
         col = ee.ImageCollection(asset).filterDate(a, b)
+        days[sid] = _days(col)
 
         def per(img, sid=sid, frp=frp, mask=mask):
             fire = img.select(mask).gte(7)
@@ -118,6 +126,7 @@ def fire_month(month: str, budget: Budget) -> list[dict]:
             return st.filter(ee.Filter.gt("n_count", 0)).map(lambda f: f.set({"date": img.date().format("YYYY-MM-dd"), "source": sid}))
         out = out.merge(col.map(per).flatten())
     firms = ee.ImageCollection(FIRMS).filterDate(a, b).select("T21")
+    days["firms-modis"] = _days(firms)
 
     def per_firms(img):
         st = img.gt(0).selfMask().rename("n").addBands(img.rename("frp")).reduceRegions(fc, ee.Reducer.count(), scale=1000)
@@ -129,7 +138,7 @@ def fire_month(month: str, budget: Budget) -> list[dict]:
         p = f["properties"]
         rows.append({"volcano": p["volcano"], "ring": p["ring"], "date": p["date"], "source": p["source"],
                      "n": p.get("n_count", p.get("n")), "max_frp_mw": p.get("frp_max")})
-    return rows
+    return rows, budget.get(ee.Dictionary(days))
 
 
 def run_monthly(kind: str, start: str, end: str, budget: Budget) -> dict:
@@ -138,10 +147,15 @@ def run_monthly(kind: str, start: str, end: str, budget: Budget) -> dict:
     done = skipped = 0
     for m in months(start, end):
         path = TABLES / f"ee-{kind}" / f"{m}.csv"
-        if path.exists():
+        # a fire month is run again until every collection covers it (a partial month must not freeze as zeros)
+        if path.exists() and (kind != "fire" or coverage.fire_month_complete(m, coverage.read_coverage(path))):
             skipped += 1
             continue
         rows = fn(m, budget)
+        if kind == "fire":
+            rows, cov = rows
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.with_suffix(".coverage.json").write_text(json.dumps(cov, sort_keys=True))
         _write(path, rows, cols)
         done += 1
         print(f"  {kind} {m}: {len(rows)} rows; run {budget.run_s:.0f} EECU-s", flush=True)
