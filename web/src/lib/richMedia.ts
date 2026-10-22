@@ -21,7 +21,8 @@ function saveData(): boolean {
   return !!c?.saveData;
 }
 
-function snapshot(): boolean {
+/** The rule 6b decision right now (outside React: app/prefetch.ts). */
+export function snapshot(): boolean {
   if (typeof window === "undefined" || !window.matchMedia) return false;
   return richMediaAllowed({ matches: (q) => window.matchMedia(q).matches, saveData: saveData() });
 }

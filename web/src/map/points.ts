@@ -160,3 +160,9 @@ export async function loadAllQuakes(layer: Layer, versionBase: string, months: r
   );
   return parts.flat();
 }
+
+/** The zoom range of one PMTiles file of `layer` (build time: the map's first-window pack, map/firstWindow.ts). */
+export async function pmtilesZooms(versionBase: string, path: string): Promise<{ min: number; max: number }> {
+  const header = await new PMTiles(new FetchSource(resolveUrl(versionBase, path))).getHeader();
+  return { min: header.minZoom, max: header.maxZoom };
+}

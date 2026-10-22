@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 
 import type { Layers, VolcanoesIndex } from "@contracts/readmodels";
 
-import { activityByVolcano, depthClass, hexbin, monthlyCounts, NEAR_KM, nearestKm, type Activity, type Hex, type MonthCount, type VolcanoPt } from "./density";
-import { loadQuakes, loadThermal, type QuakePt, type ThermalPt } from "./points";
+import { layerMonths } from "../data/layers";
+import { activityByVolcano, depthClass, hexbin, monthlyCounts, NEAR_KM, nearestKm, quakesPerMonth, WINDOW_MONTHS, windowMonths, type Activity, type Hex, type MonthCount, type VolcanoPt } from "./density";
+import { firstWindowFor, packQuakes, packThermal } from "./firstWindow";
+import { loadAllQuakes, loadQuakes, loadThermal, type QuakePt, type ThermalPt } from "./points";
 
 export type TaggedThermal = ThermalPt & { near: boolean };
 
@@ -36,6 +38,11 @@ export async function loadWindow(layers: Layers, versionBase: string, index: Vol
     thermalLayer ? loadThermal(thermalLayer, versionBase, months).catch(() => []) : [],
     quakeLayer ? loadQuakes(quakeLayer, versionBase, months).catch(() => []) : [],
   ]);
+  return deriveWindow(index, months, rawThermal, quakes);
+}
+
+/** Everything the map shows for a window, from its points. */
+export function deriveWindow(index: VolcanoesIndex, months: string[], rawThermal: readonly ThermalPt[], quakes: QuakePt[]): WindowData {
   const volcanoes = volcanoPoints(index);
   // FIRMS's own active-volcano flag (type 1) also counts as near.
   const thermal = rawThermal.map((t) => ({ ...t, near: t.type === 1 || nearestKm(t.lon, t.lat, volcanoes) <= NEAR_KM }));
@@ -61,16 +68,57 @@ export function toGeojson(d: WindowData): MapGeojson {
   };
 }
 
+/** Every month any national layer offers, up to the data's last month, oldest first (the map's timeline). */
+export function recordMonths(layers: Layers, dataAsOf: string): string[] {
+  const thermal = layers.layers.find((l) => l.id === "thermal-detections");
+  const quakes = layers.layers.find((l) => l.id === "earthquakes-usgs");
+  return [...new Set([...layerMonths(thermal), ...layerMonths(quakes)])].filter((m) => m <= dataAsOf.slice(0, 7)).sort();
+}
+
+/** The map's first window: the WINDOW_MONTHS months up to the record's last month. */
+export function defaultWindowMonths(record: readonly string[]): string[] {
+  const end = record.at(-1);
+  return end ? windowMonths(end, WINDOW_MONTHS) : [];
+}
+
+// The window most recently asked for (one entry): the map page's first window is started from main.tsx before the
+// page's chunk has arrived (app/prefetch.ts), and the page then picks up the same promise instead of loading again.
+let lastWindow: { key: string; p: Promise<WindowData> } | null = null;
+
+/** loadWindow, sharing the promise with the previous call for the same window. With the data version's `stamp`, the
+ *  map's first window comes from the build-time pack (map/firstWindow.ts) when it matches, with the same points. */
+export function loadWindowShared(layers: Layers, versionBase: string, index: VolcanoesIndex, months: string[], stamp?: string): Promise<WindowData> {
+  const key = `${versionBase}|${months.join(",")}`;
+  if (lastWindow?.key !== key) {
+    const p = (stamp ? firstWindowFor(stamp, months) : Promise.resolve(null)).then((pack) =>
+      pack ? deriveWindow(index, months, packThermal(pack), packQuakes(pack)) : loadWindow(layers, versionBase, index, months),
+    );
+    lastWindow = { key, p };
+    p.catch(() => {
+      if (lastWindow?.p === p) lastWindow = null;
+    });
+  }
+  return lastWindow.p;
+}
+
+/** The record's earthquakes per month (the map's timeline strip): from the first-window pack when it matches. */
+export async function recordQuakeCounts(layers: Layers, versionBase: string, record: string[], stamp?: string): Promise<number[]> {
+  const pack = stamp ? await firstWindowFor(stamp, record, "record") : null;
+  if (pack) return pack.recordQuakes;
+  const quakeLayer = layers.layers.find((l) => l.id === "earthquakes-usgs");
+  return quakesPerMonth(record, quakeLayer ? await loadAllQuakes(quakeLayer, versionBase, record) : []);
+}
+
 /** The window's data; null while the first window loads (the previous window stays while the next one loads). */
-export function useWindowData(layers: Layers, versionBase: string, index: VolcanoesIndex, months: string[]): { data: WindowData | null; loading: boolean } {
+export function useWindowData(layers: Layers, versionBase: string, index: VolcanoesIndex, months: string[], stamp?: string): { data: WindowData | null; loading: boolean } {
   const key = months.join(",");
   const [got, setGot] = useState<{ key: string; data: WindowData } | null>(null);
   useEffect(() => {
     let live = true;
-    void loadWindow(layers, versionBase, index, key ? key.split(",") : []).then((data) => live && setGot({ key, data }));
+    void loadWindowShared(layers, versionBase, index, key ? key.split(",") : [], stamp).then((data) => live && setGot({ key, data }));
     return () => {
       live = false;
     };
-  }, [layers, versionBase, index, key]);
+  }, [layers, versionBase, index, key, stamp]);
   return { data: got?.data ?? null, loading: got?.key !== key };
 }
