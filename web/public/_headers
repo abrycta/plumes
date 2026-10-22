@@ -9,18 +9,19 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Cross-Origin-Opener-Policy: same-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  # Data: same origin (fixtures, M1), then the published versions on GitHub Pages and the Hugging Face mirror
-  # (resolve URLs redirect to *.hf.co); basemap: OpenFreeMap (style, tiles, glyphs, sprites). Add new hosts to connect-src.
-  Content-Security-Policy: default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://abrycta.github.io https://huggingface.co https://*.hf.co; font-src 'self' data:; connect-src 'self' https://abrycta.github.io https://huggingface.co https://*.huggingface.co https://*.hf.co https://tiles.openfreemap.org; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+  # Data: the published versions on GitHub Pages (krtmtthw.dev/plumes/data/, the user site's custom domain; the
+  # abrycta.github.io URL redirects there) and the Hugging Face mirror (resolve URLs redirect to *.hf.co, which also
+  # answers PMTiles range requests); basemap: OpenFreeMap (style, tiles, glyphs, sprites). Add new hosts to connect-src.
+  Content-Security-Policy: default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.hf.co; font-src 'self' data:; connect-src 'self' https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.huggingface.co https://*.hf.co https://tiles.openfreemap.org; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
 
 # Vite emits content-hashed file names here, so they never change in place.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Data versions (v0/, v1/, ...). Published versions are immutable, but M1 serves the contract fixture v0, which is
-# rebuilt in place, so an hour for now; make it immutable when config.json points at published versions.
+# Data versions (v1/, v2/, ...) are immutable once published. The deployed site reads them from GitHub Pages and the
+# Hugging Face mirror (config.json), so these two rules only apply if a version is ever served from this origin.
 /data/v*
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, max-age=31536000, immutable
 
 # The pointer to the current data version: short cache so a new release shows up quickly.
 /data/latest.json

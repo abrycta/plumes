@@ -21,7 +21,7 @@ export function periodsOf(model: VolcanoReadModel): Period[] {
     const from = clip(addDays(a, -7));
     const to = clip(addDays(b, 7));
     if (toDay(to) - toDay(from) < 2 || out.some((p) => p.from === from && p.to === to)) continue;
-    out.push({ id: `${a}`, from, to, label: { en: formatRange(a, b, "en"), ja: formatRange(a, b, "ja") } });
+    out.push({ id: `${a}/${b}`, from, to, label: { en: formatRange(a, b, "en"), ja: formatRange(a, b, "ja") } });
   }
   return out;
 }

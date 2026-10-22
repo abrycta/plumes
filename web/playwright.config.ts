@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// E2E against the production build served by `vite preview` (build first: npm run build). The data base URL is the
-// contract fixture (served at /data/ by scripts/vite-fixture-data.ts). OpenFreeMap is stubbed unreachable in
+// E2E against the production build served by `vite preview` (build first: npm run build). PLUMES_FIXTURES=1 makes
+// the preview serve the contract fixtures at /data/ and a config.json pointing there (scripts/vite-fixture-data.ts). OpenFreeMap is stubbed unreachable in
 // e2e/fixtures.ts, so the interactive map uses its bundled coastline and runs offline.
 const PORT = Number(process.env.E2E_PORT ?? 4327);
 
@@ -28,5 +28,6 @@ export default defineConfig({
     url: `http://127.0.0.1:${PORT}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
+    env: { PLUMES_FIXTURES: "1" },
   },
 });

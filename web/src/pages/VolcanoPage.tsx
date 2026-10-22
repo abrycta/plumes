@@ -22,9 +22,9 @@ import { DataThrough } from "@/components/DataThrough";
 import { DraftBadge, FigureList } from "@/components/FigureList";
 import { loadVolcano, loadVolcanoes, STORIES } from "@/data/load";
 import { periodsOf } from "@/data/periods";
-import { buildTracks, ringOptions } from "@/data/tracks";
+import { absentRecords, buildTracks, ringOptions } from "@/data/tracks";
 import { addDays, formatDate, formatRange, toDay } from "@/lib/dates";
-import { formatNumber } from "@/lib/format";
+import { formatNumber, volcanoType } from "@/lib/format";
 import { Readout } from "@/volcano/Readout";
 import { Timeline } from "@/volcano/Timeline";
 
@@ -57,7 +57,7 @@ function Facts({ f, model }: { f: Feature; model: VolcanoReadModel | null }) {
   const p = f.properties;
   const ring = model?.exposure.rings[0];
   const rows: [string, React.ReactNode][] = [
-    [t("Type (GVP)", "種類(GVP)"), model?.volcano.type ?? "–"],
+    [t("Type (GVP)", "種類(GVP)"), model?.volcano.type ? volcanoType(model.volcano.type, lang) : "–"],
     [t("Elevation", "標高"), p.elevationM != null ? `${formatNumber(p.elevationM, lang, 0)} m` : "–"],
     [t("Eruptions since 2000 (GVP)", "2000年以降の噴火(GVP)"), p.eruptionsSince2000 ?? "–"],
     [t("Last eruption (GVP)", "最後の噴火(GVP)"), p.lastEruption?.start ? `${formatDate(p.lastEruption.start, lang)}${p.lastEruption.vei != null ? ` · VEI ${p.lastEruption.vei}` : ""}` : "–"],
@@ -92,6 +92,7 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
   const period = periods.find((p) => p.from === url.from && p.to === url.to) ?? periods[0]!;
   const ring = url.ring && rings.includes(url.ring) ? url.ring : (rings[0] ?? null);
   const tracks = useMemo(() => buildTracks(model, ring), [model, ring]);
+  const absent = useMemo(() => absentRecords(model, tracks), [model, tracks]);
   const firstEvent = model.readings[0]?.start;
   const cursor = url.date && url.date >= period.from && url.date <= period.to ? url.date : firstEvent && firstEvent >= period.from && firstEvent <= period.to ? firstEvent : period.from;
   const days = toDay(period.to) - toDay(period.from) + 1;
@@ -168,6 +169,19 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
             <Readout tracks={tracks} date={cursor} />
           </aside>
         </div>
+        {absent.length ? (
+          <div className="flex flex-col gap-2" data-absent-records>
+            <h3 className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{t("Nothing to show, and why", "記録がない系列とその理由")}</h3>
+            <dl className="m-0 grid max-w-4xl gap-x-6 gap-y-2 text-sm md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)]">
+              {absent.map((a) => (
+                <div key={a.id} className="contents" data-absent={a.id}>
+                  <dt className="font-medium">{a.title[lang]}</dt>
+                  <dd className="m-0 text-muted-foreground">{a.reason[lang]}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ) : null}
       </section>
 
       {model.readings.length ? (

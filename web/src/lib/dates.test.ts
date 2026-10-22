@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addDays, formatDate, formatRange, monthTicks, tickLabel } from "./dates";
+import { addDays, formatDate, formatRange, monthTicks, tickLabel, yearlyTicks } from "./dates";
 import { flToKm, formatNumber } from "./format";
 
 describe("dates", () => {
@@ -23,6 +23,10 @@ describe("dates", () => {
   it("month ticks and labels", () => {
     expect(monthTicks("2019-12-01", "2020-02-15")).toEqual(["2019-12-01", "2020-01-01", "2020-02-01"]);
     expect(monthTicks("2000-01-15", "2026-10-21", 8).length).toBeLessThanOrEqual(8);
+    expect(monthTicks("2000-01-01", "2026-10-22", 8)).toEqual(["2000-01-01", "2004-01-01", "2008-01-01", "2012-01-01", "2016-01-01", "2020-01-01", "2024-01-01"]);
+    expect(yearlyTicks(monthTicks("2000-01-01", "2026-10-22", 8))).toBe(true);
+    expect(yearlyTicks(monthTicks("2019-12-01", "2020-02-15"))).toBe(false);
+    expect(tickLabel("2004-01-01", "ja", true, true)).toBe("2004年");
     expect(tickLabel("2020-02-01", "en", false)).toBe("Feb");
     expect(tickLabel("2020-01-01", "ja", false)).toBe("2020年1月");
   });

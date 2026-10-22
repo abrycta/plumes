@@ -5,7 +5,7 @@
 
 import type { DailySeries, Episode, LocalText, SparseSeries, VolcanoReadModel } from "@contracts/readmodels";
 
-import { addDays, toDay } from "@/lib/dates";
+import { addDays, formatDate, toDay } from "@/lib/dates";
 
 export type GroupId = "alert" | "earthquakes" | "so2" | "thermal" | "eruptions" | "ash" | "people" | "other";
 export type TrackKind = "line" | "bars" | "markers" | "spans";
@@ -367,6 +367,70 @@ export function tracksForStep(step: { series: string[] }, tracks: Track[]): Trac
   return tracks.filter((t) => want.has(t.id) || (want.has("bulletins") && (t.id === "alert" || t.id.startsWith("bulletin_"))));
 }
 
+
+export interface AbsentRecord {
+  id: string;
+  title: LocalText;
+  /** Why this volcano has nothing in the series: the specific reason, never a generic "no record". */
+  reason: LocalText;
+}
+
+/** Series this volcano's record has nothing in, each with the reason (shown under the time axis). */
+export function absentRecords(model: VolcanoReadModel, tracks: Track[]): AbsentRecord[] {
+  const out: AbsentRecord[] = [];
+  const asOf = model.dataAsOf;
+  const b = model.bulletins;
+  if (!b || !b.rows.length)
+    out.push({
+      id: "bulletins",
+      title: { en: "PHIVOLCS bulletins (alert levels, volcanic earthquakes, SO₂ flux)", ja: "PHIVOLCSの火山情報(警戒レベル、火山性地震、SO₂放出量)" },
+      reason: {
+        en: "None issued for this volcano in the record: PHIVOLCS publishes daily bulletins for its observatory volcanoes and during unrest. Plumes reads the English bulletins from September 2017 and the LAVA bulletins from July 2022.",
+        ja: "記録の期間にこの火山の火山情報は発表されていない。PHIVOLCSの日々の火山情報は観測所のある火山と活動時のみ。Plumesは2017年9月からの英語版と2022年7月からのLAVA版を読んでいる。",
+      },
+    });
+  else {
+    if (!b.rows.some((r) => r[2] != null))
+      out.push({ id: "bulletin_eq", title: { en: "Volcanic earthquakes per bulletin (PHIVOLCS)", ja: "火山性地震の回数(PHIVOLCS)" }, reason: { en: "No bulletin in the record reports a volcanic-earthquake count.", ja: "記録中の火山情報に火山性地震の回数の記載がない。" } });
+    if (!b.rows.some((r) => r[4] != null))
+      out.push({ id: "bulletin_so2", title: { en: "SO₂ flux, PHIVOLCS (ground)", ja: "SO₂放出量(PHIVOLCS、地上観測)" }, reason: { en: "No bulletin in the record reports an SO₂ flux.", ja: "記録中の火山情報にSO₂放出量の記載がない。" } });
+  }
+  if (!model.advisories || !model.advisories.rows.length)
+    out.push({
+      id: "advisories",
+      title: { en: "Volcanic ash advisories (Tokyo VAAC)", ja: "航空路火山灰情報(東京VAAC)" },
+      reason:
+        model.volcano.gvpNumber == null
+          ? { en: "Advisories name volcanoes by their GVP number, and this volcano has none, so none can be matched to it.", ja: "火山灰情報はGVP番号で火山を示すが、この火山には番号がないため対応する情報はない。" }
+          : { en: "Tokyo VAAC issued no advisory for this volcano from 2010 (the start of the archive Plumes reads) to the data date.", ja: "東京VAACは2010年(Plumesが読む記録の開始)からデータの最終日まで、この火山の情報を発表していない。" },
+    });
+  if (!model.episodes.some((e) => e.kind === "gvp_eruption"))
+    out.push({
+      id: "eruptions",
+      title: { en: "Eruptions (GVP)", ja: "噴火(GVP)" },
+      reason:
+        model.volcano.gvpNumber == null
+          ? { en: "Not in the Smithsonian GVP list of Holocene volcanoes, so there is no GVP eruption history for it.", ja: "スミソニアン博物館GVPの完新世火山の一覧にないため、GVPの噴火史はない。" }
+          : { en: "The Smithsonian GVP lists this volcano but records no dated eruption for it.", ja: "スミソニアン博物館GVPはこの火山を掲載しているが、年代のある噴火の記録はない。" },
+    });
+  if (!model.displacement || !model.displacement.rows.length)
+    out.push({
+      id: "displacement",
+      title: { en: "People affected (DSWD DROMIC)", ja: "被災者数(DSWD DROMIC)" },
+      reason: { en: "This data version carries DSWD DROMIC figures for the Taal eruption of January 2020 only.", ja: "このデータ版のDSWD DROMICの数値は2020年1月のタール火山噴火のみ。" },
+    });
+  for (const t of tracks)
+    if (t.kind === "bars" && !t.points.length)
+      out.push({
+        id: t.id,
+        title: t.title,
+        reason: {
+          en: `Nothing detected${t.ringKm ? ` within ${t.ringKm} km` : ""} from ${formatDate(t.start ?? model.span.start, "en")}, when the instrument record starts, to ${formatDate(asOf, "en")}.`,
+          ja: `観測記録の始まる${formatDate(t.start ?? model.span.start, "ja")}から${formatDate(asOf, "ja")}まで、${t.ringKm ? `${t.ringKm} km圏で` : ""}検知なし。`,
+        },
+      });
+  return out;
+}
 
 /** 504265 -> "504k", 38203 -> "38k", 950 -> "950". */
 export function compact(n: number): string {

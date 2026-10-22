@@ -16,7 +16,7 @@ The Plumes front end: Vite + React 19 + TypeScript, `@abrycta/akari` (Header, Pa
 
 Data contract: [`../contracts/`](../contracts/README.md). Types come straight from `../contracts/ts/readmodels.ts` (alias `@contracts/*`); never copy them.
 
-`public/config.json` names the data base URL and fallbacks (no rebuild to switch). The app reads `latest.json` there, then every file relative to the version's `base`, falling back to `latest.mirrors`. Until the pipeline publishes, `scripts/vite-fixture-data.ts` serves `../contracts/fixtures/data` at `/data/` in dev and preview and copies it into the build. To switch, set `data.baseUrl` to the GitHub Pages URL and `fallbackBaseUrls` to the Hugging Face mirror (both hosts are already in the CSP in `public/_headers`), and make `/data/v*` immutable there.
+`public/config.json` names the data base URL and fallbacks (no rebuild to switch): the published versions at `https://krtmtthw.dev/plumes/data/` (GitHub Pages), then the Hugging Face mirror. The app reads `latest.json` there, then every file relative to the version's `base`, falling back to `latest.mirrors`. Tests and offline development use the contract fixtures instead: with `PLUMES_FIXTURES=1` (set by `playwright.config.ts`), `scripts/vite-fixture-data.ts` serves `../contracts/fixtures/data` at `/data/` and a `config.json` pointing there; the build never contains them.
 
 `src/content/sources.json` (the About page's licence table) is generated from `../docs/sources-draft.yaml`: `npm run sources`.
 

@@ -66,13 +66,22 @@ export function monthTicks(from: string, to: string, max = 8): string[] {
   }
   if (out.length <= max) return out;
   const step = Math.ceil(out.length / max);
-  return out.filter((_, i) => i % step === 0);
+  if (step < 12) return out.filter((_, i) => i % step === 0);
+  // Long spans: whole years (1 January of every nth year), so every label can carry its year.
+  const years = Math.ceil(step / 12);
+  return out.filter((iso) => iso.slice(5, 7) === "01" && Number(iso.slice(0, 4)) % years === 0);
 }
 
-/** Axis label for a month tick: the year only on January and on the first tick. */
-export function tickLabel(iso: string, lang: Lang, first: boolean): string {
+/** True when the ticks are whole years (see monthTicks), so labels show the year alone. */
+export function yearlyTicks(ticks: string[]): boolean {
+  return ticks.length > 1 && ticks.every((iso) => iso.slice(5, 7) === "01") && Number(ticks[1]!.slice(0, 4)) > Number(ticks[0]!.slice(0, 4));
+}
+
+/** Axis label for a month tick: the year only on January and on the first tick; the year alone on yearly ticks. */
+export function tickLabel(iso: string, lang: Lang, first: boolean, yearly = false): string {
   const y = iso.slice(0, 4);
   const m = Number(iso.slice(5, 7));
+  if (yearly) return lang === "ja" ? `${y}年` : y;
   const withYear = first || m === 1;
   if (lang === "ja") return withYear ? `${y}年${m}月` : `${m}月`;
   return withYear ? `${MONTHS_EN[m - 1]} ${y}` : MONTHS_EN[m - 1]!;

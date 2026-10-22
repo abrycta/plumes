@@ -3,8 +3,8 @@ import { type PointerEvent, useEffect, useRef, useState } from "react";
 
 import { DataThrough } from "@/components/DataThrough";
 import { GROUPS, observedShare, type Track, valuesIn } from "@/data/tracks";
-import { formatDate, fromDay, monthTicks, tickLabel, toDay } from "@/lib/dates";
-import { formatNumber, formatPercent } from "@/lib/format";
+import { formatDate, fromDay, monthTicks, tickLabel, toDay, yearlyTicks } from "@/lib/dates";
+import { formatNumber, formatPercent, unitLabel } from "@/lib/format";
 
 const LINE_H = 56;
 const BAR_H = 44;
@@ -90,19 +90,19 @@ function TrackPlot({ track, s, from, to, cursor, lang, highlight }: { track: Tra
         if (p.coverage != null) els.push(<rect key={`cv${p.date}`} x={s.x(p.date)} y={LINE_H + 2} width={Math.max(1, s.dayW - 0.5)} height={5} fill="var(--chart-seq-3)" opacity={Math.max(0.08, p.coverage)} />);
   } else if (track.kind === "bars") {
     const bw = Math.max(2, s.dayW - (s.dayW > 4 ? 2 : 0));
-    for (const p of inRange) {
+    for (const [i, p] of inRange.entries()) {
       if (p.value == null) continue;
       const top = y(p.value);
-      els.push(<rect key={p.date} x={s.x(p.date) + (s.dayW - bw) / 2} y={top} width={bw} height={Math.max(1.5, y(0) - top)} rx={Math.min(2, bw / 2)} fill="var(--chart-seq-4)" />);
+      els.push(<rect key={`${p.date}#${i}`} x={s.x(p.date) + (s.dayW - bw) / 2} y={top} width={bw} height={Math.max(1.5, y(0) - top)} rx={Math.min(2, bw / 2)} fill="var(--chart-seq-4)" />);
     }
     els.push(<line key="base" x1={0} x2={s.w} y1={y(0)} y2={y(0)} stroke="var(--border)" strokeWidth={1} />);
   } else if (track.kind === "spans") {
-    for (const p of inRange) {
+    for (const [i, p] of inRange.entries()) {
       const x0 = Math.max(0, s.x(p.date));
       const x1 = Math.min(s.w, s.x(p.end ?? p.date) + s.dayW);
       const label = `${p.mark ?? ""} · ${formatDate(p.date, lang)}${p.end ? ` – ${formatDate(p.end, lang)}` : ""}`;
       els.push(
-        <a key={p.date} href={p.url} target="_blank" rel="noopener noreferrer" aria-label={`${label} (GVP)`}>
+        <a key={`${p.date}#${i}`} href={p.url} target="_blank" rel="noopener noreferrer" aria-label={`${label} (GVP)`}>
           <rect x={x0} y={7} width={Math.max(4, x1 - x0)} height={16} rx={2} fill="color-mix(in oklab, var(--seal) 18%, transparent)" stroke="var(--seal)" strokeWidth={1.5} />
           {x1 - x0 > 44 ? (
             <text x={x0 + 6} y={19} fontSize={11} fill="var(--foreground)">
@@ -116,13 +116,27 @@ function TrackPlot({ track, s, from, to, cursor, lang, highlight }: { track: Tra
         </a>,
       );
     }
+  } else if (inRange.length * 18 > s.w) {
+    // Too many dated markers to draw one by one (years of daily bulletins): one tick per pixel column, as tall as the
+    // highest value there. Each marker stays dated and linked in the day readout beside the plot.
+    const columns = new Map<number, number>();
+    for (const p of inRange) {
+      const c = Math.floor(s.x(p.date) + s.dayW / 2);
+      columns.set(c, Math.max(columns.get(c) ?? 0, p.value ?? 0));
+    }
+    const top = Math.max(1, ...columns.values());
+    for (const [c, v] of columns) {
+      const th = 4 + (v / top) * (MARK_H - 8);
+      els.push(<rect key={`d${c}`} x={c} y={MARK_H - 2 - th} width={1} height={th} fill="var(--foreground)" opacity={0.75} />);
+    }
+    els.push(<line key="base" x1={0} x2={s.w} y1={MARK_H - 2} y2={MARK_H - 2} stroke="var(--border)" strokeWidth={1} />);
   } else {
     // Dated markers; PHIVOLCS, VAAC and DROMIC markers link to their pages.
     let lastX = -Infinity;
-    for (const p of inRange) {
+    for (const [i, p] of inRange.entries()) {
       const px = s.x(p.date) + s.dayW / 2;
       const short = (p.mark ?? "").length <= 2;
-      const label = `${p.mark ? `${p.mark}: ` : ""}${track.title[lang]}, ${p.value != null ? formatNumber(p.value, lang) : "–"}${track.unit ? ` ${track.unit}` : ""}, ${formatDate(p.date, lang)}`;
+      const label = `${p.mark ? `${p.mark}: ` : ""}${track.title[lang]}, ${p.value != null ? formatNumber(p.value, lang) : "–"}${track.unit ? ` ${unitLabel(track.unit, lang)}` : ""}, ${formatDate(p.date, lang)}`;
       const body = short ? (
         <>
           <circle cx={px} cy={MARK_H / 2} r={9} fill="var(--background)" stroke="var(--foreground)" strokeWidth={1.5} />
@@ -143,11 +157,11 @@ function TrackPlot({ track, s, from, to, cursor, lang, highlight }: { track: Tra
       if (!short && px - lastX > 70) lastX = px;
       els.push(
         p.url ? (
-          <a key={p.date} href={p.url} target="_blank" rel="noopener noreferrer" aria-label={label}>
+          <a key={`${p.date}#${i}`} href={p.url} target="_blank" rel="noopener noreferrer" aria-label={label}>
             {body}
           </a>
         ) : (
-          <g key={p.date} role="img" aria-label={label}>
+          <g key={`${p.date}#${i}`} role="img" aria-label={label}>
             {body}
           </g>
         ),
@@ -191,6 +205,7 @@ export function Timeline({ tracks, from, to, cursor, onCursor, dataAsOf, highlig
   const [ref, w] = useWidth<HTMLDivElement>();
   const s = makeScale(from, to, Math.max(w, 1));
   const ticks = monthTicks(from, to, w < 500 ? 4 : 8);
+  const yearly = yearlyTicks(ticks);
   const dragging = useRef(false);
   const cols = compact ? "" : "md:grid-cols-[220px_minmax(0,1fr)]";
 
@@ -209,7 +224,7 @@ export function Timeline({ tracks, from, to, cursor, onCursor, dataAsOf, highlig
           {w > 0
             ? ticks.map((iso, i) => (
                 <span key={iso} className="absolute top-0 -translate-x-1/2 font-mono whitespace-nowrap" style={{ left: Math.min(Math.max(s.x(iso), 18), s.w - 18) }}>
-                  {tickLabel(iso, lang, i === 0)}
+                  {tickLabel(iso, lang, i === 0, yearly)}
                 </span>
               ))
             : null}
@@ -227,7 +242,7 @@ export function Timeline({ tracks, from, to, cursor, onCursor, dataAsOf, highlig
                   <figcaption className="flex flex-col gap-0.5">
                     <span className="text-sm font-medium">
                       {tr.title[lang]}
-                      {tr.unit && tr.kind !== "spans" ? <span className="font-normal text-muted-foreground"> ({tr.unit})</span> : null}
+                      {tr.unit && tr.kind !== "spans" ? <span className="font-normal text-muted-foreground"> ({unitLabel(tr.unit, lang)})</span> : null}
                     </span>
                     <span className="text-xs text-muted-foreground">{tr.instrument[lang]}</span>
                     {cov ? <span className="text-xs text-muted-foreground">{cov}</span> : null}

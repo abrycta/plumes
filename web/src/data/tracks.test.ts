@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { VolcanoReadModel } from "@contracts/readmodels";
 
 import { periodsOf } from "./periods";
-import { buildTracks, compact, dayOf, pickByRing, readAt, ringOptions, tracksForStep } from "./tracks";
+import { absentRecords, buildTracks, compact, dayOf, pickByRing, readAt, ringOptions, tracksForStep } from "./tracks";
 
 const taal = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../../contracts/fixtures/data/v0/volcano/taal.json"), "utf8")) as VolcanoReadModel;
 
@@ -79,5 +79,18 @@ describe("small helpers", () => {
   });
   it("compact", () => {
     expect([compact(504265), compact(38203), compact(1500), compact(950)]).toEqual(["504k", "38k", "1.5k", "950"]);
+  });
+});
+
+describe("absentRecords", () => {
+  it("names every series a sparse volcano has nothing in, each with its specific reason", () => {
+    const events = Object.fromEntries(Object.entries(taal.events).map(([k, v]) => [k, k.startsWith("eq") ? { ...v, rows: [] } : v]));
+    const sparse = { ...taal, volcano: { ...taal.volcano, gvpNumber: null }, bulletins: null, advisories: null, displacement: null, events, episodes: [] } as unknown as VolcanoReadModel;
+    const absent = absentRecords(sparse, buildTracks(sparse, 10));
+    const ids = absent.map((a) => a.id);
+    expect(ids).toEqual(expect.arrayContaining(["bulletins", "advisories", "eruptions", "displacement", "eq_usgs_30km"]));
+    expect(absent.find((a) => a.id === "advisories")!.reason.en).toContain("GVP number");
+    expect(absent.find((a) => a.id === "eq_usgs_30km")!.reason.en).toMatch(/^Nothing detected within 30 km from /);
+    expect(absentRecords(taal, buildTracks(taal, 15)).map((a) => a.id)).not.toContain("bulletins");
   });
 });

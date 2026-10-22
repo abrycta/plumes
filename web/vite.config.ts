@@ -25,7 +25,7 @@ export default defineConfig({
     tailwindcss(),
     // Akari's pre-paint theme script (shared krtmtthw.dev theme cookie), served from our own origin.
     akariThemeInit(),
-    // The read-model fixtures as the /data/ base URL until the pipeline publishes real versions.
+    // PLUMES_FIXTURES=1 (e2e, offline dev): the contract fixtures at /data/ and a config.json pointing there.
     fixtureData(fileURLToPath(new URL("../contracts/fixtures/data", import.meta.url))),
   ],
   define: {

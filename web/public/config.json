@@ -1,9 +1,9 @@
 {
   "siteUrl": "https://plumes.krtmtthw.dev",
   "data": {
-    "baseUrl": "/data/",
+    "baseUrl": "https://krtmtthw.dev/plumes/data/",
     "pointer": "latest.json",
-    "fallbackBaseUrls": []
+    "fallbackBaseUrls": ["https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/"]
   },
   "basemap": {
     "style": "https://tiles.openfreemap.org/styles/positron",

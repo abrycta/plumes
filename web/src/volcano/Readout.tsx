@@ -3,7 +3,7 @@ import { useLang, useT } from "@abrycta/akari/react";
 import { ExtLink } from "@/app/Link";
 import { readAt, type Track } from "@/data/tracks";
 import { formatDate } from "@/lib/dates";
-import { flToKm, formatNumber, formatPercent } from "@/lib/format";
+import { flToKm, formatNumber, formatPercent, unitLabel } from "@/lib/format";
 
 /** The scrubber's day, read off every track in words: the table view of the timeline (and its screen-reader path). */
 export function Readout({ tracks, date }: { tracks: Track[]; date: string }) {
@@ -22,7 +22,7 @@ export function Readout({ tracks, date }: { tracks: Track[]; date: string }) {
             let cell: React.ReactNode;
             if (r.status === "value") {
               const p = r.point;
-              const v = p.value == null ? "–" : tr.unit === "FL" ? `FL${p.value} (${formatNumber(flToKm(p.value), lang, 1)} km)` : `${formatNumber(p.value, lang)}${tr.unit ? ` ${tr.unit}` : ""}`;
+              const v = p.value == null ? "–" : tr.unit === "FL" ? `FL${p.value} (${formatNumber(flToKm(p.value), lang, 1)} km)` : `${formatNumber(p.value, lang)}${tr.unit ? ` ${unitLabel(tr.unit, lang)}` : ""}`;
               const main =
                 tr.id === "alert"
                   ? t(`Alert Level ${p.value}, as reported by PHIVOLCS on ${formatDate(p.date, "en")}`, `警戒レベル${p.value}(${formatDate(p.date, "ja")}にPHIVOLCSが発表)`)
