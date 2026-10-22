@@ -11,6 +11,27 @@
     <!-- The published data host (config.json) and, for the embed, the basemap host: connect while the scripts load. -->
     <link rel="preconnect" href="https://krtmtthw.dev" crossorigin />
     <meta name="description" content="A retrospective record of the 24 active Philippine volcanoes since 2000: satellite SO₂, thermal anomalies, earthquakes, eruptions and dated, linked PHIVOLCS bulletins. Not a monitoring or warning service." />
+    <!-- Pre-load still: the project's kanji glyph, the same quiet tile as krtmtthw.dev's embed slots (Akari muted tokens),
+      until the view is ready. Inside #root, so React's first render replaces it. -->
+    <style>
+      .glyph-seal {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        display: grid;
+        place-items: center;
+        background: var(--muted);
+        color: var(--muted-foreground);
+        font-family: var(--font-heading);
+        font-size: clamp(48px, 9vw, 80px);
+        font-weight: 700;
+        line-height: 1;
+        pointer-events: none;
+      }
+      html[data-embed-ready] .glyph-seal {
+        display: none;
+      }
+    </style>
     <title>Plumes</title>
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Plumes" />
@@ -18,7 +39,7 @@
     <meta property="og:description" content="Every record of the 24 active Philippine volcanoes on one time axis. A past record only; DOST-PHIVOLCS is the sole authority for alert levels and advisories." />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="glyph-seal" aria-hidden="true" lang="ja">噴</div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
