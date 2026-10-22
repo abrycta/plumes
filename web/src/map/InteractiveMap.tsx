@@ -252,7 +252,8 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
       el.style.setProperty("--mk-thermal", layerVar(LAYER_TOKENS.thermal));
       el.style.setProperty("--mk-quakes", layerVar(LAYER_TOKENS.depth[0]));
       el.dataset.coverage = f.properties.coverage;
-      if (erupted) el.dataset.erupted = "";
+      if (erupted) el.dataset.erupted = erupted;
+      el.dataset.total = String(total);
       // Activity halo: 0 to 4 steps, by the order of magnitude of the window's counts around the volcano.
       el.dataset.activity = String(total ? Math.min(4, 1 + Math.floor(Math.log10(total))) : 0);
       const said = [
@@ -305,7 +306,41 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
         });
       return new maplibregl.Marker({ element: el, anchor: "left", offset: [-12, 0] }).setLngLat(f.geometry.coordinates.slice(0, 2) as [number, number]).addTo(map);
     });
-    return () => markers.forEach((m) => m.remove());
+    // Labels never overlap: on a collision the lower-priority label hides (its dot stays, with a hover title).
+    // Priority: the most recent eruption first, then the highest activity, then deep coverage.
+    const els = markers.map((m) => m.getElement());
+    const ranked = els
+      .filter((e) => e.querySelector(".label"))
+      .sort((x, y) => (y.dataset.erupted ?? "").localeCompare(x.dataset.erupted ?? "") || Number(y.dataset.total) - Number(x.dataset.total) || Number(y.dataset.coverage === "deep") - Number(x.dataset.coverage === "deep"));
+    let frame = 0;
+    const declutter = () => {
+      frame = 0;
+      const kept: DOMRect[] = [];
+      for (const e of ranked) {
+        const label = e.querySelector<HTMLElement>(".label")!;
+        const r = label.getBoundingClientRect();
+        const hit = kept.some((k) => r.left < k.right + 2 && r.right + 2 > k.left && r.top < k.bottom + 2 && r.bottom + 2 > k.top);
+        label.style.visibility = hit ? "hidden" : "";
+        if (hit) e.title = e.getAttribute("aria-label") ?? "";
+        else {
+          e.removeAttribute("title");
+          kept.push(r);
+        }
+      }
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(declutter);
+    };
+    schedule();
+    map.on("move", schedule);
+    map.on("resize", schedule);
+    void document.fonts?.ready.then(schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      map.off("move", schedule);
+      map.off("resize", schedule);
+      markers.forEach((m) => m.remove());
+    };
     // embed and formatMonth are fixed for the map's life; activity and eruptions are compared by value.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, lang, activityKey, eruptionKey]);
