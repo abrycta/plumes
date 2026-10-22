@@ -182,8 +182,26 @@ def generate(v_dir: pathlib.Path, out_dir: pathlib.Path | None = None, cat_path:
     pinned = ov.get("first") or []
     built.sort(key=lambda x: (x[1]["id"] not in pinned, pinned.index(x[1]["id"]) if x[1]["id"] in pinned else 0,
                               -x[1]["score"]["families"], -_vei(x[0]), [-ord(c) for c in x[0].start]))
+    # Hand-built stories already in the version (Taal 2020, reviewed by Kurt) stay listed, and stay the public file.
+    hand = {}
+    for p in sorted((v_dir / "story").glob("*.json")):
+        doc = json.loads(p.read_text())
+        if doc.get("generator"):
+            continue
+        status = "reviewed" if all(s.get("status") == "reviewed" for s in doc["steps"]) else "draft"
+        hand[doc["id"]] = {"id": doc["id"], "volcanoId": doc["volcanoId"], "title": doc["title"], "span": doc["span"], "status": status,
+                           "file": f"story/{p.name}"}
     index = []
     for rank, (_ev, story, errs) in enumerate(built, 1):
+        h = hand.get(story["id"])
+        if h and h["status"] == "reviewed" and story["status"] != "reviewed":
+            # A reviewed hand-built story stands in for the generated draft of the same event, at its rank (listed once).
+            p = out_dir / f"story/drafts/{story['id']}.json"
+            if story["score"]["tier"] == "story" and not errs:
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text(json.dumps(story, separators=(",", ":"), ensure_ascii=False))
+            index.append(hand.pop(story["id"]) | {"rank": rank})
+            continue
         entry = {k: story[k] for k in ("id", "volcanoId", "title", "span", "episodeIds", "score", "status")} | {"rank": rank}
         if story["score"]["tier"] == "story" and not errs:
             rel = f"story/{story['id']}.json" if story["status"] == "reviewed" else f"story/drafts/{story['id']}.json"
@@ -193,14 +211,7 @@ def generate(v_dir: pathlib.Path, out_dir: pathlib.Path | None = None, cat_path:
             entry["file"] = rel
             entry["sentences"] = sum(len(s["sentences"]) for s in story["steps"])
         index.append(entry)
-    # Hand-built stories already in the version (Taal 2020, reviewed by Kurt) stay listed, and stay the public file.
-    for p in sorted((v_dir / "story").glob("*.json")):
-        doc = json.loads(p.read_text())
-        if doc.get("generator"):
-            continue
-        status = "reviewed" if all(s.get("status") == "reviewed" for s in doc["steps"]) else "draft"
-        index.insert(0, {"id": doc["id"], "volcanoId": doc["volcanoId"], "title": doc["title"], "span": doc["span"], "status": status,
-                         "file": f"story/{p.name}"})
+    index = [h for h in hand.values() if h["id"] not in {e["id"] for e in index}][::-1] + index
     doc = {**(hdr or {}), "kind": "stories", "stories": index, "excluded": excluded}
     e = schema_errors(doc)
     checks.append({"check": "stories.json schema", "passed": not e, "detail": "; ".join(e[:3])})

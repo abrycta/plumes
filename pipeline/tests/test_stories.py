@@ -193,10 +193,11 @@ def test_generation_on_the_fixture_writes_valid_drafts_and_an_index(tmp_path):
     assert all(c["passed"] for c in res["checks"]), [c for c in res["checks"] if not c["passed"]]
     idx = json.loads((tmp_path / "stories.json").read_text())
     assert not errors(idx)
-    draft = next(s for s in idx["stories"] if s.get("file") == "story/drafts/taal-2020.json")
-    assert draft["status"] == "draft" and draft["score"]["tier"] == "story"
-    assert any(s.get("file") == "story/taal-2020.json" and "score" not in s for s in idx["stories"])  # the hand-built story stays listed
-    story = json.loads((tmp_path / draft["file"]).read_text())
+    # the reviewed hand-built Taal 2020 is listed once, at the generated story's rank; its generated draft is written but not listed
+    taal = [s for s in idx["stories"] if s["id"] == "taal-2020"]
+    assert len(taal) == 1 and taal[0]["file"] == "story/taal-2020.json" and "score" not in taal[0] and taal[0]["rank"] >= 1
+    story = json.loads((tmp_path / "story" / "drafts" / "taal-2020.json").read_text())
+    assert story["status"] == "draft" and story["score"]["tier"] == "story"
     assert not errors(story)
     for st in story["steps"]:
         assert st["status"] == "draft" and st["kind"] in ("before", "onset", "course", "after")
@@ -225,3 +226,9 @@ def test_a_matching_review_hash_publishes_the_story_and_a_changed_number_reopens
 
 def test_omi_is_gone_from_the_catalogue():  # Kurt dropped OMI SO₂ on 2026-10-23
     assert not [t for t in CAT if t.endswith("-OMI")] and all("omi-omso2e" not in t.source for t in CAT.values())
+
+
+def test_review_entries_are_well_formed_and_leave_the_hand_built_taal_alone():
+    rows = yaml.safe_load((pathlib.Path(facts.__file__).parent / "review.yaml").read_text())["reviews"]
+    assert rows and all(set(r) == {"story", "step", "sha256", "reviewer", "date"} and len(r["sha256"]) == 64 for r in rows)
+    assert len({(r["story"], r["step"]) for r in rows}) == len(rows) and not [r for r in rows if r["story"] == "taal-2020"]
