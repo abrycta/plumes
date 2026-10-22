@@ -397,8 +397,8 @@
     ]
    ],
    "note": {
-    "en": "Summit area (pixels within 2 km) minus COMET's reference area, relative to the first date. Positive = toward the satellite, negative = away; line-of-sight motion mixes vertical and east-west movement, so it is not uplift or subsidence by itself. los_std_mm is the spread of the summit pixels, not a formal error. Processed by COMET, not by Plumes. COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data 2014–2026. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
-    "ja": "山頂付近(2 km以内の画素)からCOMETの参照域を差し引いた値で、初回観測日を基準とする。正は衛星に近づく向き、負は遠ざかる向き。視線方向の変位は上下と東西の動きを含むため、それだけで隆起や沈降とは言えない。los_std_mm は山頂付近の画素のばらつきで、正式な誤差ではない。解析はCOMETによる(Plumesではない)。COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data 2014–2026. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
+    "en": "Summit area (pixels within 2 km) minus COMET's reference area, relative to the first date. Positive = toward the satellite, negative = away; line-of-sight motion mixes vertical and east-west movement, so it is not uplift or subsidence by itself. los_std_mm is the spread of the summit pixels, not a formal error. Processed by COMET, not by Plumes. COMET LiCSBAS (COMET Volcano Portal, https://comet.nerc.ac.uk/comet-volcano-portal/), processed by COMET, not by Plumes; LiCSAR contains modified Copernicus Sentinel data 2014–2026. Changes made: reduced to a summit series and a mean velocity per frame. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
+    "ja": "山頂付近(2 km以内の画素)からCOMETの参照域を差し引いた値で、初回観測日を基準とする。正は衛星に近づく向き、負は遠ざかる向き。視線方向の変位は上下と東西の動きを含むため、それだけで隆起や沈降とは言えない。los_std_mm は山頂付近の画素のばらつきで、正式な誤差ではない。解析はCOMETによる(Plumesではない)。COMET LiCSBAS (COMET Volcano Portal, https://comet.nerc.ac.uk/comet-volcano-portal/), processed by COMET, not by Plumes; LiCSAR contains modified Copernicus Sentinel data 2014–2026. Changes made: reduced to a summit series and a mean velocity per frame. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)"
    }
   }
  },
@@ -1258,7 +1258,7 @@
    },
    {
     "id": "comet-licsbas",
-    "attribution": "COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data 2014–2026. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
+    "attribution": "COMET LiCSBAS (COMET Volcano Portal, https://comet.nerc.ac.uk/comet-volcano-portal/), processed by COMET, not by Plumes; LiCSAR contains modified Copernicus Sentinel data 2014–2026. Changes made: reduced to a summit series and a mean velocity per frame. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
     "licence": "noncommercial-only: COMET Volcano Portal CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
     "snapshotDate": "2026-10-21",
     "fromArchive": false

@@ -61,16 +61,16 @@
     "unit": "mm/yr",
     "stops": [
      [
-      -55,
-      "≤ −55"
+      -60,
+      "≤ −60"
      ],
      [
       0,
       "0"
      ],
      [
-      55,
-      "≥ 55"
+      60,
+      "≥ 60"
      ]
     ]
    },
@@ -80,7 +80,7 @@
    "sources": [
     "comet-licsbas"
    ],
-   "attribution": "COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data 2014–2026. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
+   "attribution": "COMET LiCSBAS (COMET Volcano Portal, https://comet.nerc.ac.uk/comet-volcano-portal/), processed by COMET, not by Plumes; LiCSAR contains modified Copernicus Sentinel data 2014–2026. Changes made: reduced to a summit series and a mean velocity per frame. CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)",
    "frames": [
     {
      "id": "taal-032D_07536_111313",

@@ -47,7 +47,7 @@ DISP_URL = PORTAL + "disp_data_gacos/{region}/{name}_{frame}_web_x100.json"
 OUT = RAW / SOURCE_ID
 LICENCE_URL = "https://creativecommons.org/licenses/by-nc/4.0/"
 
-COH_FLOOR = 0.3  # LAYERS-PLAN §3.1 [U]: Taal 032D keeps 1,230 of 8,811 COMET-valid pixels at 0.3 (1,983 at 0.2)
+COH_FLOOR = 0.2  # Kurt, 2026-10-22 (DECISIONS L10): Taal 032D keeps 1,983 of 8,811 COMET-valid pixels (1,230 at the planned 0.3)
 SUMMIT_KM = (2.0, 3.0)  # summit window radius; the second is tried when the first holds fewer than MIN_PIXELS valid pixels
 MIN_PIXELS = 3
 MIN_DATES = 0.5  # a pixel needs values on at least half of the dates for a velocity
@@ -309,8 +309,10 @@ def years_text(start: str, end: str) -> str:
 
 
 def attribution(start: str, end: str) -> str:
-    return (f"COMET LiCSBAS (processed by COMET, University of Leeds; not by Plumes); LiCSAR contains modified Copernicus Sentinel data "
-            f"{years_text(start, end)}. CC BY-NC 4.0 ({LICENCE_URL})")
+    """LICENCES.md wording (DECISIONS L1a): source, processor, Copernicus acknowledgement, licence and the changes made."""
+    return (f"COMET LiCSBAS (COMET Volcano Portal, https://comet.nerc.ac.uk/comet-volcano-portal/), processed by COMET, not by Plumes; "
+            f"LiCSAR contains modified Copernicus Sentinel data {years_text(start, end)}. Changes made: reduced to a summit series and a mean "
+            f"velocity per frame. CC BY-NC 4.0 ({LICENCE_URL})")
 
 
 def lt(en: str, ja: str) -> dict:

@@ -94,3 +94,16 @@ def test_velocity_tif_is_north_up_and_scaled():
 def test_frame_meta():
     assert comet.frame_meta("032D_07536_111313") == {"track": 32, "pass": "descending"}
     assert comet.frame_meta("142A_07606_131313") == {"track": 142, "pass": "ascending"}
+
+
+def test_coherence_floor_is_0_2():
+    assert comet.COH_FLOOR == 0.2
+    j = frame()
+    j["coh"] = [[0.25] * 10 for _ in range(8)]
+    assert comet.reduce_frame(j)["validPixels"] == 79  # 80 pixels, one masked by COMET
+
+
+def test_attribution_names_comet_copernicus_licence_and_changes():
+    a = comet.attribution("2014-10-19", "2026-08-12")
+    assert "LiCSAR contains modified Copernicus Sentinel data 2014–2026" in a
+    assert "CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/)" in a and "Changes made" in a
