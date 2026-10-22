@@ -52,6 +52,13 @@ function motionToken(name: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
+/** A CSS time ("360ms", or ".36s" once minified) in milliseconds; 0 when unreadable. */
+function durationMs(v: string): number {
+  const n = parseFloat(v);
+  if (!Number.isFinite(n)) return 0;
+  return v.endsWith("ms") ? n : v.endsWith("s") ? n * 1000 : n;
+}
+
 /** The windows in time order, loaded one after another with the densest-ranked first, so the first is ready soonest.
  *  From the build-time pack (pack.ts: a few hundred kB, a smaller file per window on phones); without a pack (an
  *  offline build), computed in the browser from the published layers. */
@@ -122,7 +129,7 @@ function useTour(ends: readonly string[], frame: React.RefObject<HTMLDivElement 
         .animate(
           { opacity: to },
           {
-            duration: parseFloat(motionToken("--ak-duration-slow")) || 0,
+            duration: durationMs(motionToken("--ak-duration-slow")),
             easing: motionToken(to === 0 ? "--ak-ease-exit" : "--ak-ease-standard") || "ease",
             fill: "forwards",
           },
@@ -252,6 +259,8 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
   const headline = s ? (names.length ? t(`${names.join(" and ")} ${names.length > 1 ? "erupt" : "erupts"}`, `${names.join("・")}の噴火`) : t("The latest 12 months", "直近12か月")) : "";
   const range = s ? `${formatDate(months[0]!, lang)} – ${formatDate(s.end, lang)}` : "";
   const n = (v: number) => formatNumber(v, lang);
+  const notObserved = t("Not observed: outside this instrument's record", "観測なし(この観測機器の記録の範囲外)");
+  const gaps = !!d?.counts.some((c) => c.thermalObserved === false || c.quakesObserved === false);
   const cMax = d ? Math.max(1, ...d.counts.map((c) => Math.max(c.thermalNear + c.thermalFar, c.quakes))) : 1;
 
   return (
@@ -313,12 +322,16 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
               <div className="min-w-0">
                 <div className="flex h-ak-8 items-end gap-ak-0-5" aria-hidden="true" data-embed-months>
                   {d.counts.map((c) => (
-                    <div key={c.month} className="flex h-full flex-1 items-end gap-px">
-                      <div className="flex h-full flex-1 flex-col justify-end">
-                        <div className={`${LAYER_BG.thermal} opacity-30`} style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
-                        <div className={LAYER_BG.thermal} style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
-                      </div>
-                      <div className={`flex-1 ${LAYER_BG.quakes}`} style={{ height: `${(100 * c.quakes) / cMax}%` }} />
+                    <div key={c.month} className="flex h-full flex-1 items-end gap-px" data-not-observed={[c.thermalObserved === false && "thermal", c.quakesObserved === false && "quakes"].filter(Boolean).join(" ") || undefined}>
+                      {c.thermalObserved === false ? (
+                        <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} />
+                      ) : (
+                        <div className="flex h-full flex-1 flex-col justify-end">
+                          <div className={`${LAYER_BG.thermal} opacity-30`} style={{ height: `${(100 * c.thermalFar) / cMax}%` }} />
+                          <div className={LAYER_BG.thermal} style={{ height: `${(100 * c.thermalNear) / cMax}%` }} />
+                        </div>
+                      )}
+                      {c.quakesObserved === false ? <div className="h-full flex-1 bg-muted opacity-70" title={notObserved} /> : <div className={`flex-1 ${LAYER_BG.quakes}`} style={{ height: `${(100 * c.quakes) / cMax}%` }} />}
                     </div>
                   ))}
                 </div>
@@ -333,6 +346,14 @@ function EmbedMap({ frame }: { frame: React.RefObject<HTMLDivElement | null> }) 
                   </span>
                   {t("earthquakes", "地震")}
                 </p>
+                {gaps ? (
+                  <p className="m-0 flex items-baseline gap-ak-0-5 truncate text-ak-base text-muted-foreground" data-embed-not-observed>
+                    <span aria-hidden="true" className="text-muted opacity-70">
+                      ■
+                    </span>
+                    {notObserved}
+                  </p>
+                ) : null}
               </div>
             ) : null}
             <p className={`m-0 text-muted-foreground ${compact ? "truncate text-ak-2xs" : "text-ak-base"}`}>© OpenMapTiles © OpenStreetMap · NASA FIRMS · USGS · Copernicus Sentinel-5P</p>
