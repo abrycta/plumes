@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import type { Layers, VolcanoesIndex } from "@contracts/readmodels";
 
 import { layerMonths } from "../data/layers";
-import { activityByVolcano, depthClass, hexbin, monthlyCounts, NEAR_KM, nearestKm, quakesPerMonth, WINDOW_MONTHS, windowMonths, type Activity, type Hex, type MonthCount, type VolcanoPt } from "./density";
+import { activityByVolcano, depthClass, hexbin, monthlyCounts, NEAR_KM, nearestKm, quakesPerMonth, WINDOW_MONTHS, windowMonths, type Activity, type Hex, type LayerCoverage, type MonthCount, type VolcanoPt } from "./density";
 import { firstWindowFor, packQuakes, packThermal } from "./firstWindow";
 import { loadAllQuakes, loadQuakes, loadThermal, type QuakePt, type ThermalPt } from "./points";
 
@@ -31,6 +31,15 @@ export function volcanoPoints(index: VolcanoesIndex): VolcanoPt[] {
   return index.features.map((f) => ({ id: f.properties.id, lon: f.geometry.coordinates[0], lat: f.geometry.coordinates[1] }));
 }
 
+/** The months the thermal and earthquake layers cover (their `time` in layers.json). */
+export function layerCoverage(layers: Layers): LayerCoverage {
+  const months = (id: string) => {
+    const m = layerMonths(layers.layers.find((l) => l.id === id));
+    return m.length ? new Set(m) : null;
+  };
+  return { thermal: months("thermal-detections"), quakes: months("earthquakes-usgs") };
+}
+
 export async function loadWindow(layers: Layers, versionBase: string, index: VolcanoesIndex, months: string[]): Promise<WindowData> {
   const thermalLayer = layers.layers.find((l) => l.id === "thermal-detections");
   const quakeLayer = layers.layers.find((l) => l.id === "earthquakes-usgs");
@@ -38,11 +47,11 @@ export async function loadWindow(layers: Layers, versionBase: string, index: Vol
     thermalLayer ? loadThermal(thermalLayer, versionBase, months).catch(() => []) : [],
     quakeLayer ? loadQuakes(quakeLayer, versionBase, months).catch(() => []) : [],
   ]);
-  return deriveWindow(index, months, rawThermal, quakes);
+  return deriveWindow(index, months, rawThermal, quakes, layerCoverage(layers));
 }
 
 /** Everything the map shows for a window, from its points. */
-export function deriveWindow(index: VolcanoesIndex, months: string[], rawThermal: readonly ThermalPt[], quakes: QuakePt[]): WindowData {
+export function deriveWindow(index: VolcanoesIndex, months: string[], rawThermal: readonly ThermalPt[], quakes: QuakePt[], coverage?: LayerCoverage): WindowData {
   const volcanoes = volcanoPoints(index);
   // FIRMS's own active-volcano flag (type 1) also counts as near.
   const thermal = rawThermal.map((t) => ({ ...t, near: t.type === 1 || nearestKm(t.lon, t.lat, volcanoes) <= NEAR_KM }));
@@ -51,7 +60,7 @@ export function deriveWindow(index: VolcanoesIndex, months: string[], rawThermal
     thermal,
     quakes,
     hexes: hexbin(thermal),
-    counts: monthlyCounts(months, thermal, quakes),
+    counts: monthlyCounts(months, thermal, quakes, coverage),
     activity: activityByVolcano(volcanoes, thermal, quakes),
   };
 }
@@ -91,7 +100,7 @@ export function loadWindowShared(layers: Layers, versionBase: string, index: Vol
   const key = `${versionBase}|${months.join(",")}`;
   if (lastWindow?.key !== key) {
     const p = (stamp ? firstWindowFor(stamp, months) : Promise.resolve(null)).then((pack) =>
-      pack ? deriveWindow(index, months, packThermal(pack), packQuakes(pack)) : loadWindow(layers, versionBase, index, months),
+      pack ? deriveWindow(index, months, packThermal(pack), packQuakes(pack), layerCoverage(layers)) : loadWindow(layers, versionBase, index, months),
     );
     lastWindow = { key, p };
     p.catch(() => {

@@ -130,11 +130,34 @@ export interface MonthCount {
   thermalNear: number;
   thermalFar: number;
   quakes: number;
+  /** false: the month is outside the thermal layer's record (not observed, never zero). Absent: observed. */
+  thermalObserved?: boolean;
+  /** false: the month is outside the earthquake layer's record. Absent: observed. */
+  quakesObserved?: boolean;
 }
 
-/** Counts per month of `months`, splitting thermal detections by distance to a volcano. */
-export function monthlyCounts(months: readonly string[], thermal: readonly (ThermalPt & { near: boolean })[], quakes: readonly QuakePt[]): MonthCount[] {
-  const by = new Map<string, MonthCount>(months.map((m) => [m, { month: m, thermalNear: 0, thermalFar: 0, quakes: 0 }]));
+/** The months each national layer covers (layers.json `time`); null when unknown (every month counts as observed). */
+export interface LayerCoverage {
+  thermal: ReadonlySet<string> | null;
+  quakes: ReadonlySet<string> | null;
+}
+
+/** Counts per month of `months`, splitting thermal detections by distance to a volcano. Months outside a layer's
+ *  coverage are flagged not observed, so the timeline shows a gap instead of a zero. */
+export function monthlyCounts(months: readonly string[], thermal: readonly (ThermalPt & { near: boolean })[], quakes: readonly QuakePt[], coverage?: LayerCoverage): MonthCount[] {
+  const by = new Map<string, MonthCount>(
+    months.map((m) => [
+      m,
+      {
+        month: m,
+        thermalNear: 0,
+        thermalFar: 0,
+        quakes: 0,
+        ...(coverage?.thermal && !coverage.thermal.has(m) ? { thermalObserved: false } : {}),
+        ...(coverage?.quakes && !coverage.quakes.has(m) ? { quakesObserved: false } : {}),
+      },
+    ]),
+  );
   for (const t of thermal) {
     const c = by.get(t.month);
     if (c) {

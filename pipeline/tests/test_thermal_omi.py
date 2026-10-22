@@ -39,6 +39,12 @@ def test_n20_series_standard_then_nrt(tmp_path, monkeypatch):
     assert s["source"] == ["firms-viirs-noaa20"] and s["start"] == "2018-04-01"
     assert s["rows"] == [["2026-06-28", 2, 1, 9.0], ["2026-07-02", 1, None, 2.0]]
     assert "provisional" in s["note"]["en"]
+    assert s["end"] == "2026-07-02"  # no recent.json yet: the tail file's newest day
+    (thermal_n20.NRT_FILE.with_name("recent.json")).write_text(json.dumps({"from": "2026-07-01", "sp_to": "2026-06-30", "to": "2026-07-05"}))
+    assert thermal_n20.series_by_volcano([TAAL])["taal"][thermal_n20.SERIES_ID]["end"] == "2026-07-05"
+    thermal_n20.NRT_FILE.unlink()
+    thermal_n20.NRT_FILE.with_name("recent.json").unlink()
+    assert thermal_n20.series_by_volcano([TAAL])["taal"][thermal_n20.SERIES_ID]["end"] == "2026-06-30"  # standard coverage only
 
 
 def test_omi_reduce_and_series(tmp_path, monkeypatch):
