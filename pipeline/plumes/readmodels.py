@@ -23,7 +23,7 @@ import subprocess
 
 import yaml
 
-from plumes import comet, deeptime, omi, run_b, thermal_n20
+from plumes import comet, deeptime, omi, run_a, run_b, thermal_n20
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
@@ -644,6 +644,8 @@ def build(version: int, as_of: str) -> dict:
                                      "coverage": v["coverage"], "lastEruption": {"start": last["start"], "vei": last["vei"]} if last else None,
                                      "eruptionsSince1900": sum(y >= 1900 for y in yr), "eruptionsSince2000": sum(y >= 2000 for y in yr), "file": f"volcano/{v['id']}.json"}})
     run_b.apply(models, load_ee("rain"), REG)  # EE run B: IMERG rain (only once its tables exist)
+    run_a_tables = {k: load_ee(k) for k in ("laketemp", "lakegsw", "lakes2", "uvai")}  # EE run A (only once its tables exist)
+    run_a.apply(models, run_a_tables, run_a.eruption_windows(vols, gvp_e, {g: sorted({a[0][:10] for a in adv}) for g, adv in vaac.items()}, as_of), REG)
     story, reading = story_taal(next(v for v in vols if v["id"] == "taal"), models["taal"], as_of, hdr)
     models["taal"]["readings"] = [reading]
     for vid, vm in models.items():

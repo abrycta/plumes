@@ -312,3 +312,27 @@ def volcano_series(vid: str, lakes: list[dict], tables: dict[str, list[dict]], w
 
 EE_ASSETS = [a for a, *_ in LANDSAT_ST] + [S2, GSW, S5P_AER_AI]
 SOURCE_IDS = ["landsat-surface-temperature", "s2-sr-harmonized", "jrc-global-surface-water", "s5p-offl-aer-ai"]
+
+
+def apply(models: dict, tables: dict[str, list[dict]], windows: dict[str, list[tuple[str, str]]], registry: dict) -> int:
+    """Add run A's `events` entries to each volcano model that gets any, with their provenance records and EE assets.
+    Returns how many volcanoes changed (0 while the run A tables are absent)."""
+    lakes, n = load_lakes(), 0
+    for vid, vm in models.items():
+        added = volcano_series(vid, lakes, tables, windows)
+        if not added:
+            continue
+        vm["events"] = {**vm.get("events", {}), **added}
+        prov = vm.setdefault("provenance", {})
+        have = {x["id"] for x in prov.setdefault("sources", [])}
+        for sid in dict.fromkeys(s for e in added.values() for s in e["source"]):
+            if sid in have:
+                continue
+            e = registry[sid]
+            prov["sources"].append({"id": sid, "attribution": " ".join(e["attribution"].split()), "licence": " ".join(e["licence"].split()), "fromArchive": False})
+        assets = prov.setdefault("earthEngine", {}).setdefault("assets", [])
+        for a in EE_ASSETS:
+            if a not in assets:
+                assets.append(a)
+        n += 1
+    return n
