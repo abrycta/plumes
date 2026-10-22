@@ -66,7 +66,6 @@ jobs:
           uv run python -m plumes.crawl.vaac --since "$(date +%Y)"
           uv run python -m plumes.firms
           uv run python -m plumes.thermal_n20
-          uv run python -m plumes.omi
           test -f data/raw/nasa-msvolso2l4/philippines.json || uv run python -m plumes.nasa
           test -f data/raw/cod-ab/phl_admin3.csv || uv run python -m plumes.codab
       - name: Earth Engine (new months only)

@@ -22,7 +22,7 @@ import subprocess
 
 import yaml
 
-from plumes import comet, coverage, deeptime, omi, run_a, run_b, thermal_n20
+from plumes import comet, coverage, deeptime, run_a, run_b, thermal_n20
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
@@ -582,7 +582,7 @@ def build(version: int, as_of: str) -> dict:
     expo = rows(TABLES / "ee-exposure.csv")
     lgus = rows(RAW / "cod-ab" / "phl_admin3.csv")
     fprov = file_provenance()
-    n20, omi_so2 = thermal_n20.series_by_volcano(vols), omi.series_by_volcano(as_of)
+    n20 = thermal_n20.series_by_volcano(vols)
     defo, defo_layer = comet.build(v_dir, vols)  # COMET LOS series + deformation-velocity layer (absent without raw files)
     models, feats = {}, []
     for v in vols:
@@ -592,7 +592,7 @@ def build(version: int, as_of: str) -> dict:
               | {"links": {"phivolcs": WP_HOME, "hazardhunter": "https://hazardhunter.georisk.gov.ph/", "comet": "https://comet.nerc.ac.uk/comet-lics-portal/"}
                  | ({"gvp": f"https://volcano.si.edu/volcano.cfm?vn={v['gvpNumber']}"} if v["gvpNumber"] else {})},
               "span": {"start": SPAN_START, "end": as_of},
-              "daily": {**so2_series(v["id"], so2, as_of), **omi_so2.get(v["id"], {})},
+              "daily": so2_series(v["id"], so2, as_of),
               "events": {**fire_series(v["id"], fire, fire_end), **n20.get(v["id"], {}), **eq_series(v, usgs), **defo.get(v["id"], {})},
               "bulletins": {"source": ["phivolcs-bulletins", "phivolcs-lava-bulletins"], "authority": "DOST-PHIVOLCS",
                             "cols": ["date", "alertLevel", "volcanicEq", "tremor", "so2FluxTpd", "so2FluxDate", "plumeM", "deformation", "url"],
@@ -607,7 +607,7 @@ def build(version: int, as_of: str) -> dict:
                 "firms-modis", "worldpop-100m", "cod-ab-phl-gdb"] + (["phivolcs-bulletins", "phivolcs-lava-bulletins"] if b else []) \
             + (["vaac-tokyo-advisories"] if vm["advisories"] else []) + (["dswd-dromic-reports"] if vm["displacement"] else []) \
             + (["nasa-msvolso2l4"] if any(e.get("so2MassKt") for e in vm["episodes"]) else []) \
-            + (["firms-viirs-noaa20"] if v["id"] in n20 else []) + (["omi-omso2e"] if v["id"] in omi_so2 else []) + ([comet.SOURCE_ID] if v["id"] in defo else [])
+            + (["firms-viirs-noaa20"] if v["id"] in n20 else []) + ([comet.SOURCE_ID] if v["id"] in defo else [])
         vm["provenance"] = provenance(used, fprov) | {"earthEngine": {"assets": ["COPERNICUS/S5P/OFFL/L3_SO2", "MODIS/061/MOD14A1", "NASA/VIIRS/002/VNP14A1", "FIRMS", "WorldPop/GP/100m/pop"]}}
         models[v["id"]] = vm
         er = [e for e in vm["episodes"] if e["kind"] == "gvp_eruption"]

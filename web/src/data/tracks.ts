@@ -62,10 +62,6 @@ export const INSTRUMENTS: Record<string, LocalText> = {
     en: "Sentinel-5P TROPOMI (satellite, early-afternoon overpass, clear days only); a column amount, not a flux",
     ja: "Sentinel-5P TROPOMI(衛星、午後の通過時、晴天日のみ)。放出量ではなくカラム量",
   },
-  "omi-omso2e": {
-    en: "OMI on Aura (satellite, from Oct 2004, 0.25° cells, clear cells only, partial rows since 2008); a column amount, not a flux",
-    ja: "Aura衛星OMI(2004年10月から、0.25°格子、晴天の格子のみ、2008年以降は一部の列が欠測)。放出量ではなくカラム量",
-  },
   "modis-mod14a1": { en: "MODIS on Terra (satellite, 1 km daily); may include vegetation fires", ja: "Terra衛星MODIS(1 km、日別)。植生火災を含む場合あり" },
   "viirs-vnp14a1": { en: "VIIRS on S-NPP (satellite, 1 km daily); may include vegetation fires", ja: "S-NPP衛星VIIRS(1 km、日別)。植生火災を含む場合あり" },
   "firms-modis": { en: "NASA FIRMS active-fire detections (satellite); may include vegetation fires", ja: "NASA FIRMS 熱異常検知(衛星)。植生火災を含む場合あり" },

@@ -36,7 +36,6 @@ BUNDLES = {
     "cod-ab-phl-gdb": [RAW / "cod-ab" / "phl_admin3.csv"],
     "firms-modis": sorted(Path(p) for d in ("MODIS_SP", "VIIRS_SNPP_SP") for p in glob.glob(str(RAW / "firms" / d / "*"))),
     "firms-viirs-noaa20": sorted(Path(p) for p in glob.glob(str(RAW / "firms" / "VIIRS_NOAA20_*" / "*"))),
-    "omi-omso2e": sorted(Path(p) for p in glob.glob(str(TABLES / "omi-so2" / "*.csv"))),
     "s5p-offl-so2": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-so2" / "*.csv")) + glob.glob(str(TABLES / "ee-so2-monthly" / "*.tif"))),
     "gpm-imerg-v07": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-rain" / "*.csv"))),
     "modis-mod14a1": sorted(Path(p) for g in ("*.csv", "*.coverage.json") for p in glob.glob(str(TABLES / "ee-fire" / g))),
@@ -57,7 +56,6 @@ NOTES = {
     "jrc-global-surface-water": "Earth Engine run A: JRC GSW monthly crater-lake water area per lake (query results).",
     "s5p-offl-aer-ai": "Earth Engine run A: TROPOMI UV aerosol index per volcano ring and day in eruption windows (query results).",
     "firms-viirs-noaa20": "NASA FIRMS area API results (VIIRS_NOAA20_SP 5-day windows; VIIRS_NOAA20_NRT recent days) over the Philippine box.",
-    "omi-omso2e": "OMSO2e v004 reduced per volcano (50 km box) and day from Harmony subsets (query results).",
     "s5p-offl-so2": "Earth Engine reductions of TROPOMI SO2 per volcano ring and day, and national monthly mean grids (query results).",
     "gpm-imerg-v07": "Earth Engine reductions of GPM IMERG V07 Final rain per volcano ring and UTC day (query results).",
 }
