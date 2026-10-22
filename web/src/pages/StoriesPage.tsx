@@ -1,28 +1,24 @@
-import { Alert, AlertDescription, AlertTitle, Badge, Page, useLang, useT } from "@abrycta/akari/react";
+import { Alert, AlertDescription, AlertTitle, Page, useLang, useT } from "@abrycta/akari/react";
 import { use, useEffect } from "react";
 
 import { COMPACT_PAGE } from "@/app/layout";
 import { AppLink } from "@/app/Link";
+import { DraftBadge } from "@/components/FigureList";
 import { useUrlState } from "@/app/url";
 import { loadStoriesIndex, loadStoryFile, type StoryRef, storyRefs } from "@/data/load";
 import { formatRange } from "@/lib/dates";
 
 function StoryCard({ entry }: { entry: StoryRef }) {
   const { lang } = useLang();
-  const t = useT();
   const story = use(loadStoryFile(entry.file));
   if (!story) return null;
   return (
-    <li className="flex flex-col gap-2 rounded-sm border border-border bg-card p-4" data-story-card={entry.status}>
-      <AppLink to="story" id={entry.id} className="font-heading text-ak-subsection font-semibold underline-offset-4 hover:underline">
+    <li className="flex flex-col gap-1 rounded-sm border border-border bg-card p-4" data-story-card={entry.status}>
+      <AppLink to="story" id={entry.id} className="font-heading text-xl font-semibold underline-offset-4 hover:underline">
         {story.title[lang]}
       </AppLink>
       <span className="text-sm text-muted-foreground">{formatRange(story.span.start, story.span.end, lang)}</span>
-      {entry.status === "draft" ? (
-        <Badge variant="outline" className="self-start">
-          {t("Draft, not yet reviewed", "下書き（未レビュー）")}
-        </Badge>
-      ) : null}
+      <DraftBadge status={entry.status} />
       {story.summary ? <p className="m-0 text-sm">{story.summary[lang]}</p> : null}
     </li>
   );
@@ -48,7 +44,7 @@ export default function StoriesPage() {
           </AlertDescription>
         </Alert>
       ) : null}
-      <ul className="m-0 grid list-none items-start gap-4 p-0 sm:grid-cols-2">
+      <ul className="m-0 grid list-none items-start gap-3 p-0 sm:grid-cols-2">
         {entries.map((s) => (
           <StoryCard key={s.id} entry={s} />
         ))}

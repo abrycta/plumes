@@ -2,7 +2,6 @@ import {
   Alert,
   AlertDescription,
   AlertTitle,
-  Badge,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
@@ -10,7 +9,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   Page,
-  Prose,
   Scrollytelling,
   T,
   useLang,
@@ -24,7 +22,7 @@ import type { Story, StoryStep, VolcanoReadModel } from "@contracts/readmodels";
 import { AppLink } from "@/app/Link";
 import { DataThrough } from "@/components/DataThrough";
 import { useUrlState } from "@/app/url";
-import { FigureList } from "@/components/FigureList";
+import { DraftBadge, FigureList } from "@/components/FigureList";
 import { assetUrl, loadRoot, loadStoriesIndex, loadStoryFile, loadVolcano, storyRefs } from "@/data/load";
 import { buildTracks, type Track, tracksForStep } from "@/data/tracks";
 import { formatDate, formatRange } from "@/lib/dates";
@@ -68,7 +66,7 @@ function StepVisual({ story, model, step, tracks }: { story: Story; model: Volca
   const shown = tracksForStep(step, tracks);
   return (
     <div className="flex flex-col gap-3 rounded-sm border border-border bg-background p-3" data-story-visual>
-      <p className="m-0 font-mono text-ak-2xs tracking-wide text-muted-foreground uppercase">
+      <p className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
         {formatRange(step.start, step.end, lang)} · {model.volcano.name[lang]}
       </p>
       {shown.length ? (
@@ -90,7 +88,7 @@ function StepVisual({ story, model, step, tracks }: { story: Story; model: Volca
         <div className="flex flex-col gap-1">
           {model.exposure.rings.map((r) => (
             <p key={r.radiusKm} className="m-0">
-              <span className="font-heading text-ak-3xl font-semibold tabular">≈ {formatNumber(r.population, lang, 0)}</span>{" "}
+              <span className="font-heading text-3xl font-semibold tabular">≈ {formatNumber(r.population, lang, 0)}</span>{" "}
               <span className="text-sm text-muted-foreground">{lang === "ja" ? `${r.radiusKm} km圏の人口（WorldPop ${r.year}年）` : `people within ${r.radiusKm} km (WorldPop ${r.year})`}</span>
             </p>
           ))}
@@ -161,17 +159,11 @@ function StoryView({ story }: { story: Story }) {
           id: s.id,
           content: (
             <div className="flex flex-col gap-2">
-              <p className="m-0 font-mono text-ak-2xs tracking-wide text-muted-foreground uppercase">{formatRange(s.start, s.end, lang)}</p>
-              <h2 className="m-0 font-heading text-ak-subsection font-semibold">{s.title[lang]}</h2>
-              <Prose>
-                <p>{s.text[lang]}</p>
-              </Prose>
+              <p className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{formatRange(s.start, s.end, lang)}</p>
+              <h2 className="m-0 font-heading text-xl font-semibold">{s.title[lang]}</h2>
+              <p className="m-0">{s.text[lang]}</p>
               {wide ? null : <StepVisual story={story} model={model} step={s} tracks={tracks} />}
-              {s.status === "draft" ? (
-                <Badge variant="outline" className="self-start">
-                  {t("Draft text, not yet reviewed", "下書き（未レビュー）")}
-                </Badge>
-              ) : null}
+              <DraftBadge status={s.status} />
               <FigureList figures={s.figures} />
             </div>
           ),
