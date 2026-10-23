@@ -51,7 +51,10 @@ _PAGES = object()  # git()'s default cwd: PAGES_DIR as it is at call time
 
 
 def git(*args, cwd=_PAGES, check=True):
-    return subprocess.run(["git", *auth(), *args], cwd=PAGES_DIR if cwd is _PAGES else cwd, check=check, capture_output=True, text=True)
+    # cwd=None runs outside any repository: inside the Actions checkout, its own http.extraheader would be sent as well
+    # and GitHub refuses a duplicate Authorization header (400)
+    cwd = PAGES_DIR if cwd is _PAGES else (cwd or tempfile.gettempdir())
+    return subprocess.run(["git", *auth(), *args], cwd=cwd, check=check, capture_output=True, text=True)
 
 
 def origin() -> str:
