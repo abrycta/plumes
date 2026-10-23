@@ -29,6 +29,10 @@ jobs:
           NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
         run: |
           if [ -z "$ARCHIVE_READ_TOKEN" ] || [ -z "$NEON_DATABASE_URL" ]; then
+            # after a Data run a missing secret means the API silently stops updating: fail, so it shows as a red check (audit P14)
+            if [ "${{ github.event_name }}" = "workflow_run" ]; then
+              echo "::error title=API load failed::ARCHIVE_READ_TOKEN or NEON_DATABASE_URL is not set"; exit 1
+            fi
             echo "::notice title=API load skipped::ARCHIVE_READ_TOKEN or NEON_DATABASE_URL is not set"; echo "ok=false" >> "$GITHUB_OUTPUT"
           else echo "ok=true" >> "$GITHUB_OUTPUT"; fi
       - name: Latest archived USGS and FIRMS snapshots
@@ -36,10 +40,12 @@ jobs:
         env: { GH_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}" }
         run: |
           mkdir -p in && cd in
-          gh release list -R abrycta/plumes-archive -L 300 --json tagName,createdAt,isDraft > releases.json
+          # Every release (all pages); newest by the tag's date and same-day sequence. All releases share one createdAt,
+          # so sorting by it picks an arbitrary snapshot (audit P8); sort -V puts id-D before id-D.2 and .2 before .10.
+          gh api --paginate "repos/abrycta/plumes-archive/releases?per_page=100" --jq '.[] | select(.draft | not) | .tag_name' > tags.txt
           for id in usgs-comcat-ph-1900-2009 usgs-comcat-ph-2010 firms-modis; do
-            tag=$(jq -r --arg id "$id" '[.[] | select((.isDraft | not) and (.tagName | test("^" + $id + "-[0-9]{4}-[0-9]{2}-[0-9]{2}(\\.[0-9]+)?$")))] | sort_by(.createdAt) | last | .tagName' releases.json)
-            [ "$tag" != "null" ] || { echo "::error::no release for $id"; exit 1; }
+            tag=$(grep -E "^${id}-[0-9]{4}-[0-9]{2}-[0-9]{2}(\.[0-9]+)?$" tags.txt | sort -V | tail -n 1 || true)
+            [ -n "$tag" ] || { echo "::error::no release for $id"; exit 1; }
             mkdir "$id" && gh release download "$tag" -R abrycta/plumes-archive -D "$id"
             (cd "$id" && sha256sum -c SHA256SUMS --ignore-missing --quiet)
             echo "$id: $tag" | tee -a "$GITHUB_STEP_SUMMARY"

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import functools
 import glob
 import hashlib
 import io
@@ -24,6 +25,7 @@ from pathlib import Path
 import yaml
 import zstandard
 
+from plumes.archive_tags import list_tags, newest
 from plumes.paths import BUILD, DATA, RAW, REGISTRY, TABLES
 
 REPO = "abrycta/plumes-archive"
@@ -36,7 +38,8 @@ BUNDLES = {
     "cod-ab-phl-gdb": [RAW / "cod-ab" / "phl_admin3.csv"],
     "firms-modis": sorted(Path(p) for d in ("MODIS_SP", "VIIRS_SNPP_SP") for p in glob.glob(str(RAW / "firms" / d / "*"))),
     "firms-viirs-noaa20": sorted(Path(p) for p in glob.glob(str(RAW / "firms" / "VIIRS_NOAA20_*" / "*"))),
-    "s5p-offl-so2": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-so2" / "*.csv")) + glob.glob(str(TABLES / "ee-so2-monthly" / "*.tif"))),
+    "s5p-offl-so2": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-so2" / "*.csv")) + glob.glob(str(TABLES / "ee-so2" / "*.coverage.json"))
+                           + glob.glob(str(TABLES / "ee-so2-monthly" / "*.tif"))),
     "gpm-imerg-v07": sorted(Path(p) for p in glob.glob(str(TABLES / "ee-rain" / "*.csv"))),
     "modis-mod14a1": sorted(Path(p) for g in ("*.csv", "*.coverage.json") for p in glob.glob(str(TABLES / "ee-fire" / g))),
     "worldpop-100m": [TABLES / "ee-exposure.csv"],
@@ -66,7 +69,7 @@ def gh(*args, check=True) -> subprocess.CompletedProcess:
 
 
 def next_tag(sid: str, date: str) -> str:
-    existing = set(gh("release", "list", "-R", REPO, "-L", "1000", "--json", "tagName", "-q", ".[].tagName").stdout.split())
+    existing = set(list_tags(REPO, drafts=True))
     tag, k = f"{sid}-{date}", 1
     while tag in existing:
         k += 1
@@ -86,12 +89,16 @@ def bundle(sid: str, files: list[Path]) -> tuple[bytes, dict]:
                   "members": [{"path": str(f.relative_to(DATA)), "bytes": f.stat().st_size, "sha256": hashlib.sha256(f.read_bytes()).hexdigest()} for f in files]}
 
 
+@functools.cache
+def _tags() -> tuple[str, ...]:
+    return tuple(list_tags(REPO))
+
+
 def latest_manifest(sid: str) -> dict | None:
-    tags = [t for t in gh("release", "list", "-R", REPO, "-L", "1000", "--json", "tagName,isDraft", "-q",
-                          '.[] | select(.isDraft | not) | .tagName').stdout.split() if t.startswith(sid + "-20")]
-    if not tags:
+    tag = newest(_tags(), sid)
+    if not tag:
         return None
-    r = gh("release", "download", sorted(tags)[-1], "-R", REPO, "-p", "manifest.json", "-O", "-", check=False)
+    r = gh("release", "download", tag, "-R", REPO, "-p", "manifest.json", "-O", "-", check=False)
     return json.loads(r.stdout) if r.returncode == 0 else None
 
 

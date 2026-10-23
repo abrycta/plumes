@@ -1,0 +1,21 @@
+name: Keepalive
+# GitHub disables scheduled workflows in a public repository after 60 days without repository activity (audit P15).
+# Re-enabling them through the API each month resets that clock; the call is idempotent (204 when already enabled).
+on:
+  schedule: [{ cron: "17 3 1 * *" }]   # the 1st of each month
+  workflow_dispatch:
+permissions: { actions: write }
+jobs:
+  keepalive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Re-enable the scheduled workflows
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          failed=0
+          for wf in data.yml api.yml live-check.yml keepalive.yml; do
+            if gh api -X PUT "repos/${{ github.repository }}/actions/workflows/$wf/enable"; then echo "$wf enabled"
+            else echo "::error title=keepalive::$wf could not be re-enabled"; failed=1; fi
+          done
+          exit "$failed"

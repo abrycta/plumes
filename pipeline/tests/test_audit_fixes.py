@@ -2,6 +2,8 @@
 
 import datetime as dt
 
+import pytest
+
 from plumes import readmodels, sources
 from plumes.crawl import lava, vaac
 
@@ -32,7 +34,8 @@ def test_gvp_drift_warns_but_a_wrong_file_is_rejected(tmp_path, monkeypatch):
     wfs.write_text("Volcano_Number\n273010\n273020\n273099\n")
     assert sources.check_gvp_volcanoes(wfs, {}) == []  # one renumbered: drift
     wfs.write_text("Volcano_Number\n273010\n")
-    assert sources.check_gvp_volcanoes(wfs, {}) != []
+    with pytest.raises(sources.SchemaError):  # a wrong file is rejected, not reported as drift (audit P2)
+        sources.check_gvp_volcanoes(wfs, {})
 
 
 def test_wp_slugs_match_after_2029():

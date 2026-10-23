@@ -1,6 +1,8 @@
-"""NASA Earthdata sources: MSVOLSO2L4 (SO2 mass per eruption). Needs EARTHDATA_TOKEN (CI mints it from the login).
+"""NASA Earthdata sources: MSVOLSO2L4 (SO2 mass per eruption). A token is minted per run from EARTHDATA_USERNAME and
+EARTHDATA_PASSWORD (Earthdata Login find_or_create_token, as Lights does); the 60-day EARTHDATA_TOKEN is only the fallback
+(audit P13).
 
-    EARTHDATA_TOKEN=… uv run python -m plumes.nasa msvolso2l4
+    EARTHDATA_USERNAME=… EARTHDATA_PASSWORD=… uv run python -m plumes.nasa msvolso2l4
 """
 
 from __future__ import annotations
@@ -16,6 +18,21 @@ from plumes.paths import RAW
 
 MSVOL_URL = "https://measures.gesdisc.eosdis.nasa.gov/data/SO2/MSVOLSO2L4.4/MSVOLSO2L4_v04-00-2026m0513.txt"
 PH_BOX = (4.0, 22.0, 116.0, 128.0)
+EDL = "https://urs.earthdata.nasa.gov"
+
+
+def token() -> str | None:
+    """A fresh Earthdata token from the login, else EARTHDATA_TOKEN, else None. Never logged."""
+    user, pwd = os.environ.get("EARTHDATA_USERNAME"), os.environ.get("EARTHDATA_PASSWORD")
+    if user and pwd:
+        try:
+            r = httpx.post(f"{EDL}/api/users/find_or_create_token", auth=(user, pwd), timeout=60)
+            if r.status_code == 200 and r.json().get("access_token"):
+                return str(r.json()["access_token"])
+            print(f"::warning title=Earthdata token not minted::HTTP {r.status_code}; trying EARTHDATA_TOKEN", flush=True)
+        except (httpx.HTTPError, ValueError) as e:
+            print(f"::warning title=Earthdata token not minted::{type(e).__name__}; trying EARTHDATA_TOKEN", flush=True)
+    return os.environ.get("EARTHDATA_TOKEN") or None
 
 
 def parse_msvol(text: str) -> list[dict]:
@@ -40,9 +57,9 @@ def parse_msvol(text: str) -> list[dict]:
 
 
 def msvolso2l4() -> dict:
-    tok = os.environ.get("EARTHDATA_TOKEN")
+    tok = token()
     if not tok:
-        sys.exit("EARTHDATA_TOKEN is not set")
+        sys.exit("no Earthdata credentials: set EARTHDATA_USERNAME/EARTHDATA_PASSWORD or EARTHDATA_TOKEN")
     r = httpx.get(MSVOL_URL, headers={"Authorization": f"Bearer {tok}"}, follow_redirects=True, timeout=120)
     r.raise_for_status()
     if not r.text.lstrip().startswith("ESDT"):

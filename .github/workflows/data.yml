@@ -16,10 +16,16 @@ jobs:
     timeout-minutes: 300
     env:
       ARCHIVE_READ_TOKEN: ${{ secrets.ARCHIVE_READ_TOKEN }}
+      # a trial run (publish=false) still warns, but opens or closes no health issue in the archive repo
+      PLUMES_TRIAL: ${{ github.event_name != 'schedule' && !inputs.publish }}
     steps:
       - id: token
         run: |
           if [ -z "$ARCHIVE_READ_TOKEN" ]; then
+            # a scheduled run without it would end green and the data would silently stop updating: fail (audit P14)
+            if [ "${{ github.event_name }}" = "schedule" ]; then
+              echo "::error title=data run failed::ARCHIVE_READ_TOKEN is not set; the private archivekit and the archived state can't be read"; exit 1
+            fi
             echo "::notice title=data run skipped::ARCHIVE_READ_TOKEN is not set yet; the private archivekit and the archived state can't be read."
             echo "ok=false" >> "$GITHUB_OUTPUT"
           else echo "ok=true" >> "$GITHUB_OUTPUT"; fi
@@ -45,45 +51,61 @@ jobs:
           if [ "$n" != "0" ]; then echo "::warning title=Earth Engine skipped::a Lights data run is in progress"; echo "ee=false" >> "$GITHUB_OUTPUT";
           else echo "ee=${{ github.event_name == 'schedule' || inputs.ee }}" >> "$GITHUB_OUTPUT"; fi
       - name: Restore state (previous version, EE ledger, crawl records)
+        id: restore
         if: steps.token.outputs.ok == 'true'
         working-directory: pipeline
-        env: { GH_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}" }
+        # the newest good bundle per source (older tags when a newer one is corrupt), and the gh-pages branch cloned
+        # once: latest.json, the previous manifest and ee-usage.json are read there, never from the live site (audit A2)
+        env: { GH_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}", GITHUB_TOKEN: "${{ github.token }}" }
         run: uv run python -m plumes.state restore
       - name: Fetch file sources (archivekit)
         if: steps.token.outputs.ok == 'true'
         working-directory: pipeline
         run: uv run python -m plumes.sources
       - name: Crawl deltas
+        # Each crawler is its own stage (audit P7): a failing source keeps its restored records, warns, opens its
+        # "stage <name>" health issue in the archive repo, and the run goes on; the build's checks still gate publishing.
         if: steps.token.outputs.ok == 'true'
         working-directory: pipeline
         env:
           FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          uv run python -m plumes.crawl.wp
-          uv run python -m plumes.crawl.lava index --since auto
-          uv run python -m plumes.crawl.lava fetch
-          uv run python -m plumes.crawl.vaac --since auto
-          uv run python -m plumes.firms
-          uv run python -m plumes.thermal_n20
+          stage() { uv run python -m plumes.stage "$@"; }
+          stage wp plumes.crawl.wp
+          stage lava-index plumes.crawl.lava index --since auto
+          stage lava-fetch plumes.crawl.lava fetch
+          stage vaac plumes.crawl.vaac --since auto
+          stage firms plumes.firms
+          stage thermal-n20 plumes.thermal_n20
+          # needed by the build: without them it fails, so they stay hard steps
           test -f data/raw/nasa-msvolso2l4/philippines.json || uv run python -m plumes.nasa
           test -f data/raw/cod-ab/phl_admin3.csv || uv run python -m plumes.codab
       - name: Earth Engine (new months only)
-        if: steps.token.outputs.ok == 'true' && steps.lights.outputs.ee == 'true'
+        # an unreadable published ledger leaves the month's usage unknown: Earth Engine stays off (fail closed)
+        if: steps.token.outputs.ok == 'true' && steps.lights.outputs.ee == 'true' && steps.restore.outputs.ee_ledger != 'missing'
         working-directory: pipeline
         env: { EE_SA_KEY: "${{ secrets.EE_SA_KEY }}" }
         run: |
-          uv run python -m plumes.ee_series so2
-          uv run python -m plumes.ee_series fire --start 2013-01
+          uv run python -m plumes.stage ee-so2 plumes.ee_series so2
+          uv run python -m plumes.stage ee-fire plumes.ee_series fire --start 2013-01
       - name: Build read models and run the checks
         if: steps.token.outputs.ok == 'true'
         working-directory: pipeline
-        run: uv run python -m plumes.readmodels --version "$(uv run python -m plumes.state next-version)"
+        env: { GITHUB_TOKEN: "${{ github.token }}" }
+        run: |
+          # next-version reads the gh-pages branch and fails when latest.json is unreadable while versions exist (audit P3)
+          v=$(uv run python -m plumes.state next-version)
+          uv run python -m plumes.readmodels --version "$v"
       - name: List the built version's files
         id: built
         if: always() && steps.token.outputs.ok == 'true'
-        working-directory: pipeline/data/build/site
+        working-directory: pipeline
         run: |
+          # the folder is missing when the build failed early: nothing to list, and this step stays green
+          mkdir -p data/build/site && cd data/build/site
           v=$(find . -maxdepth 1 -type d -name 'v*' | sed 's#^\./##' | sort -V | tail -n 1)
           if [ -z "$v" ]; then echo "::notice title=no version built::nothing to list"; exit 0; fi
           echo "dir=pipeline/data/build/site/$v" >> "$GITHUB_OUTPUT"
@@ -104,8 +126,9 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
       - name: Adopt new bundles into the archive
-        # before Publish, so a published version's crawled inputs are always in the archive (audit H1)
-        if: steps.token.outputs.ok == 'true'
+        # before Publish, so a published version's crawled inputs are always in the archive (audit H1); a trial run
+        # (publish=false) publishes nothing, so it adopts nothing either
+        if: steps.token.outputs.ok == 'true' && (github.event_name == 'schedule' || inputs.publish)
         working-directory: pipeline
         env: { GH_TOKEN: "${{ secrets.ARCHIVE_WRITE_TOKEN }}" }
         run: |
@@ -119,7 +142,8 @@ jobs:
       - name: Publish
         if: steps.token.outputs.ok == 'true' && (github.event_name == 'schedule' || inputs.publish)
         working-directory: pipeline
-        env: { HF_TOKEN: "${{ secrets.HF_TOKEN }}" }
+        # GITHUB_TOKEN: the gh-pages clone is a separate repository the checkout's credentials don't reach (audit P1)
+        env: { HF_TOKEN: "${{ secrets.HF_TOKEN }}", GITHUB_TOKEN: "${{ github.token }}" }
         run: |
           git config --global user.name Kurt
           git config --global user.email 73582015+abrycta@users.noreply.github.com

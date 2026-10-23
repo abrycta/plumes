@@ -1,7 +1,10 @@
 import json
 
+import pytest
+
 from plumes.contracts import errors
 from plumes.deeptime import build_model, check_hazel
+from plumes.sources import SchemaError
 
 HDR = {"schemaVersion": "1", "dataVersion": "v0", "dataAsOf": "2026-10-21", "generatedAt": "2026-10-22T00:00:00Z", "fixture": True}
 VOLS = [{"id": "hibok-hibok", "gvpNumber": 271080}, {"id": "taal", "gvpNumber": 273070}]
@@ -41,6 +44,8 @@ def test_hook_rejects_a_paged_or_foreign_answer(tmp_path):
     p.write_text(json.dumps({"items": items, "page": 1, "totalPages": 1, "totalItems": 40}))
     assert check_hazel(p, {}) == []
     p.write_text(json.dumps({"items": items, "page": 1, "totalPages": 2, "totalItems": 80}))
-    assert any("paged" in x for x in check_hazel(p, {}))
+    with pytest.raises(SchemaError, match="paged"):
+        check_hazel(p, {})
     p.write_text(json.dumps({"items": items + [hazel(99, 284000, 1900)], "page": 1, "totalPages": 1, "totalItems": 41}))
-    assert any("Philippine range" in x for x in check_hazel(p, {}))
+    with pytest.raises(SchemaError, match="Philippine range"):
+        check_hazel(p, {})

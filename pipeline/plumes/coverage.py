@@ -21,6 +21,9 @@ SOURCE_END = {"viirs-vnp14a1": SNPP_END}
 # Tables written before the sidecars (Earth Engine run A, 2026-10) are trusted as whole months up to here; later
 # legacy months count only up to their last detection and are re-run.
 LEGACY_SETTLED_TO = "2026-04"
+# A month whose last day is this far back is no longer re-run, whatever its coverage (a source has ended or stalled).
+SETTLE_DAYS = 120
+SO2_SOURCE = "s5p-offl-so2"
 
 
 def month_last_day(month: str) -> str:
@@ -33,11 +36,26 @@ def _covers(month: str, source: str, days: list[str]) -> bool:
     return need < f"{month}-01" or (bool(days) and max(days) >= need)
 
 
-def fire_month_complete(month: str, cov: dict | None) -> bool:
-    """True when every fire source has images up to the month's last day (or its own end)."""
+def settled(month: str, today: dt.date | None = None) -> bool:
+    """The month ended more than SETTLE_DAYS ago: a source that still has no images for it has ended or stalled."""
+    return month_last_day(month) < ((today or dt.date.today()) - dt.timedelta(days=SETTLE_DAYS)).isoformat()
+
+
+def fire_month_complete(month: str, cov: dict | None, today: dt.date | None = None) -> bool:
+    """True when every fire source has images up to the month's last day (or its own end), or the month has settled:
+    a collection that stops (Terra MOD14A1 at end of mission, the FIRMS collection) then counts as ended, its series
+    stops at its last covered day (fire_ends), and the month is no longer re-run every week (audit P10)."""
     if cov is None:
         return month <= LEGACY_SETTLED_TO
-    return all(_covers(month, s, cov.get(s, [])) for s in FIRE_SOURCES)
+    return all(_covers(month, s, cov.get(s, [])) for s in FIRE_SOURCES) or settled(month, today)
+
+
+def so2_month_complete(month: str, cov: dict | None, today: dt.date | None = None) -> bool:
+    """An SO2 month is re-run until TROPOMI covers its last day (late OFFL days), or it settles (audit P12). Tables
+    written before the sidecar existed are kept as they are."""
+    if cov is None:
+        return True
+    return _covers(month, SO2_SOURCE, cov.get(SO2_SOURCE, [])) or settled(month, today)
 
 
 def read_coverage(table: Path) -> dict | None:
