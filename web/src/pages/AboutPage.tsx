@@ -119,8 +119,8 @@ export default function AboutPage() {
         </h2>
         <p className="m-0 max-w-prose text-sm text-muted-foreground">
           <T
-            en={`${rows.length} registry entries (24 sources; USGS and Landsat are each split in two, and three arrive later). Each verdict was checked on the publisher's own terms page; the attribution is the text the publisher asks for.`}
-            ja={`登録数は${rows.length}件です(24の出典。USGSとLandsatはそれぞれ2件に分かれ、3件は今後追加)。各判定は、公開元の利用規約ページで確認しました。帰属表示は、公開元が求める文言です。`}
+            en={`${rows.length} registry entries (24 sources; USGS and Landsat are each split in two). Each verdict was checked on the publisher's own terms page; the attribution is the text the publisher asks for.`}
+            ja={`登録数は${rows.length}件です(24の出典。USGSとLandsatはそれぞれ2件に分かれます)。各判定は、公開元の利用規約ページで確認しました。帰属表示は、公開元が求める文言です。`}
           />
         </p>
         <div className="overflow-x-auto">
@@ -191,8 +191,8 @@ export default function AboutPage() {
           )}{" "}
           {root.latest.fixture
             ? t(
-                "This is the sample data version built from real Taal tables for December 2019 to February 2020; the full record arrives with the first published version.",
-                "これは2019年12月〜2020年2月のタール火山の実データから作ったサンプル版です。全期間の記録は最初の公開版で加わります。",
+                "This is the sample data version, built from real Taal tables for December 2019 to February 2020. The published versions carry the full record.",
+                "これは、2019年12月〜2020年2月のタール火山の実データから作ったサンプル版です。全期間の記録は公開版にあります。",
               )
             : null}
         </p>
