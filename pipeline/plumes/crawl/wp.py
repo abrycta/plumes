@@ -14,7 +14,7 @@ import argparse
 import re
 import xml.etree.ElementTree as ET
 
-from plumes.crawl.records import Records, now, sha256
+from plumes.crawl.records import PARSE_FAILED, Records, now, sha256
 from plumes.http import Polite
 from plumes.paths import RAW
 
@@ -74,19 +74,29 @@ def extract(html: str) -> str:
 def crawl(limit: int | None = None) -> dict:
     rec = Records(OUT / "pages.jsonl")
     done = rec.done()
+    gave_up = rec.given_up()
     with Polite() as c:
         posts = list_posts(c)
+        if not posts:  # a sitemap switch or a challenge page: keep the previous list, never truncate it (audit P6)
+            raise SystemExit("PHIVOLCS sitemaps listed no English bulletin: the sitemap layout changed or the answer is not a sitemap")
         (OUT / "list.tsv").write_text("".join(f"{u}\t{m}\n" for u, m in posts))
-        todo = [(u, m) for u, m in posts if u not in done][:limit]
+        todo = [(u, m) for u, m in posts if u not in done and u not in gave_up][:limit]
         print(f"{len(posts)} English bulletins listed, {len(done)} already fetched, {len(todo)} to fetch", flush=True)
+        unparsed = 0
         for k, (u, m) in enumerate(todo):
             r = c.get(u)
-            body = r.text if r.status_code == 200 else ""
-            rec.add({"url": u, "lastmod": m, "status": r.status_code, "fetched": now(), "sha256": sha256(r.content),
-                     "bytes": len(r.content), "last_modified": r.headers.get("last-modified"), "entry": extract(body)})
+            entry = extract(r.text) if r.status_code == 200 else ""
+            status = r.status_code
+            if status == 200 and not entry:  # no post body (an error or challenge page): fetched again next run
+                status, unparsed = PARSE_FAILED, unparsed + 1
+            rec.add({"url": u, "lastmod": m, "status": status, "fetched": now(), "sha256": sha256(r.content),
+                     "bytes": len(r.content), "last_modified": r.headers.get("last-modified"), "entry": entry})
             if k % 200 == 0:
                 print(f"  {k}/{len(todo)} {r.status_code} {u}", flush=True)
-    return {"listed": len(posts), "fetched": len(todo), "requests": c.requests}
+    if unparsed or gave_up:
+        print(f"::warning title=PHIVOLCS bulletins not parsed::{unparsed} answered 200 without a post body (retried next run); "
+              f"{len(gave_up)} given up after repeated failures", flush=True)
+    return {"listed": len(posts), "fetched": len(todo), "unparsed": unparsed, "requests": c.requests}
 
 
 if __name__ == "__main__":

@@ -16,6 +16,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from plumes.sources import reject
+
 SOURCE_ID = "noaa-hazel-volcanoes-ph"
 GVP_ID = "gvp-eruptions-ph"
 SATELLITE_ERA_START = "2000-01-01"
@@ -75,12 +77,14 @@ def hazel_items(path: Path) -> list[dict]:
 
 
 def check_hazel(path: Path, source: dict[str, Any]) -> list[str]:
-    """Reject a HazEL page that is incomplete or holds rows that are not Philippine volcano events."""
+    """Reject (SchemaError) a HazEL page that is incomplete or holds rows that are not Philippine volcano events."""
     try:
         d = json.loads(Path(path).read_text())
         items = d["items"]
+        if not isinstance(items, list) or not all(isinstance(it, dict) for it in items):
+            raise TypeError("items is not a list of objects")
     except (ValueError, KeyError, TypeError) as e:
-        return [f"not a HazEL page: {e}"]
+        reject([f"not a HazEL page: {e}"])
     probs = []
     if d.get("totalPages") != 1 or d.get("totalItems") != len(items):
         probs.append(f"paged answer: {len(items)} items of {d.get('totalItems')} in {d.get('totalPages')} pages")
@@ -95,7 +99,8 @@ def check_hazel(path: Path, source: dict[str, Any]) -> list[str]:
         for f in ("deaths", "deathsTotal", "injuries", "missing", "housesDestroyed", "damageMillionsDollars"):
             if it.get(f) is not None and not (isinstance(it[f], int | float) and it[f] >= 0):
                 probs.append(f"event {it.get('id')}: {f} {it[f]!r}")
-    return probs[:20]
+    reject(probs)  # SchemaError: the kit rejects the page and tries the next link (audit P2)
+    return []
 
 
 # ---------------------------------------------------------------- dates

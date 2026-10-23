@@ -69,7 +69,10 @@ def fetch_tail(key: str, c: Polite, since: dt.date, sp_to: dt.date, until: dt.da
         if r.status_code != 200 or "Invalid" in r.text[:200] or "transaction limit" in r.text[:200]:
             errors += 1
         else:
-            out += [row | {"product": product} for row in firms.rows_of(r.text)]
+            try:
+                out += [row | {"product": product} for row in firms.rows_of(r.text)]
+            except firms.NotFirmsCsv:  # a 200 page that is not detections: keep the previous tail (audit P4)
+                errors += 1
         d += dt.timedelta(days=days)
     if errors:
         return {"tail": "kept previous file", "errors": errors}
@@ -87,6 +90,9 @@ def fetch(start: str | None = None, end: str | None = None, nrt: bool = True) ->
     key = os.environ.get("FIRMS_MAP_KEY") or sys.exit("FIRMS_MAP_KEY is not set")
     with Polite(min_interval=1.0) as c:
         avail = firms.availability(c, key)
+    if SP not in avail:  # retired or renamed: keep the restored detections, never crash the run (audit P7)
+        print(f"::warning title=FIRMS product not listed::{SP} is missing from FIRMS data_availability; NOAA-20 detections kept as they are", flush=True)
+        return {SP: "not listed"}
     # the last window fetched must end on or before the product's last day (window start + 4 <= max_date)
     sp_end = _day(avail[SP]) - dt.timedelta(days=4)
     if end:

@@ -82,8 +82,9 @@ def test_crawl_refetches_a_legacy_partial_window_without_doubling_rows(tmp_path,
 
 def test_ee_fire_month_complete_only_when_every_source_covers_it():
     full = {s: ["2026-08-01", "2026-08-31"] for s in coverage.FIRE_SOURCES}
-    assert coverage.fire_month_complete("2026-08", full)
-    assert not coverage.fire_month_complete("2026-08", full | {"modis-mod14a1": ["2026-08-01", "2026-08-10"]})
+    today = dt.date(2026, 10, 23)
+    assert coverage.fire_month_complete("2026-08", full, today)
+    assert not coverage.fire_month_complete("2026-08", full | {"modis-mod14a1": ["2026-08-01", "2026-08-10"]}, today)
     assert not coverage.fire_month_complete("2026-08", None)  # legacy table, recent: re-run
     assert coverage.fire_month_complete("2020-01", None)  # legacy table, long settled
 

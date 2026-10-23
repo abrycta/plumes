@@ -28,7 +28,7 @@ jobs:
             echo "::notice title=registry check skipped::ARCHIVE_READ_TOKEN is not available (fork PR or not created yet); the private archivekit can't be installed."
             echo "ok=false" >> "$GITHUB_OUTPUT"
           else echo "ok=true" >> "$GITHUB_OUTPUT"; fi
-      - name: Validate the source registry
+      - name: Validate the source registry and run the kit chaos tests
         if: steps.token.outputs.ok == 'true' && hashFiles('pipeline/sources.yaml') != ''
         env: { ARCHIVE_READ_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}" }
         working-directory: pipeline
@@ -36,6 +36,8 @@ jobs:
           git config --global url."https://x-access-token:${ARCHIVE_READ_TOKEN}@github.com/abrycta/data-archive-kit".insteadOf "https://github.com/abrycta/data-archive-kit"
           uv sync --locked --group sources
           uv run archivekit validate-registry --registry sources.yaml
+          # the chaos tests that need the kit (hooks through validate_file, restore, versioning) run here (audit P2, P3, P11)
+          uv run pytest -q tests/test_chaos.py
   contracts:
     runs-on: ubuntu-24.04
     timeout-minutes: 5

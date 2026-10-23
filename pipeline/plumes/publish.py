@@ -9,10 +9,13 @@ older ones leave Pages (DATA-PLAN §5 retention) but stay on the mirror's histor
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
+import re
 import shutil
 import subprocess
+import tempfile
 
 from plumes.paths import BUILD, DATA, EE_LEDGER, REPO
 
@@ -33,17 +36,49 @@ with a link to the bulletin they come from. Layout: `latest.json` points to the 
 """
 
 
-def git(*args, cwd=PAGES_DIR, check=True):
-    return subprocess.run(["git", *args], cwd=cwd, check=check, capture_output=True, text=True)
+def auth() -> list[str]:
+    """`git -c` arguments that authenticate github.com HTTPS with GITHUB_TOKEN (set by the Data workflow). The gh-pages
+    clone is a repository of its own, so the checkout's credentials never reach it (audit P1); the header is passed per
+    command and never written to a .git/config."""
+    tok = os.environ.get("GITHUB_TOKEN")
+    if not tok:
+        return []
+    basic = base64.b64encode(f"x-access-token:{tok}".encode()).decode()
+    return ["-c", f"http.https://github.com/.extraheader=AUTHORIZATION: basic {basic}"]
+
+
+_PAGES = object()  # git()'s default cwd: PAGES_DIR as it is at call time
+
+
+def git(*args, cwd=_PAGES, check=True):
+    return subprocess.run(["git", *auth(), *args], cwd=PAGES_DIR if cwd is _PAGES else cwd, check=check, capture_output=True, text=True)
+
+
+def origin() -> str:
+    return subprocess.run(["git", "remote", "get-url", "origin"], cwd=REPO, capture_output=True, text=True, check=True).stdout.strip()
+
+
+def remote_versions(remote: str) -> list[int]:
+    """The version numbers under data/ on the remote gh-pages branch; [] when the branch does not exist yet. Raises when
+    the branch cannot be read, so a new version is never numbered blind (audit P3)."""
+    r = git("ls-remote", "--exit-code", "--heads", remote, "gh-pages", cwd=None, check=False)
+    if r.returncode == 2:
+        return []
+    if r.returncode != 0:
+        raise RuntimeError(f"gh-pages on {remote} is not readable: {r.stderr.strip()[:200]}")
+    with tempfile.TemporaryDirectory() as td:
+        git("clone", "-q", "--depth", "1", "--filter=blob:none", "--no-checkout", "--branch", "gh-pages", remote, td, cwd=None)
+        names = git("ls-tree", "--name-only", "HEAD", "data/", cwd=td).stdout.split()
+    return sorted(int(m[1]) for n in names if (m := re.fullmatch(r"data/v(\d+)", n)))
 
 
 def pages(version: int) -> dict:
     site = BUILD / "site"
-    remote = subprocess.run(["git", "remote", "get-url", "origin"], cwd=REPO, capture_output=True, text=True, check=True).stdout.strip()
+    remote = origin()
     if not (PAGES_DIR / ".git").exists():
         PAGES_DIR.mkdir(parents=True, exist_ok=True)
-        if subprocess.run(["git", "ls-remote", "--exit-code", "--heads", remote, "gh-pages"], capture_output=True).returncode == 0:
-            subprocess.run(["git", "clone", "--depth", "1", "--branch", "gh-pages", remote, str(PAGES_DIR)], check=True, capture_output=True)
+        if git("ls-remote", "--exit-code", "--heads", remote, "gh-pages", cwd=None, check=False).returncode == 0:
+            git("clone", "--depth", "1", "--branch", "gh-pages", remote, str(PAGES_DIR), cwd=None)
         else:
             git("init", "-q", "-b", "gh-pages")
             git("remote", "add", "origin", remote)
@@ -52,13 +87,15 @@ def pages(version: int) -> dict:
         git("pull", "-q", "--ff-only", "origin", "gh-pages", check=False)
     data = PAGES_DIR / "data"
     data.mkdir(exist_ok=True)
+    held = {int(m[1]): d for d in data.glob("v*") if d.is_dir() and (m := re.fullmatch(r"v(\d+)", d.name))}
+    if max(held, default=0) > version:  # never move latest.json backwards or prune newer versions (audit P3)
+        raise SystemExit(f"gh-pages already holds v{max(held)}, newer than v{version}: nothing is published")
     dst = data / f"v{version}"
     if dst.exists():
         shutil.rmtree(dst)
     shutil.copytree(site / f"v{version}", dst)
-    keep = {f"v{version}", f"v{version - 1}"}
-    for old in data.glob("v*"):
-        if old.is_dir() and old.name not in keep:
+    for n, old in held.items():  # keep this version and the previous one (rollback)
+        if n < version - 1:
             shutil.rmtree(old)
     shutil.copy(site / "latest.json", data / "latest.json")
     if EE_LEDGER.exists():

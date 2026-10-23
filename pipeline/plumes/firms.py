@@ -38,11 +38,22 @@ def availability(c: Polite, key: str) -> dict[str, str]:
     return {row["data_id"]: row["max_date"] for row in csv.DictReader(io.StringIO(r.text))}
 
 
+# Columns every FIRMS area CSV carries (SP and NRT; NRT has no `type`): a body without them is not an answer.
+NEED = {"latitude", "longitude", "acq_date", "acq_time"}
+
+
+class NotFirmsCsv(ValueError):
+    """A 200 answer that is not a FIRMS CSV (a maintenance page, a JSON error, renamed columns): an error, never 0 rows."""
+
+
 def rows_of(text: str) -> list[dict]:
+    """Detections in a FIRMS answer: [] for an empty body or a header-only CSV (no detections); NotFirmsCsv otherwise."""
     text = text.strip()
-    if not text or not text.startswith("latitude"):
+    if not text:
         return []
-    head = text.split("\n", 1)[0]
+    head = text.split("\n", 1)[0].strip()
+    if not NEED.issubset(c.strip() for c in head.split(",")):
+        raise NotFirmsCsv(f"not a FIRMS CSV: {head[:120]!r}")
     lines = [ln for ln in text.replace(head, "\n" + head).splitlines() if ln and ln != head]
     return list(csv.DictReader([head, *lines]))
 
@@ -98,6 +109,10 @@ def crawl(products: list[str], start: str | None = None, end: str | None = None)
     with Polite(min_interval=1.0) as c:
         avail = availability(c, key)
         for product in products:
+            if product not in avail:  # a retired product (MODIS end of mission) or a renamed one: skip it, never crash the run
+                print(f"::warning title=FIRMS product not listed::{product} is missing from FIRMS data_availability; its windows are kept as they are", flush=True)
+                stats[product] = {"windows_fetched": 0, "available_to": None}
+                continue
             log = Records(OUT / product / "windows.jsonl")
             latest = log.latest("date")
             done = {ds for ds, r in latest.items() if complete(r)}
@@ -108,7 +123,7 @@ def crawl(products: list[str], start: str | None = None, end: str | None = None)
             # the last window fetched must end on or before the product's last day
             last_start = last - dt.timedelta(days=WINDOW_DAYS - 1)
             end_ = min(last_start, dt.date.fromisoformat(end)) if end else last_start
-            n = 0
+            n = bad = 0
             while d <= end_:
                 ds = d.isoformat()
                 if ds not in done:
@@ -118,15 +133,25 @@ def crawl(products: list[str], start: str | None = None, end: str | None = None)
                             break
                         time.sleep(600)
                         r = c.get(API.format(key=key, product=product, date=ds))
-                    if r.status_code != 200 or "Invalid" in r.text[:200]:
-                        log.add({"date": ds, "status": r.status_code, "fetched": now(), "error": r.text[:200].replace(key, "<MAP_KEY>")})
+                    rows, status = None, r.status_code
+                    if r.status_code == 200 and "Invalid" not in r.text[:200]:
+                        try:
+                            rows = rows_of(r.text)
+                        except NotFirmsCsv:
+                            status = "not-csv"
+                        if rows == [] and not r.text.strip():
+                            rows, status = None, "empty"  # no header at all: provisional, fetched again (a no-detection answer is a header line)
+                    if rows is None:
+                        log.add({"date": ds, "status": status, "fetched": now(), "error": r.text[:200].replace(key, "<MAP_KEY>")})
+                        bad += 1
                     else:
-                        rows = rows_of(r.text)
                         _write_window(product, d, rows, replace=latest.get(ds, {}).get("status") == 200)
                         log.add({"date": ds, "to": _end(d).isoformat(), "status": 200, "fetched": now(), "rows": len(rows), "sha256": sha256(r.content)})
                         n += 1
                 d += dt.timedelta(days=WINDOW_DAYS)
-            stats[product] = {"windows_fetched": n, "available_to": avail[product]}
+            if bad:  # logged as errors (not done), so the next run asks again
+                print(f"::warning title=FIRMS answers not usable::{product}: {bad} windows answered with an error, an empty body or not a FIRMS CSV", flush=True)
+            stats[product] = {"windows_fetched": n, "windows_failed": bad, "available_to": avail[product]}
             print(product, stats[product], flush=True)
     return stats
 

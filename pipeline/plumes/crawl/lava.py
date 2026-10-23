@@ -15,9 +15,11 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import re
+import sys
 
-from plumes.crawl.records import Records, now, sha256
+from plumes.crawl.records import PARSE_FAILED, Records, now, sha256
 from plumes.http import Polite
+from plumes.parse import parse_lava
 from plumes.paths import RAW
 
 HOST = "https://wovodat.phivolcs.dost.gov.ph"
@@ -85,7 +87,18 @@ def index(since: str = FIRST, until: str | None = None) -> dict:
                     n += 1
                 a = b + dt.timedelta(days=1)
             print(f"  {vid}: indexed to {end}", flush=True)
-    return {"rows": n, "requests": c.requests}
+    return {"rows": n, "requests": c.requests, "days": (end - a0).days + 1}
+
+
+# Taal and Mayon get a bulletin every day: no row for any volcano over this many days means the search answer changed
+# (a new layout, a login or error page), not a quiet spell (audit P6).
+EMPTY_INDEX_DAYS = 14
+
+
+def require_rows(res: dict) -> None:
+    """Fail the stage (soft: plumes.stage warns and files an issue) when a long index window listed nothing."""
+    if res["rows"] == 0 and res["days"] >= EMPTY_INDEX_DAYS:
+        sys.exit(f"LAVA search listed no bulletin for any volcano over {res['days']} days: the search answer changed")
 
 
 def bid_map() -> dict[int, dict]:
@@ -96,17 +109,25 @@ def bid_map() -> dict[int, dict]:
 def fetch(limit: int | None = None) -> dict:
     rec = Records(OUT / "pages.jsonl")
     done = rec.done("bid")
-    todo = [r for b, r in sorted(bid_map().items()) if b not in done][:limit]
+    gave_up = rec.given_up("bid")
+    todo = [r for b, r in sorted(bid_map().items()) if b not in done and b not in gave_up][:limit]
     print(f"{len(todo)} LAVA bulletins to fetch", flush=True)
+    unparsed = 0
     with Polite() as c:
         for k, r in enumerate(todo):
             url = f"{HOST}/bulletin/{r['path']}?bid={r['bid']}&lang=en"
             resp = c.get(url)
-            rec.add({"bid": r["bid"], "volcano": r["volcano"], "date": r["date"], "url": url, "status": resp.status_code,
-                     "fetched": now(), "sha256": sha256(resp.content), "html": resp.text if resp.status_code == 200 else ""})
+            status = resp.status_code
+            if status == 200 and parse_lava(resp.text) is None:  # a 200 that is not a bulletin: fetched again next run
+                status, unparsed = PARSE_FAILED, unparsed + 1
+            rec.add({"bid": r["bid"], "volcano": r["volcano"], "date": r["date"], "url": url, "status": status,
+                     "fetched": now(), "sha256": sha256(resp.content), "html": resp.text if status == 200 else ""})
             if k % 200 == 0:
                 print(f"  {k}/{len(todo)} {resp.status_code} {url}", flush=True)
-    return {"fetched": len(todo), "requests": c.requests}
+    if unparsed or gave_up:
+        print(f"::warning title=LAVA bulletins not parsed::{unparsed} answered 200 but are not bulletins (retried next run); "
+              f"{len(gave_up)} given up after repeated failures", flush=True)
+    return {"fetched": len(todo), "unparsed": unparsed, "requests": c.requests}
 
 
 if __name__ == "__main__":
@@ -116,4 +137,7 @@ if __name__ == "__main__":
     ap.add_argument("--until")
     ap.add_argument("--limit", type=int)
     a = ap.parse_args()
-    print(index(a.since, a.until) if a.step == "index" else fetch(a.limit))
+    res = index(a.since, a.until) if a.step == "index" else fetch(a.limit)
+    print(res)
+    if a.step == "index":
+        require_rows(res)

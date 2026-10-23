@@ -19,7 +19,7 @@ import urllib.request
 import ee
 
 from plumes import coverage
-from plumes.ee_budget import Budget, init
+from plumes.ee_budget import Budget, BudgetExceeded, init
 from plumes.paths import BUILD, CROSSWALK, DATA, TABLES
 
 S5P = "COPERNICUS/S5P/OFFL/L3_SO2"
@@ -29,6 +29,7 @@ FIRMS = "FIRMS"
 SO2_RINGS = [5, 10, 15, 30]
 FIRE_RINGS = [5, 10, 15]
 MOLAR_SO2 = 64.066  # g/mol
+MAX_RERUNS = 6  # incomplete months re-run per run and kind
 
 
 def volcanoes() -> list[dict]:
@@ -72,11 +73,12 @@ def _write(path, rows, cols):
         w.writerows(rows)
 
 
-def so2_month(month: str, budget: Budget) -> list[dict]:
+def so2_month(month: str, budget: Budget) -> tuple[list[dict], dict]:
     """Daily TROPOMI SO2 per volcano ring: mean column (both bands), valid-pixel count, total pixels, mass (t, valid pixels only).
 
     One aggregation per month: the daily mean images are stacked as bands (d<NN>_pbl, d<NN>_c15, d<NN>_mass) of one
-    image and reduced once over every ring (EE refuses many concurrent reduceRegions)."""
+    image and reduced once over every ring (EE refuses many concurrent reduceRegions). Also the days with an image
+    (plumes.coverage), so a month is re-run until late OFFL days arrive (audit P12)."""
     fc = ring_fc(SO2_RINGS, box_km=50)
     col = ee.ImageCollection(S5P).select(S5P_BANDS)
     y, m = map(int, month.split("-"))
@@ -93,6 +95,7 @@ def so2_month(month: str, budget: Budget) -> list[dict]:
     stack = ee.Image.cat(bands).addBands(ee.Image.constant(1).rename("total"))
     reducer = ee.Reducer.mean().combine(ee.Reducer.count(), sharedInputs=True).combine(ee.Reducer.sum(), sharedInputs=True)
     feats = budget.get(stack.reduceRegions(fc, reducer, scale=1113.2).map(lambda f: f.setGeometry(None)))["features"]
+    days = budget.get(_days(col.filterDate(first.isoformat(), (first + dt.timedelta(days=ndays)).isoformat())))
     rows = []
     for f in feats:
         p = f["properties"]
@@ -101,7 +104,7 @@ def so2_month(month: str, budget: Budget) -> list[dict]:
             rows.append({"volcano": p["volcano"], "ring": p["ring"], "date": (first + dt.timedelta(days=d)).isoformat(),
                          "so2_pbl_mol_m2": p.get(f"{k}_pbl_mean"), "so2_15km_mol_m2": p.get(f"{k}_c15_mean"),
                          "valid": p.get(f"{k}_pbl_count") or 0, "total": p.get("total_count") or 0, "mass_pbl_t": p.get(f"{k}_mass_sum")})
-    return rows
+    return rows, {coverage.SO2_SOURCE: days}
 
 
 def _days(col) -> ee.List:
@@ -144,22 +147,28 @@ def fire_month(month: str, budget: Budget) -> tuple[list[dict], dict]:
 def run_monthly(kind: str, start: str, end: str, budget: Budget) -> dict:
     fn, cols = {"so2": (so2_month, ["volcano", "ring", "date", "so2_pbl_mol_m2", "so2_15km_mol_m2", "valid", "total", "mass_pbl_t"]),
                 "fire": (fire_month, ["volcano", "ring", "date", "source", "n", "max_frp_mw"])}[kind]
-    done = skipped = 0
+    complete = {"so2": coverage.so2_month_complete, "fire": coverage.fire_month_complete}[kind]
+    done = skipped = reruns = deferred = 0
     for m in months(start, end):
         path = TABLES / f"ee-{kind}" / f"{m}.csv"
-        # a fire month is run again until every collection covers it (a partial month must not freeze as zeros)
-        if path.exists() and (kind != "fire" or coverage.fire_month_complete(m, coverage.read_coverage(path))):
-            skipped += 1
-            continue
-        rows = fn(m, budget)
-        if kind == "fire":
-            rows, cov = rows
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.with_suffix(".coverage.json").write_text(json.dumps(cov, sort_keys=True))
+        # a month is run again until every collection covers it (a partial month must not freeze as zeros)
+        if path.exists():
+            if complete(m, coverage.read_coverage(path)):
+                skipped += 1
+                continue
+            if reruns >= MAX_RERUNS:  # bounded, so stalled collections never eat the whole run (audit P10)
+                deferred += 1
+                continue
+            reruns += 1
+        rows, cov = fn(m, budget)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.with_suffix(".coverage.json").write_text(json.dumps(cov, sort_keys=True))
         _write(path, rows, cols)
         done += 1
         print(f"  {kind} {m}: {len(rows)} rows; run {budget.run_s:.0f} EECU-s", flush=True)
-    return {"months_done": done, "months_skipped": skipped}
+    if deferred:
+        print(f"::notice title=Earth Engine re-runs capped::{kind}: {deferred} incomplete months wait for a later run (cap {MAX_RERUNS} a run)", flush=True)
+    return {"months_done": done, "months_skipped": skipped, "months_deferred": deferred}
 
 
 def exposure(budget: Budget) -> dict:
@@ -193,12 +202,12 @@ def thumbs_taal(budget: Budget) -> dict:
     return res
 
 
-if __name__ == "__main__":
+def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("step", choices=["so2", "fire", "exposure", "thumbs-taal"])
     ap.add_argument("--start")
     ap.add_argument("--end", default=(dt.date.today().replace(day=1) - dt.timedelta(days=1)).strftime("%Y-%m"))
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     init()
     budget = Budget()
     try:
@@ -208,6 +217,13 @@ if __name__ == "__main__":
             res = exposure(budget)
         else:
             res = thumbs_taal(budget)
+    except BudgetExceeded as e:  # the cap is a planned stop, not a failure: months left wait for the next run (audit P7)
+        print(f"::warning title=Earth Engine budget reached::{e}; the remaining months wait for a later run", flush=True)
+        res = {"stopped": str(e)}
     finally:
         print(json.dumps(budget.save(f"{a.step} {a.start or ''}..{a.end}")))
     print(json.dumps(res))
+
+
+if __name__ == "__main__":
+    main()

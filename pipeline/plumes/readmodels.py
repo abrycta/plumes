@@ -22,7 +22,7 @@ import subprocess
 
 import yaml
 
-from plumes import comet, coverage, deeptime, run_a, run_b, thermal_n20
+from plumes import comet, coverage, deeptime, freshness, run_a, run_b, thermal_n20
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
@@ -658,7 +658,10 @@ def build(version: int, as_of: str) -> dict:
         (site / "latest.json").write_text(json.dumps({"schemaVersion": "1", "kind": "latest", "current": f"v{version}", "base": f"v{version}/", "dataAsOf": as_of,
                                                        "generatedAt": hdr["generatedAt"], "previous": f"v{version - 1}" if version > 1 else None,
                                                        "mirrors": ["https://krtmtthw.dev/plumes/data/", "https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/"]}, indent=1))
-    return {"version": version, "passed": passed, "failed": blocking(checks),
+    # per-source freshness, internal only (never in the published files; audit P5)
+    fresh = freshness.assess(freshness.newest(usgs, so2, fire_end))
+    (BUILD / "freshness.json").write_text(json.dumps(fresh, indent=1))
+    return {"version": version, "passed": passed, "failed": blocking(checks), "freshness": fresh,
             "warnings": [c for c in checks if not c["passed"] and c.get("severity") == "warning"], "files": len(files),
             "bytes": sum(f["bytes"] for f in files), "storiesLeft": gen["left"]}
 
@@ -673,4 +676,5 @@ if __name__ == "__main__":
         print(f"::warning title=fact check changed::{c['check']} {c['detail']}".rstrip())
     for x in res["storiesLeft"]:  # a previously public story that left with a data-driven reason (ST15)
         print(f"::warning title=story no longer public::{x}")
+    freshness.alert(res.pop("freshness"))  # stale sources: ::warning + health issue, never a public label (audit P5)
     print(json.dumps(res, indent=1))
