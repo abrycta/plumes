@@ -8,12 +8,15 @@ Reporting never fails the run: without the kit, a token or CI (ARCHIVEKIT_REPORT
 from __future__ import annotations
 
 import functools
+import os
 
 from plumes.paths import PIPELINE, REGISTRY
 
 
 @functools.cache
 def _reporter():
+    if os.environ.get("PLUMES_TRIAL") == "true":  # a trial Data run (publish=false) warns but opens or closes no issue
+        return None
     try:
         import archivekit
         import httpx

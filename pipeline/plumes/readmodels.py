@@ -22,7 +22,7 @@ import subprocess
 
 import yaml
 
-from plumes import comet, coverage, deeptime, freshness, run_a, run_b, thermal_n20
+from plumes import comet, coverage, deeptime, freshness, publish, run_a, run_b, thermal_n20
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
@@ -52,7 +52,17 @@ def rows(path) -> list[dict]:
 
 
 def fnum(x):
-    return None if x in (None, "") else float(x)
+    """A finite float, or None for an empty value; NaN and inf become None, never a bare NaN in a published file (audit A1)."""
+    if x in (None, ""):
+        return None
+    v = float(x)
+    return v if math.isfinite(v) else None
+
+
+def dumps(obj, **kw) -> str:
+    """json.dumps for every published file: a NaN or inf that slips through fails the build instead of shipping a file
+    browsers can't parse (audit A1)."""
+    return json.dumps(obj, allow_nan=False, **kw)
 
 
 def days_between(a: str, b: str) -> int:
@@ -141,11 +151,12 @@ def load_dromic() -> list:
 
 
 def load_usgs() -> list[dict]:
-    out = []
+    out, seen = [], set()
     for f in ("usgs-comcat-ph-1900-2009.csv", "usgs-comcat-ph-2010.csv"):
         for r in rows(RAW / "usgs" / f):
-            if r["type"] != "earthquake":
+            if r["type"] != "earthquake" or r["id"] in seen:  # a repeated event is counted once (audit A1)
                 continue
+            seen.add(r["id"])
             out.append({"t": r["time"], "lat": float(r["latitude"]), "lon": float(r["longitude"]), "mag": fnum(r["mag"]), "depth": fnum(r["depth"]), "id": r["id"]})
     return out
 
@@ -467,7 +478,7 @@ def thermal_layers(out_dir, as_of: str) -> dict | None:
         src = tmp / f"thermal-{y}.geojsonl"
         with open(src, "w") as f:
             for product, r in rs:
-                f.write(json.dumps({"type": "Feature", "geometry": {"type": "Point", "coordinates": [float(r["longitude"]), float(r["latitude"])]},
+                f.write(dumps({"type": "Feature", "geometry": {"type": "Point", "coordinates": [float(r["longitude"]), float(r["latitude"])]},
                                     "properties": {"month": r["acq_date"][:7], "date": r["acq_date"], "frp": fnum(r["frp"]), "sensor": r.get("product") or product,
                                                    "type": int(r["type"]) if r.get("type") not in (None, "") else None}}) + "\n")
         dst = out_dir / "layers" / "thermal" / f"{y}.pmtiles"
@@ -492,7 +503,7 @@ def quake_layer(out_dir, usgs: list[dict]) -> dict:
     with open(src, "w") as f:
         for e in usgs:
             if e["t"][:4] >= "2000":
-                f.write(json.dumps({"type": "Feature", "geometry": {"type": "Point", "coordinates": [e["lon"], e["lat"]]},
+                f.write(dumps({"type": "Feature", "geometry": {"type": "Point", "coordinates": [e["lon"], e["lat"]]},
                                     "properties": {"month": e["t"][:7], "time": e["t"], "mag": e["mag"], "depth": e["depth"], "id": e["id"]}}) + "\n")
     dst = out_dir / "layers" / "earthquakes-usgs.pmtiles"
     dst.parent.mkdir(parents=True, exist_ok=True)
@@ -505,7 +516,44 @@ def quake_layer(out_dir, usgs: list[dict]) -> dict:
 
 # ---------------------------------------------------------------- checks
 
-def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list) -> list[dict]:
+def _no_constant(name: str):
+    raise ValueError(f"{name} is not JSON (a browser's JSON.parse rejects it)")
+
+
+# Counts that may only shrink this much from the previous published version (manifest checks.counts): a file cut at a row
+# boundary or a renamed category passes every structural check but silently drops records (audit A1, A3).
+SHRINK = 0.02
+
+
+def counts_check(check, counts: dict[str, int], previous: dict | None) -> None:
+    prev = ((previous or {}).get("checks") or {}).get("counts") or {}
+    for k, n in counts.items():
+        if isinstance(prev.get(k), int) and prev[k] > 0:
+            check(f"{k}: at least {1 - SHRINK:.0%} of the previous version", n >= prev[k] * (1 - SHRINK), f"{n} vs {prev[k]}")
+        check(f"{k}: not empty", n > 0, str(n))
+
+
+def file_checks(check, site_v) -> None:
+    """Thermal tilesets per year, and strict JSON in every published file."""
+    years = {p.stem for p in (site_v / "layers" / "thermal").glob("*.pmtiles")}
+    last = int(json.loads((site_v / "layers.json").read_text())["dataAsOf"][:4]) - 1
+    missing = sorted({str(y) for y in range(2000, last + 1)} - years)
+    # a hole inside the record, or no tileset at all: a broken crawl, restore or build
+    gaps = [y for y in missing if y < max(years)] if years else missing
+    check("thermal detections: one tileset per year 2000 onward", not gaps, ",".join(gaps))
+    # years after the last detection: every FIRMS product stopped (retired, key revoked). The last tilesets stay
+    # published and the run goes on; the stale FIRMS sources warn and file their health issues (audit A4)
+    check("thermal detections: no year without any detection at the end", not (set(missing) - set(gaps)),
+          ",".join(sorted(set(missing) - set(gaps))), warn=True)
+    for p in sorted(site_v.rglob("*.json")) + sorted(site_v.rglob("*.geojson")):
+        try:
+            json.loads(p.read_text(), parse_constant=_no_constant)
+        except ValueError as e:
+            check(f"strict JSON {p.relative_to(site_v)}", False, str(e)[:120])
+
+
+def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list, counts: dict[str, int] | None = None,
+               previous: dict | None = None) -> list[dict]:
     res = []
 
     def check(name, ok, detail="", warn=False):
@@ -518,10 +566,8 @@ def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list)
             e = errors(doc)
             check(f"schema {p.relative_to(site_v)}", not e, "; ".join(e[:3]))
     check("24 volcanoes in the crosswalk", len(vols) == 24, str(len(vols)))
-    years = {p.stem for p in (site_v / "layers" / "thermal").glob("*.pmtiles")}
-    last = int(json.loads((site_v / "layers.json").read_text())["dataAsOf"][:4]) - 1
-    missing = sorted({str(y) for y in range(2000, last + 1)} - years)
-    check("thermal detections: one tileset per year 2000 onward", not missing, ",".join(missing))
+    counts_check(check, counts or {}, previous)
+    file_checks(check, site_v)
     check("GVP lists 23 Philippine volcanoes", len(gvp_v) == 23, str(len(gvp_v)), warn=True)  # GVP can add, merge or renumber; the registry's row bounds gate the file
     check("GVP eruptions within bounds", 200 <= len(gvp_e) <= 400, str(len(gvp_e)))
     for vid, m in models.items():
@@ -531,7 +577,7 @@ def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list)
         for t in ("bulletins", "advisories", "displacement"):
             if m.get(t):
                 check(f"{vid}: every {t} row links its source", all(str(r[-1]).startswith("https://") for r in m[t]["rows"]))
-        size = len(gzip.compress(json.dumps(m, separators=(",", ":"), ensure_ascii=False).encode(), 9))
+        size = len(gzip.compress(dumps(m, separators=(",", ":"), ensure_ascii=False).encode(), 9))
         check(f"{vid}: size under 150 kB gzip", size < 150_000, f"{size / 1000:.1f} kB")
     t = models["taal"]
     gv = [e for e in t["episodes"] if e["kind"] == "gvp_eruption" and e["start"] == "2020-01-12"]
@@ -571,6 +617,18 @@ def blocking(checks: list[dict]) -> list[dict]:
 
 
 # ---------------------------------------------------------------- main
+
+def published_version():
+    """(gh-pages checkout, the version its latest.json points to) when the Data run cloned it (plumes.state restore);
+    (None, None) for a local build, which then reads the previous stories from the live site."""
+    root = publish.PAGES_DIR if (publish.PAGES_DIR / ".git").exists() else None
+    return root, publish.current(root)
+
+
+def deeptime_count() -> int:
+    p = RAW / "hazel" / f"{deeptime.SOURCE_ID}.json"
+    return len({it.get("id") for it in deeptime.hazel_items(p)}) if p.exists() else 0
+
 
 def build(version: int, as_of: str) -> dict:
     site = BUILD / "site"
@@ -632,35 +690,39 @@ def build(version: int, as_of: str) -> dict:
     for vid, vm in models.items():
         p = v_dir / "volcano" / f"{vid}.json"
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps(vm, separators=(",", ":"), ensure_ascii=False))
-    (v_dir / "volcanoes.geojson").write_text(json.dumps({**hdr, "kind": "volcanoes", "type": "FeatureCollection", "features": feats}, separators=(",", ":"), ensure_ascii=False))
+        p.write_text(dumps(vm, separators=(",", ":"), ensure_ascii=False))
+    (v_dir / "volcanoes.geojson").write_text(dumps({**hdr, "kind": "volcanoes", "type": "FeatureCollection", "features": feats}, separators=(",", ":"), ensure_ascii=False))
     (v_dir / "story").mkdir(exist_ok=True)
-    (v_dir / "story" / "taal-2020.json").write_text(json.dumps(story, separators=(",", ":"), ensure_ascii=False))
+    (v_dir / "story" / "taal-2020.json").write_text(dumps(story, separators=(",", ":"), ensure_ascii=False))
     (v_dir / "assets").mkdir(exist_ok=True)
     for a in story["steps"][3]["assets"]:
         shutil.copy(BUILD / a["url"], v_dir / a["url"])
     so2_map = run_b.so2_monthly_layer(TABLES, v_dir, " ".join(REG["s5p-offl-so2"]["attribution"].split()))
     layers = [x for x in (thermal_layers(v_dir, as_of), quake_layer(v_dir, usgs), so2_map, defo_layer) if x]
-    (v_dir / "layers.json").write_text(json.dumps({**hdr, "kind": "layers", "layers": layers}, ensure_ascii=False))
+    (v_dir / "layers.json").write_text(dumps({**hdr, "kind": "layers", "layers": layers}, ensure_ascii=False))
     deep_checks = deeptime.write(v_dir, hdr, vols, gvp_e, RAW / "hazel" / f"{deeptime.SOURCE_ID}.json", provenance([deeptime.GVP_ID, deeptime.SOURCE_ID], fprov))
     # stories that pass the automated checks, and stories.json; the published version's stories keep their ids (ST15)
-    gen = generate_stories(v_dir, previous=previous_stories.load())
+    root, prev_v = published_version()
+    prev_stories = previous_stories.load(root / "data" / f"v{prev_v}") if prev_v else ({} if root else previous_stories.load())
+    gen = generate_stories(v_dir, previous=prev_stories)
     story_checks = gen["checks"]
-    checks = run_checks(v_dir, vols, models, gvp_v, gvp_e) + deep_checks + story_checks
+    counts = {"USGS earthquakes": len(usgs), "GVP eruptions": len(gvp_e), "HazEL events": deeptime_count()}
+    previous = publish.read_json(root, f"v{prev_v}/manifest.json") if prev_v else None
+    checks = run_checks(v_dir, vols, models, gvp_v, gvp_e, counts, previous) + deep_checks + story_checks
     passed = not blocking(checks)
     files = [{"path": str(p.relative_to(v_dir)), "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
              for p in sorted(v_dir.rglob("*")) if p.is_file()]
-    manifest = {**hdr, "kind": "manifest", "files": files, "checks": {"passed": passed, "results": checks}}
+    manifest = {**hdr, "kind": "manifest", "files": files, "checks": {"passed": passed, "results": checks, "counts": counts}}
     if EE_LEDGER.exists():
         manifest["earthEngineUsage"] = json.loads(EE_LEDGER.read_text())
-    (v_dir / "manifest.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False))
+    (v_dir / "manifest.json").write_text(dumps(manifest, indent=1, ensure_ascii=False))
     if passed:
-        (site / "latest.json").write_text(json.dumps({"schemaVersion": "1", "kind": "latest", "current": f"v{version}", "base": f"v{version}/", "dataAsOf": as_of,
+        (site / "latest.json").write_text(dumps({"schemaVersion": "1", "kind": "latest", "current": f"v{version}", "base": f"v{version}/", "dataAsOf": as_of,
                                                        "generatedAt": hdr["generatedAt"], "previous": f"v{version - 1}" if version > 1 else None,
                                                        "mirrors": ["https://krtmtthw.dev/plumes/data/", "https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/"]}, indent=1))
     # per-source freshness, internal only (never in the published files; audit P5)
     fresh = freshness.assess(freshness.newest(usgs, so2, fire_end))
-    (BUILD / "freshness.json").write_text(json.dumps(fresh, indent=1))
+    (BUILD / "freshness.json").write_text(dumps(fresh, indent=1))
     return {"version": version, "passed": passed, "failed": blocking(checks), "freshness": fresh,
             "warnings": [c for c in checks if not c["passed"] and c.get("severity") == "warning"], "files": len(files),
             "bytes": sum(f["bytes"] for f in files), "storiesLeft": gen["left"]}
@@ -677,4 +739,4 @@ if __name__ == "__main__":
     for x in res["storiesLeft"]:  # a previously public story that left with a data-driven reason (ST15)
         print(f"::warning title=story no longer public::{x}")
     freshness.alert(res.pop("freshness"))  # stale sources: ::warning + health issue, never a public label (audit P5)
-    print(json.dumps(res, indent=1))
+    print(dumps(res, indent=1))

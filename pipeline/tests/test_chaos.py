@@ -5,6 +5,7 @@ import datetime as dt
 import json
 import subprocess
 import sys
+from pathlib import Path
 
 import httpx
 import pytest
@@ -38,13 +39,13 @@ def test_gvp_eruptions_hook_rejects(tmp_path, body, match):
 
 def test_usgs_hook_rejects_foreign_events_and_renamed_columns(tmp_path):
     p = tmp_path / "u.csv"
-    p.write_text("time,latitude,longitude,id\n2020-01-12T00:00:00Z,45,-100,us1\n")
+    p.write_text("time,latitude,longitude,depth,mag,type,id\n2020-01-12T00:00:00Z,45,-100,10,4,earthquake,us1\n")
     with pytest.raises(SchemaError, match="outside the Philippine box"):
         sources.check_usgs(p, {})
-    p.write_text("time,lat,lon,id\n2020-01-12T00:00:00Z,14,121,us1\n")  # renamed columns (A3)
+    p.write_text("time,lat,lon,depth,mag,type,id\n2020-01-12T00:00:00Z,14,121,10,4,earthquake,us1\n")  # renamed columns (A3)
     with pytest.raises(SchemaError, match="expected columns"):
         sources.check_usgs(p, {})
-    p.write_text("time,latitude,longitude,id\n2020-01-12T00:00:00Z,14,121,us1\n")
+    p.write_text("time,latitude,longitude,depth,mag,type,id\n2020-01-12T00:00:00Z,14,121,10,4,earthquake,us1\n")
     assert sources.check_usgs(p, {}) == []
 
 
@@ -169,30 +170,30 @@ def pages_remote(tmp_path):
     return bare
 
 
-def test_next_version_comes_from_gh_pages_and_aborts_when_latest_is_unreadable(pages_remote, monkeypatch):
-    state = pytest.importorskip("plumes.state")  # needs zstandard (sources group)
-    monkeypatch.setattr(state, "origin", lambda: str(pages_remote))
-    assert publish.remote_versions(str(pages_remote)) == [5, 6]
-    monkeypatch.setattr(state.httpx, "get", lambda *a, **k: httpx.Response(503, text="Service Unavailable"))
-    assert state.published() is None
-    with pytest.raises(SystemExit, match="latest.json unreadable"):
-        state.next_version()
+def _pages_local(tmp_path, monkeypatch, remote):
+    monkeypatch.setattr(publish, "PAGES_DIR", tmp_path / "pages")
+    monkeypatch.setattr(publish, "origin", lambda: str(remote))
 
-    def boom(*a, **k):
+
+def test_next_version_comes_from_gh_pages_and_aborts_when_latest_is_unreadable(pages_remote, tmp_path, monkeypatch):
+    state = pytest.importorskip("plumes.state")  # needs zstandard (sources group)
+    _pages_local(tmp_path, monkeypatch, pages_remote)
+
+    def boom(*a, **k):  # the live site is down: the run doesn't need it (audit A2)
         raise httpx.ConnectError("down")
     monkeypatch.setattr(state.httpx, "get", boom)
-    with pytest.raises(SystemExit):
-        state.next_version()
-    monkeypatch.setattr(state.httpx, "get", lambda *a, **k: httpx.Response(200, json={"current": "v6"}))
+    assert publish.remote_versions(str(pages_remote)) == [5, 6]
     assert state.next_version() == 7
+    (tmp_path / "pages" / "data" / "latest.json").write_text("<html>oops</html>")  # versions held, pointer unreadable
+    with pytest.raises(SystemExit, match="latest.json unreadable"):
+        state.next_version()
 
 
 def test_next_version_starts_at_1_only_without_a_gh_pages_branch(tmp_path, monkeypatch):
     state = pytest.importorskip("plumes.state")  # needs zstandard (sources group)
     bare = tmp_path / "empty.git"
     _git("init", "-q", "--bare", str(bare), cwd=tmp_path)
-    monkeypatch.setattr(state, "origin", lambda: str(bare))
-    monkeypatch.setattr(state.httpx, "get", lambda *a, **k: httpx.Response(404))
+    _pages_local(tmp_path, monkeypatch, bare)
     assert state.next_version() == 1
 
 
@@ -414,3 +415,267 @@ def test_stale_sources_warn_and_file_an_issue(capsys, monkeypatch):
     assert freshness.alert(res) == ["phivolcs-lava-bulletins", "usgs-comcat-ph-2010"]
     assert filed == ["stale phivolcs-lava-bulletins", "stale usgs-comcat-ph-2010"]
     assert "::warning title=stale phivolcs-lava-bulletins::" in capsys.readouterr().out
+
+
+# ================================================================ repair round: the verifier's gaps on PR #70
+
+USGS_HEAD = "time,latitude,longitude,depth,mag,magType,id,place,type,status"
+
+
+def _usgs(n, start=0, **over):
+    rows = []
+    for i in range(start, start + n):
+        r = {"time": f"2020-01-{1 + i % 28:02d}T00:00:00.000Z", "latitude": "14", "longitude": "121", "depth": "10",
+             "mag": "4.1", "magType": "mb", "id": f"us{i}", "type": "earthquake",
+             "place": "12 km SSW of Somewhere Philippines " + "x" * 110, "status": "reviewed"} | over  # real rows are about 150 bytes (size bounds)
+        rows.append(",".join(r[k] for k in USGS_HEAD.split(",")))
+    return USGS_HEAD + "\n" + "\n".join(rows) + "\n"
+
+
+def test_fetch_files_uses_the_archive_baseline_without_a_local_sidecar(tmp_path, monkeypatch):
+    """A1: CI starts from a fresh checkout; the gate's baseline then comes from the newest good archive snapshot."""
+    archivekit = pytest.importorskip("archivekit")
+    seen = {}
+
+    def fake_fetch(sid, reg, **k):
+        seen[sid] = k["previous"]
+        return type("P", (), {"link_id": "x", "rows": 1})()
+    monkeypatch.setattr(archivekit, "fetch", fake_fetch)
+    monkeypatch.setattr(sources, "archive_baseline", lambda reg, sid, client: {"rows": 11595, "archive_tag": f"{sid}-2026-10-21"})
+    monkeypatch.setattr(archivekit, "load_registry", lambda *a, **k: _Reg(tmp_path))
+    sources.fetch_files(["usgs-comcat-ph-2010"])
+    assert seen["usgs-comcat-ph-2010"]["rows"] == 11595
+    (tmp_path / "u.csv.provenance.json").write_text("{}")  # a local sidecar wins: the kit reads it itself
+    sources.fetch_files(["usgs-comcat-ph-2010"])
+    assert seen["usgs-comcat-ph-2010"] is None
+
+
+class _Reg:
+    def __init__(self, root):
+        self.root, self.health = root, {}
+
+    def source(self, sid):
+        return {"local_path": "u.csv"}
+
+
+def test_kit_rejects_a_usgs_file_cut_at_a_row_boundary_against_the_baseline(tmp_path):
+    """A1: 10,500 complete rows where the archive holds 11,595: inside the row bounds, but a >2% shrink."""
+    archivekit = pytest.importorskip("archivekit")
+    from plumes.paths import PIPELINE, REGISTRY
+
+    reg = archivekit.load_registry(REGISTRY, root=PIPELINE)
+    body = _usgs(10_500)
+    client = httpx.Client(transport=httpx.MockTransport(lambda req: httpx.Response(200, stream=httpx.ByteStream(body.encode()), headers={"content-type": "text/csv"})))
+    kw = dict(dest=tmp_path / "u.csv", client=client, reporter=False, allow_archive=False)
+    with pytest.raises(archivekit.AllLinksFailed, match="shrink|below"):
+        archivekit.fetch("usgs-comcat-ph-2010", reg, previous={"rows": 11595}, **kw)
+    assert archivekit.fetch("usgs-comcat-ph-2010", reg, previous={"rows": 10_400}, **kw).rows == 10_500
+
+
+@pytest.mark.parametrize("over,match", [
+    ({"mag": "NaN"}, "magnitude"), ({"mag": "42"}, "magnitude"), ({"depth": "inf"}, "depth"), ({"depth": "9000"}, "depth"),
+    ({"time": "1577836800000"}, "bad time"),                    # A3: epoch milliseconds
+    ({"type": "Earthquake"}, "type 'earthquake'"),             # A3: a renamed category value
+    ({"type": "earthquake (tectonic)"}, "type 'earthquake'"),
+])
+def test_usgs_hook_rejects_absurd_values_epoch_times_and_renamed_types(tmp_path, over, match):
+    p = tmp_path / "u.csv"
+    p.write_text(_usgs(20, **over))
+    with pytest.raises(SchemaError, match=match):
+        sources.check_usgs(p, {})
+
+
+def test_usgs_hook_rejects_duplicates_and_warns_on_a_new_type(tmp_path, capsys):
+    p = tmp_path / "u.csv"
+    p.write_text(_usgs(20) + _usgs(20).split("\n", 1)[1])  # every row twice (A1)
+    with pytest.raises(SchemaError, match="duplicate ids"):
+        sources.check_usgs(p, {})
+    p.write_text(_usgs(20) + _usgs(1, start=99, type="sinkhole").split("\n", 1)[1])
+    assert sources.check_usgs(p, {}) == []  # 95% earthquakes: accepted
+    assert "new event type values ['sinkhole']" in capsys.readouterr().out
+    p.write_text(_usgs(5, mag="") + _usgs(5, start=5, mag="-0.5", depth="-3").split("\n", 1)[1])  # magnitude not reported; shallow
+    assert sources.check_usgs(p, {}) == []
+
+
+def test_hazel_hook_rejects_infinite_damage_and_repeated_events(tmp_path):
+    p = tmp_path / "h.json"
+    items = [_hazel(i) for i in range(40)]
+    p.write_text(json.dumps({"items": items[:39] + [items[0] | {"damageMillionsDollars": float("inf")}], "totalPages": 1, "totalItems": 40}))
+    with pytest.raises(SchemaError, match="damageMillionsDollars"):
+        check_hazel(p, {})
+    p.write_text(json.dumps({"items": items[:1] * 40, "totalPages": 1, "totalItems": 40}))
+    with pytest.raises(SchemaError, match="duplicate ids"):
+        check_hazel(p, {})
+    p.write_text(json.dumps({"items": items, "totalPages": 1, "totalItems": 40}))
+    assert check_hazel(p, {}) == []
+
+
+def test_gvp_eruptions_hook_rejects_repeated_eruptions(tmp_path):
+    p = tmp_path / "e.csv"
+    p.write_text("Volcano_Number,Volcano_Name,Eruption_Number,ExplosivityIndexMax\n273030,Taal,1,2\n273030,Taal,1,2\n")
+    with pytest.raises(SchemaError, match="duplicate ids"):
+        sources.check_gvp_eruptions(p, {})
+
+
+def test_published_files_never_hold_nan(tmp_path):
+    """A1: a NaN that slips past the hooks becomes null (fnum) or fails the build (dumps, strict JSON check)."""
+    rm = pytest.importorskip("plumes.readmodels")
+    assert rm.fnum("NaN") is None and rm.fnum("inf") is None and rm.fnum("4.5") == 4.5
+    with pytest.raises(ValueError):
+        rm.dumps({"maxMag": float("nan")})
+    v = tmp_path / "v7"
+    (v / "volcano").mkdir(parents=True)
+    (v / "layers.json").write_text(json.dumps({"dataAsOf": "2001-06-01"}))
+    (v / "layers" / "thermal").mkdir(parents=True)
+    (v / "layers" / "thermal" / "2000.pmtiles").write_text("")
+    (v / "volcano" / "taal.json").write_text('{"rows": [["2020-01-12", 3, NaN]]}')
+    res = []
+    rm.file_checks(lambda name, ok, detail="", warn=False: res.append((name, ok, warn)), v)
+    assert ("strict JSON volcano/taal.json", False, False) in res
+
+
+def test_usgs_loader_counts_a_repeated_event_once(tmp_path, monkeypatch):
+    rm = pytest.importorskip("plumes.readmodels")
+    (tmp_path / "usgs").mkdir()
+    (tmp_path / "usgs" / "usgs-comcat-ph-1900-2009.csv").write_text(_usgs(3))
+    (tmp_path / "usgs" / "usgs-comcat-ph-2010.csv").write_text(_usgs(3) + _usgs(3).split("\n", 1)[1])
+    monkeypatch.setattr(rm, "RAW", tmp_path)
+    assert len(rm.load_usgs()) == 3
+
+
+def _checks(fn, *a):
+    res = []
+    fn(lambda name, ok, detail="", warn=False: res.append({"check": name, "passed": bool(ok), "warn": warn}), *a)
+    return {r["check"]: r for r in res}
+
+
+def test_counts_may_not_shrink_from_the_previous_version():
+    """A1/A3: a cut file or a renamed type drops records; blocked against the previous version's manifest counts."""
+    rm = pytest.importorskip("plumes.readmodels")
+    prev = {"checks": {"counts": {"USGS earthquakes": 27_333, "GVP eruptions": 233}}}
+    r = _checks(rm.counts_check, {"USGS earthquakes": 19_000, "GVP eruptions": 233}, prev)
+    assert not r["USGS earthquakes: at least 98% of the previous version"]["passed"]
+    assert r["GVP eruptions: at least 98% of the previous version"]["passed"]
+    r = _checks(rm.counts_check, {"USGS earthquakes": 0}, None)  # no previous counts yet (v6): only "not empty"
+    assert list(r) == ["USGS earthquakes: not empty"] and not r["USGS earthquakes: not empty"]["passed"]
+
+
+def test_thermal_years_after_every_firms_product_stopped_warn_instead_of_blocking(tmp_path):
+    """A4: no detections at all in the last year(s) (every product gone) never blocks every later build."""
+    rm = pytest.importorskip("plumes.readmodels")
+    v = tmp_path / "v9"
+    (v / "layers" / "thermal").mkdir(parents=True)
+    (v / "layers.json").write_text(json.dumps({"dataAsOf": "2028-01-05"}))
+    for y in [*range(2000, 2015), *range(2016, 2027)]:  # 2015 is a hole; 2027 has nothing
+        (v / "layers" / "thermal" / f"{y}.pmtiles").write_text("")
+    r = _checks(rm.file_checks, v)
+    assert not r["thermal detections: one tileset per year 2000 onward"]["passed"]  # the hole still blocks
+    tail = r["thermal detections: no year without any detection at the end"]
+    assert not tail["passed"] and tail["warn"]
+    (v / "layers" / "thermal" / "2015.pmtiles").write_text("")
+    assert _checks(rm.file_checks, v)["thermal detections: one tileset per year 2000 onward"]["passed"]
+    for p in (v / "layers" / "thermal").glob("*"):
+        p.unlink()
+    assert not _checks(rm.file_checks, v)["thermal detections: one tileset per year 2000 onward"]["passed"]  # no tileset at all
+
+
+@pytest.mark.parametrize("body", [HEAD + "\n13.25,123.6", HEAD + "\n13.25,123.6,2000-11-0", HEAD + "\n13.2,123.6,2000-11-01,100,T,MODIS,80,5.1,D,0,extra"])
+def test_firms_answer_cut_mid_row_is_an_error_and_fetched_again(tmp_path, monkeypatch, body):
+    with pytest.raises(firms.NotFirmsCsv, match="incomplete"):
+        firms.rows_of(body)
+    monkeypatch.setenv("FIRMS_MAP_KEY", "k")
+    monkeypatch.setattr(firms, "OUT", tmp_path / "firms")
+    monkeypatch.setattr(firms, "Polite", _Firms(body))
+    firms.crawl(["MODIS_SP"])
+    assert firms.covered_to("MODIS_SP") is None
+    ok = HEAD + "\n13.2,123.6,2000-11-01,100,T,MODIS,80,5.1,D,0"  # no trailing newline: FIRMS's normal answer
+    assert firms.rows_of(ok)[0]["frp"] == "5.1"
+
+
+def test_firms_rate_limit_stops_the_stage_within_its_budget(tmp_path, monkeypatch, capsys):
+    """A2: 'transaction limit' on every call stops after 2 windows instead of 3 x 10 min per window."""
+    clock = [0.0]
+    monkeypatch.setattr(firms.time, "monotonic", lambda: clock[0])
+    monkeypatch.setattr(firms.time, "sleep", lambda s: clock.__setitem__(0, clock[0] + s))
+    monkeypatch.setenv("FIRMS_MAP_KEY", "k")
+    monkeypatch.setattr(firms, "OUT", tmp_path / "firms")
+    f = _Firms("Exceeding allowed transaction limit.")
+    f.products = "MODIS_SP"
+    monkeypatch.setattr(firms, "Polite", f)
+    st = firms.crawl(["MODIS_SP"])["MODIS_SP"]
+    assert st["stopped"] == "rate-limited" and st["windows_failed"] == 2
+    assert clock[0] <= firms.BUDGET_S
+    assert "FIRMS stopped early" in capsys.readouterr().out
+
+
+def _bundle(sid, files: dict[str, bytes]):
+    import hashlib
+    import io
+    import tarfile
+
+    zstandard = pytest.importorskip("zstandard")
+    raw = io.BytesIO()
+    with tarfile.open(fileobj=raw, mode="w") as tar:
+        for name, data in files.items():
+            ti = tarfile.TarInfo(name)
+            ti.size = len(data)
+            tar.addfile(ti, io.BytesIO(data))
+    comp = zstandard.ZstdCompressor().compress(raw.getvalue())
+    man = {"raw_sha256": hashlib.sha256(raw.getvalue()).hexdigest(), "compressed_sha256": hashlib.sha256(comp).hexdigest(),
+           "members": [{"path": n, "sha256": hashlib.sha256(d).hexdigest()} for n, d in files.items()]}
+    return comp, man
+
+
+def _fake_gh(releases):
+    """`gh release download <tag> -p <sid>.tar.zst -p manifest.json -D <dir>` over {tag: (asset bytes|None, manifest)}."""
+    def run(cmd, **k):
+        tag, d = cmd[3], cmd[cmd.index("-D") + 1]
+        asset, man = releases[tag]
+        sid = cmd[cmd.index("-p") + 1]
+        if asset is None:
+            return subprocess.CompletedProcess(cmd, 1, "", "no assets match the file pattern")
+        (Path(d) / sid).write_bytes(asset)
+        (Path(d) / "manifest.json").write_text(json.dumps(man))
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+    return run
+
+
+def test_restore_falls_back_to_an_older_good_tag(tmp_path, monkeypatch):
+    """A4: a corrupt or missing newest bundle no longer blocks every run; members are checked against manifest.json."""
+    state = pytest.importorskip("plumes.state")
+    good, gman = _bundle("x", {"raw/x/pages.jsonl": b'{"a": 1}\n'})
+    newer, nman = _bundle("x", {"raw/x/pages.jsonl": b'{"a": 2}\n'})
+    reports = []
+    monkeypatch.setattr(state.health, "report", lambda key, st, summary: reports.append((key, st)))
+    monkeypatch.setattr(state.health, "resolve", lambda key, note: None)
+    tags = ["x-2026-10-01", "x-2026-10-08", "x-2026-10-08.2"]
+    rel = {"x-2026-10-08.2": (newer[:-20] + b"\0" * 20, nman), "x-2026-10-08": (None, gman), "x-2026-10-01": (good, gman)}
+    monkeypatch.setattr(state.subprocess, "run", _fake_gh(rel))
+    assert state.restore_bundle("x", tags, dest=tmp_path) == "x-2026-10-01"
+    assert (tmp_path / "raw/x/pages.jsonl").read_bytes() == b'{"a": 1}\n'
+    assert reports == [("restore x", "older tag used")]
+    rel["x-2026-10-01"] = (good, nman)  # the manifest doesn't match the bundle: not good either
+    with pytest.raises(SystemExit, match="no good release"):
+        state.restore_bundle("x", tags, dest=tmp_path)
+
+
+def test_ee_ledger_comes_from_gh_pages_and_fails_closed(pages_remote, tmp_path, monkeypatch):
+    """A2: the ledger is read from the gh-pages branch; versions without a readable ledger switch Earth Engine off."""
+    state = pytest.importorskip("plumes.state")
+    _pages_local(tmp_path, monkeypatch, pages_remote)
+    monkeypatch.setattr(state, "EE_LEDGER", tmp_path / "ledger.json")
+    out = tmp_path / "out"
+    monkeypatch.setenv("GITHUB_OUTPUT", str(out))
+    assert state.restore_ledger() == "unreadable: Earth Engine off"
+    assert out.read_text() == "ee_ledger=missing\n"
+    (tmp_path / "pages" / "data" / "ee-usage.json").write_text(json.dumps({"runs": [], "months": {}}))
+    assert state.restore_ledger().startswith("merged")
+
+
+def test_trial_runs_open_no_health_issues(monkeypatch):
+    monkeypatch.setenv("PLUMES_TRIAL", "true")
+    health._reporter.cache_clear()
+    try:
+        assert health._reporter() is None
+    finally:
+        health._reporter.cache_clear()

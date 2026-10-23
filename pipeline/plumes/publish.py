@@ -12,6 +12,7 @@ import argparse
 import base64
 import json
 import os
+import pathlib
 import re
 import shutil
 import subprocess
@@ -73,6 +74,50 @@ def remote_versions(remote: str) -> list[int]:
         git("clone", "-q", "--depth", "1", "--filter=blob:none", "--no-checkout", "--branch", "gh-pages", remote, td, cwd=None)
         names = git("ls-tree", "--name-only", "HEAD", "data/", cwd=td).stdout.split()
     return sorted(int(m[1]) for n in names if (m := re.fullmatch(r"data/v(\d+)", n)))
+
+
+def checkout(remote: str | None = None) -> pathlib.Path | None:
+    """The gh-pages branch, cloned once per run into PAGES_DIR (Publish pulls and reuses it); None when the branch does
+    not exist yet. The Data run reads the published state (latest.json, the previous manifest, stories, ee-usage.json)
+    from here, never from the live site, so a krtmtthw.dev outage doesn't stop a run (audit A2). Raises when the branch
+    exists but can't be read."""
+    if (PAGES_DIR / ".git").exists():
+        return PAGES_DIR
+    remote = remote or origin()
+    r = git("ls-remote", "--exit-code", "--heads", remote, "gh-pages", cwd=None, check=False)
+    if r.returncode == 2:
+        return None
+    if r.returncode != 0:
+        raise RuntimeError(f"gh-pages on {remote} is not readable: {r.stderr.strip()[:200]}")
+    PAGES_DIR.parent.mkdir(parents=True, exist_ok=True)
+    git("clone", "-q", "--depth", "1", "--branch", "gh-pages", remote, str(PAGES_DIR), cwd=None)
+    return PAGES_DIR
+
+
+def held(root: pathlib.Path | None) -> list[int]:
+    """The version numbers under data/ in a gh-pages checkout."""
+    if root is None:
+        return []
+    return sorted(int(m[1]) for d in (root / "data").glob("v*") if d.is_dir() and (m := re.fullmatch(r"v(\d+)", d.name)))
+
+
+def read_json(root: pathlib.Path | None, rel: str):
+    """data/<rel> from a gh-pages checkout, or None when it is missing or not strict JSON."""
+    try:
+        return json.loads((root / "data" / rel).read_text(), parse_constant=_no_constant) if root else None
+    except (OSError, ValueError):
+        return None
+
+
+def _no_constant(name: str):
+    raise ValueError(f"{name} is not JSON")
+
+
+def current(root: pathlib.Path | None) -> int | None:
+    """The version the checkout's latest.json points to; None when it can't be read as one."""
+    p = read_json(root, "latest.json")
+    m = re.fullmatch(r"v(\d+)", str(p.get("current"))) if isinstance(p, dict) else None
+    return int(m[1]) if m else None
 
 
 def pages(version: int) -> dict:

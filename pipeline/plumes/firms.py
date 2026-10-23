@@ -30,6 +30,10 @@ WINDOW_DAYS = 5
 # Records written before windows carried "to" may be partial: trusted only when fetched this long after the window
 # ended (standard products lag the calendar by up to about four months); anything newer is fetched again.
 LEGACY_SETTLED_DAYS = 180
+# A stage's time budget: FIRMS answering "transaction limit" on every call would otherwise wait 3 x 10 min per window
+# until the job's timeout cancels the whole run (audit A2). Windows not fetched stay undone and are asked again next run.
+BUDGET_S = float(os.environ.get("FIRMS_BUDGET_MIN", "45")) * 60
+MAX_LIMITED = 2  # consecutive windows still rate-limited after their retries
 COLS = ["latitude", "longitude", "acq_date", "acq_time", "satellite", "instrument", "confidence", "frp", "daynight", "type"]
 
 
@@ -55,7 +59,19 @@ def rows_of(text: str) -> list[dict]:
     if not NEED.issubset(c.strip() for c in head.split(",")):
         raise NotFirmsCsv(f"not a FIRMS CSV: {head[:120]!r}")
     lines = [ln for ln in text.replace(head, "\n" + head).splitlines() if ln and ln != head]
-    return list(csv.DictReader([head, *lines]))
+    out = list(csv.DictReader([head, *lines]))
+    for r in out:  # a body cut mid-row: missing fields (None) or extra ones (key None) mean a partial answer (audit A1)
+        if None in r or None in r.values() or not _is_date(r["acq_date"]):
+            raise NotFirmsCsv(f"incomplete FIRMS row: {','.join(str(v) for v in r.values())[:120]!r}")
+    return out
+
+
+def _is_date(s: str) -> bool:
+    try:
+        dt.date.fromisoformat(s)
+    except (TypeError, ValueError):
+        return False
+    return True
 
 
 def _end(d: dt.date) -> dt.date:
@@ -106,6 +122,8 @@ def _write_window(product: str, d: dt.date, rows: list[dict], replace: bool) -> 
 def crawl(products: list[str], start: str | None = None, end: str | None = None) -> dict:
     key = os.environ.get("FIRMS_MAP_KEY") or sys.exit("FIRMS_MAP_KEY is not set")
     stats = {}
+    deadline = time.monotonic() + BUDGET_S
+    limited = 0
     with Polite(min_interval=1.0) as c:
         avail = availability(c, key)
         for product in products:
@@ -124,15 +142,20 @@ def crawl(products: list[str], start: str | None = None, end: str | None = None)
             last_start = last - dt.timedelta(days=WINDOW_DAYS - 1)
             end_ = min(last_start, dt.date.fromisoformat(end)) if end else last_start
             n = bad = 0
+            stopped = None
             while d <= end_:
                 ds = d.isoformat()
                 if ds not in done:
+                    if time.monotonic() > deadline or limited >= MAX_LIMITED:
+                        stopped = "rate-limited" if limited >= MAX_LIMITED else "time budget spent"
+                        break
                     r = c.get(API.format(key=key, product=product, date=ds))
                     for _ in range(3):  # FIRMS weighs transactions by size: wait out the 10-minute window and retry
-                        if "transaction limit" not in r.text[:200]:
+                        if "transaction limit" not in r.text[:200] or time.monotonic() + 600 > deadline:
                             break
                         time.sleep(600)
                         r = c.get(API.format(key=key, product=product, date=ds))
+                    limited = limited + 1 if "transaction limit" in r.text[:200] else 0
                     rows, status = None, r.status_code
                     if r.status_code == 200 and "Invalid" not in r.text[:200]:
                         try:
@@ -149,9 +172,11 @@ def crawl(products: list[str], start: str | None = None, end: str | None = None)
                         log.add({"date": ds, "to": _end(d).isoformat(), "status": 200, "fetched": now(), "rows": len(rows), "sha256": sha256(r.content)})
                         n += 1
                 d += dt.timedelta(days=WINDOW_DAYS)
+            if stopped:  # the windows left are not logged as done, so the next run asks for them again
+                print(f"::warning title=FIRMS stopped early::{product}: {stopped} at window {ds}; the remaining windows are fetched next run", flush=True)
             if bad:  # logged as errors (not done), so the next run asks again
                 print(f"::warning title=FIRMS answers not usable::{product}: {bad} windows answered with an error, an empty body or not a FIRMS CSV", flush=True)
-            stats[product] = {"windows_fetched": n, "windows_failed": bad, "available_to": avail[product]}
+            stats[product] = {"windows_fetched": n, "windows_failed": bad, "available_to": avail[product]} | ({"stopped": stopped} if stopped else {})
             print(product, stats[product], flush=True)
     return stats
 

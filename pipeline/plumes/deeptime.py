@@ -13,10 +13,11 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 from pathlib import Path
 from typing import Any
 
-from plumes.sources import reject
+from plumes.sources import duplicates, reject
 
 SOURCE_ID = "noaa-hazel-volcanoes-ph"
 GVP_ID = "gvp-eruptions-ph"
@@ -97,8 +98,10 @@ def check_hazel(path: Path, source: dict[str, Any]) -> list[str]:
         if not isinstance(y, int) or not -12000 <= y <= 2100:
             probs.append(f"event {it.get('id')}: year {y!r}")
         for f in ("deaths", "deathsTotal", "injuries", "missing", "housesDestroyed", "damageMillionsDollars"):
-            if it.get(f) is not None and not (isinstance(it[f], int | float) and it[f] >= 0):
+            # bool is an int; inf >= 0 holds, so finiteness is checked too (audit A1)
+            if it.get(f) is not None and not (isinstance(it[f], int | float) and not isinstance(it[f], bool) and math.isfinite(it[f]) and it[f] >= 0):
                 probs.append(f"event {it.get('id')}: {f} {it[f]!r}")
+    probs += duplicates(it.get("id") for it in items)  # a repeated event would attach its impacts several times
     reject(probs)  # SchemaError: the kit rejects the page and tries the next link (audit P2)
     return []
 

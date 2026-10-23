@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 300
     env:
       ARCHIVE_READ_TOKEN: ${{ secrets.ARCHIVE_READ_TOKEN }}
+      # a trial run (publish=false) still warns, but opens or closes no health issue in the archive repo
+      PLUMES_TRIAL: ${{ github.event_name != 'schedule' && !inputs.publish }}
     steps:
       - id: token
         run: |
@@ -49,9 +51,12 @@ jobs:
           if [ "$n" != "0" ]; then echo "::warning title=Earth Engine skipped::a Lights data run is in progress"; echo "ee=false" >> "$GITHUB_OUTPUT";
           else echo "ee=${{ github.event_name == 'schedule' || inputs.ee }}" >> "$GITHUB_OUTPUT"; fi
       - name: Restore state (previous version, EE ledger, crawl records)
+        id: restore
         if: steps.token.outputs.ok == 'true'
         working-directory: pipeline
-        env: { GH_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}" }
+        # the newest good bundle per source (older tags when a newer one is corrupt), and the gh-pages branch cloned
+        # once: latest.json, the previous manifest and ee-usage.json are read there, never from the live site (audit A2)
+        env: { GH_TOKEN: "${{ secrets.ARCHIVE_READ_TOKEN }}", GITHUB_TOKEN: "${{ github.token }}" }
         run: uv run python -m plumes.state restore
       - name: Fetch file sources (archivekit)
         if: steps.token.outputs.ok == 'true'
@@ -79,7 +84,8 @@ jobs:
           test -f data/raw/nasa-msvolso2l4/philippines.json || uv run python -m plumes.nasa
           test -f data/raw/cod-ab/phl_admin3.csv || uv run python -m plumes.codab
       - name: Earth Engine (new months only)
-        if: steps.token.outputs.ok == 'true' && steps.lights.outputs.ee == 'true'
+        # an unreadable published ledger leaves the month's usage unknown: Earth Engine stays off (fail closed)
+        if: steps.token.outputs.ok == 'true' && steps.lights.outputs.ee == 'true' && steps.restore.outputs.ee_ledger != 'missing'
         working-directory: pipeline
         env: { EE_SA_KEY: "${{ secrets.EE_SA_KEY }}" }
         run: |
@@ -96,8 +102,10 @@ jobs:
       - name: List the built version's files
         id: built
         if: always() && steps.token.outputs.ok == 'true'
-        working-directory: pipeline/data/build/site
+        working-directory: pipeline
         run: |
+          # the folder is missing when the build failed early: nothing to list, and this step stays green
+          mkdir -p data/build/site && cd data/build/site
           v=$(find . -maxdepth 1 -type d -name 'v*' | sed 's#^\./##' | sort -V | tail -n 1)
           if [ -z "$v" ]; then echo "::notice title=no version built::nothing to list"; exit 0; fi
           echo "dir=pipeline/data/build/site/$v" >> "$GITHUB_OUTPUT"
