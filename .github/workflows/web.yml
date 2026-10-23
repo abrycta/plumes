@@ -7,9 +7,9 @@ name: Web
 on:
   push:
     branches: [main]
-    paths: [web/**, contracts/**, docs/sources-draft.yaml, .github/workflows/web.yml]
+    paths: [web/**, contracts/**, docs/sources-draft.yaml, .github/workflows/web.yml, .github/scripts/deploy-gate.sh]
   pull_request:
-    paths: [web/**, contracts/**, docs/sources-draft.yaml, .github/workflows/web.yml]
+    paths: [web/**, contracts/**, docs/sources-draft.yaml, .github/workflows/web.yml, .github/scripts/deploy-gate.sh]
   workflow_dispatch:
 
 permissions:
