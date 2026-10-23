@@ -1,7 +1,7 @@
 # Storage options: keeping published data bounded
 
-Status: **chosen: A1 now, then C's release step** (Kurt, 2026-10-23; DECISIONS S1, S2). C's HF pruning and squash,
-D, A2 and B are not done; pruning and squash wait for the triggers in §3 step 4.
+Status: **chosen: A1 now, then C's release step** (Kurt, 2026-10-23; DECISIONS S1, S2). C's release step and the storage
+triggers are in the Data run; C's HF pruning and squash, D, A2 and B are not done; pruning and squash wait for the triggers in §3 step 4.
 Source of the request: data audit P16 / CRITIC item 11 ("about 2 GB a year of HF history; changed bundles are
 re-uploaded whole"). Measured on 2026-10-23 against gh-pages `1c9e3b5` (v6), HF `permission-alluring/plumes`
 `a6ccefc`, and `abrycta/plumes-archive` releases.
