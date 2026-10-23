@@ -21,9 +21,11 @@ export default defineConfig({
     launchOptions: { args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] },
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 900 } }, testIgnore: /devices\.spec/ },
+    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 900 } }, testIgnore: /devices\.spec|stories-webkit\.spec/ },
     // Rule 6b device matrix: only the map decision runs here (devices.spec.ts).
     { name: "devices", testMatch: /devices\.spec/, use: { ...devices["Desktop Chrome"] } },
+    // Safari on iPhone: the Stories first-load check (stories-webkit.spec.ts). WebKit takes no Chromium launch flags.
+    { name: "webkit-iphone", testMatch: /stories-webkit\.spec/, use: { ...devices["iPhone 13"], launchOptions: {} } },
   ],
   webServer: {
     command: `npx vite preview --port ${PORT} --strictPort --host 127.0.0.1`,

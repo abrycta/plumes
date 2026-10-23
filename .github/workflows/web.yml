@@ -59,7 +59,7 @@ jobs:
           path: |
             ~/.cache/ms-playwright
             ~/.cache/playwright-debs
-          key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.pw.outputs.version }}-chromium
+          key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.pw.outputs.version }}-chromium-webkit
       - name: Install Playwright OS packages (and the browser on a cache miss)
         timeout-minutes: 6
         env:
