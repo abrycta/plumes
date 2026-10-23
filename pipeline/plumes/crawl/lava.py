@@ -49,6 +49,23 @@ def search(c: Polite, vd: int, a: dt.date, b: dt.date) -> list[dict]:
     return rows
 
 
+def unknown_volcanoes(html: str) -> dict[int, str]:
+    """LAVA's volcano picker entries that VDID does not crawl (audit L3): reported, never fatal."""
+    opts = {int(v): n.strip() for v, n in re.findall(r'<option value="(\d+)">([^<]+)</option>', html)}
+    return {v: n for v, n in opts.items() if v not in VDID.values()}
+
+
+def warn_unknown(c: Polite) -> None:
+    try:
+        r = c.get(f"{HOST}/bulletin/list-of-bulletin")
+        new = unknown_volcanoes(r.text) if r.status_code == 200 else {}
+    except Exception as e:  # the check is advisory; the crawl goes on
+        print(f"::notice title=LAVA volcano list not checked::{e}", flush=True)
+        return
+    if new:
+        print(f"::warning title=LAVA lists volcanoes not crawled::{new}; add them to crawl/lava.py VDID", flush=True)
+
+
 def index(since: str = FIRST, until: str | None = None) -> dict:
     """Append (volcano, date, bid) rows for every volcano and 15-day window."""
     rec = Records(OUT / "index.jsonl")
@@ -58,6 +75,7 @@ def index(since: str = FIRST, until: str | None = None) -> dict:
     a0, end = dt.date.fromisoformat(since), dt.date.fromisoformat(until) if until else dt.date.today()
     n = 0
     with Polite() as c:
+        warn_unknown(c)
         for vid, vd in VDID.items():
             a = a0
             while a <= end:

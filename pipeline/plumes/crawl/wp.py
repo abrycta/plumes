@@ -26,23 +26,38 @@ KIND = r"bulletin|advisory|update|eruption|lowering|raising|alert"
 NS = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
 
+def _recent(slug: str) -> bool:
+    years = re.findall(r"(20\d\d)", slug)  # any 20xx year, so the crawl keeps matching from 2030 (audit L3)
+    return bool(years) and int(years[-1]) >= 2017
+
+
 def wanted(url: str) -> bool:
     slug = url.rstrip("/").rsplit("/", 1)[-1]
     if not re.search(VOLCANO, slug) or not re.search(KIND, slug) or re.search(FILIPINO, slug) or "summary" in slug:
         return False
-    years = re.findall(r"(20\d\d)", slug)  # any 20xx year, so the crawl keeps matching from 2030 (audit L3)
-    return bool(years) and int(years[-1]) >= 2017
+    return _recent(slug)
+
+
+def unknown_volcano(url: str) -> bool:
+    """A recent English volcano bulletin whose volcano is not in VOLCANO: reported, so the list is extended (audit L3)."""
+    slug = url.rstrip("/").rsplit("/", 1)[-1]
+    return ("volcano" in slug and not re.search(VOLCANO, slug) and bool(re.search(KIND, slug)) and not re.search(FILIPINO, slug)
+            and "summary" not in slug and _recent(slug))
 
 
 def list_posts(c: Polite) -> list[tuple[str, str]]:
     idx = ET.fromstring(c.get(BASE + "wp-sitemap.xml").content)
     maps = [e.text for e in idx.findall("s:sitemap/s:loc", NS) if "posts-post" in e.text]
-    out = []
+    out, unknown = [], []
     for m in maps:
         for u in ET.fromstring(c.get(m).content).findall("s:url", NS):
             loc, lastmod = u.findtext("s:loc", namespaces=NS), u.findtext("s:lastmod", namespaces=NS)
             if wanted(loc):
                 out.append((loc, lastmod))
+            elif unknown_volcano(loc):
+                unknown.append(loc)
+    if unknown:
+        print(f"::warning title=PHIVOLCS bulletins for an unknown volcano::{len(unknown)} posts, e.g. {unknown[:3]}; add the volcano to crawl/wp.py VOLCANO", flush=True)
     return out
 
 

@@ -71,6 +71,9 @@ jobs:
             echo "meta: ${got:-waiting} (want $want)"; sleep 10
           done
           [ "$got" = "$want" ] || { echo "::error::/v1/meta still reports ${got:-nothing}, not $want"; exit 1; }
+          # The ETag carries the data version ("…-d<N>"), so cached clients revalidate onto the new version.
+          etag=$(curl -sS -D - -o /dev/null "$SITE/api/v1/meta" | tr -d '\r' | awk 'tolower($1)=="etag:"{print $2}')
+          case "$etag" in *"-d${want#v}\""*) echo "ETag $etag carries $want" ;; *) echo "::error::/v1/meta ETag ${etag:-missing} does not carry $want"; exit 1 ;; esac
           # The list and Taal equal the published files (the contract's "equals" rule), retried while the edge refreshes.
           for pair in "volcanoes=volcanoes.geojson" "volcanoes/taal=volcano/taal.json"; do
             set -- "${pair%%=*}" "${pair#*=}"
