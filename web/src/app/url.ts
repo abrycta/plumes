@@ -15,7 +15,7 @@ export interface UrlState {
   from: string | null;
   to: string | null;
   ring: number | null;
-  /** ?preview: show story drafts that Kurt has not reviewed yet (ST1). Never linked from the site. */
+  /** ?preview: show story drafts that have not passed the automated checks yet (ST1, ST15). Never linked from the site. */
   preview?: boolean;
 }
 

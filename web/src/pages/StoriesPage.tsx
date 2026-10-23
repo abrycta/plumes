@@ -40,8 +40,8 @@ export default function StoriesPage() {
           <AlertTitle>{t("Preview", "プレビュー")}</AlertTitle>
           <AlertDescription>
             {t(
-              "This list includes drafts generated from the data. They are not reviewed yet and are hidden without the preview link.",
-              "この一覧には、データから生成した下書きが含まれます。まだレビューされておらず、プレビュー用のリンクがなければ表示されません。",
+              "This list includes drafts generated from the data. They have not passed the automated checks yet and are hidden without the preview link.",
+              "この一覧には、データから生成した下書きが含まれます。まだ自動チェックに合格しておらず、プレビュー用のリンクがなければ表示されません。",
             )}
           </AlertDescription>
         </Alert>

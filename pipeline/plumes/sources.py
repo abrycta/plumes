@@ -25,7 +25,13 @@ def check_gvp_volcanoes(path: Path, source: dict[str, Any]) -> list[str]:
     want = {int(r["gvp_number"]) for r in _rows(CROSSWALK) if r["gvp_number"]}
     got = {int(r["Volcano_Number"]) for r in _rows(path)}
     missing = sorted(want - got)
-    return [f"crosswalk GVP numbers missing from the WFS: {missing}"] if missing else []
+    if len(missing) > len(want) // 2:  # most of the crosswalk gone: a wrong or broken file, not drift
+        return [f"crosswalk GVP numbers missing from the WFS: {missing}"]
+    if missing:  # a GVP renumbering or merge is drift, not a broken file; the registry's row bounds still gate the file (audit L1)
+        print(f"::warning title=GVP drift::crosswalk GVP numbers missing from the WFS: {missing}; update plumes/data/volcanoes.csv", flush=True)
+    if new := sorted(got - want):
+        print(f"::notice title=GVP drift::Philippine GVP numbers not in the crosswalk: {new}", flush=True)
+    return []
 
 
 def check_gvp_eruptions(path: Path, source: dict[str, Any]) -> list[str]:

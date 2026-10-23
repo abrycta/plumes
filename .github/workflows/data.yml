@@ -1,6 +1,6 @@
 name: Data
 # Weekly delta and manual runs (DATA-PLAN §7): fetch -> crawl deltas -> Earth Engine (budgeted) -> read models + checks
-# -> publish (GitHub Pages, then the Hugging Face mirror) -> adopt new bundles into abrycta/plumes-archive.
+# -> adopt new bundles into abrycta/plumes-archive -> publish (GitHub Pages, then the Hugging Face mirror).
 # Earth Engine steps never run while a Lights data run is in progress, and stop at Plumes' cap (50 EECU-h a month, 10 a run).
 on:
   schedule: [{ cron: "0 18 * * 6" }]   # Sundays 02:00 PHT
@@ -61,9 +61,9 @@ jobs:
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
           uv run python -m plumes.crawl.wp
-          uv run python -m plumes.crawl.lava index --since "$(date -d '21 days ago' +%F)"
+          uv run python -m plumes.crawl.lava index --since auto
           uv run python -m plumes.crawl.lava fetch
-          uv run python -m plumes.crawl.vaac --since "$(date +%Y)"
+          uv run python -m plumes.crawl.vaac --since auto
           uv run python -m plumes.firms
           uv run python -m plumes.thermal_n20
           test -f data/raw/nasa-msvolso2l4/philippines.json || uv run python -m plumes.nasa
@@ -103,6 +103,19 @@ jobs:
           path: ${{ steps.built.outputs.dir }}
           retention-days: 7
           if-no-files-found: ignore
+      - name: Adopt new bundles into the archive
+        # before Publish, so a published version's crawled inputs are always in the archive (audit H1)
+        if: steps.token.outputs.ok == 'true'
+        working-directory: pipeline
+        env: { GH_TOKEN: "${{ secrets.ARCHIVE_WRITE_TOKEN }}" }
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            if [ "${{ github.event_name }}" = "schedule" ]; then
+              echo "::error title=adoption failed::ARCHIVE_WRITE_TOKEN is not set; a scheduled run never publishes inputs the archive does not hold"; exit 1
+            fi
+            echo "::notice title=adoption skipped::ARCHIVE_WRITE_TOKEN is not set"; exit 0
+          fi
+          uv run python -m plumes.adopt --changed-only
       - name: Publish
         if: steps.token.outputs.ok == 'true' && (github.event_name == 'schedule' || inputs.publish)
         working-directory: pipeline
@@ -111,10 +124,3 @@ jobs:
           git config --global user.name Kurt
           git config --global user.email 73582015+abrycta@users.noreply.github.com
           uv run python -m plumes.publish --version "$(uv run python -m plumes.state built-version)" --pages --hf
-      - name: Adopt new bundles into the archive
-        if: steps.token.outputs.ok == 'true'
-        working-directory: pipeline
-        env: { GH_TOKEN: "${{ secrets.ARCHIVE_WRITE_TOKEN }}" }
-        run: |
-          if [ -z "$GH_TOKEN" ]; then echo "::notice title=adoption skipped::ARCHIVE_WRITE_TOKEN is not set"; exit 0; fi
-          uv run python -m plumes.adopt --changed-only

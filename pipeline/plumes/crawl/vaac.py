@@ -3,7 +3,7 @@
 The yearly list pages link every advisory; Philippine ones carry the GVP number in the file name
 (`<YYYYMMDD>_<GVP number>00_<seq>_Text.html`, e.g. Taal 27307000). Polite: <= 1 request/s, resumable.
 
-    uv run python -m plumes.crawl.vaac [--since 2010]
+    uv run python -m plumes.crawl.vaac [--since 2010 | auto]
 """
 
 from __future__ import annotations
@@ -21,15 +21,21 @@ OUT = RAW / "vaac-tokyo-advisories"
 PH = re.compile(r"TextData/(\d{4})/(\d{8})_(27[1-4]\d{3})(\d{2})_(\d{4})_Text\.html")
 
 
+def refresh_from(today: dt.date | None = None) -> int:
+    """First year whose list is re-read: last year's too in January, so late-December advisories are listed (audit M7)."""
+    today = today or dt.date.today()
+    return today.year - 1 if today.month == 1 else today.year
+
+
 def crawl(since: int = 2010, refresh_lists_from: int | None = None) -> dict:
     lists, pages = Records(OUT / "lists.jsonl"), Records(OUT / "pages.jsonl")
     listed = {r["year"]: r for r in lists}
     done = pages.done()
     this_year = dt.date.today().year
-    refresh = refresh_lists_from or this_year
+    refresh = refresh_lists_from or refresh_from()
     with Polite() as c:
         urls = []
-        for y in range(since, this_year + 1):
+        for y in range(min(since, refresh), this_year + 1):
             if y not in listed or y >= refresh:
                 r = c.get(f"{BASE}Archives/{y}_vaac_list.html")
                 found = sorted({m.group(0) for m in PH.finditer(r.text)}) if r.status_code == 200 else []
@@ -48,5 +54,6 @@ def crawl(since: int = 2010, refresh_lists_from: int | None = None) -> dict:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--since", type=int, default=2010)
-    print(crawl(ap.parse_args().since))
+    ap.add_argument("--since", default="2010", help="first year, or auto (the years whose lists are refreshed)")
+    s = ap.parse_args().since
+    print(crawl(refresh_from() if s == "auto" else int(s)))

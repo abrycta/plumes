@@ -6,7 +6,7 @@ not check them): `/bulletin/list-of-bulletin?vdId=<volcano>&type=bulletin&sdate=
 attributed by the search, so no "fixed daily order" guess is needed, and the weekly delta only re-queries recent
 windows (no daily list-page poll). The search returns at most 30 rows, so a full window is split in half.
 
-    uv run python -m plumes.crawl.lava index [--since 2022-01-01]
+    uv run python -m plumes.crawl.lava index [--since 2022-01-01 | auto]
     uv run python -m plumes.crawl.lava fetch [--limit N]
 """
 
@@ -26,6 +26,17 @@ VDID = {"bulusan": 571, "hibok-hibok": 562, "kanlaon": 565, "mayon": 574, "pinat
 ROW = re.compile(r"<td>\s*([^<]+?)\s*</td>\s*<td>\s*([^<]+?)\s*</td>\s*<td>\s*(\d{4}-\d{2}-\d{2})\s*</td>\s*"
                  r"<td>\s*<a href=\"/bulletin/(activity-\w+)\?bid=(\d+)\"")
 SPLIT_AT = 30  # the search returns at most 30 rows (newest first); a full window is split in half
+FIRST = "2022-01-01"
+
+
+def auto_since(rows, today: dt.date | None = None) -> str:
+    """Delta window start: 7 days before the newest indexed bulletin date, and never later than 21 days ago, so a gap
+    between successful runs (failures, a missing token) is re-indexed instead of lost (audit M7)."""
+    today = today or dt.date.today()
+    last = max((r["date"] for r in rows), default=None)
+    if last is None:
+        return FIRST
+    return min(dt.date.fromisoformat(last) - dt.timedelta(days=7), today - dt.timedelta(days=21)).isoformat()
 
 
 def search(c: Polite, vd: int, a: dt.date, b: dt.date) -> list[dict]:
@@ -38,9 +49,12 @@ def search(c: Polite, vd: int, a: dt.date, b: dt.date) -> list[dict]:
     return rows
 
 
-def index(since: str = "2022-01-01", until: str | None = None) -> dict:
+def index(since: str = FIRST, until: str | None = None) -> dict:
     """Append (volcano, date, bid) rows for every volcano and 15-day window."""
     rec = Records(OUT / "index.jsonl")
+    if since == "auto":
+        since = auto_since(rec)
+        print(f"  indexing from {since}", flush=True)
     a0, end = dt.date.fromisoformat(since), dt.date.fromisoformat(until) if until else dt.date.today()
     n = 0
     with Polite() as c:
@@ -80,7 +94,7 @@ def fetch(limit: int | None = None) -> dict:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("step", choices=["index", "fetch"])
-    ap.add_argument("--since", default="2022-01-01")
+    ap.add_argument("--since", default=FIRST, help="YYYY-MM-DD, or auto (from the last indexed date)")
     ap.add_argument("--until")
     ap.add_argument("--limit", type=int)
     a = ap.parse_args()

@@ -508,8 +508,9 @@ def quake_layer(out_dir, usgs: list[dict]) -> dict:
 def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list) -> list[dict]:
     res = []
 
-    def check(name, ok, detail=""):
-        res.append({"check": name, "passed": bool(ok), "detail": detail})
+    def check(name, ok, detail="", warn=False):
+        # warn=True: a fact upstream can revise (GVP, NASA, VAAC, WorldPop); recorded in the manifest, never blocks publishing (audit M6)
+        res.append({"check": name, "passed": bool(ok), "detail": detail} | ({"severity": "warning"} if warn else {}))
 
     for p in sorted(site_v.rglob("*.json")) + sorted(site_v.rglob("*.geojson")):
         doc = json.loads(p.read_text())
@@ -534,16 +535,16 @@ def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list)
         check(f"{vid}: size under 150 kB gzip", size < 150_000, f"{size / 1000:.1f} kB")
     t = models["taal"]
     gv = [e for e in t["episodes"] if e["kind"] == "gvp_eruption" and e["start"] == "2020-01-12"]
-    check("Taal 2020-01-12: GVP VEI 4", gv and gv[0]["vei"] == 4)
-    check("Taal 2020-01-12: MSVOLSO2L4 170 kt", gv and gv[0].get("so2MassKt") == 170)
+    check("Taal 2020-01-12: GVP VEI 4", gv and gv[0]["vei"] == 4, warn=True)
+    check("Taal 2020-01-12: MSVOLSO2L4 170 kt", gv and gv[0].get("so2MassKt") == 170, warn=True)
     adv = [r for r in (t["advisories"] or {"rows": []})["rows"] if r[0].startswith("2020-01-12")]
-    check("Taal 2020-01-12: VAAC observed FL550", any(r[2] == 550 and r[3] == "observed" for r in adv))
+    check("Taal 2020-01-12: VAAC observed FL550", any(r[2] == 550 and r[3] == "observed" for r in adv), warn=True)
     s5 = t["daily"]["so2_s5p_15km"]
     i13 = days_between(s5["start"], "2020-01-13")
     base = sorted(x for x in s5["values"][i13 - 40: i13 - 2] if x is not None)
     check("Taal 2020-01-13: TROPOMI SO2 > 20x the December median", base and s5["values"][i13] > 20 * max(base[len(base) // 2], 1), f"{s5['values'][i13]} vs {base[len(base) // 2] if base else None}")
     k = [e for e in models["kanlaon"]["episodes"] if e["kind"] == "gvp_eruption" and e["start"] == "2024-06-03"]
-    check("Kanlaon 2024-06-03 eruption present", bool(k))
+    check("Kanlaon 2024-06-03 eruption present", bool(k), warn=True)
     b = {r[0]: r for r in (t.get("bulletins") or {"rows": []})["rows"]}
     check("Taal 2020-01-13 bulletin: alert level 4", b.get("2020-01-13", [None, None])[1] == 4)
     check("Taal 2020-01-12 bulletin (7:30 PM, a notice of change): alert level 4", b.get("2020-01-12", [None, None])[1] == 4)
@@ -560,8 +561,13 @@ def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list)
         n = len((models[vid].get("bulletins") or {"rows": []})["rows"])
         check(f"{vid}: at least 1,500 bulletin days (2017-09 onward)", n >= 1500, str(n))
     pop = next((r["population"] for r in t["exposure"]["rings"] if r["radiusKm"] == 14), 0)
-    check("Taal WorldPop 2020 within 14 km about 318,000", 250_000 < pop < 400_000, str(pop))
+    check("Taal WorldPop 2020 within 14 km about 318,000", 250_000 < pop < 400_000, str(pop), warn=True)
     return res
+
+
+def blocking(checks: list[dict]) -> list[dict]:
+    """Failed checks that stop publishing; a failed warning (a revisable upstream fact) never does (audit M6)."""
+    return [c for c in checks if not c["passed"] and c.get("severity") != "warning"]
 
 
 # ---------------------------------------------------------------- main
@@ -641,7 +647,7 @@ def build(version: int, as_of: str) -> dict:
     gen = generate_stories(v_dir, previous=previous_stories.load())
     story_checks = gen["checks"]
     checks = run_checks(v_dir, vols, models, gvp_v, gvp_e) + deep_checks + story_checks
-    passed = all(c["passed"] for c in checks)
+    passed = not blocking(checks)
     files = [{"path": str(p.relative_to(v_dir)), "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
              for p in sorted(v_dir.rglob("*")) if p.is_file()]
     manifest = {**hdr, "kind": "manifest", "files": files, "checks": {"passed": passed, "results": checks}}
@@ -652,7 +658,8 @@ def build(version: int, as_of: str) -> dict:
         (site / "latest.json").write_text(json.dumps({"schemaVersion": "1", "kind": "latest", "current": f"v{version}", "base": f"v{version}/", "dataAsOf": as_of,
                                                        "generatedAt": hdr["generatedAt"], "previous": f"v{version - 1}" if version > 1 else None,
                                                        "mirrors": ["https://krtmtthw.dev/plumes/data/", "https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/"]}, indent=1))
-    return {"version": version, "passed": passed, "failed": [c for c in checks if not c["passed"]], "files": len(files),
+    return {"version": version, "passed": passed, "failed": blocking(checks),
+            "warnings": [c for c in checks if not c["passed"] and c.get("severity") == "warning"], "files": len(files),
             "bytes": sum(f["bytes"] for f in files), "storiesLeft": gen["left"]}
 
 
@@ -662,6 +669,8 @@ if __name__ == "__main__":
     ap.add_argument("--as-of", default=dt.date.today().isoformat())
     a = ap.parse_args()
     res = build(a.version, a.as_of)
+    for c in res["warnings"]:  # a revisable upstream fact changed: review it, publishing goes on (audit M6)
+        print(f"::warning title=fact check changed::{c['check']} {c['detail']}".rstrip())
     for x in res["storiesLeft"]:  # a previously public story that left with a data-driven reason (ST15)
         print(f"::warning title=story no longer public::{x}")
     print(json.dumps(res, indent=1))
