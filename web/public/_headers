@@ -12,7 +12,7 @@
   # Data: the published versions on GitHub Pages (krtmtthw.dev/plumes/data/, the user site's custom domain; the
   # abrycta.github.io URL redirects there) and the Hugging Face mirror (resolve URLs redirect to *.hf.co, which also
   # answers PMTiles range requests); basemap: OpenFreeMap (style, tiles, glyphs, sprites). Add new hosts to connect-src.
-  Content-Security-Policy: default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.hf.co; font-src 'self' data:; connect-src 'self' https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.huggingface.co https://*.hf.co https://tiles.openfreemap.org; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.hf.co; font-src 'self' data:; connect-src 'self' data: https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.huggingface.co https://*.hf.co https://tiles.openfreemap.org; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
 
 # Vite emits content-hashed file names here, so they never change in place.
 /assets/*
@@ -50,7 +50,7 @@
 /embed
   ! X-Frame-Options
   ! Content-Security-Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.hf.co; font-src 'self' data:; connect-src 'self' https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.huggingface.co https://*.hf.co https://tiles.openfreemap.org; frame-ancestors https://krtmtthw.dev; base-uri 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.hf.co; font-src 'self' data:; connect-src 'self' data: https://krtmtthw.dev https://abrycta.github.io https://huggingface.co https://*.huggingface.co https://*.hf.co https://tiles.openfreemap.org; frame-ancestors https://krtmtthw.dev; base-uri 'self'; object-src 'none'
   Cache-Control: public, max-age=0, must-revalidate
 
 /embed-pack/*
