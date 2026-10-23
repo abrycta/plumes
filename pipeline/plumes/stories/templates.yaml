@@ -18,40 +18,40 @@ templates:
     family: alert
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { level: level, span: span }
-    en: "PHIVOLCS bulletins reported Alert Level {level} on every day from {span}, as reported by PHIVOLCS."
-    ja: "PHIVOLCSの火山情報は{span}毎日、警戒レベル{level}を発表していた（PHIVOLCS発表）。"
+    en: "Every daily bulletin from {span} gave Alert Level {level}, as reported by PHIVOLCS."
+    ja: "{span}、火山情報は毎日、警戒レベル{level}を示していました（PHIVOLCS発表）。"
 
   - id: ALERT-HELD-GAPS
     steps: [before]
     family: alert
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { level: level, n: int, span: span }
-    en: "PHIVOLCS bulletins reported Alert Level {level} on each of the {n} days with a bulletin from {span}, as reported by PHIVOLCS."
-    ja: "PHIVOLCSの火山情報は{span}、発表のあった{n}日すべてで警戒レベル{level}だった（PHIVOLCS発表）。"
+    en: "On each of the {n} days with a bulletin from {span}, the alert was level {level}, as reported by PHIVOLCS."
+    ja: "{span}、火山情報が出た{n}日はすべて警戒レベル{level}でした（PHIVOLCS発表）。"
 
   - id: ALERT-RAISED
     steps: [before, onset, course, after]
     family: alert
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { a: level, b: level, date: date, time: time }
-    en: "PHIVOLCS raised the alert from level {a} to level {b} on {date} in its {time} bulletin, as reported by PHIVOLCS."
-    ja: "PHIVOLCSは{date}{time}の火山情報で警戒レベルを{a}から{b}に引き上げた（PHIVOLCS発表）。"
+    en: "The alert was raised from level {a} to level {b} on {date}, in the {time} bulletin, as reported by PHIVOLCS."
+    ja: "{date}{time}の火山情報で、警戒レベルが{a}から{b}に引き上げられました（PHIVOLCS発表）。"
 
   - id: ALERT-RAISED-DAY
     steps: [before, onset, course, after]
     family: alert
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { a: level, b: level, date: date }
-    en: "PHIVOLCS raised the alert from level {a} to level {b} on {date}, as reported by PHIVOLCS."
-    ja: "PHIVOLCSは{date}、警戒レベルを{a}から{b}に引き上げた（PHIVOLCS発表）。"
+    en: "The alert was raised from level {a} to level {b} on {date}, as reported by PHIVOLCS."
+    ja: "{date}、警戒レベルが{a}から{b}に引き上げられました（PHIVOLCS発表）。"
 
   - id: ALERT-LOWERED
     steps: [course, after]
     family: alert
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { a: level, b: level, date: date }
-    en: "PHIVOLCS lowered the alert from level {a} to level {b} on {date}, as reported by PHIVOLCS."
-    ja: "PHIVOLCSは{date}、警戒レベルを{a}から{b}に引き下げた（PHIVOLCS発表）。"
+    en: "The alert was lowered from level {a} to level {b} on {date}, as reported by PHIVOLCS."
+    ja: "{date}、警戒レベルが{a}から{b}に引き下げられました（PHIVOLCS発表）。"
 
   # A level change across days without a bulletin: the record shows both days, not the day of the change.
   - id: ALERT-CHANGED-GAP
@@ -59,8 +59,8 @@ templates:
     family: alert
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { a: level, d0: date, b: level, date: date }
-    en: "PHIVOLCS bulletins reported Alert Level {a} on {d0} and Alert Level {b} on {date}, as reported by PHIVOLCS."
-    ja: "PHIVOLCSの火山情報は{d0}に警戒レベル{a}、{date}に警戒レベル{b}を発表した（PHIVOLCS発表）。"
+    en: "The bulletins gave Alert Level {a} on {d0} and Alert Level {b} on {date}, as reported by PHIVOLCS."
+    ja: "火山情報は{d0}に警戒レベル{a}、{date}に警戒レベル{b}を示しました（PHIVOLCS発表）。"
 
   - id: BUL-VEQ-MAX
     steps: [before, onset, course, after]
@@ -68,21 +68,21 @@ templates:
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { n: int, span: span }
     constants: ["1日"]
-    en: "PHIVOLCS bulletins counted up to {n} volcanic earthquakes in a day from {span}, as reported by PHIVOLCS."
-    ja: "PHIVOLCSの火山情報は{span}に1日最大{n}回の火山性地震を記録した（PHIVOLCS発表）。"
+    en: "The bulletins counted up to {n} volcanic earthquakes in a day from {span}, as reported by PHIVOLCS."
+    ja: "{span}、火山情報が数えた火山性地震は1日最大{n}回でした（PHIVOLCS発表）。"
     variants:
       - when: { zero: n }
-        en: "PHIVOLCS bulletins counted no volcanic earthquake from {span}, as reported by PHIVOLCS."
-        ja: "PHIVOLCSの火山情報は{span}、火山性地震を記録しなかった（PHIVOLCS発表）。"
+        en: "The bulletins counted no volcanic earthquake from {span}, as reported by PHIVOLCS."
+        ja: "{span}、火山情報に火山性地震の記録はありませんでした（PHIVOLCS発表）。"
       - when: { single: span, one: n }
-        en: "PHIVOLCS bulletins counted {n} volcanic earthquake on {span}, as reported by PHIVOLCS."
-        ja: "PHIVOLCSの火山情報は{span}に{n}回の火山性地震を記録した（PHIVOLCS発表）。"
+        en: "The bulletins counted {n} volcanic earthquake on {span}, as reported by PHIVOLCS."
+        ja: "{span}、火山情報が数えた火山性地震は{n}回でした（PHIVOLCS発表）。"
       - when: { single: span }
-        en: "PHIVOLCS bulletins counted {n} volcanic earthquakes on {span}, as reported by PHIVOLCS."
-        ja: "PHIVOLCSの火山情報は{span}に{n}回の火山性地震を記録した（PHIVOLCS発表）。"
+        en: "The bulletins counted {n} volcanic earthquakes on {span}, as reported by PHIVOLCS."
+        ja: "{span}、火山情報が数えた火山性地震は{n}回でした（PHIVOLCS発表）。"
       - when: { one: n }
-        en: "PHIVOLCS bulletins counted up to {n} volcanic earthquake in a day from {span}, as reported by PHIVOLCS."
-        ja: "PHIVOLCSの火山情報は{span}に1日最大{n}回の火山性地震を記録した（PHIVOLCS発表）。"
+        en: "The bulletins counted up to {n} volcanic earthquake in a day from {span}, as reported by PHIVOLCS."
+        ja: "{span}、火山情報が数えた火山性地震は1日最大{n}回でした（PHIVOLCS発表）。"
 
   - id: BUL-SO2FLUX-MAX
     steps: [before, onset, course, after]
@@ -90,24 +90,24 @@ templates:
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { x: int, span: span }
     constants: ["1日"]
-    en: "PHIVOLCS measured SO₂ emissions of up to {x} tonnes a day from {span}, as reported by PHIVOLCS."
-    ja: "PHIVOLCSは{span}に最大1日{x}トンのSO₂放出量を測定した（PHIVOLCS発表）。"
+    en: "From {span}, SO₂ emissions peaked at {x} tonnes a day, as reported by PHIVOLCS."
+    ja: "{span}、SO₂放出量は最大で1日{x}トンでした（PHIVOLCS発表）。"
     variants:
       - when: { single: span }
-        en: "PHIVOLCS measured SO₂ emissions of {x} tonnes a day on {span}, as reported by PHIVOLCS."
-        ja: "PHIVOLCSは{span}に1日{x}トンのSO₂放出量を測定した（PHIVOLCS発表）。"
+        en: "SO₂ emissions were {x} tonnes a day on {span}, as reported by PHIVOLCS."
+        ja: "{span}のSO₂放出量は1日{x}トンでした（PHIVOLCS発表）。"
 
   - id: BUL-PLUME-MAX
     steps: [onset, course]
     family: bulletin
     source: [phivolcs-bulletins, phivolcs-lava-bulletins]
     types: { m: int, span: span }
-    en: "PHIVOLCS reported plumes up to {m} m above the crater from {span}, as reported by PHIVOLCS."
-    ja: "PHIVOLCSは{span}に火口上最大{m} mの噴煙を報告した（PHIVOLCS発表）。"
+    en: "From {span}, plumes rose up to {m} m above the crater, as reported by PHIVOLCS."
+    ja: "{span}、噴煙は火口上最大{m} mに達しました（PHIVOLCS発表）。"
     variants:
       - when: { single: span }
-        en: "PHIVOLCS reported a plume {m} m above the crater on {span}, as reported by PHIVOLCS."
-        ja: "PHIVOLCSは{span}に火口上{m} mの噴煙を報告した（PHIVOLCS発表）。"
+        en: "On {span}, a plume rose {m} m above the crater, as reported by PHIVOLCS."
+        ja: "{span}、噴煙が火口上{m} mに達しました（PHIVOLCS発表）。"
 
   # ------------------------------------------------------------ satellite SO₂
   - id: SO2-BASELINE
@@ -115,16 +115,16 @@ templates:
     family: so2
     source: [s5p-offl-so2]
     types: { sensor: sensor, r: km, med: num, span: span, n: int, N: int }
-    en: "The {sensor} SO₂ column within {r} km had a median of {med} µmol/m² from {span} ({n} of {N} days with a clear view)."
-    ja: "{r} km圏の{sensor} SO₂カラム量は{span}の中央値が{med} µmol/m²だった（{N}日中{n}日が観測可能）。"
+    en: "The {sensor} SO₂ column within {r} km had a median of {med} µmol/m² from {span} ({n} of {N} days had a clear view)."
+    ja: "{span}、{r} km圏の{sensor} SO₂カラム量は中央値が{med} µmol/m²でした（観測できたのは{N}日中{n}日）。"
 
   - id: SO2-PEAK
     steps: [onset, course]
     family: so2
     source: [s5p-offl-so2]
     types: { sensor: sensor, r: km, x: num, date: date, cov: share }
-    en: "The {sensor} SO₂ column within {r} km reached {x} µmol/m² on {date}, the highest in this period (coverage {cov})."
-    ja: "{r} km圏の{sensor} SO₂カラム量は{date}に{x} µmol/m²で、この期間の最大だった（被覆率{cov}）。"
+    en: "The {sensor} SO₂ column within {r} km was highest in this period on {date}, at {x} µmol/m² (coverage {cov})."
+    ja: "{r} km圏の{sensor} SO₂カラム量は、{date}の{x} µmol/m²がこの期間の最大でした（被覆率{cov}）。"
 
   # ------------------------------------------------------------ USGS earthquakes
   - id: EQ-QUIET
@@ -133,12 +133,12 @@ templates:
     source: [usgs-comcat-ph-1900-2009, usgs-comcat-ph-2010]
     types: { d1: date, d2: date, n: int, m: num }
     constants: ["30 km"]
-    en: "The USGS catalogue lists no earthquake within 30 km after {d1} until {d2}, when it lists {n}, the largest M{m}."
-    ja: "USGSのカタログには{d1}の後、{d2}まで30 km圏の地震がなく、同日には{n}回（最大M{m}）が記録されている。"
+    en: "After {d1}, the USGS catalogue lists no earthquake within 30 km until {d2}. That day it lists {n}, the largest M{m}."
+    ja: "USGSのカタログでは、{d1}の後、{d2}まで30 km圏の地震がありません。同日には{n}回（最大M{m}）が記録されています。"
     variants:
       - when: { one: n }
-        en: "The USGS catalogue lists no earthquake within 30 km after {d1} until {d2}, when it lists {n}, of M{m}."
-        ja: "USGSのカタログには{d1}の後、{d2}まで30 km圏の地震がなく、同日には{n}回（M{m}）が記録されている。"
+        en: "After {d1}, the USGS catalogue lists no earthquake within 30 km until {d2}. That day it lists {n}, of M{m}."
+        ja: "USGSのカタログでは、{d1}の後、{d2}まで30 km圏の地震がありません。同日には{n}回（M{m}）が記録されています。"
 
   - id: EQ-COUNT
     steps: [before, onset, course, after]
@@ -146,12 +146,12 @@ templates:
     source: [usgs-comcat-ph-1900-2009, usgs-comcat-ph-2010]
     types: { n: int, span: span, m: num }
     constants: ["30 km"]
-    en: "The USGS catalogue lists {n} earthquakes within 30 km from {span}, the largest M{m}."
-    ja: "USGSのカタログには{span}に30 km圏の地震が{n}回記録されており、最大はM{m}だった。"
+    en: "The USGS catalogue lists {n} earthquakes within 30 km from {span}; the largest is M{m}."
+    ja: "USGSのカタログには、{span}に30 km圏の地震が{n}回記録されています。最大はM{m}です。"
     variants:
       - when: { one: n }
         en: "The USGS catalogue lists {n} earthquake within 30 km from {span}, of M{m}."
-        ja: "USGSのカタログには{span}に30 km圏の地震が{n}回記録されており、M{m}だった。"
+        ja: "USGSのカタログには、{span}に30 km圏の地震が{n}回記録されています。規模はM{m}です。"
 
   - id: EQ-NONE
     steps: [before, onset, course, after]
@@ -160,7 +160,7 @@ templates:
     types: { span: span }
     constants: ["30 km"]
     en: "The USGS catalogue lists no earthquake within 30 km from {span}."
-    ja: "USGSのカタログには{span}、30 km圏の地震の記録がない。"
+    ja: "USGSのカタログには、{span}の30 km圏の地震の記録がありません。"
 
   # ------------------------------------------------------------ Tokyo VAAC
   - id: VAAC-MAX
@@ -169,7 +169,7 @@ templates:
     source: [vaac-tokyo-advisories]
     types: { fl: fl, date: date }
     en: "Tokyo VAAC observed ash up to {fl} on {date}."
-    ja: "東京VAACは{date}に最高{fl}の火山灰を観測した。"
+    ja: "東京VAACは{date}、最高{fl}の火山灰を観測しました。"
 
   - id: VAAC-COUNT
     steps: [onset, course]
@@ -177,11 +177,11 @@ templates:
     source: [vaac-tokyo-advisories]
     types: { n: int, span: span }
     en: "Tokyo VAAC issued {n} ash advisories from {span}."
-    ja: "東京VAACは{span}に{n}件の火山灰情報を発表した。"
+    ja: "東京VAACは{span}に{n}件の火山灰情報を発表しました。"
     variants:
       - when: { one: n }
         en: "Tokyo VAAC issued {n} ash advisory from {span}."
-        ja: "東京VAACは{span}に{n}件の火山灰情報を発表した。"
+        ja: "東京VAACは{span}に{n}件の火山灰情報を発表しました。"
 
   # ------------------------------------------------------------ thermal
   - id: HEAT-DAYS
@@ -190,12 +190,12 @@ templates:
     source: [modis-mod14a1, viirs-vnp14a1]
     types: { sensor: sensor, n: int, span: span, x: num, date: date }
     constants: ["15 km"]
-    en: "{sensor} detected heat within 15 km on {n} days from {span}, the strongest {x} MW on {date}."
-    ja: "{sensor}は{span}の{n}日、15 km圏で熱異常を検出し、最大は{date}の{x} MWだった。"
+    en: "{sensor} detected heat within 15 km on {n} days from {span}. The strongest was {x} MW, on {date}."
+    ja: "{sensor}は{span}のうち{n}日、15 km圏で熱異常を検出しました。最大は{date}の{x} MWです。"
     variants:
       - when: { one: n }
         en: "{sensor} detected heat within 15 km on {n} day from {span}: {x} MW on {date}."
-        ja: "{sensor}は{span}の{n}日、15 km圏で熱異常を検出し、{date}の{x} MWだった。"
+        ja: "{sensor}は{span}のうち{n}日、15 km圏で熱異常を検出しました（{date}、{x} MW）。"
 
   # ------------------------------------------------------------ GVP and NASA records of the eruption
   - id: GVP-VEI
@@ -204,7 +204,7 @@ templates:
     source: [gvp-eruptions-ph]
     types: { vei: int }
     en: "GVP records the eruption as VEI {vei}."
-    ja: "GVPはこの噴火をVEI {vei}としている。"
+    ja: "GVPはこの噴火をVEI {vei}としています。"
 
   - id: SO2-MASS
     steps: [onset]
@@ -213,7 +213,7 @@ templates:
     types: { x: num, date: date }
     constants: ["MSVOLSO2L4"]
     en: "NASA's MSVOLSO2L4 record lists {x} kt of SO₂ for the eruption of {date}."
-    ja: "NASAのMSVOLSO2L4は{date}の噴火のSO₂量を{x} ktとしている。"
+    ja: "NASAのMSVOLSO2L4は、{date}の噴火のSO₂量を{x} ktとしています。"
 
   # ------------------------------------------------------------ DSWD DROMIC
   - id: DROMIC-AFFECTED
@@ -221,16 +221,16 @@ templates:
     family: dromic
     source: [dswd-dromic-reports]
     types: { n: int, date: date }
-    en: "DSWD DROMIC reports counted {n} people affected by {date}."
-    ja: "DSWD DROMIC報告は{date}までに{n}人の被災者を数えた。"
+    en: "By {date}, DSWD DROMIC reports counted {n} people affected."
+    ja: "DSWD DROMIC報告が数えた被災者は、{date}までに{n}人です。"
 
   - id: DROMIC-INSIDE-MAX
     steps: [course]
     family: dromic
     source: [dswd-dromic-reports]
     types: { n: int, date: date, k: int }
-    en: "The most people in evacuation centres, {n}, were counted on {date}, according to DSWD DROMIC Report #{k}."
-    ja: "DSWD DROMIC報告第{k}号によると、避難所にいた人は{date}の{n}人が最多だった。"
+    en: "Evacuation centres held the most people on {date}: {n}, according to DSWD DROMIC Report #{k}."
+    ja: "DSWD DROMIC報告第{k}号によると、避難所にいた人は{date}の{n}人が最多でした。"
 
   # ------------------------------------------------------------ Smithsonian/USGS Weekly Reports (ST2). No extractor yet:
   # these templates are in the catalogue so the checks cover them; they render once the weekly-report source exists.
@@ -239,8 +239,8 @@ templates:
     family: weekly
     source: [gvp-weekly-reports]
     types: { b: level, date: date }
-    en: "PHIVOLCS raised the alert to level {b} on {date}, as reported by PHIVOLCS, via Smithsonian/USGS."
-    ja: "PHIVOLCSは{date}に警戒レベルを{b}に引き上げた（PHIVOLCS発表、スミソニアン/USGS経由）。"
+    en: "The alert was raised to level {b} on {date}, as reported by PHIVOLCS, via Smithsonian/USGS."
+    ja: "{date}、警戒レベルが{b}に引き上げられました（PHIVOLCS発表、スミソニアン/USGS経由）。"
 
   - id: WEEKLY-EVAC
     steps: [course]
@@ -248,7 +248,7 @@ templates:
     source: [gvp-weekly-reports]
     types: { n: int, date: date, agency: agency }
     en: "{n} people were in evacuation centres on {date}, as reported by {agency}, via Smithsonian/USGS."
-    ja: "{date}には{n}人が避難所にいた（{agency}発表、スミソニアン/USGS経由）。"
+    ja: "{date}には{n}人が避難所にいました（{agency}発表、スミソニアン/USGS経由）。"
 
   - id: WEEKLY-SO2
     steps: [before, onset, course, after]
@@ -257,15 +257,15 @@ templates:
     types: { x: int, date: date }
     constants: ["1日"]
     en: "SO₂ emissions were {x} tonnes a day on {date}, as reported by PHIVOLCS, via Smithsonian/USGS."
-    ja: "{date}のSO₂放出量は1日{x}トンだった（PHIVOLCS発表、スミソニアン/USGS経由）。"
+    ja: "{date}のSO₂放出量は1日{x}トンでした（PHIVOLCS発表、スミソニアン/USGS経由）。"
 
   - id: WEEKLY-LAKE-GONE
     steps: [onset, course]
     family: weekly
     source: [gvp-weekly-reports]
     types: { week: dash }
-    en: "Satellite images in the week of {week} showed that the Main Crater lake was gone, as reported by PHIVOLCS, via Smithsonian/USGS."
-    ja: "{week}の衛星画像では主火口湖が消失していた（PHIVOLCS発表、スミソニアン/USGS経由）。"
+    en: "Satellite images in the week of {week} showed the Main Crater lake was gone, as reported by PHIVOLCS, via Smithsonian/USGS."
+    ja: "{week}の衛星画像では、主火口湖が消えていました（PHIVOLCS発表、スミソニアン/USGS経由）。"
 
   # ------------------------------------------------------------ NOAA NCEI HazEL
   - id: HAZEL-DEATHS
@@ -274,11 +274,11 @@ templates:
     source: [noaa-hazel-volcanoes-ph]
     types: { n: int }
     en: "NOAA's Significant Volcanic Eruptions Database records {n} deaths for this eruption."
-    ja: "NOAAの重要火山噴火データベースは、この噴火による死者を{n}人と記録している。"
+    ja: "NOAAの重要火山噴火データベースは、この噴火による死者を{n}人と記録しています。"
     variants:
       - when: { one: n }
         en: "NOAA's Significant Volcanic Eruptions Database records {n} death for this eruption."
-        ja: "NOAAの重要火山噴火データベースは、この噴火による死者を{n}人と記録している。"
+        ja: "NOAAの重要火山噴火データベースは、この噴火による死者を{n}人と記録しています。"
 
   - id: HAZEL-HOUSES
     steps: [after]
@@ -286,17 +286,17 @@ templates:
     source: [noaa-hazel-volcanoes-ph]
     types: { n: int }
     en: "NOAA's Significant Volcanic Eruptions Database records {n} houses destroyed by this eruption."
-    ja: "NOAAの重要火山噴火データベースは、この噴火による全壊家屋を{n}棟と記録している。"
+    ja: "NOAAの重要火山噴火データベースは、この噴火による全壊家屋を{n}棟と記録しています。"
     variants:
       - when: { cont: hazel, one: n }
         en: "It records {n} house destroyed."
-        ja: "全壊家屋は{n}棟と記録されている。"
+        ja: "全壊家屋は{n}棟と記録されています。"
       - when: { cont: hazel }
         en: "It records {n} houses destroyed."
-        ja: "全壊家屋は{n}棟と記録されている。"
+        ja: "全壊家屋は{n}棟と記録されています。"
       - when: { one: n }
         en: "NOAA's Significant Volcanic Eruptions Database records {n} house destroyed by this eruption."
-        ja: "NOAAの重要火山噴火データベースは、この噴火による全壊家屋を{n}棟と記録している。"
+        ja: "NOAAの重要火山噴火データベースは、この噴火による全壊家屋を{n}棟と記録しています。"
 
   - id: HAZEL-DAMAGE
     steps: [after]
@@ -304,11 +304,11 @@ templates:
     source: [noaa-hazel-volcanoes-ph]
     types: { x: num }
     en: "NOAA's Significant Volcanic Eruptions Database records damage of about US${x} million from this eruption."
-    ja: "NOAAの重要火山噴火データベースは、この噴火による被害額を約{x}百万米ドルと記録している。"
+    ja: "NOAAの重要火山噴火データベースは、この噴火による被害額を約{x}百万米ドルと記録しています。"
     variants:
       - when: { cont: hazel }
         en: "It records damage of about US${x} million."
-        ja: "被害額は約{x}百万米ドルと記録されている。"
+        ja: "被害額は約{x}百万米ドルと記録されています。"
 
   # ------------------------------------------------------------ COMET deformation
   - id: DEFORM-LOS
@@ -318,7 +318,7 @@ templates:
     types: { x: num, dir: dir, span: span }
     constants: ["Sentinel-1"]
     en: "COMET's Sentinel-1 record shows {x} mm of movement {dir} the satellite along its line of sight from {span}."
-    ja: "COMETのSentinel-1記録では、{span}に視線方向で{x} mm（衛星に{dir}向き）の変位があった。"
+    ja: "COMETのSentinel-1記録では、{span}に視線方向で{x} mm（衛星に{dir}向き）の変位がありました。"
 
   # ------------------------------------------------------------ context (not counted towards the score)
   - id: RAIN-TOTAL
@@ -329,7 +329,7 @@ templates:
     types: { x: num, span: span }
     constants: ["15 km"]
     en: "GPM IMERG estimates {x} mm of rain within 15 km from {span}."
-    ja: "GPM IMERGの推定では、{span}に15 km圏で{x} mmの雨が降った。"
+    ja: "GPM IMERGの推定では、{span}に15 km圏で{x} mmの雨が降りました。"
 
   - id: RAIN-WETTEST
     steps: [course, after]
@@ -338,7 +338,7 @@ templates:
     source: [gpm-imerg-v07]
     types: { date: date, x: num }
     en: "The wettest day in this period was {date}, with {x} mm."
-    ja: "この期間で最も雨が多かったのは{date}で、{x} mmだった。"
+    ja: "この期間で最も雨が多かったのは{date}で、{x} mmでした。"
 
   - id: IMAGE-CAPTION
     steps: [before, after]
@@ -359,13 +359,13 @@ templates:
     family: title
     types: { date: date }
     en: "What the instruments recorded before, during and after the {date} eruption. A past record, not a hazard assessment."
-    ja: "{date}の噴火の前後に観測機器が記録したこと。過去の記録であり、ハザード評価ではない。"
+    ja: "{date}の噴火の前後に、観測機器が記録したことです。過去の記録であり、ハザード評価ではありません。"
 
   - id: SUMMARY-UNREST
     family: title
     types: { date: date }
     en: "What the instruments recorded before, during and after the raised alert levels that began on {date}. A past record, not a hazard assessment."
-    ja: "{date}に始まった警戒レベル引き上げの前後に観測機器が記録したこと。過去の記録であり、ハザード評価ではない。"
+    ja: "{date}に始まった警戒レベル引き上げの前後に、観測機器が記録したことです。過去の記録であり、ハザード評価ではありません。"
 
   - id: STEP-BEFORE
     family: title
@@ -398,29 +398,29 @@ templates:
     family: why
     types: { volcano: name, date: date }
     en: "PHIVOLCS bulletins for these dates are not online; the online record for {volcano} starts on {date}."
-    ja: "この期間のPHIVOLCS火山情報はオンラインで公開されていない（{volcano}の記録は{date}から）。"
+    ja: "この期間のPHIVOLCS火山情報は、オンラインで公開されていません（{volcano}の記録は{date}から）。"
 
   - id: WHY-BEFORE-INSTRUMENT
     family: why
     types: { sensor: sensor, date: date }
     en: "{sensor} began observing on {date}, after these dates."
-    ja: "{sensor}の観測は{date}に始まり、この期間より後である。"
+    ja: "{sensor}の観測は{date}に始まりました。この期間より後です。"
 
   - id: WHY-NO-VAAC
     family: why
     types: { volcano: name, year: year }
     en: "Tokyo VAAC's online list has no ash advisory for {volcano} in these dates (the list starts in {year})."
-    ja: "東京VAACのオンライン一覧には、この期間の{volcano}に関する火山灰情報がない（一覧は{year}年から）。"
+    ja: "東京VAACのオンライン一覧には、この期間の{volcano}の火山灰情報がありません（一覧は{year}年から）。"
 
   - id: WHY-NO-DROMIC
     family: why
     types: {}
     en: "No DSWD DROMIC report was found for this event."
-    ja: "このイベントに関するDSWD DROMIC報告は見つからなかった。"
+    ja: "このイベントのDSWD DROMIC報告は見つかりませんでした。"
 
   - id: WHY-NO-CLEAR-SCENE
     family: why
     types: {}
     constants: ["90日", "90 days", "Sentinel-2"]
     en: "No cloud-free Landsat or Sentinel-2 scene was found within 90 days."
-    ja: "90日以内に雲のないLandsatまたはSentinel-2の画像が見つからなかった。"
+    ja: "90日以内に、雲のないLandsatまたはSentinel-2の画像は見つかりませんでした。"

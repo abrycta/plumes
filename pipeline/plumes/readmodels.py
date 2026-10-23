@@ -360,23 +360,23 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
     pre = [r for d, r in bd.items() if "2019-12-01" <= d <= "2020-01-11" and r[1] is not None]
     levels = sorted({r[1] for r in pre})
     if len(levels) == 1:
-        before_en.append(f"PHIVOLCS bulletins reported Alert Level {levels[0]} on every day from {date_en(pre[0][0])} to {date_en(pre[-1][0])}, as reported by PHIVOLCS.")
-        before_ja.append(f"PHIVOLCSの火山情報は{date_ja(pre[0][0])}から{date_ja(pre[-1][0])}まで毎日、警戒レベル{levels[0]}を発表していた（PHIVOLCS発表）。")
+        before_en.append(f"Every daily bulletin from {date_en(pre[0][0])} to {date_en(pre[-1][0])} gave Alert Level {levels[0]}, as reported by PHIVOLCS.")
+        before_ja.append(f"{date_ja(pre[0][0])}から{date_ja(pre[-1][0])}まで、火山情報は毎日、警戒レベル{levels[0]}を示していました（PHIVOLCS発表）。")
     if s5:
         dec = sorted(x for x in (so2_at(f"2019-12-{d:02d}")[0] for d in range(1, 32)) if x is not None)
         if dec:
             med = dec[len(dec) // 2] if len(dec) % 2 else round((dec[len(dec) // 2 - 1] + dec[len(dec) // 2]) / 2)
             wk = [x for x in (so2_at(f"2020-01-{d:02d}")[0] for d in range(1, 12)) if x is not None]
-            before_en.append(f"The TROPOMI SO₂ column within 15 km had a December median of {med} µmol/m² ({len(dec)} of 31 days with a clear view); "
-                             f"from 1 to 11 January 2020 it read between {neg(min(wk))} and {neg(max(wk))} µmol/m² on the {len(wk)} clear days.")
-            before_ja.append(f"15 km圏のTROPOMI SO₂カラム量は12月の中央値が{med} µmol/m²（31日中{len(dec)}日が観測可能）で、"
-                             f"2020年1月1日から11日までは観測できた{len(wk)}日で{neg(min(wk))}〜{neg(max(wk))} µmol/m²だった。")
+            before_en.append(f"In December, the TROPOMI SO₂ column within 15 km had a median of {med} µmol/m² ({len(dec)} of 31 days had a clear view). "
+                             f"From 1 to 11 January 2020, it read between {neg(min(wk))} and {neg(max(wk))} µmol/m² on the {len(wk)} clear days.")
+            before_ja.append(f"15 km圏のTROPOMI SO₂カラム量は、12月の中央値が{med} µmol/m²でした（観測できたのは31日中{len(dec)}日）。"
+                             f"2020年1月1日から11日までは、観測できた{len(wk)}日で{neg(min(wk))}〜{neg(max(wk))} µmol/m²でした。")
     quiet = [r for r in eq_rows if r[0] < "2020-01-12"]
     if eq12 and quiet:
-        before_en.append(f"The USGS catalogue lists no earthquake within 30 km after {date_en(quiet[-1][0])} until 12 January 2020, "
-                         f"when it lists {eq12[1]}, the largest M{eq12[2]}.")
-        before_ja.append(f"USGSのカタログには{date_ja(quiet[-1][0])}の後、2020年1月12日まで30 km圏の地震がなく、"
-                         f"同日には{eq12[1]}回（最大M{eq12[2]}）が記録されている。")
+        before_en.append(f"After {date_en(quiet[-1][0])}, the USGS catalogue lists no earthquake within 30 km until 12 January 2020. "
+                         f"That day it lists {eq12[1]}, the largest M{eq12[2]}.")
+        before_ja.append(f"USGSのカタログでは、{date_ja(quiet[-1][0])}の後、2020年1月12日まで30 km圏の地震がありません。"
+                         f"同日には{eq12[1]}回（最大M{eq12[2]}）が記録されています。")
 
     # Step 2: the alert level as reported, with the bulletin's time
     def time_en(h, m):
@@ -384,16 +384,16 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
 
     erupt_en, erupt_ja = [], []
     if a12 and a12[1] is not None:
-        when_en = f" in its {time_en(t12['hour'], t12['minute'])} bulletin" if t12.get("hour") is not None else ""
-        when_ja = f"{'午前' if t12['hour'] < 12 else '午後'}{t12['hour'] % 12 or 12}時{t12['minute']:02d}分の火山情報で" if t12.get("hour") is not None else ""
-        erupt_en.append(f"PHIVOLCS raised the alert to level {a12[1]} on 12 January 2020{when_en}, as reported by PHIVOLCS.")
-        erupt_ja.append(f"PHIVOLCSは2020年1月12日{when_ja}警戒レベルを{a12[1]}に引き上げた（PHIVOLCS発表）。")
+        when_en = f", in the {time_en(t12['hour'], t12['minute'])} bulletin" if t12.get("hour") is not None else ""
+        when_ja = f"{'午前' if t12['hour'] < 12 else '午後'}{t12['hour'] % 12 or 12}時{t12['minute']:02d}分の火山情報で、" if t12.get("hour") is not None else ""
+        erupt_en.append(f"The alert was raised to level {a12[1]} on 12 January 2020{when_en}, as reported by PHIVOLCS.")
+        erupt_ja.append(f"2020年1月12日{when_ja or '、'}警戒レベルが{a12[1]}に引き上げられました（PHIVOLCS発表）。")
     if top:
         erupt_en.append(f"Tokyo VAAC observed ash up to {fl_gloss(top[2])['en']} on {date_en(top[0])}.")
-        erupt_ja.append(f"東京VAACは{date_ja(top[0])}に最高{fl_gloss(top[2])['ja']}の火山灰を観測した。")
+        erupt_ja.append(f"東京VAACは{date_ja(top[0])}、最高{fl_gloss(top[2])['ja']}の火山灰を観測しました。")
     if gvp and gvp.get("vei") is not None:
         erupt_en.append(f"GVP records the eruption as VEI {gvp['vei']}.")
-        erupt_ja.append(f"GVPはこの噴火をVEI {gvp['vei']}としている。")
+        erupt_ja.append(f"GVPはこの噴火をVEI {gvp['vei']}としています。")
 
     steps = [
         {"id": "before", "start": "2019-12-01", "end": "2020-01-11", "status": "reviewed", "title": lt("Before", "噴火前"),
@@ -404,21 +404,21 @@ def story_taal(v: dict, vm: dict, as_of: str, hdr: dict) -> tuple[dict, dict]:
          "series": ["bulletins", "advisories", "so2_s5p_15km", "eq_usgs_30km", "frp_modis_15km"], "figures": figs_erupt,
          "map": {"center": [v["lon"], v["lat"]], "zoom": 9, "layers": ["thermal-detections"], "month": "2020-01"}},
         {"id": "people", "start": "2020-01-12", "end": "2020-03-12", "status": "reviewed", "title": lt("People", "人々"),
-         "text": lt((f"DSWD DROMIC reports counted {last[2]:,} people affected by {date_en(last[0])}. " if last else "") +
-                    (f"WorldPop estimates {pop14:,} people lived within 14 km in 2020." if pop14 else ""),
-                    (f"DSWD DROMIC報告は{date_ja(last[0])}までに{last[2]:,}人の被災者を数えた。" if last else "") +
-                    (f"WorldPopの推計では2020年に14 km圏内に{pop14:,}人が住んでいた。" if pop14 else "")),
+         "text": lt((f"By {date_en(last[0])}, DSWD DROMIC reports counted {last[2]:,} people affected. " if last else "") +
+                    (f"WorldPop estimates that {pop14:,} people lived within 14 km in 2020." if pop14 else ""),
+                    (f"DSWD DROMIC報告が数えた被災者は、{date_ja(last[0])}までに{last[2]:,}人です。" if last else "") +
+                    (f"WorldPopの推計では、2020年に14 km圏内に{pop14:,}人が住んでいました。" if pop14 else "")),
          "series": ["displacement"],
          "figures": ([{"label": lt("Persons affected", "被災者数"), "value": last[2], "source": "dswd-dromic-reports", "asOf": last[0], "url": last[7]}] if last else [])
          + ([{"label": lt("People within 14 km (WorldPop 2020)", "14 km圏内の人口（WorldPop 2020）"), "value": pop14, "source": "worldpop-100m"}] if pop14 else [])},
         {"id": "crater", "start": "2019-11-19", "end": "2020-03-23", "status": "reviewed", "title": lt("The crater lake", "火口湖"),
-         "text": lt("Sentinel-2 before and after: the main crater lake on Volcano Island drained during the eruption.", "Sentinel-2の前後比較:火山島の主火口湖は噴火中に干上がった。"),
+         "text": lt("Sentinel-2 images from before and after show that the main crater lake on Volcano Island drained during the eruption.", "噴火前後のSentinel-2画像では、火山島の主火口湖が噴火中に干上がったことがわかります。"),
          "series": [], "figures": [], "assets": assets},
     ]
     story = {**hdr, "kind": "story", "id": "taal-2020", "volcanoId": "taal", "volcanoFile": "volcano/taal.json",
              "title": lt("Taal, January 2020", "タール火山 2020年1月"),
              "summary": lt("What the instruments recorded before, during and after the 12 January 2020 eruption. A past record, not a hazard assessment.",
-                           "2020年1月12日の噴火の前後に観測機器が記録したこと。過去の記録であり、ハザード評価ではない。"),
+                           "2020年1月12日の噴火の前後に、観測機器が記録したことです。過去の記録であり、ハザード評価ではありません。"),
              "span": {"start": "2019-12-01", "end": "2020-03-31"}, "steps": steps,
              "winds": {"source": ["era5-pressure-levels"], "point": winds["point"], "cols": winds["cols"], "rows": winds["rows"]},
              "provenance": provenance(["phivolcs-bulletins", "vaac-tokyo-advisories", "dswd-dromic-reports", "s5p-offl-so2", "usgs-comcat-ph-2010",

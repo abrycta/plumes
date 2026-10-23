@@ -42,8 +42,8 @@ export default function AboutPage() {
     <Page
       title={t("About & sources", "概要と出典")}
       lede={t(
-        "Plumes is a retrospective record of the 24 active Philippine volcanoes: a past record and visualisation only, never a hazard service.",
-        "Plumesはフィリピンの24の活火山の過去の記録です。過去の記録と可視化のみで、防災情報サービスではありません。",
+        "Plumes is a retrospective record of the 24 active Philippine volcanoes. It records and visualises the past only, and is never a hazard service.",
+        "Plumesは、フィリピンの24の活火山の過去を記録したものです。扱うのは過去の記録と可視化だけで、防災情報サービスではありません。",
       )}
     >
       <Prose as="section" aria-labelledby="what">
@@ -51,8 +51,8 @@ export default function AboutPage() {
         <ul>
           <li>
             <T
-              en="A retrospective record from 2000 to the data date. It is not a monitoring or warning service, has no live feeds and never shows a present alert level."
-              ja="2000年からデータの最終日までの過去の記録です。監視・警報サービスではなく、リアルタイムのデータはなく、現時点の警戒レベルは表示しません。"
+              en="It covers 2000 to the data date. It is not a monitoring or warning service: it has no live feeds and never shows a present alert level."
+              ja="対象は2000年からデータの最終日までです。監視・警報サービスではありません。リアルタイムのデータはなく、現時点の警戒レベルも表示しません。"
             />
           </li>
           <li>
@@ -61,15 +61,15 @@ export default function AboutPage() {
           </li>
           <li>
             <T
-              en="Alert levels appear only as dated, linked markers, each labelled “as reported by PHIVOLCS on <date>”. Every PHIVOLCS, VAAC and DSWD figure links to its page; no PHIVOLCS data file is published."
-              ja="警戒レベルは日付とリンク付きの印としてのみ示し、それぞれに「<日付>にPHIVOLCSが発表」と記します。PHIVOLCS・VAAC・DSWDの数値はすべて元のページにリンクし、PHIVOLCSのデータファイルは公開しません。"
+              en="Alert levels appear only as dated, linked markers, each labelled “as reported by PHIVOLCS on <date>”. Every PHIVOLCS, VAAC and DSWD figure links to its page. No PHIVOLCS data file is published."
+              ja="警戒レベルは、日付とリンクの付いた印としてだけ示し、それぞれに「<日付>にPHIVOLCSが発表」と記します。PHIVOLCS・VAAC・DSWDの数値は、すべて元のページにリンクします。PHIVOLCSのデータファイルは公開しません。"
             />
           </li>
           <li>
-            <T en="Nothing here says what a volcano will do next." ja="ここには火山の今後については何も書かれていません。" />
+            <T en="Nothing here says what a volcano will do next." ja="火山が今後どうなるかは、ここでは一切扱いません。" />
           </li>
           <li>
-            <T en="Hazard maps are linked, never embedded: " ja="ハザードマップは埋め込まず、リンクのみ:" />
+            <T en="Hazard maps are linked, never embedded: " ja="ハザードマップは埋め込まず、リンクだけを示します:" />
             <ExtLink href="https://hazardhunter.georisk.gov.ph/">HazardHunterPH</ExtLink>.
           </li>
           <li>
@@ -84,31 +84,31 @@ export default function AboutPage() {
           <li>
             <strong>{t("SO₂ from satellites", "衛星のSO₂")}</strong>:{" "}
             <T
-              en="TROPOMI (from 2018) measures a column amount over an area on clear days at one overpass, not the flux a ground instrument measures. A low value on a cloudy day means “not enough data”, so coverage is shown beside every value."
-              ja="TROPOMI(2018年から)は、晴天日の通過時に一定範囲のカラム量を測るもので、地上観測の放出量とは異なります。曇りの日の低い値は「データ不足」を意味するため、すべての値に被覆率を併記します。"
+              en="TROPOMI (from 2018) measures a column amount over an area, on clear days, at one overpass. That is not the flux a ground instrument measures. On a cloudy day a low value means “not enough data”, so every value shows its coverage beside it."
+              ja="TROPOMI(2018年から)は、晴れた日の1回の通過時に、一定範囲のカラム量を測ります。地上の観測機器が測る放出量とは別のものです。曇りの日の低い値は「データ不足」を意味するので、すべての値に被覆率を添えています。"
             />
           </li>
           <li>
             <strong>{t("Heat", "熱")}</strong>:{" "}
             <T
-              en="MODIS and VIIRS thermal anomalies and radiative power within a ring around the summit. They can include vegetation fires and are not validated for volcanoes."
-              ja="山頂周辺のMODISとVIIRSの熱異常と放射電力。植生火災を含むことがあり、火山向けに検証されたものではありません。"
+              en="MODIS and VIIRS detect thermal anomalies and their radiative power within a ring around the summit. Detections can include vegetation fires, and the products are not validated for volcanoes."
+              ja="MODISとVIIRSが、山頂周辺の円内で熱異常とその放射電力を検出します。植生火災を含むことがあり、火山向けには検証されていません。"
             />
           </li>
           <li>
             <strong>{t("Earthquakes", "地震")}</strong>:{" "}
-            <T en="USGS ComCat locates earthquakes from a global network and misses the small local events PHIVOLCS counts." ja="USGS ComCatは全球観測網による震源で、PHIVOLCSが数える小さな地元の地震は含まれません。" />
+            <T en="USGS ComCat locates earthquakes from a global network and misses the small local events PHIVOLCS counts." ja="USGS ComCatは全球の観測網で震源を決めています。PHIVOLCSが数える小さな地元の地震は含まれません。" />
           </li>
           <li>
             <strong>{t("Gaps", "欠測")}</strong>:{" "}
             <T
-              en="Each series starts when its instrument does. A day without a valid observation is a gap, never a zero; before an instrument's start and after the last day its record covers, it says “not observed”."
-              ja="各系列は観測機器の開始日から始まります。有効な観測のない日は欠測でありゼロではなく、観測開始前と記録の最終日より後は「観測なし」と表示します。"
+              en="Each series starts when its instrument does. A day without a valid observation is a gap, never a zero. Before an instrument starts, and after the last day its record covers, the series says “not observed”."
+              ja="各系列は、観測機器の開始日から始まります。有効な観測のない日は欠測で、ゼロではありません。観測開始前と記録の最終日より後は「観測なし」と表示します。"
             />
           </li>
           <li>
             <strong>{t("People nearby", "周辺の人口")}</strong>:{" "}
-            <T en="Population within N km (WorldPop 2020). Rings are distances, not hazard zones." ja="N km圏の人口(WorldPop 2020年)。距離の円はハザード区域ではありません。" />
+            <T en="Population within N km (WorldPop 2020). Rings are distances, not hazard zones." ja="N km圏の人口です(WorldPop 2020年)。円は距離を示すもので、ハザード区域ではありません。" />
           </li>
         </ul>
       </Prose>
@@ -119,8 +119,8 @@ export default function AboutPage() {
         </h2>
         <p className="m-0 max-w-prose text-sm text-muted-foreground">
           <T
-            en={`${rows.length} registry entries (24 sources; USGS and Landsat are each split in two, and three arrive later). Each verdict was checked on the publisher's own terms page; the attribution is the text the publisher asks for.`}
-            ja={`登録数${rows.length}件(24の出典。USGSとLandsatはそれぞれ2件に分かれ、3件は今後追加)。各判定は公開元の利用規約ページで確認し、帰属表示は公開元が求める文言です。`}
+            en={`${rows.length} registry entries (24 sources; USGS and Landsat are each split in two). Each verdict was checked on the publisher's own terms page; the attribution is the text the publisher asks for.`}
+            ja={`登録数は${rows.length}件です(24の出典。USGSとLandsatはそれぞれ2件に分かれます)。各判定は、公開元の利用規約ページで確認しました。帰属表示は、公開元が求める文言です。`}
           />
         </p>
         <div className="overflow-x-auto">
@@ -191,8 +191,8 @@ export default function AboutPage() {
           )}{" "}
           {root.latest.fixture
             ? t(
-                "This is the sample data version built from real Taal tables for December 2019 to February 2020; the full record arrives with the first published version.",
-                "これは2019年12月〜2020年2月のタール火山の実データから作ったサンプル版です。全期間の記録は最初の公開版で加わります。",
+                "This is the sample data version, built from real Taal tables for December 2019 to February 2020. The published versions carry the full record.",
+                "これは、2019年12月〜2020年2月のタール火山の実データから作ったサンプル版です。全期間の記録は公開版にあります。",
               )
             : null}
         </p>
