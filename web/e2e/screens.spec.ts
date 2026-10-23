@@ -30,7 +30,7 @@ test("volcano: the scrubber moves one day across every track, and the URL keeps 
 
 test("volcano without a record in this version says so", async ({ page }) => {
   await page.goto("/volcano/mayon");
-  await expect(page.getByText("no per-volcano record for this volcano yet")).toBeVisible();
+  await expect(page.getByText("no per-volcano record for this volcano")).toBeVisible();
   await page.goto("/volcano/not-a-volcano");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Nothing recorded here");
 });
@@ -57,5 +57,5 @@ test("Japanese: the switch translates the page and the URL keeps ?lang=ja", asyn
   await page.getByRole("radio", { name: "日本語" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("タール火山");
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
-  await expect(page.locator("[data-safety-banner]")).toContainText("過去の記録です");
+  await expect(page.locator("[data-safety-banner]")).toContainText("警報サービスではありません");
 });

@@ -12,7 +12,7 @@ for (const lang of ["en", "ja"] as const) {
       await expect(page.getByRole("banner")).toHaveAttribute("data-akari-header", "");
       const banner = page.locator("[data-safety-banner]");
       await expect(banner).toHaveCount(1);
-      await expect(banner).toContainText(lang === "en" ? "DOST-PHIVOLCS is the sole authority" : "唯一の機関はDOST-PHIVOLCS");
+      await expect(banner).toContainText(lang === "en" ? "DOST-PHIVOLCS is the authority on alert levels" : "警戒レベルを発表するのはDOST-PHIVOLCSです");
       await expect(banner.getByRole("link", { name: /DOST-PHIVOLCS/ })).toHaveAttribute("href", "https://www.phivolcs.dost.gov.ph/");
       await expect(banner.getByRole("link", { name: /bulletins|火山情報/ })).toHaveAttribute("href", /phivolcs\.dost\.gov\.ph\/bulletin/);
       const text = await page.locator("body").innerText();
