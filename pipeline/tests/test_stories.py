@@ -91,7 +91,7 @@ def test_variants_plural_zero_single_day_and_continuation():
     assert "counted no volcanic earthquake from" in rd.render(t, {"n": V(0, "s"), "span": span})["en"]
     assert "up to 1 volcanic earthquake in a day" in rd.render(t, {"n": V(1, "s"), "span": span})["en"]
     one_day = rd.render(t, {"n": V(12, "s"), "span": V(("2020-01-18", "2020-01-18"), "s")})
-    assert one_day["en"] == "PHIVOLCS bulletins counted 12 volcanic earthquakes on 18 January 2020, as reported by PHIVOLCS."
+    assert one_day["en"] == "The bulletins counted 12 volcanic earthquakes on 18 January 2020, as reported by PHIVOLCS."
     assert rd.render(CAT["VAAC-COUNT"], {"n": V(5, "s"), "span": V(("2024-06-03", "2024-06-03"), "s")})["en"] == "Tokyo VAAC issued 5 ash advisories on 3 June 2024."
     h = CAT["HAZEL-HOUSES"]
     assert rd.render(h, {"n": V(12, "s")}, {"prev_family": "hazel"})["en"] == "It records 12 houses destroyed."
@@ -100,10 +100,10 @@ def test_variants_plural_zero_single_day_and_continuation():
 
 def test_taal_sentences_match_the_reviewed_wording():
     held = rd.render(CAT["ALERT-HELD"], {"level": V(1, "s"), "span": V(("2019-12-01", "2020-01-11"), "s")})
-    assert held == {"en": "PHIVOLCS bulletins reported Alert Level 1 on every day from 1 December 2019 to 11 January 2020, as reported by PHIVOLCS.",
-                    "ja": "PHIVOLCSの火山情報は2019年12月1日から2020年1月11日まで毎日、警戒レベル1を発表していた（PHIVOLCS発表）。"}
+    assert held == {"en": "Every daily bulletin from 1 December 2019 to 11 January 2020 gave Alert Level 1, as reported by PHIVOLCS.",
+                    "ja": "2019年12月1日から2020年1月11日まで、火山情報は毎日、警戒レベル1を示していました（PHIVOLCS発表）。"}
     vaac = rd.render(CAT["VAAC-MAX"], {"fl": V(550, "s"), "date": V("2020-01-12", "s")})
-    assert vaac == {"en": "Tokyo VAAC observed ash up to FL550 (about 16.8 km) on 12 January 2020.", "ja": "東京VAACは2020年1月12日に最高FL550（約16.8 km）の火山灰を観測した。"}
+    assert vaac == {"en": "Tokyo VAAC observed ash up to FL550 (about 16.8 km) on 12 January 2020.", "ja": "東京VAACは2020年1月12日、最高FL550（約16.8 km）の火山灰を観測しました。"}
 
 
 def test_checks_catch_advice_words_and_causal_rain_wording():
@@ -164,7 +164,7 @@ def test_alert_adapter_holds_raises_with_the_bulletin_time_and_skips_one_day_bli
     onset = facts.alert(m, "onset", ("2020-01-12", "2020-01-18"))
     assert [c.template for c in onset] == ["ALERT-RAISED"]
     text = rd.render(CAT["ALERT-RAISED"], onset[0].values)
-    assert text["en"] == "PHIVOLCS raised the alert from level 1 to level 4 on 12 January 2020 in its 7:30 PM bulletin, as reported by PHIVOLCS."
+    assert text["en"] == "The alert was raised from level 1 to level 4 on 12 January 2020, in the 7:30 PM bulletin, as reported by PHIVOLCS."
     assert onset[0].figures[0]["url"].startswith("https://www.phivolcs")
 
 
