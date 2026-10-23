@@ -8,6 +8,7 @@ import { loadConfig } from "@/data/load";
 
 import { depthClass, HEX_BREAKS } from "./density";
 import { linesToPath, PH_BOUNDS, project, svgSize } from "./geo";
+import type { LayerToggles } from "./InteractiveMap";
 import type { WindowData } from "./windowData";
 import { LAYER_TOKENS, layerVar } from "./layerColors";
 
@@ -34,7 +35,7 @@ function loadCoast(): Promise<number[][][]> {
  * volcanoes as links, drawn in SVG. No WebGL, no tiles. Detections far from a volcano are shown only through the
  * faint density hexagons here (thousands of dots would not draw well on a phone).
  */
-export function StaticMap({ index, data, selected }: { index: VolcanoesIndex; data?: WindowData | null; selected?: string | null }) {
+export function StaticMap({ index, data, selected, show = { hexes: true, thermal: true, quakes: true } }: { index: VolcanoesIndex; data?: WindowData | null; selected?: string | null; show?: LayerToggles }) {
   const t = useT();
   const { lang } = useLang();
   const coast = use(loadCoast());
@@ -45,16 +46,16 @@ export function StaticMap({ index, data, selected }: { index: VolcanoesIndex; da
       <path d={linesToPath(coast, PH_BOUNDS, W)} fill="none" stroke="var(--ak-map-coast)" strokeWidth={0.8} strokeLinejoin="round" aria-hidden="true" />
       {data ? (
         <g aria-hidden="true">
-          {data.hexes.map((h, i) => (
+          {(show.hexes ? data.hexes : []).map((h, i) => (
             <path key={i} d={linesToPath([h.ring], PH_BOUNDS, W) + "Z"} fill={hexFill(h.count)} opacity={0.7} />
           ))}
           {data.thermal
-            .filter((p) => p.near)
+            .filter((p) => show.thermal && p.near)
             .map((p, i) => {
               const [x, y] = project(p.lon, p.lat, PH_BOUNDS, W);
               return <circle key={i} cx={x} cy={y} r={1.8} fill={layerVar(LAYER_TOKENS.thermal)} opacity={0.9} />;
             })}
-          {[...data.quakes]
+          {[...(show.quakes ? data.quakes : [])]
             .sort((a, b) => (a.mag ?? 0) - (b.mag ?? 0))
             .map((q, i) => {
               const [x, y] = project(q.lon, q.lat, PH_BOUNDS, W);

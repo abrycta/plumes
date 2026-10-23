@@ -167,7 +167,7 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
         </Suspense>
       ) : (
         <>
-          <StaticMap index={index} data={ownData} />
+          <StaticMap index={index} data={ownData} show={show} />
           {ownData ? null : <MapGlyph />}
         </>
       )}
