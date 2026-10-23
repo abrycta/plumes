@@ -137,7 +137,7 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
           ) : null}
         </div>
 
-        <div className="sticky top-[5rem] z-10 max-[639px]:top-[7rem] -mx-ak-gutter border-y border-border bg-background/95 px-ak-gutter py-2 backdrop-blur-sm">
+        <div className="sticky top-ak-header-height z-10 max-[639px]:top-ak-header-height-phone -mx-ak-gutter border-y border-border bg-background/95 px-ak-gutter py-2 backdrop-blur-sm">
           <div className="grid items-center gap-x-4 gap-y-1 md:grid-cols-[220px_minmax(0,1fr)]">
             <label htmlFor="scrubber" className="text-sm">
               <T en="Day" ja="日付" />: <strong className="tabular">{formatDate(cursor, lang)}</strong>
