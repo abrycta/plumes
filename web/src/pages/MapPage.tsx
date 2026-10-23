@@ -275,7 +275,7 @@ export default function MapPage({ embed }: { embed?: MapPageEmbed } = {}) {
           )}
         </div>
       </section>
-      <aside aria-labelledby="list-title" className={`flex min-w-0 flex-[1_1_360px] flex-col gap-3 px-ak-gutter py-6 md:max-w-[440px] ${embed ? "h-full overflow-hidden" : "lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto"}`}>
+      <aside aria-labelledby="list-title" className={`flex min-w-0 flex-[1_1_360px] flex-col gap-3 px-ak-gutter py-6 md:max-w-ak-sidebar-width ${embed ? "h-full overflow-hidden" : "lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto"}`}>
         <h2 id="list-title" className="m-0 font-heading text-ak-subsection font-semibold">
           <T en="Volcanoes" ja="火山" />
         </h2>
