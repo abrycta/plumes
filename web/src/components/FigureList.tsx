@@ -3,6 +3,7 @@ import { useLang, useT } from "@abrycta/akari/react";
 import type { Figure } from "@contracts/readmodels";
 
 import { ExtLink } from "@/app/Link";
+import { useUrlState } from "@/app/url";
 import { formatDate } from "@/lib/dates";
 import { formatNumber } from "@/lib/format";
 
@@ -34,6 +35,7 @@ export function FigureList({ figures }: { figures: Figure[] }) {
 /** "Draft" until Kurt has reviewed both languages (contracts README). */
 export function DraftBadge({ status }: { status?: "draft" | "reviewed" }) {
   const t = useT();
-  if (status !== "draft") return null;
+  const { preview } = useUrlState();
+  if (status !== "draft" || !preview) return null;
   return <span className="self-start rounded-sm border border-dashed border-border px-1.5 text-[11px] text-muted-foreground">{t("Draft text, not yet reviewed", "下書き(未レビュー)")}</span>;
 }

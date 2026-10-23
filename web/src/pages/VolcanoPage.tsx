@@ -95,6 +95,8 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
   const tracks = useMemo(() => buildTracks(model, ring), [model, ring]);
   const absent = useMemo(() => absentRecords(model, tracks), [model, tracks]);
   const firstEvent = model.readings[0]?.start;
+  // Draft readings (not yet reviewed) only with the preview link, like stories.
+  const readings = url.preview ? model.readings : model.readings.filter((r) => r.status !== "draft");
   const cursor = url.date && url.date >= period.from && url.date <= period.to ? url.date : firstEvent && firstEvent >= period.from && firstEvent <= period.to ? firstEvent : period.from;
   const days = toDay(period.to) - toDay(period.from) + 1;
   const idx = toDay(cursor) - toDay(period.from);
@@ -189,12 +191,12 @@ function Record({ model, f }: { model: VolcanoReadModel; f: Feature }) {
         ) : null}
       </section>
 
-      {model.readings.length ? (
+      {readings.length ? (
         <section aria-labelledby="readings-title" className="flex flex-col gap-3">
           <h2 id="readings-title" className="m-0 font-heading text-2xl font-semibold">
             <T en="What the records show" ja="記録が示すこと" />
           </h2>
-          {model.readings.map((r) => (
+          {readings.map((r) => (
             <article key={r.id} className="flex flex-col gap-2 rounded-sm border border-border bg-card p-3">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="m-0 font-heading text-lg font-semibold">{formatRange(r.start, r.end, lang)}</h3>
@@ -369,7 +371,7 @@ export default function VolcanoPage({ id, part }: { id: string; part?: "deeptime
         <>
           <section className="flex flex-col gap-2 rounded-sm border border-dashed border-border p-3">
             <p className="m-0">
-              <T en="This data version has no per-volcano record for this volcano yet." ja="このデータ版には、この火山の個別の記録はまだありません。" />
+              <T en="This data version has no per-volcano record for this volcano." ja="このデータ版には、この火山の個別の記録はありません。" />
             </p>
             <p className="m-0 text-sm text-muted-foreground">
               <T en="The overview figures above come from the Smithsonian Global Volcanism Program." ja="上の概要はスミソニアン博物館グローバル火山活動プログラムによるものです。" />

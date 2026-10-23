@@ -17,13 +17,11 @@ export function SafetyBanner({ dataAsOf, fixture, lang }: { dataAsOf?: string; f
     <div role="note" aria-label={lang === "ja" ? "この記録について" : "About this record"} data-safety-banner className="safety-banner">
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-ak-gutter py-2 text-sm">
         <p className="m-0">
-          <strong>
-            <T en={`A retrospective record, 2000–${year ?? ""}.`.replace("–.", " onward.")} ja={`過去の記録です(2000〜${year ? `${year}年` : ""})。`} />
-          </strong>{" "}
           <T
-            en="Not a monitoring or warning service. DOST-PHIVOLCS is the sole authority for alert levels and advisories."
-            ja="監視・警報サービスではありません。警戒レベルと火山情報を発表する唯一の機関はDOST-PHIVOLCSです。"
-          />
+            en={`A record of 2000–${year ?? ""}, not a warning service.`.replace("–,", " onward,")}
+            ja={year ? `2000〜${year}年の記録で、警報サービスではありません。` : "2000年以降の記録で、警報サービスではありません。"}
+          />{" "}
+          <T en="DOST-PHIVOLCS is the authority on alert levels." ja="警戒レベルを発表するのはDOST-PHIVOLCSです。" />
           {dataAsOf ? (
             <>
               {" "}
