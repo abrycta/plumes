@@ -458,7 +458,7 @@ function passthrough(r: Response): Response {
 
 function waking(): Response {
   return problem("backend-waking", 503, "Backend is waking up", {
-    detail: "The API runs on free hosting that sleeps when idle; it takes a few seconds to wake. The site does not need it.",
+    detail: "The API sleeps when idle and takes a few seconds to wake. The site does not need it.",
     headers: { "Retry-After": String(WAKE_RETRY_AFTER_S) },
   });
 }
