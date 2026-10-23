@@ -148,3 +148,31 @@ jobs:
           git config --global user.name Kurt
           git config --global user.email 73582015+abrycta@users.noreply.github.com
           uv run python -m plumes.publish --version "$(uv run python -m plumes.state built-version)" --pages --hf
+      - name: Save the published version in the archive
+        # storage option C (DECISIONS S2): release data-v<N> in abrycta/plumes-archive, downloaded again and hash-checked,
+        # so a version stays recoverable without the gh-pages history or the HF mirror. A trial run saves under a trial
+        # tag and deletes it after the check. Nothing is pruned.
+        if: >-
+          steps.token.outputs.ok == 'true' && (github.event_name == 'schedule' || inputs.publish
+          || steps.built.outputs.version != '')
+        working-directory: pipeline
+        env: { GH_TOKEN: "${{ secrets.ARCHIVE_WRITE_TOKEN }}" }
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            if [ "${{ github.event_name }}" = "schedule" ]; then
+              echo "::error title=release failed::ARCHIVE_WRITE_TOKEN is not set; the published version has no archive copy"; exit 1
+            fi
+            echo "::notice title=release skipped::ARCHIVE_WRITE_TOKEN is not set"; exit 0
+          fi
+          if [ "$PLUMES_TRIAL" = "true" ]; then
+            v="${{ steps.built.outputs.version }}"
+            uv run python -m plumes.release save --version "${v#v}" --trial "run${{ github.run_id }}"
+          else
+            uv run python -m plumes.release save --version "$(uv run python -m plumes.state built-version)"
+          fi
+      - name: Storage (internal trigger for pruning)
+        # HF counted storage above 2 GB or the abrycta/plumes repo above 500 MB: ::warning and a health issue, never public
+        if: always() && steps.token.outputs.ok == 'true'
+        working-directory: pipeline
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: uv run python -m plumes.storage
