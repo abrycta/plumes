@@ -636,7 +636,8 @@ def build(version: int, as_of: str) -> dict:
     layers = [x for x in (thermal_layers(v_dir, as_of), quake_layer(v_dir, usgs), so2_map, defo_layer) if x]
     (v_dir / "layers.json").write_text(json.dumps({**hdr, "kind": "layers", "layers": layers}, ensure_ascii=False))
     deep_checks = deeptime.write(v_dir, hdr, vols, gvp_e, RAW / "hazel" / f"{deeptime.SOURCE_ID}.json", provenance([deeptime.GVP_ID, deeptime.SOURCE_ID], fprov))
-    story_checks = generate_stories(v_dir)["checks"]  # generated drafts (story/drafts/) and stories.json; hidden until reviewed (ST1)
+    gen = generate_stories(v_dir)  # generated drafts (story/drafts/) and stories.json; hidden until reviewed (ST1)
+    story_checks = gen["checks"]
     checks = run_checks(v_dir, vols, models, gvp_v, gvp_e) + deep_checks + story_checks
     passed = all(c["passed"] for c in checks)
     files = [{"path": str(p.relative_to(v_dir)), "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
@@ -650,7 +651,7 @@ def build(version: int, as_of: str) -> dict:
                                                        "generatedAt": hdr["generatedAt"], "previous": f"v{version - 1}" if version > 1 else None,
                                                        "mirrors": ["https://krtmtthw.dev/plumes/data/", "https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/"]}, indent=1))
     return {"version": version, "passed": passed, "failed": [c for c in checks if not c["passed"]], "files": len(files),
-            "bytes": sum(f["bytes"] for f in files)}
+            "bytes": sum(f["bytes"] for f in files), "pendingReview": gen["pendingReview"]}
 
 
 if __name__ == "__main__":
@@ -658,4 +659,7 @@ if __name__ == "__main__":
     ap.add_argument("--version", type=int, required=True)
     ap.add_argument("--as-of", default=dt.date.today().isoformat())
     a = ap.parse_args()
-    print(json.dumps(build(a.version, a.as_of), indent=1))
+    res = build(a.version, a.as_of)
+    for p in res["pendingReview"]:  # the reviewed text stays public; the new text waits in story/drafts/ for Kurt's re-review
+        print(f"::warning title=story pending re-review::{p['id']}: {', '.join(p['steps'])} (the reviewed text stays public)")
+    print(json.dumps(res, indent=1))

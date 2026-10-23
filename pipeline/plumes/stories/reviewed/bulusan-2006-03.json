@@ -1,0 +1,421 @@
+{
+ "schemaVersion": "1",
+ "dataVersion": "v6",
+ "dataAsOf": "2026-10-23",
+ "generatedAt": "2026-10-23T03:02:28Z",
+ "kind": "story",
+ "id": "bulusan-2006-03",
+ "volcanoId": "bulusan",
+ "volcanoFile": "volcano/bulusan.json",
+ "title": {
+  "en": "Bulusan, March 2006",
+  "ja": "ブルサン山 2006年3月"
+ },
+ "summary": {
+  "en": "What the instruments recorded before, during and after the 21 March 2006 eruption. A past record, not a hazard assessment.",
+  "ja": "2006年3月21日の噴火の前後に、観測機器が記録したことです。過去の記録であり、ハザード評価ではありません。"
+ },
+ "span": {
+  "start": "2005-12-21",
+  "end": "2006-09-26"
+ },
+ "status": "reviewed",
+ "generator": {
+  "name": "plumes.stories",
+  "version": "1",
+  "catalogueVersion": 1
+ },
+ "episodeIds": [
+  "gvp-16770"
+ ],
+ "score": {
+  "families": 4,
+  "steps": 4,
+  "tier": "story"
+ },
+ "steps": [
+  {
+   "id": "before",
+   "kind": "before",
+   "start": "2005-12-21",
+   "end": "2006-03-20",
+   "title": {
+    "en": "Before",
+    "ja": "噴火前"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 21 December 2005 to 20 March 2006. GPM IMERG estimates 898 mm of rain within 15 km from 21 December 2005 to 20 March 2006.",
+    "ja": "USGSのカタログには、2005年12月21日から2006年3月20日までの30 km圏の地震の記録がありません。GPM IMERGの推定では、2005年12月21日から2006年3月20日までに15 km圏で898 mmの雨が降りました。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 898.0,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2006-03-20"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 21 December 2005 to 20 March 2006.",
+      "ja": "USGSのカタログには、2005年12月21日から2006年3月20日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-1900-2009"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 898 mm of rain within 15 km from 21 December 2005 to 20 March 2006.",
+      "ja": "GPM IMERGの推定では、2005年12月21日から2006年3月20日までに15 km圏で898 mmの雨が降りました。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "onset",
+   "kind": "onset",
+   "start": "2006-03-21",
+   "end": "2006-03-27",
+   "title": {
+    "en": "21–27 March 2006",
+    "ja": "2006年3月21〜27日"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 21 to 27 March 2006. GVP records the eruption as VEI 2. NASA's MSVOLSO2L4 record lists 1 kt of SO₂ for the eruption of 21 March 2006. GPM IMERG estimates 10.6 mm of rain within 15 km from 21 to 27 March 2006.",
+    "ja": "USGSのカタログには、2006年3月21日から27日までの30 km圏の地震の記録がありません。GVPはこの噴火をVEI 2としています。NASAのMSVOLSO2L4は、2006年3月21日の噴火のSO₂量を1 ktとしています。GPM IMERGの推定では、2006年3月21日から27日までに15 km圏で10.6 mmの雨が降りました。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Volcanic Explosivity Index (GVP)",
+      "ja": "火山爆発指数（GVP）"
+     },
+     "value": 2,
+     "source": "gvp-eruptions-ph",
+     "url": "https://volcano.si.edu/volcano.cfm?vn=273010"
+    },
+    {
+     "label": {
+      "en": "SO₂ mass (MSVOLSO2L4)",
+      "ja": "SO₂量（MSVOLSO2L4）"
+     },
+     "value": 1.0,
+     "source": "nasa-msvolso2l4",
+     "unit": "kt",
+     "asOf": "2006-03-21"
+    },
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 10.6,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2006-03-27"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 21 to 27 March 2006.",
+      "ja": "USGSのカタログには、2006年3月21日から27日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-1900-2009"
+     ]
+    },
+    {
+     "template": "GVP-VEI",
+     "text": {
+      "en": "GVP records the eruption as VEI 2.",
+      "ja": "GVPはこの噴火をVEI 2としています。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "gvp-eruptions-ph"
+     ]
+    },
+    {
+     "template": "SO2-MASS",
+     "text": {
+      "en": "NASA's MSVOLSO2L4 record lists 1 kt of SO₂ for the eruption of 21 March 2006.",
+      "ja": "NASAのMSVOLSO2L4は、2006年3月21日の噴火のSO₂量を1 ktとしています。"
+     },
+     "figures": [
+      1
+     ],
+     "sources": [
+      "nasa-msvolso2l4"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 10.6 mm of rain within 15 km from 21 to 27 March 2006.",
+      "ja": "GPM IMERGの推定では、2006年3月21日から27日までに15 km圏で10.6 mmの雨が降りました。"
+     },
+     "figures": [
+      2
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "course",
+   "kind": "course",
+   "start": "2006-03-28",
+   "end": "2006-06-28",
+   "title": {
+    "en": "28 March – 28 June 2006",
+    "ja": "2006年3月28日〜6月28日"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 28 March to 28 June 2006. GPM IMERG estimates 527.9 mm of rain within 15 km from 28 March to 28 June 2006. The wettest day in this period was 11 May 2006, with 112.7 mm.",
+    "ja": "USGSのカタログには、2006年3月28日から6月28日までの30 km圏の地震の記録がありません。GPM IMERGの推定では、2006年3月28日から6月28日までに15 km圏で527.9 mmの雨が降りました。この期間で最も雨が多かったのは2006年5月11日で、112.7 mmでした。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 527.9,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2006-06-28"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 28 March to 28 June 2006.",
+      "ja": "USGSのカタログには、2006年3月28日から6月28日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-1900-2009"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 527.9 mm of rain within 15 km from 28 March to 28 June 2006.",
+      "ja": "GPM IMERGの推定では、2006年3月28日から6月28日までに15 km圏で527.9 mmの雨が降りました。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    },
+    {
+     "template": "RAIN-WETTEST",
+     "text": {
+      "en": "The wettest day in this period was 11 May 2006, with 112.7 mm.",
+      "ja": "この期間で最も雨が多かったのは2006年5月11日で、112.7 mmでした。"
+     },
+     "figures": [],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "after",
+   "kind": "after",
+   "start": "2006-06-29",
+   "end": "2006-09-26",
+   "title": {
+    "en": "After",
+    "ja": "噴火後"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 29 June to 26 September 2006. NOAA's Significant Volcanic Eruptions Database records 1 death for this eruption. GPM IMERG estimates 546.2 mm of rain within 15 km from 29 June to 26 September 2006. The wettest day in this period was 26 September 2006, with 97.7 mm.",
+    "ja": "USGSのカタログには、2006年6月29日から9月26日までの30 km圏の地震の記録がありません。NOAAの重要火山噴火データベースは、この噴火による死者を1人と記録しています。GPM IMERGの推定では、2006年6月29日から9月26日までに15 km圏で546.2 mmの雨が降りました。この期間で最も雨が多かったのは2006年9月26日で、97.7 mmでした。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Deaths (NOAA NCEI estimate)",
+      "ja": "死者（NOAA NCEI推計）"
+     },
+     "value": 1,
+     "source": "noaa-hazel-volcanoes-ph",
+     "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/volcano/event-more-info/5384"
+    },
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 546.2,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2006-09-26"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 29 June to 26 September 2006.",
+      "ja": "USGSのカタログには、2006年6月29日から9月26日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-1900-2009"
+     ]
+    },
+    {
+     "template": "HAZEL-DEATHS",
+     "text": {
+      "en": "NOAA's Significant Volcanic Eruptions Database records 1 death for this eruption.",
+      "ja": "NOAAの重要火山噴火データベースは、この噴火による死者を1人と記録しています。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "noaa-hazel-volcanoes-ph"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 546.2 mm of rain within 15 km from 29 June to 26 September 2006.",
+      "ja": "GPM IMERGの推定では、2006年6月29日から9月26日までに15 km圏で546.2 mmの雨が降りました。"
+     },
+     "figures": [
+      1
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    },
+    {
+     "template": "RAIN-WETTEST",
+     "text": {
+      "en": "The wettest day in this period was 26 September 2006, with 97.7 mm.",
+      "ja": "この期間で最も雨が多かったのは2006年9月26日で、97.7 mmでした。"
+     },
+     "figures": [],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  }
+ ],
+ "provenance": {
+  "sources": [
+   {
+    "id": "usgs-comcat-ph-1900-2009",
+    "attribution": "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/",
+    "licence": "open: U.S. public domain (USGS-authored data); credit U.S. Geological Survey",
+    "fromArchive": false
+   },
+   {
+    "id": "gpm-imerg-v07",
+    "attribution": "Huffman, G.J. et al. (2019), GPM IMERG Final Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07, GES DISC, doi:10.5067/GPM/IMERG/3B-HH/07. Processed in Google Earth Engine.",
+    "licence": "open: CC0 ('All NASA-produced data from the GPM mission is made freely available for the public to use.')",
+    "fromArchive": false
+   },
+   {
+    "id": "gvp-eruptions-ph",
+    "attribution": "Global Volcanism Program, 2026. [Database] Volcanoes of the World (v. 5.4.0; 7 Aug 2026). Distributed by Smithsonian Institution, compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2026.5.4",
+    "licence": "open-with-conditions: Smithsonian Terms of Use (non-commercial use with citation; see gvp-volcanoes-ph)",
+    "fromArchive": false
+   },
+   {
+    "id": "nasa-msvolso2l4",
+    "attribution": "Carn, S. (2025), Multi-Satellite Volcanic Sulfur Dioxide L4 Long-Term Global Database V4, Goddard Earth Science Data and Information Services Center (GES DISC), doi:10.5067/MEASURES/SO2/DATA405",
+    "licence": "open: NASA full and open (CMR access constraints 'None'; EOSDIS data use guidance)",
+    "fromArchive": false
+   },
+   {
+    "id": "noaa-hazel-volcanoes-ph",
+    "attribution": "National Geophysical Data Center / World Data Service (NGDC/WDS): NCEI/WDS Global Significant Volcanic Eruptions Database. NOAA National Centers for Environmental Information. doi:10.7289/V5JW8BSH",
+    "licence": "open: \"Access to this dataset is unrestricted.\" (NCEI metadata gov.noaa.ngdc.mgg.hazards:G10147, LICENCES.md); \"Please cite this data/database as doi:10.7289/V5JW8BSH\".",
+    "fromArchive": false
+   }
+  ]
+ }
+}

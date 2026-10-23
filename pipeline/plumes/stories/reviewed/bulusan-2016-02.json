@@ -1,0 +1,360 @@
+{
+ "schemaVersion": "1",
+ "dataVersion": "v6",
+ "dataAsOf": "2026-10-23",
+ "generatedAt": "2026-10-23T03:02:28Z",
+ "kind": "story",
+ "id": "bulusan-2016-02",
+ "volcanoId": "bulusan",
+ "volcanoFile": "volcano/bulusan.json",
+ "title": {
+  "en": "Bulusan, February 2016",
+  "ja": "ブルサン山 2016年2月"
+ },
+ "summary": {
+  "en": "What the instruments recorded before, during and after the 22 February 2016 eruption. A past record, not a hazard assessment.",
+  "ja": "2016年2月22日の噴火の前後に、観測機器が記録したことです。過去の記録であり、ハザード評価ではありません。"
+ },
+ "span": {
+  "start": "2015-11-24",
+  "end": "2016-05-28"
+ },
+ "status": "reviewed",
+ "generator": {
+  "name": "plumes.stories",
+  "version": "1",
+  "catalogueVersion": 1
+ },
+ "episodeIds": [
+  "gvp-22114"
+ ],
+ "score": {
+  "families": 4,
+  "steps": 3,
+  "tier": "story"
+ },
+ "steps": [
+  {
+   "id": "before",
+   "kind": "before",
+   "start": "2015-11-24",
+   "end": "2016-02-21",
+   "title": {
+    "en": "Before",
+    "ja": "噴火前"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 24 November 2015 to 21 February 2016. VIIRS detected heat within 15 km on 1 day from 24 November 2015 to 21 February 2016: 7.9 MW on 23 January 2016. GPM IMERG estimates 560.4 mm of rain within 15 km from 24 November 2015 to 21 February 2016.",
+    "ja": "USGSのカタログには、2015年11月24日から2016年2月21日までの30 km圏の地震の記録がありません。VIIRSは2015年11月24日から2016年2月21日までのうち1日、15 km圏で熱異常を検出しました（2016年1月23日、7.9 MW）。GPM IMERGの推定では、2015年11月24日から2016年2月21日までに15 km圏で560.4 mmの雨が降りました。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "frp_viirs_15km",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "VIIRS fire radiative power within 15 km (highest)",
+      "ja": "VIIRS 放射電力、15 km圏（最大）"
+     },
+     "value": 7.9,
+     "source": "viirs-vnp14a1",
+     "unit": "MW",
+     "asOf": "2016-01-23"
+    },
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 560.4,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2016-02-21"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 24 November 2015 to 21 February 2016.",
+      "ja": "USGSのカタログには、2015年11月24日から2016年2月21日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-2010"
+     ]
+    },
+    {
+     "template": "HEAT-DAYS",
+     "text": {
+      "en": "VIIRS detected heat within 15 km on 1 day from 24 November 2015 to 21 February 2016: 7.9 MW on 23 January 2016.",
+      "ja": "VIIRSは2015年11月24日から2016年2月21日までのうち1日、15 km圏で熱異常を検出しました（2016年1月23日、7.9 MW）。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "viirs-vnp14a1"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 560.4 mm of rain within 15 km from 24 November 2015 to 21 February 2016.",
+      "ja": "GPM IMERGの推定では、2015年11月24日から2016年2月21日までに15 km圏で560.4 mmの雨が降りました。"
+     },
+     "figures": [
+      1
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "onset",
+   "kind": "onset",
+   "start": "2016-02-22",
+   "end": "2016-02-28",
+   "title": {
+    "en": "22–28 February 2016",
+    "ja": "2016年2月22〜28日"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 22 to 28 February 2016. Tokyo VAAC issued 2 ash advisories on 22 February 2016. GVP records the eruption as VEI 2. GPM IMERG estimates 67.5 mm of rain within 15 km from 22 to 28 February 2016.",
+    "ja": "USGSのカタログには、2016年2月22日から28日までの30 km圏の地震の記録がありません。東京VAACは2016年2月22日に2件の火山灰情報を発表しました。GVPはこの噴火をVEI 2としています。GPM IMERGの推定では、2016年2月22日から28日までに15 km圏で67.5 mmの雨が降りました。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "advisories",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Volcanic Explosivity Index (GVP)",
+      "ja": "火山爆発指数（GVP）"
+     },
+     "value": 2,
+     "source": "gvp-eruptions-ph",
+     "url": "https://volcano.si.edu/volcano.cfm?vn=273010"
+    },
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 67.5,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2016-02-28"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 22 to 28 February 2016.",
+      "ja": "USGSのカタログには、2016年2月22日から28日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-2010"
+     ]
+    },
+    {
+     "template": "VAAC-COUNT",
+     "text": {
+      "en": "Tokyo VAAC issued 2 ash advisories on 22 February 2016.",
+      "ja": "東京VAACは2016年2月22日に2件の火山灰情報を発表しました。"
+     },
+     "figures": [],
+     "sources": [
+      "vaac-tokyo-advisories"
+     ]
+    },
+    {
+     "template": "GVP-VEI",
+     "text": {
+      "en": "GVP records the eruption as VEI 2.",
+      "ja": "GVPはこの噴火をVEI 2としています。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "gvp-eruptions-ph"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 67.5 mm of rain within 15 km from 22 to 28 February 2016.",
+      "ja": "GPM IMERGの推定では、2016年2月22日から28日までに15 km圏で67.5 mmの雨が降りました。"
+     },
+     "figures": [
+      1
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "after",
+   "kind": "after",
+   "start": "2016-02-29",
+   "end": "2016-05-28",
+   "title": {
+    "en": "After",
+    "ja": "噴火後"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 29 February to 28 May 2016. VIIRS detected heat within 15 km on 2 days from 29 February to 28 May 2016. The strongest was 11.8 MW, on 8 May 2016. GPM IMERG estimates 71.1 mm of rain within 15 km from 29 February to 28 May 2016. The wettest day in this period was 22 May 2016, with 14.1 mm.",
+    "ja": "USGSのカタログには、2016年2月29日から5月28日までの30 km圏の地震の記録がありません。VIIRSは2016年2月29日から5月28日までのうち2日、15 km圏で熱異常を検出しました。最大は2016年5月8日の11.8 MWです。GPM IMERGの推定では、2016年2月29日から5月28日までに15 km圏で71.1 mmの雨が降りました。この期間で最も雨が多かったのは2016年5月22日で、14.1 mmでした。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "frp_viirs_15km",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "VIIRS fire radiative power within 15 km (highest)",
+      "ja": "VIIRS 放射電力、15 km圏（最大）"
+     },
+     "value": 11.8,
+     "source": "viirs-vnp14a1",
+     "unit": "MW",
+     "asOf": "2016-05-08"
+    },
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 71.1,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2016-05-28"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 29 February to 28 May 2016.",
+      "ja": "USGSのカタログには、2016年2月29日から5月28日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-2010"
+     ]
+    },
+    {
+     "template": "HEAT-DAYS",
+     "text": {
+      "en": "VIIRS detected heat within 15 km on 2 days from 29 February to 28 May 2016. The strongest was 11.8 MW, on 8 May 2016.",
+      "ja": "VIIRSは2016年2月29日から5月28日までのうち2日、15 km圏で熱異常を検出しました。最大は2016年5月8日の11.8 MWです。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "viirs-vnp14a1"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 71.1 mm of rain within 15 km from 29 February to 28 May 2016.",
+      "ja": "GPM IMERGの推定では、2016年2月29日から5月28日までに15 km圏で71.1 mmの雨が降りました。"
+     },
+     "figures": [
+      1
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    },
+    {
+     "template": "RAIN-WETTEST",
+     "text": {
+      "en": "The wettest day in this period was 22 May 2016, with 14.1 mm.",
+      "ja": "この期間で最も雨が多かったのは2016年5月22日で、14.1 mmでした。"
+     },
+     "figures": [],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  }
+ ],
+ "provenance": {
+  "sources": [
+   {
+    "id": "usgs-comcat-ph-2010",
+    "attribution": "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/",
+    "licence": "open: U.S. public domain (USGS-authored data); credit U.S. Geological Survey",
+    "fromArchive": false
+   },
+   {
+    "id": "viirs-vnp14a1",
+    "attribution": "Schroeder, W., Giglio, L. (2018). VIIRS/NPP Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V002, NASA EOSDIS LP DAAC. Processed in Google Earth Engine.",
+    "licence": "open: NASA open data (LP DAAC); cite when publishing",
+    "fromArchive": false
+   },
+   {
+    "id": "gpm-imerg-v07",
+    "attribution": "Huffman, G.J. et al. (2019), GPM IMERG Final Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07, GES DISC, doi:10.5067/GPM/IMERG/3B-HH/07. Processed in Google Earth Engine.",
+    "licence": "open: CC0 ('All NASA-produced data from the GPM mission is made freely available for the public to use.')",
+    "fromArchive": false
+   },
+   {
+    "id": "vaac-tokyo-advisories",
+    "attribution": "Source: Japan Meteorological Agency website, Tokyo VAAC volcanic ash advisories (https://ds.data.jma.go.jp/svd/vaac/data/)",
+    "licence": "open-with-conditions: JMA website terms ('The user must cite the source when using the Content.'; compatible with CC BY 4.0)",
+    "fromArchive": false
+   },
+   {
+    "id": "gvp-eruptions-ph",
+    "attribution": "Global Volcanism Program, 2026. [Database] Volcanoes of the World (v. 5.4.0; 7 Aug 2026). Distributed by Smithsonian Institution, compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2026.5.4",
+    "licence": "open-with-conditions: Smithsonian Terms of Use (non-commercial use with citation; see gvp-volcanoes-ph)",
+    "fromArchive": false
+   }
+  ]
+ }
+}

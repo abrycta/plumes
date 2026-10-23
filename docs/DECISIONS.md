@@ -167,3 +167,13 @@ Kurt's decisions on the first generated drafts (Kanlaon 2024 and Taal 2020, PR #
 | # | Decision | Note |
 |---|---|---|
 | L-OMI | **OMI SO₂ (`omi-omso2e`, series `so2_omi_box`) is dropped** (Kurt, 2026-10-23): no OMI data is published; `plumes.omi`, its `data.yml` step and the web wording are removed, and the registry entry is marked rejected | SO₂ stays TROPOMI (`s5p-offl-so2`, from 2018-12) and MSVOLSO2L4 (`nasa-msvolso2l4`, eruption masses); the backfill was slow (about 20 min a year in Harmony) and never reached a version |
+
+## 2026-10-23: reviewed stories stay stable (ST15)
+
+Why: data v7 (CI trial run 39893964947) filled a gap in Kanlaon's 2024 bulletins; its event merged into the alert window still open in 2026, was renamed `kanlaon-2024` and dropped as open, and the #1 story vanished. Any data update could do the same: open or merged alert windows, gaps filled later, archive and CI inputs that differ, ids derived from how many events a year has, windows clipped by a new neighbour, a changed number anywhere in a step (hash), or a lower score.
+
+| # | Decision | Note |
+|---|---|---|
+| ST15 | **The reviewed text is kept in the repo** (`pipeline/plumes/stories/reviewed/<id>.json`, written by `python -m plumes.stories --snapshot` with the review.yaml hashes) and is what keeps a story public, not the day's data | the same on CI and on a local build; a missing or altered reviewed file fails the build |
+| ST15a | **A reviewed story claims its event by volcano and onset date**, keeps its id, and is rebuilt over its own reviewed windows and episodes; no other event can take a reviewed id | merges, open windows, new neighbours and renames no longer touch it |
+| ST15b | **When the rebuilt text differs, the reviewed text stays public until Kurt re-reviews**; the new text is listed as a draft of the same id (seen with `?preview`) and reported as "pending re-review" (manifest check, CI warning) | a reviewed story never disappears, changes id or changes silently; its public order uses the reviewed score |

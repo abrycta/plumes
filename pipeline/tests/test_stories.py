@@ -189,7 +189,7 @@ def test_rain_needs_every_day_of_the_step():
 # ---------------------------------------------------------------- generation on the contract fixture
 
 def test_generation_on_the_fixture_writes_valid_drafts_and_an_index(tmp_path):
-    res = generate(FIXTURE, tmp_path)
+    res = generate(FIXTURE, tmp_path, review_path=tmp_path / "none.yaml", reviewed_dir=tmp_path / "none")  # the fixture, not the live reviews
     assert all(c["passed"] for c in res["checks"]), [c for c in res["checks"] if not c["passed"]]
     idx = json.loads((tmp_path / "stories.json").read_text())
     assert not errors(idx)

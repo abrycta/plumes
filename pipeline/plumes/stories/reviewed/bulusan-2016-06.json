@@ -1,0 +1,472 @@
+{
+ "schemaVersion": "1",
+ "dataVersion": "v6",
+ "dataAsOf": "2026-10-23",
+ "generatedAt": "2026-10-23T03:02:28Z",
+ "kind": "story",
+ "id": "bulusan-2016-06",
+ "volcanoId": "bulusan",
+ "volcanoFile": "volcano/bulusan.json",
+ "title": {
+  "en": "Bulusan, June 2016",
+  "ja": "ブルサン山 2016年6月"
+ },
+ "summary": {
+  "en": "What the instruments recorded before, during and after the 10 June 2016 eruption. A past record, not a hazard assessment.",
+  "ja": "2016年6月10日の噴火の前後に、観測機器が記録したことです。過去の記録であり、ハザード評価ではありません。"
+ },
+ "span": {
+  "start": "2016-03-12",
+  "end": "2017-03-29"
+ },
+ "status": "reviewed",
+ "generator": {
+  "name": "plumes.stories",
+  "version": "1",
+  "catalogueVersion": 1
+ },
+ "episodeIds": [
+  "gvp-22151"
+ ],
+ "score": {
+  "families": 4,
+  "steps": 4,
+  "tier": "story"
+ },
+ "steps": [
+  {
+   "id": "before",
+   "kind": "before",
+   "start": "2016-03-12",
+   "end": "2016-06-09",
+   "title": {
+    "en": "Before",
+    "ja": "噴火前"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 12 March to 9 June 2016. VIIRS detected heat within 15 km on 2 days from 12 March to 9 June 2016. The strongest was 11.8 MW, on 8 May 2016. GPM IMERG estimates 104.4 mm of rain within 15 km from 12 March to 9 June 2016.",
+    "ja": "USGSのカタログには、2016年3月12日から6月9日までの30 km圏の地震の記録がありません。VIIRSは2016年3月12日から6月9日までのうち2日、15 km圏で熱異常を検出しました。最大は2016年5月8日の11.8 MWです。GPM IMERGの推定では、2016年3月12日から6月9日までに15 km圏で104.4 mmの雨が降りました。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "frp_viirs_15km",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "VIIRS fire radiative power within 15 km (highest)",
+      "ja": "VIIRS 放射電力、15 km圏（最大）"
+     },
+     "value": 11.8,
+     "source": "viirs-vnp14a1",
+     "unit": "MW",
+     "asOf": "2016-05-08"
+    },
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 104.4,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2016-06-09"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 12 March to 9 June 2016.",
+      "ja": "USGSのカタログには、2016年3月12日から6月9日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-2010"
+     ]
+    },
+    {
+     "template": "HEAT-DAYS",
+     "text": {
+      "en": "VIIRS detected heat within 15 km on 2 days from 12 March to 9 June 2016. The strongest was 11.8 MW, on 8 May 2016.",
+      "ja": "VIIRSは2016年3月12日から6月9日までのうち2日、15 km圏で熱異常を検出しました。最大は2016年5月8日の11.8 MWです。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "viirs-vnp14a1"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 104.4 mm of rain within 15 km from 12 March to 9 June 2016.",
+      "ja": "GPM IMERGの推定では、2016年3月12日から6月9日までに15 km圏で104.4 mmの雨が降りました。"
+     },
+     "figures": [
+      1
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "onset",
+   "kind": "onset",
+   "start": "2016-06-10",
+   "end": "2016-06-16",
+   "title": {
+    "en": "10–16 June 2016",
+    "ja": "2016年6月10〜16日"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 10 to 16 June 2016. Tokyo VAAC observed ash up to FL120 (about 3.7 km) on 10 June 2016. Tokyo VAAC issued 5 ash advisories on 10 June 2016. GVP records the eruption as VEI 2. GPM IMERG estimates 8.6 mm of rain within 15 km from 10 to 16 June 2016.",
+    "ja": "USGSのカタログには、2016年6月10日から16日までの30 km圏の地震の記録がありません。東京VAACは2016年6月10日、最高FL120（約3.7 km）の火山灰を観測しました。東京VAACは2016年6月10日に5件の火山灰情報を発表しました。GVPはこの噴火をVEI 2としています。GPM IMERGの推定では、2016年6月10日から16日までに15 km圏で8.6 mmの雨が降りました。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "advisories",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Ash top (Tokyo VAAC, observed)",
+      "ja": "火山灰の高度（東京VAAC観測）"
+     },
+     "value": 120,
+     "source": "vaac-tokyo-advisories",
+     "unit": "FL",
+     "asOf": "2016-06-10",
+     "url": "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2016/20160610_27301000_0004_Text.html"
+    },
+    {
+     "label": {
+      "en": "Volcanic Explosivity Index (GVP)",
+      "ja": "火山爆発指数（GVP）"
+     },
+     "value": 2,
+     "source": "gvp-eruptions-ph",
+     "url": "https://volcano.si.edu/volcano.cfm?vn=273010"
+    },
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 8.6,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2016-06-16"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 10 to 16 June 2016.",
+      "ja": "USGSのカタログには、2016年6月10日から16日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-2010"
+     ]
+    },
+    {
+     "template": "VAAC-MAX",
+     "text": {
+      "en": "Tokyo VAAC observed ash up to FL120 (about 3.7 km) on 10 June 2016.",
+      "ja": "東京VAACは2016年6月10日、最高FL120（約3.7 km）の火山灰を観測しました。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "vaac-tokyo-advisories"
+     ]
+    },
+    {
+     "template": "VAAC-COUNT",
+     "text": {
+      "en": "Tokyo VAAC issued 5 ash advisories on 10 June 2016.",
+      "ja": "東京VAACは2016年6月10日に5件の火山灰情報を発表しました。"
+     },
+     "figures": [],
+     "sources": [
+      "vaac-tokyo-advisories"
+     ]
+    },
+    {
+     "template": "GVP-VEI",
+     "text": {
+      "en": "GVP records the eruption as VEI 2.",
+      "ja": "GVPはこの噴火をVEI 2としています。"
+     },
+     "figures": [
+      1
+     ],
+     "sources": [
+      "gvp-eruptions-ph"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 8.6 mm of rain within 15 km from 10 to 16 June 2016.",
+      "ja": "GPM IMERGの推定では、2016年6月10日から16日までに15 km圏で8.6 mmの雨が降りました。"
+     },
+     "figures": [
+      2
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "course",
+   "kind": "course",
+   "start": "2016-06-17",
+   "end": "2016-12-29",
+   "title": {
+    "en": "17 June – 29 December 2016",
+    "ja": "2016年6月17日〜12月29日"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 17 June to 29 December 2016. Tokyo VAAC observed ash up to FL180 (about 5.5 km) on 23 October 2016. Tokyo VAAC issued 13 ash advisories from 19 June to 29 December 2016. GPM IMERG estimates 2,094.4 mm of rain within 15 km from 17 June to 29 December 2016. The wettest day in this period was 16 December 2016, with 161.7 mm.",
+    "ja": "USGSのカタログには、2016年6月17日から12月29日までの30 km圏の地震の記録がありません。東京VAACは2016年10月23日、最高FL180（約5.5 km）の火山灰を観測しました。東京VAACは2016年6月19日から12月29日までに13件の火山灰情報を発表しました。GPM IMERGの推定では、2016年6月17日から12月29日までに15 km圏で2,094.4 mmの雨が降りました。この期間で最も雨が多かったのは2016年12月16日で、161.7 mmでした。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "advisories",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Ash top (Tokyo VAAC, observed)",
+      "ja": "火山灰の高度（東京VAAC観測）"
+     },
+     "value": 180,
+     "source": "vaac-tokyo-advisories",
+     "unit": "FL",
+     "asOf": "2016-10-23",
+     "url": "https://ds.data.jma.go.jp/svd/vaac/data/TextData/2016/20161023_27301000_0014_Text.html"
+    },
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 2094.4,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2016-12-29"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 17 June to 29 December 2016.",
+      "ja": "USGSのカタログには、2016年6月17日から12月29日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-2010"
+     ]
+    },
+    {
+     "template": "VAAC-MAX",
+     "text": {
+      "en": "Tokyo VAAC observed ash up to FL180 (about 5.5 km) on 23 October 2016.",
+      "ja": "東京VAACは2016年10月23日、最高FL180（約5.5 km）の火山灰を観測しました。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "vaac-tokyo-advisories"
+     ]
+    },
+    {
+     "template": "VAAC-COUNT",
+     "text": {
+      "en": "Tokyo VAAC issued 13 ash advisories from 19 June to 29 December 2016.",
+      "ja": "東京VAACは2016年6月19日から12月29日までに13件の火山灰情報を発表しました。"
+     },
+     "figures": [],
+     "sources": [
+      "vaac-tokyo-advisories"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 2,094.4 mm of rain within 15 km from 17 June to 29 December 2016.",
+      "ja": "GPM IMERGの推定では、2016年6月17日から12月29日までに15 km圏で2,094.4 mmの雨が降りました。"
+     },
+     "figures": [
+      1
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    },
+    {
+     "template": "RAIN-WETTEST",
+     "text": {
+      "en": "The wettest day in this period was 16 December 2016, with 161.7 mm.",
+      "ja": "この期間で最も雨が多かったのは2016年12月16日で、161.7 mmでした。"
+     },
+     "figures": [],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  },
+  {
+   "id": "after",
+   "kind": "after",
+   "start": "2016-12-30",
+   "end": "2017-03-29",
+   "title": {
+    "en": "After",
+    "ja": "噴火後"
+   },
+   "text": {
+    "en": "The USGS catalogue lists no earthquake within 30 km from 30 December 2016 to 29 March 2017. GPM IMERG estimates 765.9 mm of rain within 15 km from 30 December 2016 to 29 March 2017. The wettest day in this period was 9 January 2017, with 131.1 mm.",
+    "ja": "USGSのカタログには、2016年12月30日から2017年3月29日までの30 km圏の地震の記録がありません。GPM IMERGの推定では、2016年12月30日から2017年3月29日までに15 km圏で765.9 mmの雨が降りました。この期間で最も雨が多かったのは2017年1月9日で、131.1 mmでした。"
+   },
+   "status": "reviewed",
+   "series": [
+    "eq_usgs_30km",
+    "rain_imerg_15km"
+   ],
+   "figures": [
+    {
+     "label": {
+      "en": "Rain within 15 km (GPM IMERG)",
+      "ja": "15 km圏の雨量（GPM IMERG）"
+     },
+     "value": 765.9,
+     "source": "gpm-imerg-v07",
+     "unit": "mm",
+     "asOf": "2017-03-29"
+    }
+   ],
+   "sentences": [
+    {
+     "template": "EQ-NONE",
+     "text": {
+      "en": "The USGS catalogue lists no earthquake within 30 km from 30 December 2016 to 29 March 2017.",
+      "ja": "USGSのカタログには、2016年12月30日から2017年3月29日までの30 km圏の地震の記録がありません。"
+     },
+     "figures": [],
+     "sources": [
+      "usgs-comcat-ph-2010"
+     ]
+    },
+    {
+     "template": "RAIN-TOTAL",
+     "text": {
+      "en": "GPM IMERG estimates 765.9 mm of rain within 15 km from 30 December 2016 to 29 March 2017.",
+      "ja": "GPM IMERGの推定では、2016年12月30日から2017年3月29日までに15 km圏で765.9 mmの雨が降りました。"
+     },
+     "figures": [
+      0
+     ],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    },
+    {
+     "template": "RAIN-WETTEST",
+     "text": {
+      "en": "The wettest day in this period was 9 January 2017, with 131.1 mm.",
+      "ja": "この期間で最も雨が多かったのは2017年1月9日で、131.1 mmでした。"
+     },
+     "figures": [],
+     "sources": [
+      "gpm-imerg-v07"
+     ]
+    }
+   ],
+   "absent": [],
+   "map": {
+    "center": [
+     124.056,
+     12.769
+    ],
+    "zoom": 10
+   }
+  }
+ ],
+ "provenance": {
+  "sources": [
+   {
+    "id": "usgs-comcat-ph-2010",
+    "attribution": "U.S. Geological Survey, ANSS Comprehensive Earthquake Catalog (ComCat), https://earthquake.usgs.gov/data/comcat/",
+    "licence": "open: U.S. public domain (USGS-authored data); credit U.S. Geological Survey",
+    "fromArchive": false
+   },
+   {
+    "id": "viirs-vnp14a1",
+    "attribution": "Schroeder, W., Giglio, L. (2018). VIIRS/NPP Thermal Anomalies/Fire Daily L3 Global 1km SIN Grid V002, NASA EOSDIS LP DAAC. Processed in Google Earth Engine.",
+    "licence": "open: NASA open data (LP DAAC); cite when publishing",
+    "fromArchive": false
+   },
+   {
+    "id": "gpm-imerg-v07",
+    "attribution": "Huffman, G.J. et al. (2019), GPM IMERG Final Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07, GES DISC, doi:10.5067/GPM/IMERG/3B-HH/07. Processed in Google Earth Engine.",
+    "licence": "open: CC0 ('All NASA-produced data from the GPM mission is made freely available for the public to use.')",
+    "fromArchive": false
+   },
+   {
+    "id": "vaac-tokyo-advisories",
+    "attribution": "Source: Japan Meteorological Agency website, Tokyo VAAC volcanic ash advisories (https://ds.data.jma.go.jp/svd/vaac/data/)",
+    "licence": "open-with-conditions: JMA website terms ('The user must cite the source when using the Content.'; compatible with CC BY 4.0)",
+    "fromArchive": false
+   },
+   {
+    "id": "gvp-eruptions-ph",
+    "attribution": "Global Volcanism Program, 2026. [Database] Volcanoes of the World (v. 5.4.0; 7 Aug 2026). Distributed by Smithsonian Institution, compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2026.5.4",
+    "licence": "open-with-conditions: Smithsonian Terms of Use (non-commercial use with citation; see gvp-volcanoes-ph)",
+    "fromArchive": false
+   }
+  ]
+ }
+}
