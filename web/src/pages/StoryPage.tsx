@@ -8,6 +8,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
+  Eyebrow,
   Page,
   Scrollytelling,
   T,
@@ -81,9 +82,7 @@ function StepVisual({ story, model, step, tracks }: { story: Story; model: Volca
   const shown = tracksForStep(step, tracks);
   return (
     <div className="flex flex-col gap-3 rounded-sm border border-border bg-background p-3" data-story-visual>
-      <p className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
-        {formatRange(step.start, step.end, lang)} · {model.volcano.name[lang]}
-      </p>
+      <Eyebrow>{`${formatRange(step.start, step.end, lang)} · ${model.volcano.name[lang]}`}</Eyebrow>
       {shown.length ? (
         <Timeline tracks={shown} from={story.span.start} to={story.span.end} cursor={cursor} onCursor={setCursor} dataAsOf={story.dataAsOf} highlight={[step.start, step.end]} compact />
       ) : null}
@@ -173,7 +172,7 @@ function StoryView({ story }: { story: Story }) {
           id: s.id,
           content: (
             <div className="flex flex-col gap-2">
-              <p className="m-0 font-mono text-[11px] tracking-wide text-muted-foreground uppercase">{formatRange(s.start, s.end, lang)}</p>
+              <Eyebrow>{formatRange(s.start, s.end, lang)}</Eyebrow>
               <h2 className="m-0 font-heading text-xl font-semibold">{s.title[lang]}</h2>
               <StepText step={s} />
               {wide ? null : <StepVisual story={story} model={model} step={s} tracks={tracks} />}
