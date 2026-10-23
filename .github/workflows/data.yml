@@ -79,6 +79,30 @@ jobs:
         if: steps.token.outputs.ok == 'true'
         working-directory: pipeline
         run: uv run python -m plumes.readmodels --version "$(uv run python -m plumes.state next-version)"
+      - name: List the built version's files
+        id: built
+        if: always() && steps.token.outputs.ok == 'true'
+        working-directory: pipeline/data/build/site
+        run: |
+          v=$(find . -maxdepth 1 -type d -name 'v*' | sed 's#^\./##' | sort -V | tail -n 1)
+          if [ -z "$v" ]; then echo "::notice title=no version built::nothing to list"; exit 0; fi
+          echo "dir=pipeline/data/build/site/$v" >> "$GITHUB_OUTPUT"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Built $v: $(find "$v" -type f | wc -l) files, $(du -sb "$v" | cut -f1) bytes"
+            echo
+            echo '| bytes | file |'
+            echo '|---:|---|'
+            (cd "$v" && find . -type f -printf '%s\t%P\n' | sort -k2) | awk -F'\t' '{print "| " $1 " | " $2 " |"}'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the built version (7 days)
+        if: always() && steps.built.outputs.dir != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: data-${{ steps.built.outputs.version }}-run${{ github.run_id }}
+          path: ${{ steps.built.outputs.dir }}
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Publish
         if: steps.token.outputs.ok == 'true' && (github.event_name == 'schedule' || inputs.publish)
         working-directory: pipeline
