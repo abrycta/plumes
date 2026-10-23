@@ -22,7 +22,7 @@ import subprocess
 
 import yaml
 
-from plumes import comet, coverage, deeptime, freshness, publish, run_a, run_b, thermal_n20
+from plumes import comet, coverage, deeptime, freshness, leaks, publish, run_a, run_b, thermal_n20
 from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
@@ -455,6 +455,19 @@ def thermal_time(by_year: dict[str, list], as_of: str) -> dict:
     return {"step": "month", "start": min(days)[:7], "end": min(max(days)[:7], as_of[:7])}
 
 
+def tippecanoe(src, dst, layer: str, name: str, args: list[str]) -> None:
+    """One PMTiles file from a GeoJSONL file. Stable bytes (storage option A1): tippecanoe writes its name, description
+    and full command line into the file's metadata, by default with the output path in them, so the same tiles would
+    differ between versions and publish the local build path. A fixed name and description, and paths relative to the
+    input's folder (the file is written there, then moved), keep both out of the file."""
+    work = src.parent
+    tmp = work / f"{src.stem}.pmtiles"
+    subprocess.run(["tippecanoe", "-q", "-f", "-o", tmp.name, "-l", layer, "-n", name, "-N", name, *args, "-P", src.name],
+                   cwd=work, check=True)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(tmp, dst)
+
+
 def thermal_layers(out_dir, as_of: str) -> dict | None:
     """National FIRMS detections (area API) as one PMTiles per year, a `month` property for the scrubber."""
     if not shutil.which("tippecanoe"):
@@ -481,10 +494,8 @@ def thermal_layers(out_dir, as_of: str) -> dict | None:
                 f.write(dumps({"type": "Feature", "geometry": {"type": "Point", "coordinates": [float(r["longitude"]), float(r["latitude"])]},
                                     "properties": {"month": r["acq_date"][:7], "date": r["acq_date"], "frp": fnum(r["frp"]), "sensor": r.get("product") or product,
                                                    "type": int(r["type"]) if r.get("type") not in (None, "") else None}}) + "\n")
-        dst = out_dir / "layers" / "thermal" / f"{y}.pmtiles"
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["tippecanoe", "-q", "-f", "-o", str(dst), "-l", "thermal", "-Z", "4", "-z", "10", "--drop-densest-as-needed",
-                        "--extend-zooms-if-still-dropping", "-P", str(src)], check=True)
+        tippecanoe(src, out_dir / "layers" / "thermal" / f"{y}.pmtiles", "thermal", f"Plumes thermal detections {y}",
+                   ["-Z", "4", "-z", "10", "--drop-densest-as-needed", "--extend-zooms-if-still-dropping"])
         years.append(y)
     if not years:
         return None
@@ -505,9 +516,7 @@ def quake_layer(out_dir, usgs: list[dict]) -> dict:
             if e["t"][:4] >= "2000":
                 f.write(dumps({"type": "Feature", "geometry": {"type": "Point", "coordinates": [e["lon"], e["lat"]]},
                                     "properties": {"month": e["t"][:7], "time": e["t"], "mag": e["mag"], "depth": e["depth"], "id": e["id"]}}) + "\n")
-    dst = out_dir / "layers" / "earthquakes-usgs.pmtiles"
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run(["tippecanoe", "-q", "-f", "-o", str(dst), "-l", "earthquakes", "-Z", "4", "-z", "9", "-r1", "-P", str(src)], check=True)
+    tippecanoe(src, out_dir / "layers" / "earthquakes-usgs.pmtiles", "earthquakes", "Plumes earthquakes (USGS ComCat)", ["-Z", "4", "-z", "9", "-r1"])
     return {"id": "earthquakes-usgs", "title": lt("Earthquakes (USGS ComCat)", "地震(USGS ComCat)"), "format": "pmtiles", "url": "layers/earthquakes-usgs.pmtiles",
             "sourceLayer": "earthquakes", "time": {"step": "month", "start": "2000-01", "end": max(e["t"] for e in usgs)[:7]}, "minzoom": 4, "maxzoom": 9,
             "bounds": [116, 4, 128, 22], "properties": {"month": "YYYY-MM", "time": "UTC", "mag": "magnitude", "depth": "km", "id": "USGS event id"},
@@ -545,6 +554,8 @@ def file_checks(check, site_v) -> None:
     # published and the run goes on; the stale FIRMS sources warn and file their health issues (audit A4)
     check("thermal detections: no year without any detection at the end", not (set(missing) - set(gaps)),
           ",".join(sorted(set(missing) - set(gaps))), warn=True)
+    bad = leaks.scan(site_v)  # no build-machine path in any file or its metadata (storage option A1)
+    check("no local path in any published file", not bad, "; ".join(f"{k}: {v[0]}" for k, v in list(bad.items())[:3]))
     for p in sorted(site_v.rglob("*.json")) + sorted(site_v.rglob("*.geojson")):
         try:
             json.loads(p.read_text(), parse_constant=_no_constant)
