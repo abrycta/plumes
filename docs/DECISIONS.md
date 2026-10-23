@@ -178,3 +178,11 @@ Why: data v7 (CI trial run 39893964947) filled a gap in Kanlaon's 2024 bulletins
 | ST15a | **Stable ids**: a story public in the previous published version keeps its id; it claims the event at its volcano that holds its onset date, and no other event takes that id | read from the published `latest.json` version, the same for CI and local builds |
 | ST15b | **An alert window still open at the end of the data counts for 90 days from its start** (as an open GVP episode counts for 30) | a raised level that lasts years never stretches an event or pulls a later eruption into it; the per-story Kanlaon `after_end` pin is removed |
 | ST15c | **A public story may leave only with a data-driven reason** (below the story bar, no event holds its onset, its volcano is gone, still open), logged as a check and a CI warning; any other loss fails the build | nothing is published from a failed build |
+
+## 2026-10-23: storage of published versions (S1, S2)
+
+Options and measurements: [`architecture/STORAGE-OPTIONS.md`](architecture/STORAGE-OPTIONS.md). Kurt chose "A1 now, then C".
+
+| # | Decision | Note |
+|---|---|---|
+| S1 | **Stable tile bytes (option A1):** tippecanoe gets a fixed name and description and runs on paths relative to its work folder, so a PMTiles file whose tiles did not change is byte-identical across versions and no local build path reaches its metadata | `readmodels.tippecanoe`; the build check "no local path in any published file" (`plumes.leaks`) blocks publishing; `tests/test_stable_files.py` |
