@@ -10,6 +10,10 @@ import { mapPack } from "./scripts/vite-map-pack.ts";
 import { preloadEmbed } from "./scripts/vite-preload-embed.ts";
 import { sitemap } from "./scripts/vite-sitemap.ts";
 import { fixtureData } from "./scripts/vite-fixture-data.ts";
+
+/** Plumes' Japanese name, as on krtmtthw.dev: the one source for every loading glyph (embed page, map slot).
+ * The header brand, favicon and share card keep the single-character glyph 噴. */
+const NAME_JA = "噴煙";
 import { akariThemeInit } from "./scripts/vite-theme-init.ts";
 
 // Commit shown in the footer: CI sets BUILD_SHA or GITHUB_SHA; the local checkout is the fallback.
@@ -40,9 +44,12 @@ export default defineConfig({
     sitemap(fileURLToPath(new URL("./public/config.json", import.meta.url))),
     // /embed: the map chunk, its worker and the pack index preloaded from embed.html.
     preloadEmbed(),
+    // The embed page's pre-load glyph: %NAME_JA% in the HTML.
+    { name: "name-ja", transformIndexHtml: (html: string) => html.replaceAll("%NAME_JA%", NAME_JA) },
   ],
   define: {
     __COMMIT_SHA__: JSON.stringify(commitSha()),
+    __NAME_JA__: JSON.stringify(NAME_JA),
   },
   resolve: {
     alias: {
