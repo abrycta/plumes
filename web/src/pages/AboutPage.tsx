@@ -166,7 +166,7 @@ export default function AboutPage() {
         <h2 id="notices">{t("Required notices", "必要な表示")}</h2>
         {lang === "ja" ? <p>以下は公開元が求める原文(英語)です。</p> : null}
         <ul lang="en">
-          <li>Contains modified Copernicus Sentinel data (2018–2026), processed by ESA. Processed in Google Earth Engine (noncommercial use).</li>
+          <li>Contains modified Copernicus Sentinel data (2018–{root.latest.dataAsOf.slice(0, 4)}), processed by ESA. Processed in Google Earth Engine (noncommercial use).</li>
           <li>
             We acknowledge the use of data and/or imagery from NASA&apos;s Fire Information for Resource Management System (FIRMS) (https://earthdata.nasa.gov/firms), part of NASA&apos;s Earth Science Data and Information
             System (ESDIS). LANCE disclaimer: “The information presented through LANCE, GIBS, Worldview, and FIRMS are provided ‘as is’ and users bear all responsibility and liability for their use of data” and “Due to the
