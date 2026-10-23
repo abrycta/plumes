@@ -1,0 +1,13 @@
+{
+ "schemaVersion": "1",
+ "kind": "latest",
+ "current": "v7",
+ "base": "v7/",
+ "dataAsOf": "2026-10-23",
+ "generatedAt": "2026-10-23T06:17:32Z",
+ "previous": "v6",
+ "mirrors": [
+  "https://krtmtthw.dev/plumes/data/",
+  "https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/"
+ ]
+}

@@ -1,0 +1,1990 @@
+{
+ "schemaVersion": "1",
+ "dataVersion": "v7",
+ "dataAsOf": "2026-10-23",
+ "generatedAt": "2026-10-23T06:17:32Z",
+ "kind": "manifest",
+ "files": [
+  {
+   "path": "assets/taal-s2-2019-11.jpg",
+   "bytes": 256041,
+   "sha256": "4a1d008c0ab9a10cdb43c41e491a0f804edc0eb8cc382040b2fd89dcd3ba4817"
+  },
+  {
+   "path": "assets/taal-s2-2020-01.jpg",
+   "bytes": 239785,
+   "sha256": "c7ee9f55f1b9c08901788dadd71eb477c61cebffd9ed66114c215c1514bbcdff"
+  },
+  {
+   "path": "assets/taal-s2-2020-03.jpg",
+   "bytes": 274651,
+   "sha256": "ff17b129fadd2369720b0b29458735ba399aa830b7ab96b8d976d0d7bd033e9a"
+  },
+  {
+   "path": "deeptime.json",
+   "bytes": 59771,
+   "sha256": "45c722b6e1c648667398b3201ea48f531a6bdc52ffdf0b8fb9e7a21271aeffbc"
+  },
+  {
+   "path": "layers/deformation/banahaw-032D_07536_111313.tif",
+   "bytes": 3287,
+   "sha256": "921044026261433fb906c26a32cbdf098f19d2aae7f98125f8c9ba6f624224b3"
+  },
+  {
+   "path": "layers/deformation/banahaw-142A_07606_131313.tif",
+   "bytes": 3000,
+   "sha256": "46a3b8623ca05a55d672dfbfc7b010c0270e91c1127817a19b4bc2449c681034"
+  },
+  {
+   "path": "layers/deformation/biliran-061D_07906_131313.tif",
+   "bytes": 1143,
+   "sha256": "fe76013d0612d9dcb562c0a8e908f76e845e4e78d3dde9d78b804fa377860563"
+  },
+  {
+   "path": "layers/deformation/bulusan-069A_07674_131310.tif",
+   "bytes": 1090,
+   "sha256": "1ef8d530a1be6f5d48a559d09bcec8ea72935e7d6ae4e2c96b951d7cd0a08737"
+  },
+  {
+   "path": "layers/deformation/iriga-069A_07674_131310.tif",
+   "bytes": 2227,
+   "sha256": "0476ce59d022ad9cd896408ca5e1ad0fd68845de2e2755be0600ca0a7fdaadfa"
+  },
+  {
+   "path": "layers/deformation/iriga-134D_07688_131313.tif",
+   "bytes": 2959,
+   "sha256": "0b2c565ab300675d3cca1059b3b346f4ee7724e8314bf19084d0cef925404b2e"
+  },
+  {
+   "path": "layers/deformation/isarog-069A_07674_131310.tif",
+   "bytes": 1823,
+   "sha256": "7156cc794cf898fce3603e7b47de456d2d3baea54d9b5849bc4604d12bb2f482"
+  },
+  {
+   "path": "layers/deformation/isarog-134D_07688_131313.tif",
+   "bytes": 2254,
+   "sha256": "c99cc8e63596cd4ddb2d1146a0b0252e7c2ad80978f69325ee8de7163a3343fe"
+  },
+  {
+   "path": "layers/deformation/kanlaon-069A_07955_090909.tif",
+   "bytes": 3297,
+   "sha256": "b965c185daedf6bb99e23cb357d4d81053bea79883c3abfc5a4238dab1eeada6"
+  },
+  {
+   "path": "layers/deformation/kanlaon-134D_07892_131210.tif",
+   "bytes": 3091,
+   "sha256": "949603de712c44d96ec7d20a025171f9eb777d6e90841911014ede053439e82f"
+  },
+  {
+   "path": "layers/deformation/leonard-kniaseff-163D_08317_091313.tif",
+   "bytes": 1360,
+   "sha256": "907f5c3c4a183e5794e35a39bf39f0ac1985c000a49323d9e7d6370628c9951a"
+  },
+  {
+   "path": "layers/deformation/leonard-kniaseff-171A_08263_131000.tif",
+   "bytes": 1456,
+   "sha256": "0e548a32608925a00713f538a433e147e078f6d272e0b7713996e1c934c9c2ec"
+  },
+  {
+   "path": "layers/deformation/matutum-069A_08324_101313.tif",
+   "bytes": 1667,
+   "sha256": "c00587d98b30f5df886acb72c161cd379cadec93b6506310413bb89154fc688f"
+  },
+  {
+   "path": "layers/deformation/matutum-163D_08317_091313.tif",
+   "bytes": 1685,
+   "sha256": "2ce84538258eb2f99129852b324228791ec24abc26eb62c8aff1e559683e0dcc"
+  },
+  {
+   "path": "layers/deformation/mayon-069A_07674_131310.tif",
+   "bytes": 1856,
+   "sha256": "990026d7a863420ce5ab3f890329a11b70c5d95a49cf60715c7592805c6f8026"
+  },
+  {
+   "path": "layers/deformation/mayon-134D_07688_131313.tif",
+   "bytes": 2826,
+   "sha256": "79e16489232818d90acc38cf98e150a15e95c8b9f53a9dcd5261caf4d177a903"
+  },
+  {
+   "path": "layers/deformation/parker-069A_08324_101313.tif",
+   "bytes": 1763,
+   "sha256": "1472036152c0fb9f9036b597621bb08d17ddf5bb6a6f4460bfeb6532ee5014c2"
+  },
+  {
+   "path": "layers/deformation/parker-163D_08317_091313.tif",
+   "bytes": 1832,
+   "sha256": "11a6fe52c3da61d5cb0cc6d2dcffad15ca15f95bc2a2ade2cc4aceac6e95b1af"
+  },
+  {
+   "path": "layers/deformation/pinatubo-032D_07536_111313.tif",
+   "bytes": 4824,
+   "sha256": "d20d493c000222aa4fc6921fcb5edbdcc023f69d3326c2ec2716dafd3de17f9f"
+  },
+  {
+   "path": "layers/deformation/pinatubo-142A_07411_111313.tif",
+   "bytes": 4867,
+   "sha256": "3516280c7e3c3e8c6f74c292cf5e9189272c03a27ba9061d88b18de4d6b29faa"
+  },
+  {
+   "path": "layers/deformation/ragang-069A_08324_101313.tif",
+   "bytes": 3613,
+   "sha256": "56d8a090ecd56eaec498ca7f9be63b0c42f72cacc40fb5eb7802b75617bfe771"
+  },
+  {
+   "path": "layers/deformation/taal-032D_07536_111313.tif",
+   "bytes": 6057,
+   "sha256": "d5f24b491ce3ae33ca1bf79c02eae18fff8f3fb918c0896b7daf31250bcaee06"
+  },
+  {
+   "path": "layers/deformation/taal-142A_07606_131313.tif",
+   "bytes": 5974,
+   "sha256": "4d5be26fd27fb84520f22e2069fce67a853b5cef2f465a1bdaca2462e7defbbf"
+  },
+  {
+   "path": "layers/earthquakes-usgs.pmtiles",
+   "bytes": 3376396,
+   "sha256": "447ffaf57a608fa63cdba4395992a3151ab2d43f07556a487197d727eec17bf5"
+  },
+  {
+   "path": "layers/so2/2018-12.tif",
+   "bytes": 44503,
+   "sha256": "550d39146184c230dca3e2f7925f0386264da4afbb8fd46bc53c230e0cced139"
+  },
+  {
+   "path": "layers/so2/2019-01.tif",
+   "bytes": 45184,
+   "sha256": "9ba7670328461f2eb5b66ef298e86ae7144ca1ca1d4aefd86116fe50cb23b485"
+  },
+  {
+   "path": "layers/so2/2019-02.tif",
+   "bytes": 42011,
+   "sha256": "3672b2a64798dd027346aa26c43d5800fb2852f93a4b25f0a7988add1a8509ed"
+  },
+  {
+   "path": "layers/so2/2019-03.tif",
+   "bytes": 42718,
+   "sha256": "5c9c8650904a478dbbdfd1e785de8ba922cb726e7eb8e7c283a5f6f6aae951a6"
+  },
+  {
+   "path": "layers/so2/2019-04.tif",
+   "bytes": 42664,
+   "sha256": "e11f1bc06ef5298eddb8edba50e5f4f9735f50db390286f79275b8149fdb9843"
+  },
+  {
+   "path": "layers/so2/2019-05.tif",
+   "bytes": 43563,
+   "sha256": "36e0c80cd1a523159eb54f8af11a26ba02ed7e6ec29bfaf20b4db9beaa828c6f"
+  },
+  {
+   "path": "layers/so2/2019-06.tif",
+   "bytes": 43703,
+   "sha256": "bb601a9c05bbab031dc62f6f3511fd2e8541ecc305404c18c43687e4bd497c1e"
+  },
+  {
+   "path": "layers/so2/2019-07.tif",
+   "bytes": 43943,
+   "sha256": "149f22f6caef4b7acf50a4eea35a1f709b8837c9932193c5faa5d91d922ee03c"
+  },
+  {
+   "path": "layers/so2/2019-08.tif",
+   "bytes": 44693,
+   "sha256": "f27ff7642eabc3f54d9f512dafbcdbef6daf4f1853e8c801376d1a8dbc4da119"
+  },
+  {
+   "path": "layers/so2/2019-09.tif",
+   "bytes": 44352,
+   "sha256": "2d0003f9a6846c07aba353c52a0d4698d84e476c8dee4b7d590034faf8bbfe8f"
+  },
+  {
+   "path": "layers/so2/2019-10.tif",
+   "bytes": 43325,
+   "sha256": "9a6d085cd9508465e7e68b02f2a0dcc32d95b03a046fab269b80f5ee223722b1"
+  },
+  {
+   "path": "layers/so2/2019-11.tif",
+   "bytes": 45513,
+   "sha256": "5ceac4c0eb78a544d61b27ffeb177f1093e5c65344f1da5501a2081f13c2fde2"
+  },
+  {
+   "path": "layers/so2/2019-12.tif",
+   "bytes": 45514,
+   "sha256": "73c6d2d433464f3d1dc814bf65e49e6a014577cf83b4ff2b6e654bae2fa754ad"
+  },
+  {
+   "path": "layers/so2/2020-01.tif",
+   "bytes": 46057,
+   "sha256": "cd178df12018be6c201a0d67a3f016f232141e27d51f409e3cbd46860f669924"
+  },
+  {
+   "path": "layers/so2/2020-02.tif",
+   "bytes": 44200,
+   "sha256": "e57479a09ee19b10c42d5b44111115a58ff40a58e9bcf3485372e04a8799b468"
+  },
+  {
+   "path": "layers/so2/2020-03.tif",
+   "bytes": 42738,
+   "sha256": "f440d77603acc9422e595ce8f9242ada272148cb3a774046a772bbd5be4d3165"
+  },
+  {
+   "path": "layers/so2/2020-04.tif",
+   "bytes": 42545,
+   "sha256": "f5a639f8dcc4ad14127ee43b52edc06e48262ba4d1df0bbce7ab6526daacda7d"
+  },
+  {
+   "path": "layers/so2/2020-05.tif",
+   "bytes": 42508,
+   "sha256": "8ec5a622ddc3906fa7311d3873a5e8519bf3724d2a08f2f79e130252cc912bbc"
+  },
+  {
+   "path": "layers/so2/2020-06.tif",
+   "bytes": 43463,
+   "sha256": "72cfe947577adfbcf30967f9aa767559d8527ce7f1264f31f70e18dc92843427"
+  },
+  {
+   "path": "layers/so2/2020-07.tif",
+   "bytes": 44752,
+   "sha256": "9e7f951edd2e6b5d8e9a9de75514ca673128163f3749a8a38902066d06164eb5"
+  },
+  {
+   "path": "layers/so2/2020-08.tif",
+   "bytes": 46217,
+   "sha256": "ba4568d00a910f39281a9bb7720e4a9b98ac7794132407dba62c1f3bc243eef9"
+  },
+  {
+   "path": "layers/so2/2020-09.tif",
+   "bytes": 45364,
+   "sha256": "f8b88d53526fb2ab2dacf161f119bd4417ca251ee81b7e37288c3c4ea4a32d64"
+  },
+  {
+   "path": "layers/so2/2020-10.tif",
+   "bytes": 47256,
+   "sha256": "934f6e43025da4ef11e71cecf2fd789784f35bcf03be6ed54c5b32d4472735ba"
+  },
+  {
+   "path": "layers/so2/2020-11.tif",
+   "bytes": 46013,
+   "sha256": "ed25431758dd14f578d265f399e8425a64f92446266865cae1dfe68e314e0db9"
+  },
+  {
+   "path": "layers/so2/2020-12.tif",
+   "bytes": 47161,
+   "sha256": "9d94813631d7debddd90d48a074875ba537d16d94e8b0ec8d428287d80677ee4"
+  },
+  {
+   "path": "layers/so2/2021-01.tif",
+   "bytes": 47442,
+   "sha256": "e7519fc6e232a5a61878edf2aeba6973b4f07ca9e0458abbd46e4f53e6fcbcdf"
+  },
+  {
+   "path": "layers/so2/2021-02.tif",
+   "bytes": 46534,
+   "sha256": "a59002e31db52a2a30fd6b7a6e331ce9303c9da87e1716c88835304ea36ae368"
+  },
+  {
+   "path": "layers/so2/2021-03.tif",
+   "bytes": 44779,
+   "sha256": "d72e174221b6aabf69ee56c0d9190ea901e3515eaa8539b515743ba60a36c30a"
+  },
+  {
+   "path": "layers/so2/2021-04.tif",
+   "bytes": 44895,
+   "sha256": "67d20c07e59eb18ecad56da9215b98b61792bba16222113b998b303f153139a3"
+  },
+  {
+   "path": "layers/so2/2021-05.tif",
+   "bytes": 43873,
+   "sha256": "b79d4c91562652b32c95b852c3ded088158226e5d33a06b9ce0b3949572f52b5"
+  },
+  {
+   "path": "layers/so2/2021-06.tif",
+   "bytes": 45718,
+   "sha256": "eee2101813e8d956fac834f537751b78197e2e5f0edf8e5a144bde66b20d7d34"
+  },
+  {
+   "path": "layers/so2/2021-07.tif",
+   "bytes": 45618,
+   "sha256": "50d55be32256ed11e513e72c4d932af564478e773853da53d1b570f7d639a3ff"
+  },
+  {
+   "path": "layers/so2/2021-08.tif",
+   "bytes": 46278,
+   "sha256": "04a323993357a15628449335f56c954b40525b216633baed7cfef86598537e34"
+  },
+  {
+   "path": "layers/so2/2021-09.tif",
+   "bytes": 45478,
+   "sha256": "dbaa8a6c15ac2732a41ffd73984693eb3a1e8fb3fed554100d05dd19f907a9ac"
+  },
+  {
+   "path": "layers/so2/2021-10.tif",
+   "bytes": 46335,
+   "sha256": "375a71af52d4d6bfd37ec9eee314ae1c76bd4cf1bc72a92cd27f7d057c728250"
+  },
+  {
+   "path": "layers/so2/2021-11.tif",
+   "bytes": 46895,
+   "sha256": "1606b37f10d232a4c288c4eb7ba808c088f7756856bd2bc5e07d0fb42f149e16"
+  },
+  {
+   "path": "layers/so2/2021-12.tif",
+   "bytes": 47452,
+   "sha256": "796966a59a5881997e61bb97626b6a3a9b38d57d2085bff67a1c87bbff808755"
+  },
+  {
+   "path": "layers/so2/2022-01.tif",
+   "bytes": 46848,
+   "sha256": "f4629c1d5e70b5fdfb2aed235bb2faf4db4e95fc5e89a567f311f06442b8a216"
+  },
+  {
+   "path": "layers/so2/2022-02.tif",
+   "bytes": 46012,
+   "sha256": "f8890fa45a9d03e0f16b67eceb03de87fd1d4edb3bb32db30a0bba0093f7e469"
+  },
+  {
+   "path": "layers/so2/2022-03.tif",
+   "bytes": 45670,
+   "sha256": "53b99ffba551bd42fd678614b5cf185b74657f7d4095d95397ffb5df3ed54f77"
+  },
+  {
+   "path": "layers/so2/2022-04.tif",
+   "bytes": 45299,
+   "sha256": "188138b9bfa0a051cec2ad06281f925e0d1536daae73192b48e478c48d095d7a"
+  },
+  {
+   "path": "layers/so2/2022-05.tif",
+   "bytes": 46527,
+   "sha256": "f310264172b31460c60be6abe6ff765e9d03387d67692cd7e275aa6d9d26ebb0"
+  },
+  {
+   "path": "layers/so2/2022-06.tif",
+   "bytes": 45797,
+   "sha256": "0d4858c5f6f4f85217faeec77a6b0835efdb2134b3ff67609c7d2deccc5487f9"
+  },
+  {
+   "path": "layers/so2/2022-07.tif",
+   "bytes": 46234,
+   "sha256": "7bcbe2ac44f024a30c062df78a1b9d89e58b3a78e6fec15bf9b257acd6fa9d00"
+  },
+  {
+   "path": "layers/so2/2022-08.tif",
+   "bytes": 46412,
+   "sha256": "87d90db5506739e4027d8370775d9227d33cd1de32df44c07b279cc4f9a1f10d"
+  },
+  {
+   "path": "layers/so2/2022-09.tif",
+   "bytes": 45740,
+   "sha256": "b707dea10bc94bc41ffdc8590d07bc6acc6f08730b74d3c43ab27d2195d543e2"
+  },
+  {
+   "path": "layers/so2/2022-10.tif",
+   "bytes": 46016,
+   "sha256": "917f5ff0aac5a0ff0abed93a80d0c6f56be4d08e71f2b76ecef69fd3591545fc"
+  },
+  {
+   "path": "layers/so2/2022-11.tif",
+   "bytes": 45678,
+   "sha256": "9a89148ffa50231d9bb9b4ec30926f71a99c73466ce81f1b13ef73a2ea9356bb"
+  },
+  {
+   "path": "layers/so2/2022-12.tif",
+   "bytes": 47397,
+   "sha256": "1ed7f7470fd1ab1f540181c935ab7e5fb422576eb3b21c9be798bca3997efde6"
+  },
+  {
+   "path": "layers/so2/2023-01.tif",
+   "bytes": 47280,
+   "sha256": "e2a46127d399b3a660aa20edac1f6dd7176db5d85884aca4f3963f5d4b170e5f"
+  },
+  {
+   "path": "layers/so2/2023-02.tif",
+   "bytes": 45738,
+   "sha256": "c21f221364b09fbf8ba60a13dab53540131cde0b7f207619835f28b6ede36e29"
+  },
+  {
+   "path": "layers/so2/2023-03.tif",
+   "bytes": 43865,
+   "sha256": "ab08b3d66460fa35d7e048ab21f4f24af96734e5df0fb81a478347d919a8d947"
+  },
+  {
+   "path": "layers/so2/2023-04.tif",
+   "bytes": 44129,
+   "sha256": "e39b81aa300158458ce2fd0d80aa9d1a38fab6f387acdbfc9e5029c0c4093c89"
+  },
+  {
+   "path": "layers/so2/2023-05.tif",
+   "bytes": 44797,
+   "sha256": "69c157319523a6019e7335ea54b15afcd08821140ad9dccaa8699335bdaf13d6"
+  },
+  {
+   "path": "layers/so2/2023-06.tif",
+   "bytes": 45356,
+   "sha256": "ca4841ad4d4a31d02e2195a8207265666523bbd3736fec04aa12aba58ad93161"
+  },
+  {
+   "path": "layers/so2/2023-07.tif",
+   "bytes": 45552,
+   "sha256": "91568bee8a9ff3614a6a1e64f8dbe08a77abec8815f1867002161c5625a32062"
+  },
+  {
+   "path": "layers/so2/2023-08.tif",
+   "bytes": 44311,
+   "sha256": "795714e4c76893d989d13f6cb3b98c0a7b084cfca03d78ea36532f15281f420e"
+  },
+  {
+   "path": "layers/so2/2023-09.tif",
+   "bytes": 45747,
+   "sha256": "84a36796199c198b05bce14faef78b70d56726cc464cb8e9652e5125f44d8d43"
+  },
+  {
+   "path": "layers/so2/2023-10.tif",
+   "bytes": 45071,
+   "sha256": "b6b30ecdf2fb3ee3f81ba9da86892e30288a8def40c60817c22e9ea0b129af96"
+  },
+  {
+   "path": "layers/so2/2023-11.tif",
+   "bytes": 46106,
+   "sha256": "7dd8901a80b2ece7ddf85e321faf4c6e0b0d14437087529555dd15ce80538feb"
+  },
+  {
+   "path": "layers/so2/2023-12.tif",
+   "bytes": 46017,
+   "sha256": "686fe4bed46b365313b16a1e228e896436bbcf0acb6bce2a940a406ef61a6fcf"
+  },
+  {
+   "path": "layers/so2/2024-01.tif",
+   "bytes": 46405,
+   "sha256": "b8aa062b1f34f22d2ac138e819cb8a399f6f8a5c55853efbd965f82d39f9a41d"
+  },
+  {
+   "path": "layers/so2/2024-02.tif",
+   "bytes": 44415,
+   "sha256": "ddc1a7042a15876ebdf1176aba389b704d7b0f7afe273ca743b6b3db02343091"
+  },
+  {
+   "path": "layers/so2/2024-03.tif",
+   "bytes": 44689,
+   "sha256": "b09641bb519f66d79c52ac6f5c4f64e400bca09a6d18967e04277e5c10737bb9"
+  },
+  {
+   "path": "layers/so2/2024-04.tif",
+   "bytes": 42885,
+   "sha256": "aa3b518682e544518fe9eed5a4d4ae197a44bdf9839c51fdcebdfe19f376ed11"
+  },
+  {
+   "path": "layers/so2/2024-05.tif",
+   "bytes": 45479,
+   "sha256": "a151ba5c155d1895651c5d12d031d0aebed8daabf46e7025de6a3a2979c4059e"
+  },
+  {
+   "path": "layers/so2/2024-06.tif",
+   "bytes": 46112,
+   "sha256": "1980b2d2a015dc2111561849f45ed37dbe799f93a8707089c8313e19b89d504d"
+  },
+  {
+   "path": "layers/so2/2024-07.tif",
+   "bytes": 46822,
+   "sha256": "c9c4653ae98e97c22f62f7751b726a675fa910ea8f4cdb3711c75a4a87b085dc"
+  },
+  {
+   "path": "layers/so2/2024-08.tif",
+   "bytes": 46056,
+   "sha256": "a1a538ab5bea6edc18479172967a0ed2f29496c4b474481cec5710c577cea4a5"
+  },
+  {
+   "path": "layers/so2/2024-09.tif",
+   "bytes": 46312,
+   "sha256": "78d292f3ac673c947b65b34fd943bd84a3109abddefe07cf105d1d9921fd918f"
+  },
+  {
+   "path": "layers/so2/2024-10.tif",
+   "bytes": 46311,
+   "sha256": "b73f06e2b5beaf5ab3e539cd859497dda4263b600300543a95103f61206efed5"
+  },
+  {
+   "path": "layers/so2/2024-11.tif",
+   "bytes": 44795,
+   "sha256": "3920048b7d5d150f2145ba4f06ffe3fdf043939b05b929c09b1ca33711fc0955"
+  },
+  {
+   "path": "layers/so2/2024-12.tif",
+   "bytes": 44779,
+   "sha256": "2391732a261d2cc529acec742b1161e95ac1a4447f8c4c16f8cc381b0745b2a7"
+  },
+  {
+   "path": "layers/so2/2025-01.tif",
+   "bytes": 44374,
+   "sha256": "3c3b6284a45317dda94882fe50fdd08ffea452085533fe3391423ec37acabb95"
+  },
+  {
+   "path": "layers/so2/2025-02.tif",
+   "bytes": 43564,
+   "sha256": "525c68eb6b7d36e6406637afe75a40f7a286346d852a4dd95c92e50309d076db"
+  },
+  {
+   "path": "layers/so2/2025-03.tif",
+   "bytes": 42163,
+   "sha256": "6e78dd6e7101ffcca7322b21e17f914aae74afd1b19c5a79551f18fcbdea55cc"
+  },
+  {
+   "path": "layers/so2/2025-04.tif",
+   "bytes": 41687,
+   "sha256": "136ad12ab49d5419621bb89e4ad6b1a17865a65de28157c5f6dbc61542fa84ef"
+  },
+  {
+   "path": "layers/so2/2025-05.tif",
+   "bytes": 42680,
+   "sha256": "b6b464a99a9a10bee193e422c32a6b816d727cd37d7209cf757b4824cb7d5bbe"
+  },
+  {
+   "path": "layers/so2/2025-06.tif",
+   "bytes": 42907,
+   "sha256": "f38bfdcde7988c7b79f68550d0a76b8a337c3498e7343520638398403456e6b7"
+  },
+  {
+   "path": "layers/so2/2025-07.tif",
+   "bytes": 42601,
+   "sha256": "0c7d6441cd6ca8d57ddf5b16b3a509b495dd043ae5d35efb666e6336847cbb10"
+  },
+  {
+   "path": "layers/so2/2025-08.tif",
+   "bytes": 42919,
+   "sha256": "9b2c611ea574683deb073b477b292ba5fe2784908e44919c30210b3afd48ee34"
+  },
+  {
+   "path": "layers/so2/2025-09.tif",
+   "bytes": 43368,
+   "sha256": "d5ac1a81649430faa8f038978a208aea0f9e006c8befbd155ee2e32319ab1db8"
+  },
+  {
+   "path": "layers/so2/2025-10.tif",
+   "bytes": 42761,
+   "sha256": "2edfb3df96322147d6c713ef35177c7f3c81ec09a46dcdf721f4ff31ed184ad8"
+  },
+  {
+   "path": "layers/so2/2025-11.tif",
+   "bytes": 43359,
+   "sha256": "0449f49314c2e751e5e6e166665086e89446b366eee9dcc6a72fd51cfdd44e63"
+  },
+  {
+   "path": "layers/so2/2025-12.tif",
+   "bytes": 43980,
+   "sha256": "eb4adbca66455944f3ebe3900e1fbd333220462cac3e0c432399550c61de724b"
+  },
+  {
+   "path": "layers/so2/2026-01.tif",
+   "bytes": 43727,
+   "sha256": "8b7f949decfd40ff29024861db157714185182fa120929ec05c5587be00de303"
+  },
+  {
+   "path": "layers/so2/2026-02.tif",
+   "bytes": 42552,
+   "sha256": "e2876aa51ed5a13e45e97d77c9972922cd1d9a54370950ca268271c96e262366"
+  },
+  {
+   "path": "layers/so2/2026-03.tif",
+   "bytes": 41095,
+   "sha256": "548bac8c60c51fa746a95c52999a77f46d14451b7273439263445f3ef452631e"
+  },
+  {
+   "path": "layers/so2/2026-04.tif",
+   "bytes": 38972,
+   "sha256": "f5db5bb9747443bce82b0f337c80cc56e80dd323af69a0769ad8530aaf851ac4"
+  },
+  {
+   "path": "layers/so2/2026-05.tif",
+   "bytes": 41650,
+   "sha256": "3502e188de4e8c12e7facac03bf329984483f5b18ec88c5b6c3d5e006a88d249"
+  },
+  {
+   "path": "layers/so2/2026-06.tif",
+   "bytes": 42823,
+   "sha256": "e4817825d1d601e0920c1e34dad8f16b0bd824cf768eb3873c73b838e3314265"
+  },
+  {
+   "path": "layers/so2/2026-07.tif",
+   "bytes": 42653,
+   "sha256": "c792fbeeb3bdfa8641486748c076c78009427c50627b8a5c703996292c8b6e51"
+  },
+  {
+   "path": "layers/so2/2026-08.tif",
+   "bytes": 42112,
+   "sha256": "5ca88e5d71ec84742688d948efe996e0f2a0d46305166c68fc76a0ca726a7e3f"
+  },
+  {
+   "path": "layers/so2/2026-09.tif",
+   "bytes": 42418,
+   "sha256": "ddd253307529086f5cc9b0ef42da76b93a487d2769bfbec9116326c7aa2d3a91"
+  },
+  {
+   "path": "layers/thermal/2000.pmtiles",
+   "bytes": 27067,
+   "sha256": "df89b5f30526f18748fed2728e6a87e087a33194396c45b6f8b0ea00cfc20dab"
+  },
+  {
+   "path": "layers/thermal/2001.pmtiles",
+   "bytes": 113225,
+   "sha256": "9b8022d798ed9924b0e249818590d9fc931313ae86bea5aa25651240d6aeed2e"
+  },
+  {
+   "path": "layers/thermal/2002.pmtiles",
+   "bytes": 214217,
+   "sha256": "2755503effddd7909e47c13c06ed712d2b0540f9d050732c9543fc3a7e02f712"
+  },
+  {
+   "path": "layers/thermal/2003.pmtiles",
+   "bytes": 346284,
+   "sha256": "061270ab228e55dba4f006751f3b5500ac796c3a85c6f52d5c959deff68b20c9"
+  },
+  {
+   "path": "layers/thermal/2004.pmtiles",
+   "bytes": 336558,
+   "sha256": "8b75e786f847e2d5aec4f0d04a99bfe068524a15d0bc044d1c0adbc333754c04"
+  },
+  {
+   "path": "layers/thermal/2005.pmtiles",
+   "bytes": 371056,
+   "sha256": "a379a71264c0f63478c9922c5bd51d9470f180b4c44e99ef967569a37752314d"
+  },
+  {
+   "path": "layers/thermal/2006.pmtiles",
+   "bytes": 272575,
+   "sha256": "ceb1b5f85d4c5e8d1e066712b6aa28e00dbfe5df89a915aeebc9b3e6ccb19a5a"
+  },
+  {
+   "path": "layers/thermal/2007.pmtiles",
+   "bytes": 310029,
+   "sha256": "25582324d413268fcc7ae45a0661e61057d65e55f03b5385409c749d9e26933f"
+  },
+  {
+   "path": "layers/thermal/2008.pmtiles",
+   "bytes": 193680,
+   "sha256": "9962a5837c94fff5540a26d8093dd5d3e7c3f52f9933b271724b67fb85f7e2fd"
+  },
+  {
+   "path": "layers/thermal/2009.pmtiles",
+   "bytes": 233214,
+   "sha256": "e266cf21a552a4db0471140d6ad6c67971033241cf514ab2be5ee6d20ec1268f"
+  },
+  {
+   "path": "layers/thermal/2010.pmtiles",
+   "bytes": 368350,
+   "sha256": "9983c38a9c3ad5846e29e48f09f2fe2694f81671d743dd77818cd6fe564f95aa"
+  },
+  {
+   "path": "layers/thermal/2011.pmtiles",
+   "bytes": 177617,
+   "sha256": "461709f92713eda9009646b073602243b246f839fa85bdc9100cc720f1be1895"
+  },
+  {
+   "path": "layers/thermal/2012.pmtiles",
+   "bytes": 786298,
+   "sha256": "4f47ebc380fe89a80d33dfb0f530e19c261596f419756b4e9c16f52911df4891"
+  },
+  {
+   "path": "layers/thermal/2013.pmtiles",
+   "bytes": 940476,
+   "sha256": "f311d39adf559bdd4ce400e2db1d8810b09bdd36a973fb0f949745872e4acbee"
+  },
+  {
+   "path": "layers/thermal/2014.pmtiles",
+   "bytes": 1207451,
+   "sha256": "46f5be967ea5b4eef751e7fe9cafe1f8d55bce2f281eea31fac96bb605317754"
+  },
+  {
+   "path": "layers/thermal/2015.pmtiles",
+   "bytes": 1527168,
+   "sha256": "033e0cab8c7f2a61cf3a6eeb677800e35514cfcfcfeaf08de8e39bde14a18cd6"
+  },
+  {
+   "path": "layers/thermal/2016.pmtiles",
+   "bytes": 1582876,
+   "sha256": "0357343ef6e6d4147550eefd42fe0ea888b094ce24d5d629408a039945d27cb7"
+  },
+  {
+   "path": "layers/thermal/2017.pmtiles",
+   "bytes": 728304,
+   "sha256": "b6ac2ef7b801595cfb161e464cd06e67e9bf6dba851becddc158f93241498d12"
+  },
+  {
+   "path": "layers/thermal/2018.pmtiles",
+   "bytes": 1383174,
+   "sha256": "a0f0c2f5746e440f1c1769d29313b55cbe609cc4452c905250809d57fbd44d24"
+  },
+  {
+   "path": "layers/thermal/2019.pmtiles",
+   "bytes": 2302963,
+   "sha256": "fd20782e3ce9debb92b498367b161f358d30b9eab55c3104d6c9dbbab044f63e"
+  },
+  {
+   "path": "layers/thermal/2020.pmtiles",
+   "bytes": 2014037,
+   "sha256": "8bbbf580c2958f652d325fd35a79b7996dc1c4abf7fbbdc630b3b414c5a6ffc2"
+  },
+  {
+   "path": "layers/thermal/2021.pmtiles",
+   "bytes": 1184673,
+   "sha256": "7daf3f17a766d734077c38b60df8d96d2fa252ca15cab9c79e1ff0cd96c5eb66"
+  },
+  {
+   "path": "layers/thermal/2022.pmtiles",
+   "bytes": 918019,
+   "sha256": "4eeeca87055f38bb81602452241de9e30c6e533fed84475f35599cb0381c92da"
+  },
+  {
+   "path": "layers/thermal/2023.pmtiles",
+   "bytes": 1374180,
+   "sha256": "ab8b5403527d72a6550d254cd9059c9f3e518c2935178e76b9e908b5554e0b6b"
+  },
+  {
+   "path": "layers/thermal/2024.pmtiles",
+   "bytes": 2123949,
+   "sha256": "e35e0bfa3621a56cc4f337bbb3c0f7991004b2f155b7e8979032caf5744dc0ba"
+  },
+  {
+   "path": "layers/thermal/2025.pmtiles",
+   "bytes": 838474,
+   "sha256": "6ac13fc125e16959a263106c0e751d163ecd25d953ca4297a6a52dad9f95db3b"
+  },
+  {
+   "path": "layers/thermal/2026.pmtiles",
+   "bytes": 1733636,
+   "sha256": "8735a2526f5958334fb24b4196f489ed295f529f00076c56867707701b445af3"
+  },
+  {
+   "path": "layers.json",
+   "bytes": 10594,
+   "sha256": "eec983247169786e231cdf715175d6a5e07d929308427849c00f595b8606c64d"
+  },
+  {
+   "path": "stories.json",
+   "bytes": 11893,
+   "sha256": "f3e48fb50c30a89c1e94e733212716495ceea2443bff206748a2a49724b9cf14"
+  },
+  {
+   "path": "story/bulusan-2006-03.json",
+   "bytes": 10892,
+   "sha256": "ab8b744fd70cdf445cd086e7f43953d5f7bedfe3b8a8bf628685d39d2a918746"
+  },
+  {
+   "path": "story/bulusan-2016-02.json",
+   "bytes": 9592,
+   "sha256": "48b99b63618d920cca2bc912da0f7dd4db78db8b7603b604a4be25e2cf3f2fc7"
+  },
+  {
+   "path": "story/bulusan-2016-06.json",
+   "bytes": 12452,
+   "sha256": "305434ce28ba77f4a2e7947ca22f577d2205859d42f714a47c165baf13db64e1"
+  },
+  {
+   "path": "story/bulusan-2017.json",
+   "bytes": 9746,
+   "sha256": "4ae361605a63056e022683b89f51d94707dc1bce92afcdb4c22405ddc60e73b4"
+  },
+  {
+   "path": "story/bulusan-2022.json",
+   "bytes": 22354,
+   "sha256": "6fabd0ddbfd8b473fddcceebfdf40a99855650d6c4950af06772636ffaa96b3f"
+  },
+  {
+   "path": "story/bulusan-2025.json",
+   "bytes": 17103,
+   "sha256": "e81c2b2f1d97d710e8aab7e430eacf055ebc6f3c3fc12d88525df00004254f1a"
+  },
+  {
+   "path": "story/drafts/taal-2020.json",
+   "bytes": 35730,
+   "sha256": "9b23594bc37e4520a497b0755b7ac4a0e5a3751be786ad8456f8e31a53d69e7a"
+  },
+  {
+   "path": "story/kanlaon-2015.json",
+   "bytes": 14957,
+   "sha256": "156d7f15e6d3b4d9c4cfc8ed844e4e1d6d3d65f0e1fce526d54dafd236e6183a"
+  },
+  {
+   "path": "story/kanlaon-2017.json",
+   "bytes": 23675,
+   "sha256": "d9a79eeadefc0c32453e806e781b10841ce5b721c7c88d9fe439c37a200cc24e"
+  },
+  {
+   "path": "story/kanlaon-2024-06.json",
+   "bytes": 28660,
+   "sha256": "e31e6630631b6525a5b7b41d2c46863cd73a02b8983dd57e7ca1972d52799441"
+  },
+  {
+   "path": "story/kanlaon-2024-10.json",
+   "bytes": 28186,
+   "sha256": "45b430b89096bd6783236a998b9eab44750f9ff2c9a609efe70553d61326315d"
+  },
+  {
+   "path": "story/mayon-2013.json",
+   "bytes": 8995,
+   "sha256": "755cfa25953043d4c661c89959446cc64dc53b8b35ae371d6569bcd00d045074"
+  },
+  {
+   "path": "story/mayon-2018.json",
+   "bytes": 30265,
+   "sha256": "3dd1f319ccb653d47bed54a72de5a963545d7e58f60ba6de73021d7072d41d0a"
+  },
+  {
+   "path": "story/mayon-2022.json",
+   "bytes": 19839,
+   "sha256": "28ea1a93d00527f4cf786cab17d4ffd25aa7247d551fe1504514042998d83f4e"
+  },
+  {
+   "path": "story/mayon-2023.json",
+   "bytes": 28625,
+   "sha256": "c7a25cc0944d39f84b8a02c73ccc08e527dd78b9e4ea35ae111a1f05ea610645"
+  },
+  {
+   "path": "story/mayon-2024.json",
+   "bytes": 22435,
+   "sha256": "1718cf09ddef96f4d6b4404db8c5a64b0220e07ac469201b9341b242abb5ba52"
+  },
+  {
+   "path": "story/mayon-2026.json",
+   "bytes": 24548,
+   "sha256": "1968ad87b6f7f6b7d37790994613e2dde50200a4c4e09bfd29694e81bae21bfe"
+  },
+  {
+   "path": "story/pinatubo-2021.json",
+   "bytes": 15884,
+   "sha256": "69b622ada9adc31a2b2399804230f5b65f051ea58f31137d3ec752f746c6a974"
+  },
+  {
+   "path": "story/taal-2020.json",
+   "bytes": 12841,
+   "sha256": "b8355ea68aa8e47c2fa20800acf80e87643893586c63d7ccbfe98cce9217fe3f"
+  },
+  {
+   "path": "story/taal-2021.json",
+   "bytes": 30641,
+   "sha256": "b453bbb5fecdeff444d72ceb261878dbba44ac6ac0e835eacdcba7643b3f5775"
+  },
+  {
+   "path": "story/taal-2022.json",
+   "bytes": 26027,
+   "sha256": "5ebb9d78fab4d97e987459267e246a520333fb1abbf49118ab4206f2940d3ca9"
+  },
+  {
+   "path": "story/taal-2024.json",
+   "bytes": 25384,
+   "sha256": "baf2640d6ddfa94dba3119752659d0978c64f1820e5abdce0768344b3ce2bbac"
+  },
+  {
+   "path": "volcano/babuyan-claro.json",
+   "bytes": 138284,
+   "sha256": "b02e983ec0b37e1bc6a18c354db5259afc88a057e92562dd3eaa708437efb82e"
+  },
+  {
+   "path": "volcano/banahaw.json",
+   "bytes": 163389,
+   "sha256": "737cbdedd0e9deefcd8d2c9db96721a481214b4cc735f2d57a764762bc3eb15e"
+  },
+  {
+   "path": "volcano/biliran.json",
+   "bytes": 151449,
+   "sha256": "e7c68ba6e0ac9e7a7159fa094a78d6ae2bb0c3ecc5a6f97535a245ffb6ce5edd"
+  },
+  {
+   "path": "volcano/bud-dajo.json",
+   "bytes": 154502,
+   "sha256": "cdd0bb81ede567e2810d4d4e7c38eda0b86f59acd0bc58692d8627200bf2a7c3"
+  },
+  {
+   "path": "volcano/bulusan.json",
+   "bytes": 550109,
+   "sha256": "913c897d18a84791896d60eef775bc247168b5c05f3a078604ab7783ffd2dc98"
+  },
+  {
+   "path": "volcano/cabalian.json",
+   "bytes": 137429,
+   "sha256": "d12eebdc06494ba8bd1764d4d9ccf93e4ecfbc90248df2353b614f090f293cfa"
+  },
+  {
+   "path": "volcano/cagua.json",
+   "bytes": 140408,
+   "sha256": "260682f87f2de54909413f6db73ec394839f3595061db32245a703a6f65fff05"
+  },
+  {
+   "path": "volcano/camiguin-de-babuyanes.json",
+   "bytes": 133758,
+   "sha256": "c7938808b6dd1287b70a87df4eee54d1781421e8d4dc5979aa1a92549b45b789"
+  },
+  {
+   "path": "volcano/didicas.json",
+   "bytes": 132255,
+   "sha256": "9b6d5f5981f5ad2e39b86a2482dd3e6ae737b4c6002ba889372c5c46e547a901"
+  },
+  {
+   "path": "volcano/hibok-hibok.json",
+   "bytes": 134447,
+   "sha256": "f6eb18a72b4acc0313deccad6b8955496d514be187ec6380b8e58d7568466686"
+  },
+  {
+   "path": "volcano/iraya.json",
+   "bytes": 132504,
+   "sha256": "24a711fdef327f0542ea4650c3dc5b957f99c9bffcbe90af2d64b013953f7497"
+  },
+  {
+   "path": "volcano/iriga.json",
+   "bytes": 158145,
+   "sha256": "d3d399541a863d925b65166084f6326073db06d9e051241ef83c3223cdd373b8"
+  },
+  {
+   "path": "volcano/isarog.json",
+   "bytes": 162049,
+   "sha256": "c8f5f3f0391be3f8dcbb9c396c0e1b8afe4ae0dc5a2a4427a76115bd9cee21b6"
+  },
+  {
+   "path": "volcano/kanlaon.json",
+   "bytes": 947936,
+   "sha256": "e4dce24184c63da234548efd9763937950b87dd487991322978f7ed6385fddac"
+  },
+  {
+   "path": "volcano/leonard-kniaseff.json",
+   "bytes": 153513,
+   "sha256": "6b2f2f21b40cc83a1957ad0454565ea8d3682cfefd0b2a3b45e807fb287e28bc"
+  },
+  {
+   "path": "volcano/makaturing.json",
+   "bytes": 139660,
+   "sha256": "d42bc4d99c1c828f8a32bc550337ec505bcd7be770997b32b150f86aa2b2df26"
+  },
+  {
+   "path": "volcano/matutum.json",
+   "bytes": 165612,
+   "sha256": "7880d8e92fe9c1f48201612dc65c96b70e02fa132a99bf989a1770f35ee237d7"
+  },
+  {
+   "path": "volcano/mayon.json",
+   "bytes": 1127591,
+   "sha256": "1b9c6c359748f459f05ab49364a60f7d6e26e33a4faeb48409463eaf80ccb1cb"
+  },
+  {
+   "path": "volcano/musuan.json",
+   "bytes": 168664,
+   "sha256": "b17681bbe7b1e5b6f50d6f130594389000a654380c1907428bad14a476f01b2b"
+  },
+  {
+   "path": "volcano/parker.json",
+   "bytes": 167993,
+   "sha256": "be9a69ddca074100f378d5cff27c8103ab0df6030893145b655f1c8bcae5e517"
+  },
+  {
+   "path": "volcano/pinatubo.json",
+   "bytes": 233900,
+   "sha256": "a0375b001643b0bafb4d3b3a35b04d4e54e5bc0a172ff7e9981560e79cc06873"
+  },
+  {
+   "path": "volcano/ragang.json",
+   "bytes": 147712,
+   "sha256": "a4823ce0a5c4e401771b4f5da1e96bbd01a6d961b815ca2668c8b98f65ec326e"
+  },
+  {
+   "path": "volcano/smith.json",
+   "bytes": 136652,
+   "sha256": "cd2fee15b833a387a346a8aa3f446a29679a797fa2980546338dcf1dc01bf93d"
+  },
+  {
+   "path": "volcano/taal.json",
+   "bytes": 997054,
+   "sha256": "0432fc2212799279090c208525d5cea2bbff9cce1b478b726a42e0b84609f414"
+  },
+  {
+   "path": "volcanoes.geojson",
+   "bytes": 9203,
+   "sha256": "eb79de363a3de4ce43746684b11ad2b387bf5909bf1e0f4bab8ff4f91ce795c4"
+  }
+ ],
+ "checks": {
+  "passed": true,
+  "results": [
+   {
+    "check": "schema deeptime.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema layers.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema stories.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/bulusan-2006-03.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/bulusan-2016-02.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/bulusan-2016-06.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/bulusan-2017.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/bulusan-2022.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/bulusan-2025.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/drafts/taal-2020.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/kanlaon-2015.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/kanlaon-2017.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/kanlaon-2024-06.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/kanlaon-2024-10.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/mayon-2013.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/mayon-2018.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/mayon-2022.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/mayon-2023.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/mayon-2024.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/mayon-2026.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/pinatubo-2021.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/taal-2020.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/taal-2021.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/taal-2022.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema story/taal-2024.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/babuyan-claro.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/banahaw.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/biliran.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/bud-dajo.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/bulusan.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/cabalian.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/cagua.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/camiguin-de-babuyanes.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/didicas.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/hibok-hibok.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/iraya.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/iriga.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/isarog.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/kanlaon.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/leonard-kniaseff.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/makaturing.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/matutum.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/mayon.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/musuan.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/parker.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/pinatubo.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/ragang.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/smith.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcano/taal.json",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "schema volcanoes.geojson",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "24 volcanoes in the crosswalk",
+    "passed": true,
+    "detail": "24"
+   },
+   {
+    "check": "USGS earthquakes: not empty",
+    "passed": true,
+    "detail": "27335"
+   },
+   {
+    "check": "GVP eruptions: not empty",
+    "passed": true,
+    "detail": "233"
+   },
+   {
+    "check": "HazEL events: not empty",
+    "passed": true,
+    "detail": "50"
+   },
+   {
+    "check": "thermal detections: one tileset per year 2000 onward",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "thermal detections: no year without any detection at the end",
+    "passed": true,
+    "detail": "",
+    "severity": "warning"
+   },
+   {
+    "check": "GVP lists 23 Philippine volcanoes",
+    "passed": true,
+    "detail": "23",
+    "severity": "warning"
+   },
+   {
+    "check": "GVP eruptions within bounds",
+    "passed": true,
+    "detail": "233"
+   },
+   {
+    "check": "babuyan-claro: size under 150 kB gzip",
+    "passed": true,
+    "detail": "39.6 kB"
+   },
+   {
+    "check": "banahaw: size under 150 kB gzip",
+    "passed": true,
+    "detail": "46.2 kB"
+   },
+   {
+    "check": "biliran: size under 150 kB gzip",
+    "passed": true,
+    "detail": "44.9 kB"
+   },
+   {
+    "check": "bud-dajo: size under 150 kB gzip",
+    "passed": true,
+    "detail": "45.8 kB"
+   },
+   {
+    "check": "bulusan: one bulletin row a day",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "bulusan: every bulletins row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "bulusan: every advisories row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "bulusan: size under 150 kB gzip",
+    "passed": true,
+    "detail": "66.9 kB"
+   },
+   {
+    "check": "cabalian: size under 150 kB gzip",
+    "passed": true,
+    "detail": "40.5 kB"
+   },
+   {
+    "check": "cagua: size under 150 kB gzip",
+    "passed": true,
+    "detail": "38.1 kB"
+   },
+   {
+    "check": "camiguin-de-babuyanes: size under 150 kB gzip",
+    "passed": true,
+    "detail": "38.4 kB"
+   },
+   {
+    "check": "didicas: size under 150 kB gzip",
+    "passed": true,
+    "detail": "36.3 kB"
+   },
+   {
+    "check": "hibok-hibok: size under 150 kB gzip",
+    "passed": true,
+    "detail": "41.4 kB"
+   },
+   {
+    "check": "iraya: size under 150 kB gzip",
+    "passed": true,
+    "detail": "36.4 kB"
+   },
+   {
+    "check": "iriga: size under 150 kB gzip",
+    "passed": true,
+    "detail": "45.5 kB"
+   },
+   {
+    "check": "isarog: size under 150 kB gzip",
+    "passed": true,
+    "detail": "46.4 kB"
+   },
+   {
+    "check": "kanlaon: one bulletin row a day",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "kanlaon: every bulletins row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "kanlaon: every advisories row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "kanlaon: size under 150 kB gzip",
+    "passed": true,
+    "detail": "106.9 kB"
+   },
+   {
+    "check": "leonard-kniaseff: size under 150 kB gzip",
+    "passed": true,
+    "detail": "43.0 kB"
+   },
+   {
+    "check": "makaturing: size under 150 kB gzip",
+    "passed": true,
+    "detail": "38.5 kB"
+   },
+   {
+    "check": "matutum: size under 150 kB gzip",
+    "passed": true,
+    "detail": "46.5 kB"
+   },
+   {
+    "check": "mayon: one bulletin row a day",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "mayon: every bulletins row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "mayon: every advisories row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "mayon: size under 150 kB gzip",
+    "passed": true,
+    "detail": "126.9 kB"
+   },
+   {
+    "check": "musuan: size under 150 kB gzip",
+    "passed": true,
+    "detail": "47.6 kB"
+   },
+   {
+    "check": "parker: size under 150 kB gzip",
+    "passed": true,
+    "detail": "46.4 kB"
+   },
+   {
+    "check": "pinatubo: one bulletin row a day",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "pinatubo: every bulletins row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "pinatubo: every advisories row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "pinatubo: size under 150 kB gzip",
+    "passed": true,
+    "detail": "60.2 kB"
+   },
+   {
+    "check": "ragang: size under 150 kB gzip",
+    "passed": true,
+    "detail": "41.1 kB"
+   },
+   {
+    "check": "smith: size under 150 kB gzip",
+    "passed": true,
+    "detail": "39.2 kB"
+   },
+   {
+    "check": "taal: one bulletin row a day",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "taal: every bulletins row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "taal: every advisories row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "taal: every displacement row links its source",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "taal: size under 150 kB gzip",
+    "passed": true,
+    "detail": "121.9 kB"
+   },
+   {
+    "check": "Taal 2020-01-12: GVP VEI 4",
+    "passed": true,
+    "detail": "",
+    "severity": "warning"
+   },
+   {
+    "check": "Taal 2020-01-12: MSVOLSO2L4 170 kt",
+    "passed": true,
+    "detail": "",
+    "severity": "warning"
+   },
+   {
+    "check": "Taal 2020-01-12: VAAC observed FL550",
+    "passed": true,
+    "detail": "",
+    "severity": "warning"
+   },
+   {
+    "check": "Taal 2020-01-13: TROPOMI SO2 > 20x the December median",
+    "passed": true,
+    "detail": "6218 vs 25"
+   },
+   {
+    "check": "Kanlaon 2024-06-03 eruption present",
+    "passed": true,
+    "detail": "",
+    "severity": "warning"
+   },
+   {
+    "check": "Taal 2020-01-13 bulletin: alert level 4",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "Taal 2020-01-12 bulletin (7:30 PM, a notice of change): alert level 4",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story: no English words, ISO dates or half-width brackets left in the Japanese text",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story: every step reviewed",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "Taal reading: reviewed, Japanese text clean",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "taal: at least 1,500 bulletin days (2017-09 onward)",
+    "passed": true,
+    "detail": "2760"
+   },
+   {
+    "check": "mayon: at least 1,500 bulletin days (2017-09 onward)",
+    "passed": true,
+    "detail": "2907"
+   },
+   {
+    "check": "kanlaon: at least 1,500 bulletin days (2017-09 onward)",
+    "passed": true,
+    "detail": "2988"
+   },
+   {
+    "check": "bulusan: at least 1,500 bulletin days (2017-09 onward)",
+    "passed": true,
+    "detail": "1822"
+   },
+   {
+    "check": "Taal WorldPop 2020 within 14 km about 318,000",
+    "passed": true,
+    "detail": "322735",
+    "severity": "warning"
+   },
+   {
+    "check": "deep time: 24 volcanoes",
+    "passed": true,
+    "detail": "24"
+   },
+   {
+    "check": "deep time: taal 1911: a GVP eruption carries HazEL deaths 1335",
+    "passed": true,
+    "detail": "1335"
+   },
+   {
+    "check": "deep time: taal 1965: a GVP eruption carries HazEL deaths 355",
+    "passed": true,
+    "detail": "355"
+   },
+   {
+    "check": "deep time: mayon 1814: a GVP eruption carries HazEL deaths 1200",
+    "passed": true,
+    "detail": "1200"
+   },
+   {
+    "check": "deep time: mayon 1993: a GVP eruption carries HazEL deaths 75",
+    "passed": true,
+    "detail": "75"
+   },
+   {
+    "check": "deep time: pinatubo 1991: a GVP eruption carries HazEL deaths 350",
+    "passed": true,
+    "detail": "350"
+   },
+   {
+    "check": "deep time: hibok-hibok 1951: a GVP eruption carries HazEL deaths 500",
+    "passed": true,
+    "detail": "500"
+   },
+   {
+    "check": "deep time: at least 40 HazEL events placed",
+    "passed": true,
+    "detail": "49"
+   },
+   {
+    "check": "deep time: file under 100 kB",
+    "passed": true,
+    "detail": "59.8 kB"
+   },
+   {
+    "check": "story bulusan-2006-03",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story bulusan-2006-10",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story bulusan-2010",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story bulusan-2015",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story bulusan-2016-02",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story bulusan-2016-06",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story bulusan-2017",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story bulusan-2022",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story bulusan-2025",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story kanlaon-2002",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story kanlaon-2003",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story kanlaon-2005",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story kanlaon-2006",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story kanlaon-2015",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story kanlaon-2017",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story kanlaon-2024-06",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story kanlaon-2024-10",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2000",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2001",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2002",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2003-03",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2003-10",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2004",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2005",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2006-02",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2006-07",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2008",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2009",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2013",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2014",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2018",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2022",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2023",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2024",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story mayon-2026",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story pinatubo-2021",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story taal-2020",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story taal-2021",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story taal-2022",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "story taal-2024",
+    "passed": true,
+    "detail": ""
+   },
+   {
+    "check": "previously public stories stay public, or leave with a data-driven reason",
+    "passed": true,
+    "detail": "19 kept"
+   },
+   {
+    "check": "stories.json schema",
+    "passed": true,
+    "detail": ""
+   }
+  ],
+  "counts": {
+   "USGS earthquakes": 27335,
+   "GVP eruptions": 233,
+   "HazEL events": 50
+  }
+ },
+ "earthEngineUsage": {
+  "months": {
+   "2026-10": 36091.6
+  },
+  "runs": [
+   {
+    "date": "2026-10-22",
+    "label": "so2 2020-01..2020-01",
+    "eecu_s": 87.4,
+    "calls": 1
+   },
+   {
+    "date": "2026-10-22",
+    "label": "so2 2018-12..2026-09",
+    "eecu_s": 8197.2,
+    "calls": 93
+   },
+   {
+    "date": "2026-10-22",
+    "label": "fire 2020-01..2020-01",
+    "eecu_s": 64.2,
+    "calls": 1
+   },
+   {
+    "date": "2026-10-22",
+    "label": "exposure",
+    "eecu_s": 38.9,
+    "calls": 5
+   },
+   {
+    "date": "2026-10-22",
+    "label": "thumbs-taal",
+    "eecu_s": 0.0,
+    "calls": 3,
+    "note": "getThumbURL rendering is not profiled"
+   },
+   {
+    "date": "2026-10-22",
+    "label": "fire 2000-11..2012-12",
+    "eecu_s": 5255.8,
+    "calls": 146
+   },
+   {
+    "date": "2026-10-22",
+    "label": "fire 2013-01..2026-09",
+    "eecu_s": 8724.9,
+    "calls": 164
+   },
+   {
+    "date": "2026-10-22",
+    "label": "run-a canary ..",
+    "eecu_s": 248.4,
+    "calls": 4
+   },
+   {
+    "date": "2026-10-22",
+    "label": "run-a laketemp 2000..2026",
+    "eecu_s": 62.3,
+    "calls": 26
+   },
+   {
+    "date": "2026-10-22",
+    "label": "run-a lakes2 2017..2026",
+    "eecu_s": 1089.7,
+    "calls": 9
+   },
+   {
+    "date": "2026-10-22",
+    "label": "run B rain canary 2020-01",
+    "eecu_s": 19.5,
+    "calls": 1
+   },
+   {
+    "date": "2026-10-22",
+    "label": "run B so2-map canary 2020-01",
+    "eecu_s": 5.8,
+    "calls": 1
+   },
+   {
+    "date": "2026-10-22",
+    "label": "run B so2-map 2018-12..2026-09",
+    "eecu_s": 477.9,
+    "calls": 93
+   },
+   {
+    "date": "2026-10-23",
+    "label": "run-a uvai ..",
+    "eecu_s": 3824.5,
+    "calls": 76
+   },
+   {
+    "date": "2026-10-23",
+    "label": "run-a imagery check before",
+    "eecu_s": 0.0,
+    "calls": 0
+   },
+   {
+    "date": "2026-10-23",
+    "label": "run-a water-test rules check",
+    "eecu_s": 4.9,
+    "calls": 1
+   },
+   {
+    "date": "2026-10-23",
+    "label": "run-a water-test rules check",
+    "eecu_s": 6.1,
+    "calls": 1
+   },
+   {
+    "date": "2026-10-23",
+    "label": "run-a water-test pixel sample",
+    "eecu_s": 2.1,
+    "calls": 1
+   },
+   {
+    "date": "2026-10-23",
+    "label": "run-a imagery check after",
+    "eecu_s": 0.0,
+    "calls": 0
+   },
+   {
+    "date": "2026-10-23",
+    "label": "run-a lakes2 2017..2026",
+    "eecu_s": 1721.7,
+    "calls": 10
+   },
+   {
+    "date": "2026-10-23",
+    "label": "run B rain 2000-01..2025-09",
+    "eecu_s": 5992.4,
+    "calls": 308
+   },
+   {
+    "date": "2026-10-23",
+    "label": "fire 2026-05..2026-09",
+    "eecu_s": 267.9,
+    "calls": 10
+   },
+   {
+    "id": "289a79c44f96",
+    "date": "2026-10-23",
+    "label": "so2 ..2026-09",
+    "eecu_s": 0.0,
+    "calls": 0
+   },
+   {
+    "id": "d6efa92908b0",
+    "date": "2026-10-23",
+    "label": "fire 2013-01..2026-09",
+    "eecu_s": 0.0,
+    "calls": 0
+   }
+  ]
+ }
+}
