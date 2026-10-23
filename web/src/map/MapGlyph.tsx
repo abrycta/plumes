@@ -9,9 +9,9 @@ export function MapGlyph() {
       aria-hidden="true"
       lang="ja"
       data-testid="map-glyph"
-      className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-muted font-heading text-[clamp(40px,7vw,64px)] leading-none font-bold text-muted-foreground"
+      className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-muted font-heading text-[clamp(40px,7vw,64px)] leading-none font-bold whitespace-nowrap text-muted-foreground"
     >
-      噴
+      {__NAME_JA__}
     </div>
   );
 }
