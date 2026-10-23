@@ -168,7 +168,8 @@ export default function InteractiveMap({ index, styleUrl, coastUrl, data, show =
         type: "circle",
         source: "thermal",
         paint: {
-          "circle-radius": ["*", k, ["interpolate", ["linear"], ["zoom"], 5, ["case", ["==", ["get", "near"], 1], 2.5, 1.4], 10, ["case", ["==", ["get", "near"], 1], 5, 3]]],
+          // "zoom" may only drive a top-level interpolate: the embed scale goes inside each stop.
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, ["*", k, ["case", ["==", ["get", "near"], 1], 2.5, 1.4]], 10, ["*", k, ["case", ["==", ["get", "near"], 1], 5, 3]]],
           "circle-opacity": ["case", ["==", ["get", "near"], 1], 0.9, 0.5],
           "circle-stroke-width": ["case", ["==", ["get", "near"], 1], 0.75 * k, 0.5 * k],
         },
