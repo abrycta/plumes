@@ -33,3 +33,11 @@ def test_gvp_drift_warns_but_a_wrong_file_is_rejected(tmp_path, monkeypatch):
     assert sources.check_gvp_volcanoes(wfs, {}) == []  # one renumbered: drift
     wfs.write_text("Volcano_Number\n273010\n")
     assert sources.check_gvp_volcanoes(wfs, {}) != []
+
+
+def test_wp_slugs_match_after_2029():
+    from plumes.crawl import wp
+
+    assert wp.wanted("https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-14-march-2031/")
+    assert wp.wanted("https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-13-january-2020/")
+    assert not wp.wanted("https://www.phivolcs.dost.gov.ph/taal-volcano-bulletin-13-january-2016/")

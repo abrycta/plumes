@@ -30,7 +30,7 @@ def wanted(url: str) -> bool:
     slug = url.rstrip("/").rsplit("/", 1)[-1]
     if not re.search(VOLCANO, slug) or not re.search(KIND, slug) or re.search(FILIPINO, slug) or "summary" in slug:
         return False
-    years = re.findall(r"(20[12]\d)", slug)
+    years = re.findall(r"(20\d\d)", slug)  # any 20xx year, so the crawl keeps matching from 2030 (audit L3)
     return bool(years) and int(years[-1]) >= 2017
 
 

@@ -522,7 +522,7 @@ def run_checks(site_v, vols: list[dict], models: dict, gvp_v: list, gvp_e: list)
     last = int(json.loads((site_v / "layers.json").read_text())["dataAsOf"][:4]) - 1
     missing = sorted({str(y) for y in range(2000, last + 1)} - years)
     check("thermal detections: one tileset per year 2000 onward", not missing, ",".join(missing))
-    check("GVP lists 23 Philippine volcanoes", len(gvp_v) == 23, str(len(gvp_v)))
+    check("GVP lists 23 Philippine volcanoes", len(gvp_v) == 23, str(len(gvp_v)), warn=True)  # GVP can add, merge or renumber; the registry's row bounds gate the file
     check("GVP eruptions within bounds", 200 <= len(gvp_e) <= 400, str(len(gvp_e)))
     for vid, m in models.items():
         if m.get("bulletins"):
