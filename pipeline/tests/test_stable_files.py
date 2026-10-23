@@ -27,7 +27,7 @@ def test_a_local_path_in_pmtiles_metadata_is_found(tmp_path):
     assert list(leaks.scan(tmp_path)) == ["layers/bad.pmtiles"]
 
 
-@pytest.mark.parametrize("text", ["/Users/someone/plumes/x.csv", "/home/runner/work/plumes/a", "C:\\Users\\me\\x", "/tmp/claude-501/x"])
+@pytest.mark.parametrize("text", ["/Users/someone/plumes/x.csv", "/home/runner/work/plumes/a", "C:\\Users\\me\\x", "/tmp/build/x"])
 def test_a_local_path_in_a_text_file_is_found(tmp_path, text):
     (tmp_path / "a.json").write_text(json.dumps({"source": text}))
     assert leaks.scan(tmp_path)

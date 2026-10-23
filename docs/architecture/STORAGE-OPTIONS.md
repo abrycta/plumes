@@ -24,7 +24,7 @@ From v4 to v5 and v5 to v6, **77 of 197 files (33.4 of 38.3 MiB, 87 %) changed**
 
 - **Every pmtiles file (28 files, ~26 MiB)**: the tile data is byte-identical between versions; only the embedded
   metadata differs, because tippecanoe's default `name` and `description` are the output path, which contains
-  `.../site/v6/...`. (The path is also an absolute local build path, `/private/tmp/claude-501/...`, published in
+  `.../site/v6/...`. (The path is also an absolute local build path, `/tmp/build/...`, published in
   every tile file: a small leak worth fixing on its own.) `readmodels.py:486,510` call tippecanoe without `-n`/`-N`.
 - **Every JSON body (49 files, ~7 MiB)**: `dataVersion` and `generatedAt` are stamped into each file
   (`manifest.json`, `layers.json`, `stories.json`, `deeptime.json`, 24 volcano files, 20 stories,
