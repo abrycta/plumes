@@ -263,6 +263,8 @@ Today's Taal "crater" step text ("the main crater lake on Volcano Island drained
 
 ### B6. Review flow (draft → reviewed)
 
+> Superseded on 2026-10-23 by DECISIONS ST15: there is no manual review; a story publishes when the automated checks pass.
+
 1. The generator writes every story with every step at `status: draft`.
 2. `pipeline/stories/review.yaml` records reviews:
    - one entry per story and step, holding the SHA-256 of the step's rendered `en` + `ja` + figures, the reviewer and the date;

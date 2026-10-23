@@ -4,6 +4,11 @@ Overlapping GVP eruptions and PHIVOLCS alert windows at one volcano merge into o
 union of the episodes' spans; its title uses the earliest start. Steps are fixed windows: before (start − 90 d →
 start − 1 d), onset (start → start + 6 d), course (start + 7 d → end, dropped if empty) and after (90 days from the
 day after the end, or after the onset for a short event). Windows never reach into a neighbouring event at the same volcano.
+
+An alert window still running at the end of the data (its last bulletin within MERGE_GAP_DAYS of the data's date) is
+taken to last OPEN_ALERT_DAYS from its start, as an open GVP episode is taken to last OPEN_GVP_DAYS (DECISIONS ST15):
+filling a bulletin gap or a level that stays raised for years never stretches an event, and a later eruption is never
+pulled into an earlier event through a window that is still open.
 """
 
 from __future__ import annotations
@@ -14,6 +19,7 @@ import datetime as dt
 SINCE = "2000-01-01"
 MERGE_GAP_DAYS = 7  # the same gap the alert windows are merged across (readmodels.episodes_for)
 OPEN_GVP_DAYS = 30  # an open-ended GVP episode is taken to end 30 days after its start (§A2)
+OPEN_ALERT_DAYS = 90  # an alert window still open at the end of the data is taken to end 90 days after its start (ST15)
 BEFORE_DAYS, ONSET_DAYS, AFTER_DAYS = 90, 7, 90
 KINDS = ("before", "onset", "course", "after")
 
@@ -49,17 +55,19 @@ class Event:
         return not self.eruptions
 
 
-def episode_span(e: dict) -> tuple[str, str] | None:
+def episode_span(e: dict, as_of: str | None = None) -> tuple[str, str] | None:
     if not full(e.get("start")) or e["start"] < SINCE:
         return None
     end = e.get("end")
     if not full(end):
         end = add(e["start"], OPEN_GVP_DAYS)
+    elif e["kind"] == "alert_window" and as_of and end >= add(as_of, -MERGE_GAP_DAYS):
+        end = min(end, add(e["start"], OPEN_ALERT_DAYS - 1))
     return e["start"], max(end, e["start"])
 
 
 def merge(vid: str, episodes: list[dict], as_of: str) -> list[Event]:
-    spans = sorted(((s, en, e) for e in episodes if (sp := episode_span(e)) for s, en in [sp]), key=lambda x: (x[0], x[1]))
+    spans = sorted(((s, en, e) for e in episodes if (sp := episode_span(e, as_of)) for s, en in [sp]), key=lambda x: (x[0], x[1]))
     events: list[Event] = []
     for s, en, e in spans:
         cur = events[-1] if events else None
