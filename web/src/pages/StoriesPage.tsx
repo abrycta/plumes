@@ -27,6 +27,9 @@ export default function StoriesPage() {
   const t = useT();
   const { preview } = useUrlState();
   const entries = storyRefs(use(loadStoriesIndex()), Boolean(preview));
+  // Ask for every card's file at once (the promises are cached). Otherwise each card's use() suspends before the next
+  // card renders, so on an in-app visit the files load one after another: 19 round trips of blank page on a phone.
+  for (const s of entries) void loadStoryFile(s.file).catch(() => {});
   useEffect(() => {
     document.title = `${t("Stories", "ストーリー")} · Plumes`;
   }, [t]);

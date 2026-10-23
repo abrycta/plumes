@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs Playwright's OS packages and (on a browser-cache miss) its Chromium, bounded so a stalled apt mirror or
+# Installs Playwright's OS packages and (on a browser-cache miss) its Chromium and WebKit, bounded so a stalled apt mirror or
 # download fails in minutes with a clear error instead of using up the job.
 #
 # Usage: playwright-install.sh <playwright version> <cache-hit: true|false>
@@ -56,7 +56,7 @@ if compgen -G "$debs/*.deb" >/dev/null; then
   sudo cp "$debs"/*.deb /var/cache/apt/archives/
 fi
 start=$SECONDS
-bounded "OS packages (apt)" root "${pw[@]}" install-deps chromium
+bounded "OS packages (apt)" root "${pw[@]}" install-deps chromium webkit
 echo "OS packages installed in $((SECONDS - start)) s."
 mkdir -p "$debs"
 cp /var/cache/apt/archives/*.deb "$debs"/ 2>/dev/null || true
@@ -65,6 +65,6 @@ if [ "$cache_hit" = true ]; then
   echo "Playwright $version browser restored from cache: no download."
 else
   start=$SECONDS
-  bounded "Browser download" user "${pw[@]}" install chromium
+  bounded "Browser download" user "${pw[@]}" install chromium webkit
   echo "Browser downloaded in $((SECONDS - start)) s."
 fi
