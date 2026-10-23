@@ -207,7 +207,7 @@ sources:
         archive: true
     checks:
       bytes: { min: 1500000, max: 20000000 }
-      rows: { min: 10000, max: 20000 }
+      rows: { min: 10000, max: 18000 }             # USGS truncates at 20,000: the gate forces the yearly split first (audit L2)
       required_columns: [time, latitude, longitude, depth, mag, magType, id, place, type, status]
       shrink_tolerance: 0.02
       profile: { key: id, numeric: [latitude, longitude, depth, mag] }

@@ -152,11 +152,11 @@ function StoryView({ story }: { story: Story }) {
     >
       {story.status === "draft" ? (
         <Alert data-story-draft>
-          <AlertTitle>{t("Draft, not yet reviewed", "下書き（未レビュー）")}</AlertTitle>
+          <AlertTitle>{t("Draft, not yet public", "下書き（非公開）")}</AlertTitle>
           <AlertDescription>
             {t(
-              "Generated from the data with fixed sentence templates. It is shown only with the preview link until Kurt has reviewed it.",
-              "データから固定の文型で生成した下書きです。レビューが済むまで、プレビュー用のリンクでのみ表示されます。",
+              "Generated from the data with fixed sentence templates. It is shown only with the preview link until it passes the automated checks.",
+              "データから固定の文型で生成した下書きです。自動チェックに合格するまで、プレビュー用のリンクでのみ表示されます。",
             )}
           </AlertDescription>
         </Alert>
