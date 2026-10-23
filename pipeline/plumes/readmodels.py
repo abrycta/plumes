@@ -27,6 +27,7 @@ from plumes.contracts import errors
 from plumes.crawl.records import Records
 from plumes.parse import parse_lava, parse_vaac, parse_wp, wp_slug_meta
 from plumes.paths import BUILD, CROSSWALK, EE_LEDGER, RAW, REGISTRY, TABLES
+from plumes.stories import previous as previous_stories
 from plumes.stories.generate import generate as generate_stories
 from plumes.stories.text import date_en, date_ja, fl_gloss, ja_leftovers, neg, share_txt  # noqa: F401 (moved there, STORIES-PLAN §B8)
 
@@ -636,7 +637,9 @@ def build(version: int, as_of: str) -> dict:
     layers = [x for x in (thermal_layers(v_dir, as_of), quake_layer(v_dir, usgs), so2_map, defo_layer) if x]
     (v_dir / "layers.json").write_text(json.dumps({**hdr, "kind": "layers", "layers": layers}, ensure_ascii=False))
     deep_checks = deeptime.write(v_dir, hdr, vols, gvp_e, RAW / "hazel" / f"{deeptime.SOURCE_ID}.json", provenance([deeptime.GVP_ID, deeptime.SOURCE_ID], fprov))
-    story_checks = generate_stories(v_dir)["checks"]  # generated drafts (story/drafts/) and stories.json; hidden until reviewed (ST1)
+    # stories that pass the automated checks, and stories.json; the published version's stories keep their ids (ST15)
+    gen = generate_stories(v_dir, previous=previous_stories.load())
+    story_checks = gen["checks"]
     checks = run_checks(v_dir, vols, models, gvp_v, gvp_e) + deep_checks + story_checks
     passed = all(c["passed"] for c in checks)
     files = [{"path": str(p.relative_to(v_dir)), "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
@@ -650,7 +653,7 @@ def build(version: int, as_of: str) -> dict:
                                                        "generatedAt": hdr["generatedAt"], "previous": f"v{version - 1}" if version > 1 else None,
                                                        "mirrors": ["https://krtmtthw.dev/plumes/data/", "https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/"]}, indent=1))
     return {"version": version, "passed": passed, "failed": [c for c in checks if not c["passed"]], "files": len(files),
-            "bytes": sum(f["bytes"] for f in files)}
+            "bytes": sum(f["bytes"] for f in files), "storiesLeft": gen["left"]}
 
 
 if __name__ == "__main__":
@@ -658,4 +661,7 @@ if __name__ == "__main__":
     ap.add_argument("--version", type=int, required=True)
     ap.add_argument("--as-of", default=dt.date.today().isoformat())
     a = ap.parse_args()
-    print(json.dumps(build(a.version, a.as_of), indent=1))
+    res = build(a.version, a.as_of)
+    for x in res["storiesLeft"]:  # a previously public story that left with a data-driven reason (ST15)
+        print(f"::warning title=story no longer public::{x}")
+    print(json.dumps(res, indent=1))

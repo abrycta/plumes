@@ -14,7 +14,7 @@ from plumes.stories import facts
 from plumes.stories import render as rd
 from plumes.stories import text as tx
 from plumes.stories.events import Event, merge, windows
-from plumes.stories.generate import generate, step_hash
+from plumes.stories.generate import generate
 from plumes.stories.render import V
 
 FIXTURE = pathlib.Path(__file__).resolve().parents[2] / "contracts" / "fixtures" / "data" / "v0"
@@ -127,11 +127,12 @@ def ep(i, kind, start, end):
     return {"id": i, "kind": kind, "start": start, "end": end}
 
 
-def test_events_merge_overlapping_and_adjacent_episodes_and_flag_open_ones():
+def test_events_merge_overlapping_and_adjacent_episodes_and_cap_open_alert_windows():
     eps = [ep("gvp-1", "gvp_eruption", "2024-06-03", "2024-06-03"), ep("alert-a", "alert_window", "2024-06-04", "2024-09-09"),
            ep("alert-b", "alert_window", "2024-09-20", "2026-10-21"), ep("gvp-0", "gvp_eruption", "1991-06-15", "1991-09-02")]
     evs = merge("kanlaon", eps, "2026-10-22")
-    assert [(e.id, [x["id"] for x in e.episodes], e.open) for e in evs] == [("kanlaon-2024-06", ["gvp-1", "alert-a"], False), ("kanlaon-2024-09", ["alert-b"], True)]
+    assert [(e.id, [x["id"] for x in e.episodes], e.open) for e in evs] == [("kanlaon-2024-06", ["gvp-1", "alert-a"], False), ("kanlaon-2024-09", ["alert-b"], False)]
+    assert evs[1].end == "2024-12-18"  # an alert window still open at the end of the data counts for 90 days (ST15)
 
 
 def test_windows_keep_a_full_onset_for_a_one_day_eruption_and_stop_at_the_next_event():
@@ -209,26 +210,5 @@ def test_generation_on_the_fixture_writes_valid_drafts_and_an_index(tmp_path):
     assert [s["kind"] for s in story["steps"]][0] == "before" and story["steps"][-1]["kind"] == "after"
 
 
-def test_a_matching_review_hash_publishes_the_story_and_a_changed_number_reopens_it(tmp_path):
-    first = tmp_path / "a"
-    generate(FIXTURE, first)
-    story = json.loads((first / "story" / "drafts" / "taal-2020.json").read_text())
-    review = tmp_path / "review.yaml"
-    review.write_text(yaml.safe_dump({"reviews": [{"story": "taal-2020", "step": s["kind"], "sha256": step_hash(s), "reviewer": "Kurt", "date": "2026-10-23"}
-                                                  for s in story["steps"]]}))
-    second = tmp_path / "b"
-    generate(FIXTURE, second, review_path=review)
-    assert json.loads((second / "story" / "taal-2020.json").read_text())["status"] == "reviewed"
-    changed = copy.deepcopy(story["steps"][0])
-    changed["figures"].append({"label": {"en": "x", "ja": "x"}, "value": 1, "source": "x"})
-    assert step_hash(changed) != step_hash(story["steps"][0])
-
-
 def test_omi_is_gone_from_the_catalogue():  # Kurt dropped OMI SO₂ on 2026-10-23
     assert not [t for t in CAT if t.endswith("-OMI")] and all("omi-omso2e" not in t.source for t in CAT.values())
-
-
-def test_review_entries_are_well_formed_and_leave_the_hand_built_taal_alone():
-    rows = yaml.safe_load((pathlib.Path(facts.__file__).parent / "review.yaml").read_text())["reviews"]
-    assert rows and all(set(r) == {"story", "step", "sha256", "reviewer", "date"} and len(r["sha256"]) == 64 for r in rows)
-    assert len({(r["story"], r["step"]) for r in rows}) == len(rows) and not [r for r in rows if r["story"] == "taal-2020"]
