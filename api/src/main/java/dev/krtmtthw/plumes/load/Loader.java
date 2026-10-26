@@ -90,12 +90,55 @@ public final class Loader {
             return 0;
         }
         if (databaseUrl == null || databaseUrl.isBlank()) throw new IllegalStateException("DATABASE_URL is not set");
-        DatabaseUrl db = DatabaseUrl.parse(databaseUrl);
-        try (Connection c = connect(db)) {
-            write(c, v, where);
+        try {
+            load(DatabaseUrl.parse(databaseUrl), v, where);
+        } catch (SizeGuardException e) {
+            // Internal only: the workflow's report job opens (or comments on) the "API load failed" issue.
+            System.out.println("::error title=API load refused (database size guard)::" + e.getMessage());
+            return 3;
         }
         System.out.println("loaded " + v.dataVersion);
         return 0;
+    }
+
+    /**
+     * Sweep, guard, write, clean up. The connection is closed (so a failed transaction is rolled back) before the
+     * failure cleanup runs on a fresh one.
+     */
+    static void load(DatabaseUrl db, Version v, String where) throws SQLException {
+        try {
+            try (Connection c = connect(db)) {
+                vacuum(c, "sweep");
+                write(c, v, where);
+            }
+        } catch (SizeGuardException e) {
+            throw e;
+        } catch (SQLException | RuntimeException e) {
+            cleanupAfterFailure(db);
+            throw e;
+        }
+    }
+
+    /**
+     * VACUUM (ANALYZE) of the replaced tables only: no VACUUM FULL, no exclusive lock, fast on tables whose pages
+     * are already all-visible. As a startup sweep it makes the space of rows left dead by an earlier load (deleted
+     * or aborted) reusable before the guard measures; after a commit or a failure it does the same for this load.
+     */
+    static void vacuum(Connection c, String why) throws SQLException {
+        c.setAutoCommit(true);
+        try (Statement s = c.createStatement()) {
+            s.execute("VACUUM (ANALYZE) event, episode, volcano, dataset");
+        }
+        System.out.printf("%s: vacuumed event, episode, volcano, dataset; database %d MB%n", why, clusterBytes(c) / MB);
+    }
+
+    /** A failed load rolled back, leaving its inserted rows dead: reclaim them now. Best effort, never masks the error. */
+    static void cleanupAfterFailure(DatabaseUrl db) {
+        try (Connection c = connect(db)) {
+            vacuum(c, "cleanup after the failed load");
+        } catch (SQLException | RuntimeException e) {
+            System.err.println("cleanup after the failed load skipped (" + e.getMessage() + "); the next load's sweep retries");
+        }
     }
 
     static Connection connect(DatabaseUrl db) throws SQLException {
@@ -255,7 +298,82 @@ public final class Loader {
     // ---------------------------------------------------------------------------------------------------------
     // Writing: one transaction
 
+    // ---------------------------------------------------------------------------------------------------------
+    // Storage guard (docs/architecture/NEON-STORAGE.md). Neon Free caps a project's logical size at 1 GB
+    // (neon.max_cluster_size). DELETE keeps the old rows until the commit and VACUUM, so a load needs the database
+    // plus a second copy of the replaced tables. Refuse before touching anything if that passes 85 % of the cap.
+
+    static final long MB = 1L << 20;
+    static final long DEFAULT_CAP_MB = 1024;
+    static final double GUARD_PCT = 85;
+    static final double STAGE_MARGIN = 1.10;
+
+    /** The load would pass the size guard; nothing was written. */
+    static final class SizeGuardException extends RuntimeException {
+        SizeGuardException(String message) {
+            super(message);
+        }
+    }
+
+    static long capBytes(Connection c) throws SQLException {
+        String env = System.getenv("PLUMES_DB_CAP_MB");
+        if (env != null && !env.isBlank()) return (long) (Double.parseDouble(env) * MB);
+        try (Statement s = c.createStatement();
+             var rs = s.executeQuery("SELECT current_setting('neon.max_cluster_size', true)")) {
+            String raw = rs.next() ? rs.getString(1) : null;
+            var m = raw == null ? null : java.util.regex.Pattern.compile("(?i)\\s*(\\d+)\\s*([kmgt]b)?\\s*").matcher(raw);
+            if (m != null && m.matches() && Long.parseLong(m.group(1)) > 0) {
+                String unit = m.group(2) == null ? "mb" : m.group(2).toLowerCase(java.util.Locale.ROOT);
+                long mult = switch (unit) { case "kb" -> 1L << 10; case "gb" -> 1L << 30; case "tb" -> 1L << 40; default -> MB; };
+                return Long.parseLong(m.group(1)) * mult;
+            }
+        }
+        return DEFAULT_CAP_MB * MB;
+    }
+
+    static long clusterBytes(Connection c) throws SQLException {
+        try (Statement s = c.createStatement();
+             var rs = s.executeQuery("SELECT sum(pg_database_size(datname))::bigint FROM pg_database")) {
+            return rs.next() ? rs.getLong(1) : 0;
+        }
+    }
+
+    /** Bytes the new rows will take: the replaced tables' size (heap, TOAST, indexes) scaled to the new event count. */
+    static long projectedBytes(Connection c, Version v) throws SQLException {
+        long size = 0;
+        long events = 0;
+        try (Statement s = c.createStatement();
+             var rs = s.executeQuery("SELECT sum(pg_total_relation_size(c.oid))::bigint,"
+                     + " max(greatest(c.reltuples, 0)) FILTER (WHERE c.relname = 'event')::bigint FROM pg_class c"
+                     + " WHERE c.relnamespace = 'public'::regnamespace AND c.relname = ANY ('{event,episode,volcano,dataset}')")) {
+            if (rs.next()) {
+                size = rs.getLong(1);
+                events = rs.getLong(2);
+            }
+        }
+        double perEvent = events > 0 ? (double) size / events : 600; // measured: ~575 bytes a row with indexes
+        return (long) (perEvent * Math.max(v.events.size(), 1) * STAGE_MARGIN);
+    }
+
+    static void checkSize(Connection c, Version v) throws SQLException {
+        String env = System.getenv("PLUMES_DB_GUARD_PCT");
+        double pct = env == null || env.isBlank() ? GUARD_PCT : Double.parseDouble(env);
+        long cap = capBytes(c);
+        long now = clusterBytes(c);
+        long stage = projectedBytes(c, v);
+        long limit = (long) (cap * pct / 100);
+        System.out.printf("size guard: database %d MB + new rows ~%d MB = %d MB; limit %d MB (%.0f %% of %d MB)%n",
+                now / MB, stage / MB, (now + stage) / MB, limit / MB, pct, cap / MB);
+        if (now + stage > limit) {
+            throw new SizeGuardException(String.format("refused before writing: the database (%d MB) plus the new rows"
+                    + " (~%d MB) would reach %d MB, over the %d MB guard (%.0f %% of the %d MB cap). The API keeps serving"
+                    + " the previous version. See docs/architecture/NEON-STORAGE.md.", now / MB, stage / MB,
+                    (now + stage) / MB, limit / MB, pct, cap / MB));
+        }
+    }
+
     static void write(Connection c, Version v, String where) throws SQLException {
+        checkSize(c, v);
         c.setAutoCommit(false);
         try (Statement s = c.createStatement()) {
             s.execute("SET LOCAL statement_timeout = '300s'");
@@ -345,8 +463,12 @@ public final class Loader {
         }
         c.commit();
         c.setAutoCommit(true);
-        try (Statement s = c.createStatement()) {
-            s.execute("ANALYZE volcano; ANALYZE episode; ANALYZE event");
+        // The previous version is now dead rows: VACUUM makes their space reusable by the next load (so the
+        // database stops growing by a full copy per load) and refreshes statistics. Best effort: the load succeeded.
+        try {
+            vacuum(c, "database after the load");
+        } catch (SQLException e) {
+            System.err.println("VACUUM after the load failed (the load itself succeeded): " + e.getMessage());
         }
     }
 

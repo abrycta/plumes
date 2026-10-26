@@ -1,6 +1,9 @@
 name: API load
 # Reload the API's Neon database from the published data version (api/README.md "Loading a data version"), after
 # every successful Data run and by hand. One transaction: the API serves the old version or the new one, never a mix.
+# Before writing, a size guard refuses a load that would pass 85 % of Neon Free's 1 GB cap
+# (docs/architecture/NEON-STORAGE.md). Failures surface only internally: an ::error annotation and one open
+# "API load failed" issue, commented on repeats.
 # Earthquakes and thermal detections are not in the read models as points, so they come from the latest archived
 # snapshots in abrycta/plumes-archive (usgs-comcat-ph-*, firms-modis), the same files the version was built from.
 on:
@@ -79,7 +82,8 @@ jobs:
           args=(-Xmx6g load "$ROOT")
           for f in in/usgs-comcat-ph-*/*.csv; do args+=(--usgs "/${f}"); done
           for f in in/firms-modis/raw/firms/*/*.csv; do args+=(--firms "/${f}"); done
-          docker run --rm -e DATABASE_URL -v "$PWD/in:/in:ro" --entrypoint /app/plumes-api "$IMAGE" "${args[@]}"
+          docker run --rm -e DATABASE_URL -v "$PWD/in:/in:ro" --entrypoint /app/plumes-api "$IMAGE" "${args[@]}" | tee load.log
+          grep -E '^(sweep|size guard|database after the load):' load.log >> "$GITHUB_STEP_SUMMARY" || true
       - name: The API serves the published version (through the edge)
         # The edge keeps a copy fresh for s-maxage (10 minutes), then revalidates it by ETag, so this waits up to 12.
         if: steps.secrets.outputs.ok == 'true'
@@ -110,3 +114,20 @@ jobs:
             echo "::error::/v1/$1 differs from $want/$2"; exit 1
           done
           echo "API serves $want" >> "$GITHUB_STEP_SUMMARY"
+
+  report:
+    needs: load
+    if: failure()
+    runs-on: ubuntu-24.04
+    permissions: { issues: write }
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="API load failed"
+          body="The API database load failed: $RUN. The API keeps serving the previous version (the load is one transaction)."
+          n=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number -q '.[0].number')
+          if [ -n "$n" ]; then gh issue comment "$n" -R "$GITHUB_REPOSITORY" --body "$body"
+          else gh issue create -R "$GITHUB_REPOSITORY" --title "$title" --body "$body"; fi
+          echo "::error title=API load failed::$RUN"
