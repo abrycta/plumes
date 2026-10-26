@@ -108,7 +108,7 @@ public final class Loader {
     static void load(DatabaseUrl db, Version v, String where) throws SQLException {
         try {
             try (Connection c = connect(db)) {
-                vacuum(c, "sweep");
+                sweep(c);
                 write(c, v, where);
             }
         } catch (SizeGuardException e) {
@@ -130,6 +130,18 @@ public final class Loader {
             s.execute("VACUUM (ANALYZE) event, episode, volcano, dataset");
         }
         System.out.printf("%s: vacuumed event, episode, volcano, dataset; database %d MB%n", why, clusterBytes(c) / MB);
+    }
+
+    /**
+     * Startup sweep: drop a committed leftover event_next (a load's own staging table is uncommitted until the swap,
+     * so it is invisible here), then VACUUM, before the guard measures.
+     */
+    static void sweep(Connection c) throws SQLException {
+        c.setAutoCommit(true);
+        try (Statement s = c.createStatement()) {
+            s.execute("DROP TABLE IF EXISTS event_next");
+        }
+        vacuum(c, "sweep");
     }
 
     /** A failed load rolled back, leaving its inserted rows dead: reclaim them now. Best effort, never masks the error. */
@@ -300,8 +312,8 @@ public final class Loader {
 
     // ---------------------------------------------------------------------------------------------------------
     // Storage guard (docs/architecture/NEON-STORAGE.md). Neon Free caps a project's logical size at 1 GB
-    // (neon.max_cluster_size). DELETE keeps the old rows until the commit and VACUUM, so a load needs the database
-    // plus a second copy of the replaced tables. Refuse before touching anything if that passes 85 % of the cap.
+    // (neon.max_cluster_size). The old event table and its replacement both exist until the commit, so a load needs
+    // the database plus a second copy of the replaced tables. Refuse before touching anything above 85 % of the cap.
 
     static final long MB = 1L << 20;
     static final long DEFAULT_CAP_MB = 1024;
@@ -376,9 +388,12 @@ public final class Loader {
         checkSize(c, v);
         c.setAutoCommit(false);
         try (Statement s = c.createStatement()) {
-            s.execute("SET LOCAL statement_timeout = '300s'");
-            // DELETE, not TRUNCATE: readers keep seeing the previous version (MVCC) until the commit.
-            s.execute("DELETE FROM event");
+            s.execute("SET LOCAL statement_timeout = '900s'");
+            // event (almost all of the data) is built fresh in event_next and swapped in at the end, so its indexes
+            // are always compact: DELETE + INSERT left them about three times their fresh size (NEON-STORAGE.md).
+            // The small tables keep DELETE, not TRUNCATE: readers see the previous version (MVCC) until the commit.
+            s.execute("CREATE TABLE event_next (LIKE event INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING STORAGE"
+                    + " INCLUDING COMMENTS)");
             s.execute("DELETE FROM episode");
             s.execute("DELETE FROM volcano");
             s.execute("DELETE FROM dataset");
@@ -436,7 +451,7 @@ public final class Loader {
             ps.executeBatch();
         }
         try (PreparedStatement ps = c.prepareStatement("""
-                INSERT INTO event (kind, ext_id, t, day, lat, lon, geog, mag, mag_type, depth_km, frp_mw, sensor,
+                INSERT INTO event_next (kind, ext_id, t, day, lat, lon, geog, mag, mag_type, depth_km, frp_mw, sensor,
                                    fire_type, source)
                 VALUES (?, ?, ?, ?, ?, ?, ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography, ?, ?, ?, ?, ?, ?, ?)""")) {
             int n = 0;
@@ -461,6 +476,7 @@ public final class Loader {
             }
             ps.executeBatch();
         }
+        swapEvent(c);
         c.commit();
         c.setAutoCommit(true);
         // The previous version is now dead rows: VACUUM makes their space reusable by the next load (so the
@@ -470,6 +486,59 @@ public final class Loader {
         } catch (SQLException e) {
             System.err.println("VACUUM after the load failed (the load itself succeeded): " + e.getMessage());
         }
+    }
+
+    /**
+     * Gives event_next the live table's primary key, indexes (same definitions, read from the catalogue so they
+     * follow the migrations) and grants, built once after the inserts, then drops event and renames everything into
+     * place. Runs inside the load's transaction: readers see the old table until the commit.
+     */
+    static void swapEvent(Connection c) throws SQLException {
+        List<String[]> constraints = rows(c, "SELECT conname, pg_get_constraintdef(oid) FROM pg_constraint"
+                + " WHERE conrelid = 'public.event'::regclass AND contype IN ('p', 'u', 'x') ORDER BY conname");
+        List<String[]> indexes = rows(c, "SELECT ic.relname, pg_get_indexdef(i.indexrelid) FROM pg_index i"
+                + " JOIN pg_class ic ON ic.oid = i.indexrelid WHERE i.indrelid = 'public.event'::regclass"
+                + " AND NOT EXISTS (SELECT 1 FROM pg_constraint k WHERE k.conindid = i.indexrelid"
+                + " AND k.conrelid = i.indrelid) ORDER BY 1");
+        List<String[]> grants = rows(c, "SELECT CASE WHEN a.grantee = 0 THEN 'PUBLIC'"
+                + " ELSE quote_ident(pg_get_userbyid(a.grantee)) END, a.privilege_type FROM pg_class t,"
+                + " aclexplode(t.relacl) a WHERE t.oid = 'public.event'::regclass AND a.grantee <> t.relowner");
+        try (Statement s = c.createStatement()) {
+            for (String[] k : constraints) {
+                s.execute("ALTER TABLE event_next ADD CONSTRAINT " + k[0] + "_next " + k[1]);
+            }
+            for (String[] i : indexes) {
+                String def = i[1].replaceFirst("^(CREATE (UNIQUE )?INDEX )" + i[0] + " ON (public\\.)?event USING ",
+                        "$1" + i[0] + "_next ON public.event_next USING ");
+                if (def.equals(i[1])) throw new IllegalStateException("cannot retarget index definition: " + i[1]);
+                s.execute(def);
+            }
+            for (String[] g : grants) {
+                s.execute("GRANT " + g[1] + " ON event_next TO " + g[0]);
+            }
+            s.execute("SET LOCAL lock_timeout = '60s'");
+            s.execute("DROP TABLE event");
+            s.execute("ALTER TABLE event_next RENAME TO event");
+            for (String[] k : constraints) {
+                s.execute("ALTER TABLE event RENAME CONSTRAINT " + k[0] + "_next TO " + k[0]);
+            }
+            for (String[] i : indexes) {
+                s.execute("ALTER INDEX " + i[0] + "_next RENAME TO " + i[0]);
+            }
+        }
+    }
+
+    private static List<String[]> rows(Connection c, String sql) throws SQLException {
+        List<String[]> out = new ArrayList<>();
+        try (Statement s = c.createStatement(); var rs = s.executeQuery(sql)) {
+            int n = rs.getMetaData().getColumnCount();
+            while (rs.next()) {
+                String[] r = new String[n];
+                for (int i = 0; i < n; i++) r[i] = rs.getString(i + 1);
+                out.add(r);
+            }
+        }
+        return out;
     }
 
     // ---------------------------------------------------------------------------------------------------------
