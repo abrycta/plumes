@@ -14,33 +14,49 @@ portfolio-docs watches these numbers every day.
 
 ## How a load uses space
 
-`plumes-api load` replaces everything in one transaction with `DELETE` and `INSERT`, so readers see the old version
-until the commit. The deleted rows stay on disk until the commit and a `VACUUM`, so during a load the database holds
-**the current size + a second copy of the replaced tables**. After the commit, the loader runs
-`VACUUM (ANALYZE)`, which makes the old rows' space reusable by the next load instead of growing the files.
+`plumes-api load` replaces everything in one transaction, so readers see the old version until the commit.
+`event` (almost all of the data) is built fresh in `event_next`: rows first, then the primary key and indexes
+(definitions read from the live table, so they follow the migrations), then `DROP TABLE event` and renames. The
+small tables keep `DELETE` and `INSERT`. Until the commit the database holds **the current size + one compact copy
+of `event`**; at the commit the old table's files are freed.
 
-| 2026-10-26 (data v8) | |
-|---|---|
-| database (logical) | 413 MB |
-| `event` | 371 MB for 676,580 rows (125 MB table, 152 MB GiST on `geog`, 81 MB primary key, 12 MB `day`) |
-| load peak | about 413 + 371 = **about 784 MB (77 %)** |
+Before 2026-10-27 `event` was replaced with `DELETE` and `INSERT` too. That churn left its indexes about three times
+their fresh size, which a one-off `REINDEX` would not have fixed for long. Measured in a rolled-back transaction on
+production data (data v8, 676,580 rows):
+
+| `event` | live (after DELETE/INSERT churn) | built fresh |
+|---|---|---|
+| table | 125 MB | 122 MB |
+| GiST on `geog` | 153 MB | 49 MB |
+| primary key `(kind, ext_id)` | 81 MB | 48 MB |
+| `(kind, day)` | 13 MB | 5 MB |
+| **total** | **372 MB** | **224 MB** |
+
+| | before | after the first swap |
+|---|---|---|
+| database (logical) | 413 MB (40 %) | about 265 MB (26 %) |
+| load peak | about 788 MB (77 %) | about 489 MB (48 %) |
+
+The first load with the swap peaks at about 413 + 224 = 637 MB (62 %).
 
 ## Cleanup, automatic and cheap
 
-A Plumes load creates no tables, so nothing can be orphaned as a table. What a load can leave behind is dead
-rows: the previous version's after a commit, or a failed load's own inserted rows after a rollback. Each is
-reclaimed by `VACUUM (ANALYZE) event, episode, volcano, dataset`, on those four tables only (no `VACUUM FULL`, no
-exclusive lock; seconds on all-visible pages):
+A failed load leaves nothing behind: `event_next` and every change roll back with the transaction, and dropping
+`event_next` frees its files at once. What remains is dead rows in the small tables (and, once, in the old
+`event`), reclaimed by `VACUUM (ANALYZE) event, episode, volcano, dataset` on those four tables only (no
+`VACUUM FULL`, no exclusive lock; seconds):
 
-- *startup sweep*, before the guard measures, so rows left dead by any earlier run are reusable first;
+- *startup sweep*, before the guard measures: drops a committed leftover `event_next` (a running load's is
+  uncommitted and invisible), then VACUUMs;
 - *after the commit*, for the version just replaced;
 - *after a failure*, on a fresh connection once the failed transaction has rolled back (best effort; the next
-  run's sweep repeats it). Tested in `LoaderCleanupIT`: a load that dies in its last insert batch leaves the same
-  tables and the previous version serving, and the next load reuses the reclaimed space instead of growing.
+  run's sweep repeats it). Tested in `LoaderCleanupIT`: a load that dies while building `event_next`'s primary key
+  leaves the same tables, no `event_next` and the previous version serving; the next load swaps in a compact
+  `event` under the migration's index names.
 
 **Versions kept: only the current one.** The API never reads an older version; a rollback reloads the previous
 data version from the data root, which keeps every version. A second copy in the database would cost about
-370 MB and put the load peak over the cap.
+224 MB and raise the load peak to about 70 %.
 
 **History retention** stays at 6 hours (`history_retention_seconds = 21600`, the Free maximum). Lowering it is free
 but frees nothing of the 1 GB (history is not part of the logical size), and it is the only way to undo a bad write
@@ -48,7 +64,7 @@ within those hours.
 
 ## Size guard
 
-Before it deletes anything, the loader projects `database + replaced tables scaled to the new event count + 10 %`.
+Before it writes anything, the loader projects `database + replaced tables scaled to the new event count + 10 %`.
 Above **85 % of the cap** (870 MB) it refuses: it prints an `::error`, exits 3, the workflow's report job opens or
 comments on the "API load failed" issue, and the API keeps serving the previous version. `PLUMES_DB_CAP_MB` and
 `PLUMES_DB_GUARD_PCT` override the cap and the share (tests only).
@@ -56,9 +72,13 @@ comments on the "API load failed" issue, and the API keeps serving the previous 
 ## Growth
 
 - Events grow by about 30,000 to 50,000 a year (thermal detections and earthquakes; 2024 had 52,000), about
-  575 bytes each with indexes: about 23 MB a year in the database and **about 46 MB a year at the load peak**.
-- At that rate the load peak passes ops-watch's 70 % warning now, reaches the 85 % guard (870 MB) in about 2 years
-  (around late 2028) and the cap in about 5 (around 2031).
-- Before then, the load needs to shrink. Options, cheapest first: rebuild the `event` indexes compactly (the GiST
-  index is larger than the table), load only the months that changed instead of every event, or stage per table.
-  This is listed as a follow-up; the guard stops a load safely if it is reached first.
+  330 bytes each with compact indexes: about 13 MB a year in the database and **about 26 MB a year at the load
+  peak**.
+- At that rate the load peak reaches ops-watch's 70 % warning (717 MB) in about 9 years and the 85 % guard
+  (870 MB) in about 15. Before the swap it was already past 70 % and would have reached 85 % around late 2028.
+- If that ever needs more room: load only the months that changed. The guard stops a load safely before then.
+
+## Migrations
+
+`api-load.yml` applies pending migrations (`dbmate up`, `api/db/migrations`, direct endpoint, main only) before
+each load, so a schema change reaches production with the next load instead of by hand.

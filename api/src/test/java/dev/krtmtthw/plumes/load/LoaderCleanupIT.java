@@ -15,10 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
- * A load that dies mid-way (a primary-key violation in the last event batch, after the DELETEs and most INSERTs)
- * leaves the previous version serving and the same tables, and its dead rows are reclaimed, so the next load reuses
- * that space instead of growing the files (docs/architecture/NEON-STORAGE.md). Ends with the fixtures loaded, as
- * ContractIT expects.
+ * A load that dies mid-way (a duplicate key, found when event_next's primary key is built after every insert)
+ * leaves the previous version serving, the same tables and no event_next, and the next load swaps in a compact event
+ * with the migration's index names (docs/architecture/NEON-STORAGE.md). Ends with the fixtures loaded, as ContractIT
+ * expects.
  */
 @EnabledIfEnvironmentVariable(named = "TEST_DATABASE_URL", matches = ".+")
 class LoaderCleanupIT {
@@ -35,7 +35,7 @@ class LoaderCleanupIT {
         List<String> served = query("SELECT data_version || ' ' || (SELECT count(*) FROM event) FROM dataset");
 
         Loader.Version v = new Loader(Loader.Source.of(DATA.toString()), List.of(USGS), List.of()).read();
-        v.events.add(v.events.get(0)); // duplicate (kind, ext_id): the last INSERT batch fails
+        v.events.add(v.events.get(0)); // duplicate (kind, ext_id): building event_next's primary key fails
         assertThatThrownBy(() -> Loader.load(DB, v, DATA.toString())).isInstanceOf(SQLException.class);
 
         assertThat(query("SELECT relname FROM pg_class WHERE relkind = 'r'"
@@ -46,7 +46,9 @@ class LoaderCleanupIT {
         long afterNext = size();
         System.out.printf("tables %s; event after the failed load %d kB, after the next load %d kB%n", tables,
                 afterFailure >> 10, afterNext >> 10);
-        assertThat(afterNext).as("the next load reuses the reclaimed space").isLessThanOrEqualTo(afterFailure + (64 << 10));
+        assertThat(afterNext).as("the next load is no larger than the old table").isLessThanOrEqualTo(afterFailure + (64 << 10));
+        assertThat(query("SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'event'"
+                + " ORDER BY 1")).containsExactly("event_day_idx", "event_geog_idx", "event_pkey");
     }
 
     static int load() throws Exception {
