@@ -83,7 +83,7 @@ jobs:
           for f in in/usgs-comcat-ph-*/*.csv; do args+=(--usgs "/${f}"); done
           for f in in/firms-modis/raw/firms/*/*.csv; do args+=(--firms "/${f}"); done
           docker run --rm -e DATABASE_URL -v "$PWD/in:/in:ro" --entrypoint /app/plumes-api "$IMAGE" "${args[@]}" | tee load.log
-          grep -E '^(size guard|database after the load):' load.log >> "$GITHUB_STEP_SUMMARY" || true
+          grep -E '^(sweep|size guard|database after the load):' load.log >> "$GITHUB_STEP_SUMMARY" || true
       - name: The API serves the published version (through the edge)
         # The edge keeps a copy fresh for s-maxage (10 minutes), then revalidates it by ETag, so this waits up to 12.
         if: steps.secrets.outputs.ok == 'true'

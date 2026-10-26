@@ -90,9 +90,8 @@ public final class Loader {
             return 0;
         }
         if (databaseUrl == null || databaseUrl.isBlank()) throw new IllegalStateException("DATABASE_URL is not set");
-        DatabaseUrl db = DatabaseUrl.parse(databaseUrl);
-        try (Connection c = connect(db)) {
-            write(c, v, where);
+        try {
+            load(DatabaseUrl.parse(databaseUrl), v, where);
         } catch (SizeGuardException e) {
             // Internal only: the workflow's report job opens (or comments on) the "API load failed" issue.
             System.out.println("::error title=API load refused (database size guard)::" + e.getMessage());
@@ -100,6 +99,46 @@ public final class Loader {
         }
         System.out.println("loaded " + v.dataVersion);
         return 0;
+    }
+
+    /**
+     * Sweep, guard, write, clean up. The connection is closed (so a failed transaction is rolled back) before the
+     * failure cleanup runs on a fresh one.
+     */
+    static void load(DatabaseUrl db, Version v, String where) throws SQLException {
+        try {
+            try (Connection c = connect(db)) {
+                vacuum(c, "sweep");
+                write(c, v, where);
+            }
+        } catch (SizeGuardException e) {
+            throw e;
+        } catch (SQLException | RuntimeException e) {
+            cleanupAfterFailure(db);
+            throw e;
+        }
+    }
+
+    /**
+     * VACUUM (ANALYZE) of the replaced tables only: no VACUUM FULL, no exclusive lock, fast on tables whose pages
+     * are already all-visible. As a startup sweep it makes the space of rows left dead by an earlier load (deleted
+     * or aborted) reusable before the guard measures; after a commit or a failure it does the same for this load.
+     */
+    static void vacuum(Connection c, String why) throws SQLException {
+        c.setAutoCommit(true);
+        try (Statement s = c.createStatement()) {
+            s.execute("VACUUM (ANALYZE) event, episode, volcano, dataset");
+        }
+        System.out.printf("%s: vacuumed event, episode, volcano, dataset; database %d MB%n", why, clusterBytes(c) / MB);
+    }
+
+    /** A failed load rolled back, leaving its inserted rows dead: reclaim them now. Best effort, never masks the error. */
+    static void cleanupAfterFailure(DatabaseUrl db) {
+        try (Connection c = connect(db)) {
+            vacuum(c, "cleanup after the failed load");
+        } catch (SQLException | RuntimeException e) {
+            System.err.println("cleanup after the failed load skipped (" + e.getMessage() + "); the next load's sweep retries");
+        }
     }
 
     static Connection connect(DatabaseUrl db) throws SQLException {
@@ -426,12 +465,11 @@ public final class Loader {
         c.setAutoCommit(true);
         // The previous version is now dead rows: VACUUM makes their space reusable by the next load (so the
         // database stops growing by a full copy per load) and refreshes statistics. Best effort: the load succeeded.
-        try (Statement s = c.createStatement()) {
-            s.execute("VACUUM (ANALYZE) event, episode, volcano, dataset");
+        try {
+            vacuum(c, "database after the load");
         } catch (SQLException e) {
             System.err.println("VACUUM after the load failed (the load itself succeeded): " + e.getMessage());
         }
-        System.out.printf("database after the load: %d MB%n", clusterBytes(c) / MB);
     }
 
     // ---------------------------------------------------------------------------------------------------------

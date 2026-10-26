@@ -25,6 +25,27 @@ until the commit. The deleted rows stay on disk until the commit and a `VACUUM`,
 | `event` | 371 MB for 676,580 rows (125 MB table, 152 MB GiST on `geog`, 81 MB primary key, 12 MB `day`) |
 | load peak | about 413 + 371 = **about 784 MB (77 %)** |
 
+## Cleanup, automatic and cheap
+
+A Plumes load creates no tables, so nothing can be orphaned as a table. What a load can leave behind is dead
+rows: the previous version's after a commit, or a failed load's own inserted rows after a rollback. Each is
+reclaimed by `VACUUM (ANALYZE) event, episode, volcano, dataset`, on those four tables only (no `VACUUM FULL`, no
+exclusive lock; seconds on all-visible pages):
+
+- *startup sweep*, before the guard measures, so rows left dead by any earlier run are reusable first;
+- *after the commit*, for the version just replaced;
+- *after a failure*, on a fresh connection once the failed transaction has rolled back (best effort; the next
+  run's sweep repeats it). Tested in `LoaderCleanupIT`: a load that dies in its last insert batch leaves the same
+  tables and the previous version serving, and the next load reuses the reclaimed space instead of growing.
+
+**Versions kept: only the current one.** The API never reads an older version; a rollback reloads the previous
+data version from the data root, which keeps every version. A second copy in the database would cost about
+370 MB and put the load peak over the cap.
+
+**History retention** stays at 6 hours (`history_retention_seconds = 21600`, the Free maximum). Lowering it is free
+but frees nothing of the 1 GB (history is not part of the logical size), and it is the only way to undo a bad write
+within those hours.
+
 ## Size guard
 
 Before it deletes anything, the loader projects `database + replaced tables scaled to the new event count + 10 %`.
