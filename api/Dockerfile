@@ -18,7 +18,7 @@ COPY api/src ./src
 RUN mvn -B -Pnative -DskipTests native:compile \
  && ls -la target/plumes-api
 
-FROM gcr.io/distroless/base-debian12:nonroot AS runtime
+FROM gcr.io/distroless/base-debian13:nonroot AS runtime
 COPY --from=build /src/api/target/plumes-api /app/plumes-api
 ARG COMMIT_SHA=unknown
 ENV PLUMES_COMMIT=${COMMIT_SHA} PORT=8080
