@@ -50,10 +50,10 @@
         "links": {
           "type": "object",
           "properties": {
-            "phivolcs": { "type": "string", "format": "uri" },
-            "gvp": { "type": "string", "format": "uri" },
-            "comet": { "type": "string", "format": "uri" },
-            "hazardhunter": { "type": "string", "format": "uri" }
+            "phivolcs": { "type": "string", "format": "uri", "pattern": "^https://" },
+            "gvp": { "type": "string", "format": "uri", "pattern": "^https://" },
+            "comet": { "type": "string", "format": "uri", "pattern": "^https://" },
+            "hazardhunter": { "type": "string", "format": "uri", "pattern": "^https://" }
           }
         }
       }
@@ -112,7 +112,7 @@
               { "oneOf": [{ "$ref": "common.schema.json#/$defs/date" }, { "type": "null" }] },
               { "type": ["number", "null"] },
               { "type": ["string", "null"] },
-              { "type": "string", "format": "uri" }
+              { "type": "string", "format": "uri", "pattern": "^https://" }
             ],
             "items": false,
             "minItems": 9
@@ -141,7 +141,7 @@
               { "type": "string" },
               { "type": ["integer", "null"], "description": "Flight level (hundreds of ft)" },
               { "enum": ["observed", "reported", "none"] },
-              { "type": "string", "format": "uri" }
+              { "type": "string", "format": "uri", "pattern": "^https://" }
             ],
             "items": false,
             "minItems": 5
@@ -173,7 +173,7 @@
         "plumeAltKm": { "type": ["number", "null"], "description": "MSVOLSO2L4" },
         "maxAlert": { "type": ["integer", "null"] },
         "source": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/sourceId" } },
-        "url": { "type": "string", "format": "uri" }
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" }
       },
       "additionalProperties": false
     },

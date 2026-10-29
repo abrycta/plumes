@@ -63,7 +63,8 @@ export default defineConfig({
   build: {
     outDir: "dist",
     assetsDir: "assets",
-    sourcemap: true,
+    // No public source maps: they would publish the private Akari package's compiled source.
+    sourcemap: false,
     target: "es2023",
     // Never inline fonts as data: URIs. Akari's @font-face rules split each face into many unicode-range subsets;
     // inlined, the small ones (58 of them) made fonts.css about 290 kB gzipped and were all downloaded whether or not

@@ -15,7 +15,7 @@
         "dataAsOf": { "$ref": "common.schema.json#/$defs/date" },
         "generatedAt": { "$ref": "common.schema.json#/$defs/dateTime" },
         "previous": { "type": ["string", "null"] },
-        "mirrors": { "type": "array", "items": { "type": "string", "format": "uri" }, "description": "Base URLs serving the same files (GitHub Pages primary, Hugging Face fallback)" },
+        "mirrors": { "type": "array", "items": { "type": "string", "format": "uri", "pattern": "^https://" }, "description": "Base URLs serving the same files (GitHub Pages primary, Hugging Face fallback)" },
         "fixture": { "type": "boolean" }
       },
       "additionalProperties": false

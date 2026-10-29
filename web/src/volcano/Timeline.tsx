@@ -5,6 +5,7 @@ import { DataThrough } from "@/components/DataThrough";
 import { GROUPS, observedShare, type Track, valuesIn } from "@/data/tracks";
 import { addDays, formatDate, fromDay, monthTicks, tickLabel, toDay, yearlyTicks } from "@/lib/dates";
 import { formatNumber, formatPercent, unitLabel } from "@/lib/format";
+import { safeHref } from "@/app/safeHref";
 import { sourceLine } from "@/volcano/sourceLine";
 
 import { markersFor } from "./markers";
@@ -108,7 +109,7 @@ function TrackPlot({ track, s, from, to, cursor, lang, highlight, markers }: { t
       const x1 = Math.min(s.w, s.x(p.end ?? p.date) + s.dayW);
       const label = `${p.mark ?? ""} · ${formatDate(p.date, lang)}${p.end ? ` – ${formatDate(p.end, lang)}` : ""}`;
       els.push(
-        <a key={`${p.date}#${i}`} href={p.url} target="_blank" rel="noopener noreferrer" aria-label={`${label} (GVP)`}>
+        <a key={`${p.date}#${i}`} href={safeHref(p.url)} target="_blank" rel="noopener noreferrer" aria-label={`${label} (GVP)`}>
           <rect x={x0} y={7} width={Math.max(4, x1 - x0)} height={16} rx={2} fill="color-mix(in oklab, var(--seal) 18%, transparent)" stroke="var(--seal)" strokeWidth={1.5} />
           {x1 - x0 > 44 ? (
             <text x={x0 + 6} y={19} fontSize={11} fill="var(--foreground)">
@@ -162,8 +163,8 @@ function TrackPlot({ track, s, from, to, cursor, lang, highlight, markers }: { t
       );
       if (!short && px - lastX > 70) lastX = px;
       els.push(
-        p.url ? (
-          <a key={`${p.date}#${i}`} href={p.url} target="_blank" rel="noopener noreferrer" aria-label={label}>
+        safeHref(p.url) ? (
+          <a key={`${p.date}#${i}`} href={safeHref(p.url)} target="_blank" rel="noopener noreferrer" aria-label={label}>
             {body}
           </a>
         ) : (

@@ -19,12 +19,20 @@
 // requests share one cache entry; the answer is for the rounded point (its `query` echoes it). Every /api response carries X-Robots-Tag: noindex.
 // Settings (Pages project variables): API_ORIGIN (default below), DATA_ROOT (the published data root, holds
 // latest.json), EDGE_SECRET (secret, also set on Render as PLUMES_EDGE_SECRET: the origin answers /v1 only to
-// requests that carry it).
+// requests that carry it). RATE_LIMITER (optional binding): a Workers Rate Limiting binding, or a service binding to
+// a Worker that exposes the same limit({ key }) method (Pages projects can't declare `ratelimits` themselves). When it
+// is bound, it counts per Cloudflare location instead of per isolate; without it, or if it fails, the bucket below
+// applies.
+
+interface RateLimiter {
+  limit(options: { key: string }): Promise<{ success: boolean }>;
+}
 
 interface Env {
   API_ORIGIN?: string;
   DATA_ROOT?: string;
   EDGE_SECRET?: string;
+  RATE_LIMITER?: RateLimiter;
 }
 
 interface Context {
@@ -90,7 +98,7 @@ export const onRequest = async (context: Context): Promise<Response> => {
   const done = (r: Response, label: Label) => decorate(r, label, t0);
 
   const ip = request.headers.get("CF-Connecting-IP");
-  const rate = ip ? takeToken(ip, Date.now()) : 0;
+  const rate = ip ? await checkRate(env, ip) : 0;
   if (rate > 0) {
     return done(
       problem("rate-limited", 429, "Too many requests", {
@@ -190,6 +198,21 @@ export const onRequest = async (context: Context): Promise<Response> => {
 // -----------------------------------------------------------------------------------------------------------------
 
 const buckets = new Map<string, { tokens: number; at: number }>();
+/** Retry-After when the shared limiter says no (its window is 60 s). */
+const LIMITER_RETRY_AFTER_S = 60;
+
+/** The shared limiter when bound (as Replay's edge/src/ratelimit.ts), else this isolate's bucket. */
+async function checkRate(env: Env, ip: string): Promise<number> {
+  if (env.RATE_LIMITER) {
+    try {
+      const { success } = await env.RATE_LIMITER.limit({ key: ip });
+      return success ? 0 : LIMITER_RETRY_AFTER_S;
+    } catch {
+      /* fall back to the local bucket */
+    }
+  }
+  return takeToken(ip, Date.now());
+}
 
 /** Take one token from this IP's bucket: 0 when allowed, else the seconds until a token is free (Retry-After). */
 function takeToken(key: string, now: number): number {
