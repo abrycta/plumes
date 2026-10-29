@@ -1,0 +1,46 @@
+name: Budget
+# Render bandwidth guard (.github/scripts/bandwidth-guard.mjs): the Render workspace's 5 GB of monthly outbound
+# bandwidth is shared with Replay, and an overage bills the card on file. At 70 % it suspends the Plumes API
+# (vars.RENDER_SERVICE_ID) and opens an issue; the edge then answers from its cache and the published data files.
+# Once that issue has been open 24 h and usage is under 50 % (normally after the monthly reset) it resumes the service
+# and closes the issue. A service suspended by hand is never resumed. Thresholds: repository variables PAUSE_AT,
+# RESUME_AT (fractions). workflow_dispatch with dry_run, and every pull request that changes the guard, plan the
+# actions against the real usage without changing anything.
+on:
+  pull_request:
+    paths: [".github/scripts/bandwidth-guard*", ".github/workflows/budget.yml"]
+  schedule:
+    - cron: "47 1,9,17 * * *" # every 8 hours, between Replay's budget runs
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Plan the guard's actions without suspending, resuming or writing issues"
+        type: boolean
+        default: true
+permissions: { contents: read, issues: write }
+concurrency: { group: "budget-${{ github.ref }}", cancel-in-progress: false }
+jobs:
+  guard:
+    name: Render bandwidth guard
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with: { node-version: 24 }
+      - name: Guard logic tests (mocked APIs)
+        run: node --test .github/scripts/bandwidth-guard.test.mjs
+      - name: Read bandwidth, pause or resume the Plumes API
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
+          PAUSE_AT: ${{ vars.PAUSE_AT }}
+          RESUME_AT: ${{ vars.RESUME_AT }}
+          DRY_RUN: ${{ (github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.dry_run)) && '--dry-run' || '' }}
+        run: |
+          set -o pipefail
+          node .github/scripts/bandwidth-guard.mjs ${DRY_RUN:+"$DRY_RUN"} | tee -a "$GITHUB_STEP_SUMMARY"
