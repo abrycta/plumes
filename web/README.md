@@ -29,7 +29,7 @@ Data contract: [`../contracts/`](../contracts/README.md). Types come straight fr
 - `SafetyBanner` is a layout element in `Shell`, on every route, not dismissable.
 - `DataThrough` on every chart and map; alert levels only as "as reported by PHIVOLCS on <date>" markers (`data/tracks.ts`); every track carries its instrument wording (`INSTRUMENTS`) and coverage.
 - `src/lib/safety.test.ts` scans the source for present-status and forecasting words (EN and JA); `e2e/safety.spec.ts` checks every rendered route in both languages.
-- Rule 6b: `lib/richMedia.ts` loads MapLibre only with ≥768px, a hovering fine pointer and no Save-Data; otherwise the static SVG map (`map/StaticMap.tsx`).
+- Heavy media: `lib/richMedia.ts` loads MapLibre only with ≥768px, a hovering fine pointer and no Save-Data; otherwise the static SVG map (`map/StaticMap.tsx`).
 
 ## Develop
 

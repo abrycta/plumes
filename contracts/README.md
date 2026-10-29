@@ -25,7 +25,7 @@ Published base URL: `https://krtmtthw.dev/plumes/data/` (GitHub Pages, range req
 - **Daily series** (`daily.<id>`): `values[i]` is the value for `start + i` days; `null` means no valid observation (cloud, no overpass, before the instrument), never zero. `coverage[i]` (0–1) is the valid-pixel fraction; show it beside every satellite value.
 - **Event series** (`events.<id>`): sparse rows, the first column a date, the rest as named in `cols` with units in `units`. `start` is when the instrument could first report: an empty stretch after `start` means "nothing detected", before it "not observed".
 - **Tables** (`bulletins`, `advisories`, `displacement`): column arrays named by `cols`; **the last column is always the source URL** (DECISIONS Q5 ii: every PHIVOLCS, VAAC and DROMIC figure links to its page).
-- **Text** is `{en, ja}`. Readings and story steps carry `status: "draft"` until Kurt has reviewed both languages.
+- **Text** is `{en, ja}`. Readings and story steps carry `status: "draft"` until both languages have been reviewed.
 - **Safety:** nothing is "current". Alert levels are labelled "as reported by PHIVOLCS on <date>", and the record ends at `dataAsOf` (Q14). No reading forecasts.
 - **Provenance:** every file has `provenance.sources[]` with the registry id, attribution and licence; `fromArchive: true` means the app shows "data as of <snapshotDate>".
 
