@@ -752,16 +752,20 @@ sources:
       (2020), Remote Sensing 12(3), 424; Yu, C. et al. (2018), GACOS.
     cadence: rebuilt by COMET every few weeks to months per frame
     links:
+      # Health probes read only the first 64 KiB (a Range request), and the directories answer 403 (no listing), so
+      # each link probes one real file, the Taal frame 032D_07536_111313, for text found at its start.
       - id: portal-gacos
         url: https://comet-volcanodb.org/data/disp_data_gacos/southeast_asia/
-        probe: https://comet-volcanodb.org/data/volcanoes_frames/volcanoes_frames.js
-        probe_contains: "032D_07536_111313"
+        probe: https://comet-volcanodb.org/data/disp_data_gacos/southeast_asia/taal_032D_07536_111313_web_x100.json
+        probe_contains: '"dates":["'
       - id: portal-uncorrected               # the same series without the GACOS correction: a different product
         url: https://comet-volcanodb.org/data/disp_data/southeast_asia/
+        probe: https://comet-volcanodb.org/data/disp_data/southeast_asia/taal_032D_07536_111313_web_x100.json
+        probe_contains: '"dates":["'
         automatic: false
       - id: licsar-jasmin                    # the LiCSAR interferograms behind the series (health check only)
         url: https://gws-access.jasmin.ac.uk/public/nceo_geohazards/LiCSAR_products/
         probe: https://gws-access.jasmin.ac.uk/public/nceo_geohazards/LiCSAR_products/32/032D_07536_111313/metadata/metadata.txt
-        probe_contains: "032D_07536_111313"
+        probe_contains: "master="            # the file names no frame ID; its first line is master=<date>
         automatic: false
     archived: { enabled: false }
