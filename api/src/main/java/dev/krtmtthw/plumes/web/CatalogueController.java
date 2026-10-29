@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import dev.krtmtthw.plumes.catalogue.CatalogueService;
 import dev.krtmtthw.plumes.catalogue.CatalogueService.Center;
@@ -100,16 +100,14 @@ public class CatalogueController {
         return cached(request, d, CachePolicy.DATA, GEO_JSON, () -> {
             List<Document> features = service.repository().features();
             StringWriter out = new StringWriter();
-            try (JsonGenerator g = json.getFactory().createGenerator(out)) {
+            try (JsonGenerator g = json.createGenerator(out)) {
                 ObjectNode header = (ObjectNode) json.readTree(d.indexHeader());
                 g.writeStartObject();
-                var it = header.fields();
-                while (it.hasNext()) {
-                    var f = it.next();
-                    g.writeFieldName(f.getKey());
+                for (var f : header.properties()) {
+                    g.writeName(f.getKey());
                     g.writeTree(f.getValue());
                 }
-                g.writeArrayFieldStart("features");
+                g.writeArrayPropertyStart("features");
                 for (Document f : features) g.writeRawValue(f.json());
                 g.writeEndArray();
                 g.writeEndObject();

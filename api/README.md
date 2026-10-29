@@ -1,6 +1,6 @@
 # api
 
-The read-only Java 17 Spring Boot 3 API (MyBatis, PostGIS), built as a GraalVM native image, pushed to the private GHCR package `ghcr.io/abrycta/plumes-api` and run on Render free (DECISIONS Q3, Q20, S7). Owned by the API agent. The site never depends on it: the static read models carry every page, and the API adds the relational, spatial-temporal queries.
+The read-only Java 17 Spring Boot 4 API (MyBatis, PostGIS), built as a GraalVM native image, pushed to the private GHCR package `ghcr.io/abrycta/plumes-api` and run on Render free (DECISIONS Q3, Q20, S7). Owned by the API agent. The site never depends on it: the static read models carry every page, and the API adds the relational, spatial-temporal queries.
 
 ## Endpoints (contract: [`../contracts/openapi.yaml`](../contracts/openapi.yaml))
 

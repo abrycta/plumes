@@ -27,10 +27,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Loads one published data version (contracts/README.md) into PostGIS, atomically: everything is replaced in one
@@ -47,8 +47,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public final class Loader {
 
-    private static final ObjectMapper JSON = new ObjectMapper()
-            .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS); // keep published numbers as written
+    private static final JsonMapper JSON = JsonMapper.builder()
+            .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS).build(); // keep published numbers as written
 
     private final Source source;
     private final List<Path> usgs;
@@ -187,15 +187,15 @@ public final class Loader {
 
     Version read() throws IOException, InterruptedException {
         JsonNode latest = JSON.readTree(source.text("latest.json"));
-        String base = latest.path("base").asText();
+        String base = latest.path("base").asString();
         Version v = new Version();
-        v.dataVersion = latest.path("current").asText();
+        v.dataVersion = latest.path("current").asString();
         require(base.equals(v.dataVersion + "/"), "latest.json base must be <current>/");
 
         JsonNode index = JSON.readTree(source.text(base + "volcanoes.geojson"));
         checkHeader(index, "volcanoes", v.dataVersion);
-        v.dataAsOf = LocalDate.parse(index.path("dataAsOf").asText());
-        v.generatedAt = OffsetDateTime.parse(index.path("generatedAt").asText());
+        v.dataAsOf = LocalDate.parse(index.path("dataAsOf").asString());
+        v.generatedAt = OffsetDateTime.parse(index.path("generatedAt").asString());
         v.fixture = index.path("fixture").asBoolean(false);
         ObjectNode header = ((ObjectNode) index).deepCopy();
         header.remove("features");
@@ -204,25 +204,25 @@ public final class Loader {
         int ord = 0;
         for (JsonNode f : index.path("features")) {
             JsonNode p = f.path("properties");
-            String id = p.path("id").asText();
-            String file = p.path("file").asText(null);
+            String id = p.path("id").asString();
+            String file = p.path("file").asString(null);
             String detail = file == null ? null : source.textIfPresent(base + file);
             if (detail != null) {
                 JsonNode doc = JSON.readTree(detail);
                 checkHeader(doc, "volcano", v.dataVersion);
-                require(id.equals(doc.path("volcano").path("id").asText()), "volcano id mismatch in " + file);
+                require(id.equals(doc.path("volcano").path("id").asString()), "volcano id mismatch in " + file);
                 for (JsonNode e : doc.path("episodes")) {
-                    String start = e.path("start").asText();
-                    v.episodes.add(new EpisodeRow(id, e.path("id").asText(), e.path("kind").asText(), start,
+                    String start = e.path("start").asString();
+                    v.episodes.add(new EpisodeRow(id, e.path("id").asString(), e.path("kind").asString(), start,
                             start.matches("\\d{4}-\\d{2}-\\d{2}") ? LocalDate.parse(start) : null,
                             text(e, "end"), integer(e, "vei"), number(e, "so2MassKt"), number(e, "plumeAltKm"),
                             integer(e, "maxAlert")));
                 }
             }
             JsonNode coords = f.path("geometry").path("coordinates");
-            v.volcanoes.add(new VolcanoRow(id, ord++, integer(p, "gvpNumber"), p.path("name").path("en").asText(),
-                    p.path("name").path("ja").asText(), coords.get(1).asDouble(), coords.get(0).asDouble(),
-                    number(p, "elevationM"), p.path("observatory").asBoolean(), p.path("coverage").asText(),
+            v.volcanoes.add(new VolcanoRow(id, ord++, integer(p, "gvpNumber"), p.path("name").path("en").asString(),
+                    p.path("name").path("ja").asString(), coords.get(1).asDouble(), coords.get(0).asDouble(),
+                    number(p, "elevationM"), p.path("observatory").asBoolean(), p.path("coverage").asString(),
                     JSON.writeValueAsString(f), detail));
         }
         require(!v.volcanoes.isEmpty(), "no volcanoes in volcanoes.geojson");
@@ -238,17 +238,17 @@ public final class Loader {
         String layersText = source.textIfPresent(base + "layers.json");
         if (layersText == null) return;
         for (JsonNode layer : JSON.readTree(layersText).path("layers")) {
-            if (!layer.path("id").asText().equals("thermal-detections") || !layer.path("format").asText().equals("geojson")) {
+            if (!layer.path("id").asString().equals("thermal-detections") || !layer.path("format").asString().equals("geojson")) {
                 continue;
             }
-            String source = layer.path("sources").path(0).asText("firms-modis");
+            String source = layer.path("sources").path(0).asString("firms-modis");
             for (JsonNode month : layer.path("time").path("available")) {
-                String path = base + layer.path("url").asText().replace("{month}", month.asText());
+                String path = base + layer.path("url").asString().replace("{month}", month.asString());
                 for (JsonNode f : JSON.readTree(this.source.text(path)).path("features")) {
                     JsonNode p = f.path("properties");
                     JsonNode c = f.path("geometry").path("coordinates");
-                    addThermal(v, LocalDate.parse(p.path("date").asText()), c.get(1).asDouble(), c.get(0).asDouble(),
-                            (float) p.path("frp").asDouble(), p.path("sensor").asText(null), integer(p, "type"), source);
+                    addThermal(v, LocalDate.parse(p.path("date").asString()), c.get(1).asDouble(), c.get(0).asDouble(),
+                            (float) p.path("frp").asDouble(), p.path("sensor").asString(null), integer(p, "type"), source);
                 }
             }
         }
@@ -302,9 +302,9 @@ public final class Loader {
     }
 
     private static void checkHeader(JsonNode doc, String kind, String version) {
-        require("1".equals(doc.path("schemaVersion").asText()), kind + ": schemaVersion must be \"1\"");
-        require(kind.equals(doc.path("kind").asText()), "expected kind " + kind);
-        require(version.equals(doc.path("dataVersion").asText()), kind + ": dataVersion differs from latest.json");
+        require("1".equals(doc.path("schemaVersion").asString()), kind + ": schemaVersion must be \"1\"");
+        require(kind.equals(doc.path("kind").asString()), "expected kind " + kind);
+        require(version.equals(doc.path("dataVersion").asString()), kind + ": dataVersion differs from latest.json");
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -545,7 +545,7 @@ public final class Loader {
 
     private static String text(JsonNode n, String field) {
         JsonNode x = n.get(field);
-        return x == null || x.isNull() ? null : x.asText();
+        return x == null || x.isNull() ? null : x.asString();
     }
 
     private static Integer integer(JsonNode n, String field) {
