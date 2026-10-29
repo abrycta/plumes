@@ -11,3 +11,7 @@ spike/fixtures/parsed.json
 pipeline/data/
 pipeline/snapshots/
 *.key.json
+
+# Local secrets: wrangler's .dev.vars; .env examples stay tracked
+!.env*.example
+.dev.vars*
