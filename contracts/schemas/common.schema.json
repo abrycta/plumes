@@ -37,7 +37,7 @@
         "value": { "type": ["number", "string"] },
         "unit": { "type": "string" },
         "source": { "$ref": "#/$defs/sourceId" },
-        "url": { "type": "string", "format": "uri" },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
         "asOf": { "$ref": "#/$defs/date", "description": "The date the publisher reported the figure for" },
         "reportedBy": { "type": "string", "description": "Whose number a second-hand figure is (e.g. \"PHIVOLCS\" when the source is a weekly report)" },
         "note": { "$ref": "#/$defs/localText" }
@@ -77,7 +77,7 @@
               "link": { "type": "string", "description": "Registry link id actually used (primary, mirror or archive)" },
               "snapshotDate": { "$ref": "#/$defs/date" },
               "fromArchive": { "type": "boolean", "description": "true: the app shows 'data as of <snapshotDate>'" },
-              "url": { "type": "string", "format": "uri", "description": "Publisher page to link from the Sources panel" }
+              "url": { "type": "string", "format": "uri", "pattern": "^https://", "description": "Publisher page to link from the Sources panel" }
             },
             "additionalProperties": false
           }

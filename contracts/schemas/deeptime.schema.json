@@ -78,7 +78,7 @@
         "startDayUncertainty": { "type": "integer", "minimum": 0, "description": "± days" },
         "startYearModifier": { "type": "string", "description": "? uncertain year, < before" },
         "evidence": { "type": "string", "description": "GVP StartEvidenceMethod, e.g. 'Isotopic: 14C (calibrated)'" },
-        "url": { "type": "string", "format": "uri" },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
         "impacts": { "type": "array", "items": { "$ref": "#/$defs/impact" } }
       },
       "additionalProperties": false
@@ -114,7 +114,7 @@
         "agents": { "type": "array", "items": { "type": "string", "pattern": "^[A-Za-z]$" } },
         "tsunami": { "const": true },
         "earthquake": { "const": true },
-        "url": { "type": "string", "format": "uri", "description": "NCEI event page" }
+        "url": { "type": "string", "format": "uri", "pattern": "^https://", "description": "NCEI event page" }
       },
       "additionalProperties": false
     }
