@@ -36,10 +36,10 @@ Static read models built by a Python pipeline, plus a read-only Java 17 Spring B
 | [`web/`](web/README.md) | React 19 + Akari + MapLibre front end |
 | [`api/`](api/README.md) | read-only Java 17 Spring Boot API on PostGIS (GraalVM native image) |
 | `docs/` | planning, decisions, licences |
-| `spike/` | the one-day measurement spike that sized Earth Engine cost, file sizes and API cold start before the build (outputs gitignored) |
+| `spike/fixtures/` | crawled pages kept from the pre-build measurement spike; the pipeline's parser tests read them |
 
 Source snapshots are kept in a private archive, the last fallback when an upstream is unavailable.
 
-Start with [docs/WORKFLOW.md](docs/WORKFLOW.md), then [docs/README.md](docs/README.md).
+Start with [docs/README.md](docs/README.md).
 
 Conventions shared with my other projects: every external source goes through a registry with fallbacks and a private snapshot archive (`archivekit`); the UI uses the Akari design system; everything runs on free tiers; architecture is decided and recorded before code; targeted tests run locally and the full suites run in CI.

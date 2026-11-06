@@ -293,7 +293,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 ### LaMEVE (VOGRIPA)
 
 - **Verdict:** **noncommercial-only / permission needed** (changed from "to verify"). Quote: "All text, images and other content on this website is copyright of VOGRIPA unless explicitly stated otherwise."; "You may only download or copy it for personal, non-commercial use."; "You are required to seek written permission from VOGRIPA for any other use or purpose." — https://vogripa.org/view/controller.cfc?method=terms. No bulk export: "The database is searchable via a spatial tool and or a series of attributes, the results of which can be downloaded into a spreadsheet format." — https://vogripa.org/view/controller.cfc?method=lameve.
-- **Design consequence:** not used without written permission; the same facts (magnitude of large Philippine eruptions) come from GVP (VEI) and NCEI. If a later milestone wants LaMEVE, Kurt writes to the webmaster named on the terms page (OPEN-QUESTIONS Q25).
+- **Design consequence:** not used without written permission; the same facts (magnitude of large Philippine eruptions) come from GVP (VEI) and NCEI. If a later milestone wants LaMEVE, Kurt writes to the webmaster named on the terms page (Q25).
 - **Attribution if permitted:** "LaMEVE database (version #), VOGRIPA"; Crosweller et al. 2012, J. Appl. Volcanol. 1:4, doi:10.1186/2191-5040-1-4.
 
 ### GloSSAC stratospheric aerosol
@@ -419,7 +419,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Global Fishing Watch
 
-- **Verdict:** noncommercial-only (CC BY-NC 4.0); API token issued to organisations. Quote: "The Services are available for noncommercial use only in accordance with the CC BY-NC 4.0 license."; "50,000 requests per day" — https://globalfishingwatch.org/our-apis/documentation/docs/license-rate-limits; "You may not scrape the Site to extract data." — https://globalfishingwatch.org/terms-of-use/. Applicants "represent that you are applying on behalf of an organization or entity". Attribution: "Powered by Global Fishing Watch." with a link. **Design consequence:** low priority; an individual portfolio may not qualify for a token; decide at M3 (OPEN-QUESTIONS Q25).
+- **Verdict:** noncommercial-only (CC BY-NC 4.0); API token issued to organisations. Quote: "The Services are available for noncommercial use only in accordance with the CC BY-NC 4.0 license."; "50,000 requests per day" — https://globalfishingwatch.org/our-apis/documentation/docs/license-rate-limits; "You may not scrape the Site to extract data." — https://globalfishingwatch.org/terms-of-use/. Applicants "represent that you are applying on behalf of an organization or entity". Attribution: "Powered by Global Fishing Watch." with a link. **Design consequence:** low priority; an individual portfolio may not qualify for a token; decide at M3 (Q25).
 
 ---
 

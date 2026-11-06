@@ -1,6 +1,6 @@
 # Candidates: which Philippine big-data map to build next
 
-Status: phase 1 of [WORKFLOW.md](WORKFLOW.md), 2026-10-21. Six candidates were researched on the day with web search, page fetches and small API probes (a few KB each); the full notes, with a URL and access date for every claim, are in [`research/`](research/). **[U]** marks an estimate or a claim not verified on a primary page. Nothing is built, no account or resource was created.
+Status: phase 1, 2026-10-21. Six candidates were researched on the day with web search, page fetches and small API probes (a few KB each); the full notes, with a URL and access date for every claim, are in [`research/`](research/). **[U]** marks an estimate or a claim not verified on a primary page. Nothing is built, no account or resource was created.
 
 The bar is Lights (`../../lgu-lights/`): many real public sources, a national map with a time series, honest uncertainty beside official figures, plain-language explanations, English and Japanese, a GitHub Actions pipeline, static-first delivery. The comparison also asks what each candidate adds beyond Lights (a per-LGU annual panel with a Rust core) and Typhoon Replay (a Java/PostGIS event replay), and whether it fits the free tiers and the archiving standard (`../../DATA-ARCHIVING.md`).
 
@@ -122,4 +122,4 @@ What it absorbs from the others: the earthquake catalogue (6) becomes the "earth
 
 Runner-up for a safer build: **6, earthquakes** (fastest to ship, no Earth Engine, best honesty exhibit, narrowest technical scope). Runner-up for a bolder build: **2, subsidence** (widest technical scope and story, heaviest compute, exposed to CopPhil).
 
-Q1 in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md) asks Kurt to choose. The rest of the planning documents ([RESEARCH.md](RESEARCH.md), [DATA-PLAN.md](DATA-PLAN.md), [ARCHITECTURE-OPTIONS.md](ARCHITECTURE-OPTIONS.md), [SPIKE-PLAN.md](SPIKE-PLAN.md), [sources-draft.yaml](sources-draft.yaml)) are written for candidate 1, with enough on 2 and 6 in `research/` that switching costs a day, not a week.
+Q1 in [DECISIONS.md](DECISIONS.md) records the choice. The rest of the planning documents ([RESEARCH.md](RESEARCH.md), [DATA-PLAN.md](DATA-PLAN.md), [ARCHITECTURE-OPTIONS.md](ARCHITECTURE-OPTIONS.md), [sources-draft.yaml](sources-draft.yaml)) are written for candidate 1, with enough on 2 and 6 in `research/` that switching costs a day, not a week.

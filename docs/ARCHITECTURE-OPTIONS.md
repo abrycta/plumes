@@ -6,7 +6,7 @@ Written 2026-10-21 as the proposal for the recommended candidate (volcanoes; [CA
 
 Constraints: free tiers only; Akari for the UI; `archivekit` for every external source; static-first (the live app never depends on an upstream or on a sleeping server); English and Japanese; the safety rules in [RESEARCH.md](RESEARCH.md) §9 are part of the product, not of the UI layer alone; no heavy local computation (the pipeline runs in GitHub Actions and Earth Engine).
 
-> **Decided 2026-10-21 (Q3, Q4 in [DECISIONS.md](DECISIONS.md)): Option B from the start.** The static read models of option A carry the map and the per-volcano views; the read-only Java 17 Spring Boot (MyBatis) API on PostGIS is part of milestone 1, behind a same-origin Cloudflare Pages function with mandatory edge caching, on Render free beside Replay's service and on its own Neon free project. The front end is React 19 (Vite, Akari, MapLibre). No Rust. The text below is kept as written history: §2 still says "milestone 2 or 3" for the API, which is superseded; the free-tier constraints that follow from the decision are in [DATA-PLAN.md](DATA-PLAN.md) §8 and the extra spike items in [SPIKE-PLAN.md](SPIKE-PLAN.md) items 13–18.
+> **Decided 2026-10-21 (Q3, Q4 in [DECISIONS.md](DECISIONS.md)): Option B from the start.** The static read models of option A carry the map and the per-volcano views; the read-only Java 17 Spring Boot (MyBatis) API on PostGIS is part of milestone 1, behind a same-origin Cloudflare Pages function with mandatory edge caching, on Render free beside Replay's service and on its own Neon free project. The front end is React 19 (Vite, Akari, MapLibre). No Rust. The text below is kept as written history: §2 still says "milestone 2 or 3" for the API, which is superseded; the free-tier constraints that follow from the decision are in [DATA-PLAN.md](DATA-PLAN.md) §8.
 
 ## 0. Recommendation at a glance
 
@@ -45,7 +45,7 @@ None of this needs a request-time server. The interactive recompute works on per
 | Transform | Python (uv): pandas/pyarrow for tables, exactextract only for the InSAR milestone, text parsers with fixtures per bulletin era | Python because the Earth Engine client is Python; the parsers are the risky code and get the most tests |
 | Load / materialise | a `read-models` step writes per-volcano JSON (series + episodes + readings), national Parquet tables, PMTiles (volcano points, hotspots, earthquakes, rings), monthly SO2 raster tiles | Immutable `v<N>/` folders with a `latest.json` pointer flipped only after checks pass (archiving standard §5) |
 | Serve | Cloudflare Pages (app + per-volcano JSON); GitHub Pages primary and Hugging Face fallback for tiles and Parquet (Lights' Q5 pattern) | Pages' 25 MiB per-file cap is respected by splitting tiles per layer and raster mosaics per year |
-| Client | React 19 + Akari + MapLibre GL 6; a Web Worker (TypeScript) for ring/threshold recompute from bins; charts in Akari's chart layer | deck.gl (`@deck.gl/maplibre`, 9.4) only if the spike shows MapLibre's circle/heatmap layers cannot animate the hotspot layer well enough (SPIKE-PLAN item 7); otherwise not added |
+| Client | React 19 + Akari + MapLibre GL 6; a Web Worker (TypeScript) for ring/threshold recompute from bins; charts in Akari's chart layer | deck.gl (`@deck.gl/maplibre`, 9.4) only if the spike shows MapLibre's circle/heatmap layers cannot animate the hotspot layer well enough (spike item 7); otherwise not added |
 
 ### 2.2 Diagram
 

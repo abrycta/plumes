@@ -1,6 +1,6 @@
 # Research: a retrospective multi-sensor record of Philippine volcanoes
 
-Status: 2026-10-21, phase 3 of [WORKFLOW.md](WORKFLOW.md), written for the recommended candidate in [CANDIDATES.md](CANDIDATES.md). Every claim has a link and an access date (2026-10-21 unless stated); **[U]** marks an estimate or a claim not verified on a primary page. The raw notes with more detail are in [`research/volcanoes.md`](research/volcanoes.md) (and [`research/platform-limits.md`](research/platform-limits.md) for the free tiers). Probes were tiny: a few KB per request, no bulk downloads, no accounts, no Earth Engine calls.
+Status: 2026-10-21, phase 3, written for the recommended candidate in [CANDIDATES.md](CANDIDATES.md). Every claim has a link and an access date (2026-10-21 unless stated); **[U]** marks an estimate or a claim not verified on a primary page. The raw notes with more detail are in [`research/volcanoes.md`](research/volcanoes.md) (and [`research/platform-limits.md`](research/platform-limits.md) for the free tiers). Probes were tiny: a few KB per request, no bulk downloads, no accounts, no Earth Engine calls.
 
 ## 0. What the product is, in one paragraph
 
@@ -110,7 +110,7 @@ Exposure is a descriptive count ("people living within 10 km, WorldPop 2020"), n
 
 | Platform | Limit that matters here |
 |---|---|
-| Earth Engine noncommercial (Community tier, since 2026-04-27) | **150 EECU-hours a month per project**, soft (restricted mode beyond); 2 concurrent batch tasks; 100 MiB computed result; exports to Drive or EE assets only without billing. The one-off backfill is estimated at a few EECU-hours [U]; the GEE service account from Lights (project `lgu-lights`) shares that project's quota, so a separate project is proposed (OPEN-QUESTIONS Q11) |
+| Earth Engine noncommercial (Community tier, since 2026-04-27) | **150 EECU-hours a month per project**, soft (restricted mode beyond); 2 concurrent batch tasks; 100 MiB computed result; exports to Drive or EE assets only without billing. The one-off backfill is estimated at a few EECU-hours [U]; the GEE service account from Lights (project `lgu-lights`) shares that project's quota, so a separate project is proposed (Q11) |
 | GitHub Actions | public repo minutes free; 4 vCPU / 16 GB / 14 GB SSD; 6 h per job; private archive repo shares 2,000 min a month |
 | Cloudflare Pages | 25 MiB per file, 20,000 files, 500 builds a month; static requests unlimited |
 | GitHub Pages / Hugging Face | 1 GB site, 100 GB a month soft / best-effort public storage, Range requests work |
