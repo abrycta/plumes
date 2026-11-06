@@ -43,3 +43,7 @@ Source snapshots are kept in a private archive, the last fallback when an upstre
 Start with [docs/WORKFLOW.md](docs/WORKFLOW.md), then [docs/README.md](docs/README.md).
 
 Conventions shared with my other projects: every external source goes through a registry with fallbacks and a private snapshot archive (`archivekit`); the UI uses the Akari design system; everything runs on free tiers; architecture is decided and recorded before code; targeted tests run locally and the full suites run in CI.
+
+## License
+
+The code is released under the [MIT License](LICENSE). Data from third-party sources keeps its original terms and attribution, listed on the app's About page.
