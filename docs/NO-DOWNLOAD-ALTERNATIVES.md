@@ -1,14 +1,14 @@
 # Twenty sources, queried in place
 
-**Decided 2026-10-21:** Kurt accepted the 20 (DECISIONS.md Q30), with Black Marble and the Lights poverty join at M1.1, and added four more from NASA-EE-CANDIDATES.md (Q31): 24 sources. The text below is kept as the proposal it was.
+**Decided 2026-10-21:** the 20 were accepted (DECISIONS.md Q30), with Black Marble and the Lights poverty join at M1.1, plus four from NASA-EE-CANDIDATES.md (Q31): 24 sources. The text below is the original proposal.
 
-Status: 2026-10-21, a proposal for Kurt (**Q30**); nothing here is decided, and [DECISIONS.md](DECISIONS.md) is unchanged. Kurt's brief, in two steps the same day: first "look for alternative databases that do not require downloads", then **Plumes should have 20 sources in total**, chosen to prefer query-in-place access (Earth Engine, APIs, cloud-optimised remote reads), all free, with the Taal January 2020 story and the overview map of all 24 volcanoes still working end to end.
+Status: 2026-10-21 proposal (**Q30**); [DECISIONS.md](DECISIONS.md) unchanged. Brief: alternative databases that need no downloads, then **20 sources in total**, preferring query-in-place access (Earth Engine, APIs, cloud-optimised remote reads), all free, with the Taal January 2020 story and the overview map of all 24 volcanoes working end to end.
 
-The 20 are marked in [sources-draft.yaml](sources-draft.yaml) with a `# proposed_keep: true` comment under their id. The registry schema allows no extra fields, so the mark is a comment, and the registry still validates (`archivekit validate-registry`: no problems). No other entry is changed or deleted. Every access route marked "tested" was probed live on 2026-10-21 with a small query; samples stay in the session scratchpad, not in the repo. **[U]** marks an estimate.
+The 20 carry a `# proposed_keep: true` comment under their id in [sources-draft.yaml](sources-draft.yaml) (the schema allows no extra fields); the registry still validates (`archivekit validate-registry`: no problems), and no other entry changed. Routes marked "tested" were probed live on 2026-10-21 with a small query; samples are not in the repo. **[U]** marks an estimate.
 
 ## The 20
 
-USGS ComCat is one source kept as two registry entries (the FDSN service caps a query at 20,000 events), so the 20 sources are 21 entries.
+USGS ComCat is two registry entries (the FDSN service caps a query at 20,000 events), so the 20 sources are 21 entries.
 
 | # | Source (registry id) | Access (no-download unless noted) | Licence (registry verdict, quoted where the publisher words it) | Feeds | Milestone |
 |---|---|---|---|---|---|
@@ -37,24 +37,24 @@ USGS ComCat is one source kept as two registry entries (the FDSN service caps a 
 
 **Taal January 2020 end to end:** step 1 (deformation sentences: 3), step 2 (SO₂, thermal, earthquakes: 6, 8–10, 5), step 3 (plume height and evacuees: 11, 12, with wind arrows from 17), step 4 (alert markers: 3), step 5 (crater lake before and after: 16), step 6 (people within 14 km and the LGUs: 13, 14). **The overview map:** 24 points (1 plus the crosswalk), hillshade (15), the monthly SO₂ layer (6), thermal detections (8) and earthquakes (5).
 
-**What still downloads, and why it stays:** the three crawlers (3, 4, 11) and the DROMIC reports (12) are irreplaceable. They are the official alert levels, plume heights and evacuee counts, and none has an API. Each is fetched page by page or report by report, never as a bulk file. Their dated bundles are the query results that the archive keeps. Everything else is an Earth Engine reduction, an API query or a range read.
+**What still downloads:** the three crawlers (3, 4, 11) and the DROMIC reports (12), because they hold the official alert levels, plume heights and evacuee counts and none has an API. Each is fetched per page or per report, never as a bulk file; the archive keeps their dated bundles as the query results. Everything else is an Earth Engine reduction, an API query or a range read.
 
-**Registrations:** only the free FIRMS MAP_KEY (M1, already in Q28). Plumes no longer needs the Earthdata login (Black Marble moves to Earth Engine), OpenAQ, ReliefWeb, OpenAlex, ECMWF, Copernicus Marine, IOC, DAHITI or EROS. Every source is free; nothing needs a card or billing.
+**Registrations:** only the free FIRMS MAP_KEY (M1, already in Q28). No Earthdata login (Black Marble moves to Earth Engine), OpenAQ, ReliefWeb, OpenAlex, ECMWF, Copernicus Marine, IOC, DAHITI or EROS. All sources are free; none needs a card or billing.
 
 ## Notable cuts and why
 
-The other 65 active entries leave the plan; 4 more were already retired. They stay in the registry, unmarked, as history.
+The other 65 active entries leave the plan (4 more were already retired) and stay in the registry, unmarked, as history.
 
-- **MIROVA v2.5:** a 99 MB whole-file pull with no query route. Radiative power now comes from the MODIS and VIIRS MaxFRP on Earth Engine (9, 10). What is lost is MIROVA's volcano-tuned VRP algorithm, which could return as one small archived subset if Kurt wants it.
-- **PHIVOLCS monthly earthquake tables:** a second crawler and 150k rows. USGS plus the bulletins' volcanic-earthquake counts carry the track (this was already deferred, Q24).
-- **GHSL, WorldCover, Landsat, PSGC JSON, GEM faults:** they repeat what the 20 already cover (WorldPop for exposure, Sentinel-2 for every event since 2017, the COD-AB pcode for PSGC) or are map decoration (land cover, the share-alike fault layer).
-- **Himawari event replays, LiCSAR InSAR, Sentinel-5P layer height, GIBS gallery, Sentinel-1 change:** Himawari has no query route for past dates (NASA GIBS serves Himawari tiles only for a recent rolling window: the capabilities start at 2026-09-08), and its HSD scans are 780 MB. InSAR is per-pair files. The rest are second views of tracks already covered. InSAR stays as plain links to the COMET portal and the PHIVOLCS deformation sentences, which are not counted as sources.
+- **MIROVA v2.5:** a 99 MB whole-file pull with no query route. Radiative power now comes from MODIS and VIIRS MaxFRP on Earth Engine (9, 10). MIROVA's volcano-tuned VRP algorithm could return as one small archived subset.
+- **PHIVOLCS monthly earthquake tables:** a second crawler and 150k rows; USGS plus the bulletins' volcanic-earthquake counts carry the track (already deferred, Q24).
+- **GHSL, WorldCover, Landsat, PSGC JSON, GEM faults:** they duplicate the 20 (WorldPop for exposure, Sentinel-2 for every event since 2017, the COD-AB pcode for PSGC) or are map decoration (land cover, the share-alike fault layer).
+- **Himawari event replays, LiCSAR InSAR, Sentinel-5P layer height, GIBS gallery, Sentinel-1 change:** Himawari has no query route for past dates (NASA GIBS serves Himawari tiles only for a rolling recent window; the capabilities start at 2026-09-08), and its HSD scans are 780 MB. InSAR is per-pair files; it stays as plain links to the COMET portal and the PHIVOLCS deformation sentences, not counted as sources. The rest are second views of covered tracks.
 - **Hand downloads:** NDRRMC, DOH, the PSA barangay census, Slab2, GEBCO, EMSR418, declassified imagery.
 - **The attention track:** GDELT, Wikipedia pageviews, OpenAlex, Commons, Chronicling America.
 - **Every M4 context source:** CAMS, GloFAS, ocean colour, OISST, ISD, IGRA, IASI, IOC, DAHITI, MERRA-2, SMAP and the others.
 - **HazardHunterPH:** stays a link on every page; it was never a data source.
 
-If a cut source is wanted back later, these query-in-place routes were confirmed on 2026-10-21:
+Query-in-place routes for cut sources, confirmed 2026-10-21:
 
 | Cut source | Route |
 |---|---|
@@ -82,4 +82,9 @@ If a cut source is wanted back later, these query-in-place routes were confirmed
 
 ## Recommendation
 
-**Accept the 20** (Q30), with Black Marble and the Lights poverty join moved to M1.1 so the Lights link ships right after the first story. The M1 cut (DATA-PLAN.md §9) then loses MIROVA, GHSL, WorldCover, Landsat, PSGC, GEM faults and the HazardHunterPH entry (which stays a link). It keeps everything the Taal story and the map read, and swaps three downloads for queries: the COD-AB range read, the FIRMS area API, and WorldPop Global 2 on Earth Engine. If accepted, DATA-PLAN.md §1, §9 and §10, LICENCES.md's summary table and the spike plan are updated to the 20. The spike adds four checks: whether the FIRMS API's SP CSV carries the `type` column (1 = active volcano; otherwise the rings define the volcanic subset), which WorldPop Global 2 release the sat-io asset holds, the COD-AB `.dbf` range read inside the pipeline, and FRP-based radiative power at Taal 2020 compared against MIROVA's published figure.
+**Accept the 20** (Q30), with Black Marble and the Lights poverty join at M1.1 so the Lights link ships right after the first story. The M1 cut (DATA-PLAN.md §9) loses MIROVA, GHSL, WorldCover, Landsat, PSGC, GEM faults and the HazardHunterPH entry (still a link), keeps everything the Taal story and the map read, and swaps three downloads for queries: the COD-AB range read, the FIRMS area API and WorldPop Global 2 on Earth Engine. On acceptance, DATA-PLAN.md §1, §9 and §10, LICENCES.md's summary table and the spike plan move to the 20. Four spike checks:
+
+- whether the FIRMS API's SP CSV carries the `type` column (1 = active volcano; otherwise the rings define the volcanic subset)
+- which WorldPop Global 2 release the sat-io asset holds
+- the COD-AB `.dbf` range read inside the pipeline
+- FRP-based radiative power at Taal 2020 against MIROVA's published figure

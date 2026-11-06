@@ -1,10 +1,10 @@
 # Licence verification ledger
 
-Status: 2026-10-21. One row group per source on the approved sources canvas (the core record plus nine passes, 77 rows), in canvas order. Every verdict was checked on the publisher's own terms page on 2026-10-21 unless the row says **not fetched**, in which case the page to check by hand is named. Quotes are verbatim from the fetched page; nothing in quotation marks is paraphrased. **[U]** marks an estimate or a claim read from a search snippet rather than the page itself.
+Status: 2026-10-21. One row group per source on the approved sources canvas (the core record plus nine passes, 77 rows), in canvas order. Verdicts were checked on each publisher's terms page on 2026-10-21; rows marked **not fetched** name the page to check by hand. Quotes are verbatim. **[U]** marks an estimate or a claim read from a search snippet.
 
-**Scope (2026-10-21, DECISIONS.md Q30, Q31):** only 24 sources (25 at M1.1) are in use; see "Scope after Q30 and Q31" below. Entries for the other sources are kept, marked out of scope in the summary table.
+**Scope (2026-10-21, DECISIONS.md Q30, Q31):** 24 sources (25 at M1.1) are in use; see "Scope after Q30 and Q31". Other entries are kept and marked out of scope in the summary table.
 
-The registry ([sources-draft.yaml](sources-draft.yaml)) carries the short form of each verdict in its `licence` field and the attribution text in `attribution`; this file holds the evidence. The product posture that applies to every source: Plumes is a non-commercial portfolio site that shows **derived per-volcano summaries and dated, linked figures**; it redistributes no dataset (DECISIONS.md Q1, Q15). Raw copies live only in the private archive (archiving standard §6).
+The registry ([sources-draft.yaml](sources-draft.yaml)) holds each verdict's short form (`licence`) and attribution text (`attribution`); this file holds the evidence. For every source, Plumes is a non-commercial portfolio site that shows **derived per-volcano summaries and dated, linked figures** and redistributes no dataset (DECISIONS.md Q1, Q15). Raw copies stay only in the private archive (archiving standard §6).
 
 ## Verdict scale
 
@@ -19,7 +19,7 @@ The registry ([sources-draft.yaml](sources-draft.yaml)) carries the short form o
 
 ## Changes from the canvas
 
-The canvas marked 45 rows "to verify" and the rest open, public domain or CC. After verification (details per row below, summary table at the end):
+The canvas marked 45 rows "to verify" and the rest open, public domain or CC. Results (per row below, summary table at the end):
 
 - **Paid or unusable (2):** WWLLN lightning ("available at nominal cost", sold); OpenSky's historical database (by application, university affiliation; its REST API cannot serve a retrospective and a live integration needs a written licence). Both are dropped.
 - **Noncommercial-only or permission needed (4):** LaMEVE/VOGRIPA (personal non-commercial use only, written permission otherwise: dropped unless permission is obtained); Global Fishing Watch (CC BY-NC 4.0, tokens for organisations); IOC Sea Level (no commercial use; registration); DAHITI (CC BY-NC 3.0 badge; registration). The COMET portal images were already CC BY-NC and are linked only.
@@ -27,13 +27,13 @@ The canvas marked 45 rows "to verify" and the rest open, public domain or CC. Af
 - **Conditions that shape the design (6):** OpenStreetMap, Overture and the building footprints (ODbL: counts per ring are a produced work, the clipped tables stay private); NOAA ISD (WMO Resolution 40: Philippine station files are never put in a public release); ReliefWeb (gated API since 2025-11-01; report files are link-only); Raspberry Shake (logo and attribution line, no re-serving of waveforms); IASI (notify the PI); eVolv2k (use v3/v4, not v2 which is "for scientific use only").
 - **Substance corrections (3):** the Philippine volcanoes north of 10°N are in **Tokyo VAAC's** area, not Darwin's, and JMA publishes an open text archive from 2010; Himawari L1b on NODD is **HSD binary, not NetCDF** (780 MB per 10-minute full disk; ash RGB is built from bands 11/13/15); EarthScope holds only two open stations in the Philippines (IU DAV, PS BAG), and the FDSN code `PH` is Hawaii.
 - **Sites that block scripts (403) and need a hand download once (5):** psa.gov.ph and openstat.psa.gov.ph (census, PSGC), nhfr.doh.gov.ph, ndrrmc.gov.ph, ScienceBase (Slab2), si.edu (GVP terms page). Their files are downloaded by hand and adopted as private archive releases, as Lights did for the PSA file.
-- **Everything else** is confirmed open or CC BY with the attribution lines recorded below; nothing in the plan costs money.
+- **Everything else** is open or CC BY, with attribution lines below; nothing in the plan costs money.
 
 ---
 
 ## Scope after Q30 and Q31 (2026-10-21)
 
-Kurt accepted the 20 query-in-place sources and four NASA/Earth Engine additions ([DECISIONS.md](DECISIONS.md), Q30, Q31): **24 sources, 25 with Open Buildings Temporal at M1.1**. In scope: GVP (volcanoes, eruptions), PHIVOLCS WordPress and LAVA bulletins, USGS ComCat, Sentinel-5P SO2 and aerosol index (M2), FIRMS, MOD14A1, VNP14A1, Tokyo VAAC, DSWD DROMIC, WorldPop, OCHA COD-AB, Copernicus DEM, Sentinel-2, ERA5, GPM IMERG (M2), Black Marble on Earth Engine (M1.1), the Lights poverty estimates (M1.1), **OMI SO2 `OMSO2e`**, **MSVOLSO2L4**, **Landsat C2 L2** (with the thermal band), **Sentinel-1 GRD**, and **Google Open Buildings 2.5D Temporal** (M1.1). Every other entry below is **out of scope (Q30)**: its verdict and evidence stay as history, and the summary table's "M" column says "out (Q30)". HazardHunterPH stays a link, not a source.
+Q30 and Q31 ([DECISIONS.md](DECISIONS.md)) adopted the 20 query-in-place sources and four NASA/Earth Engine additions: **24 sources, 25 with Open Buildings Temporal at M1.1**. In scope: GVP (volcanoes, eruptions), PHIVOLCS WordPress and LAVA bulletins, USGS ComCat, Sentinel-5P SO2 and aerosol index (M2), FIRMS, MOD14A1, VNP14A1, Tokyo VAAC, DSWD DROMIC, WorldPop, OCHA COD-AB, Copernicus DEM, Sentinel-2, ERA5, GPM IMERG (M2), Black Marble on Earth Engine (M1.1), the Lights poverty estimates (M1.1), **OMI SO2 `OMSO2e`**, **MSVOLSO2L4**, **Landsat C2 L2** (with the thermal band), **Sentinel-1 GRD**, and **Google Open Buildings 2.5D Temporal** (M1.1). All other entries are **out of scope (Q30)**; their verdicts and evidence stay as history, and the summary table's "M" column says "out (Q30)". HazardHunterPH stays a link, not a source.
 
 ### NASA OMI/Aura SO2 daily L3 (`OMSO2e`) (added by Q31)
 
@@ -49,7 +49,7 @@ Kurt accepted the 20 query-in-place sources and four NASA/Earth Engine additions
 
 ### Now in scope: Landsat, Sentinel-1, MSVOLSO2L4
 
-Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band), Sentinel-1 GRD and MSVOLSO2L4 move to M1 under Q31. Their verdicts (open, below under Pass 2 and Pass 8) are unchanged; MSVOLSO2L4 brings back the Earthdata login.
+Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band), Sentinel-1 GRD and MSVOLSO2L4 move to M1 under Q31. Their verdicts (open; Pass 2 and Pass 8 below) are unchanged; MSVOLSO2L4 needs the Earthdata login again.
 
 ---
 
@@ -67,7 +67,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 - **Verdict:** open ("as is").
 - **Quote:** "sign up for free MAP_KEY using your email." and "MAP_KEY limit is 5000 transactions / 10-minute interval." — https://firms.modaps.eosdis.nasa.gov/api/map_key/. LANCE disclaimer, to be reproduced: "The information presented through LANCE, GIBS, Worldview, and FIRMS are provided "as is" and users bear all responsibility and liability for their use of data" and "Due to the spatial resolution and other characteristics of these data, their use for tactical decision-making or informing about conditions at a local scale are not advised." — https://www.earthdata.nasa.gov/data/projects/lance/disclaimer. MOD14A1 (LP DAAC): "no restrictions on subsequent use, sale, or redistribution" (RESEARCH.md §4).
 - **Attribution:** "We acknowledge the use of data and/or imagery from NASA's Fire Information for Resource Management System (FIRMS) (https://earthdata.nasa.gov/firms), part of NASA's Earth Science Data and Information System (ESDIS)", plus the product citations (MCD14DL/MCD14ML; VNP14IMGTDL; MOD14A1 doi:10.5067/MODIS/MOD14A1.061; VNP14A1).
-- **Access:** Earth Engine `FIRMS`, `MODIS/061/MOD14A1`, `NASA/VIIRS/002/VNP14A1`; the area API `https://firms.modaps.eosdis.nasa.gov/api/area/csv/[MAP_KEY]/[SOURCE]/116,4,128,22/[1-5]/[DATE]` (free MAP_KEY, Kurt's action); the archive tool (Earthdata login or emailed code) for the standard-quality CSV with the `type` column (1 = active volcano). S-NPP deliveries end 2026-11-01; NOAA-20 continues.
+- **Access:** Earth Engine `FIRMS`, `MODIS/061/MOD14A1`, `NASA/VIIRS/002/VNP14A1`; the area API `https://firms.modaps.eosdis.nasa.gov/api/area/csv/[MAP_KEY]/[SOURCE]/116,4,128,22/[1-5]/[DATE]` (free MAP_KEY, registered by hand); the archive tool (Earthdata login or emailed code) for the standard-quality CSV with the `type` column (1 = active volcano). S-NPP deliveries end 2026-11-01; NOAA-20 continues.
 
 ### MIROVA Dataset v2.5
 
@@ -86,7 +86,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 - **Verdict:** open-with-conditions (non-commercial use with citation). **Terms page not fetched**: https://www.si.edu/termsofuse and https://volcano.si.edu/gvp_termsofuse.cfm answered a Cloudflare challenge on 2026-10-21; check by hand. A search snippet of the SI terms reads "You may not use any Content with usage conditions for commercial purposes, unless you have first obtained permission from the Smithsonian museum or program responsible for the Content" and "You must cite the author and source of the Content as you would material from any printed work. You must also cite and link to, when possible, the SI Website as the source of the Content." **[U]**. The WFS GetCapabilities (fetched) declares `AccessConstraints: NONE`, `Fees: NONE`.
 - **Attribution:** the GVP database citation with the current version string, e.g. "Global Volcanism Program, 2026. [Database] Volcanoes of the World (v. 5.4.0; 7 Aug 2026). Distributed by Smithsonian Institution, compiled by Venzke, E. https://doi.org/10.5479/si.GVP.VOTW5-2026.5.4" **[U version]**, linked to volcano.si.edu.
-- **Design consequence:** the derived episode table is shown on the site with the citation and is not offered as a download (Q15 makes this moot). Photo fields carry individual photographer credits and are not reused.
+- **Design consequence:** the derived episode table is shown with the citation and never offered as a download (Q15). Photo fields carry individual photographer credits and are not reused.
 
 ### WorldPop, GHSL, ESA WorldCover, Copernicus DEM
 
@@ -109,7 +109,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Himawari-8/9 (NOAA Open Data Dissemination, AWS)
 
-- **Verdict:** open; attribution requested; no endorsement. Nothing costs money (anonymous S3).
+- **Verdict:** open; attribution requested; no endorsement implied. Free (anonymous S3).
 - **Quote:** "Himawari data is produced and managed by JMA. NOAA has rights to distribute this data freely and openly to the public. [...] NOAA and JMA request attribution for the use or dissemination of unaltered data. However, it is not permissible to state or imply endorsement by or affiliation with NOAA or JMA. If you modify these data, you may not state or imply that it is original, unaltered data." — https://registry.opendata.aws/noaa-himawari/. JMA: "The user must cite the source when using the Content." — https://www.jma.go.jp/jma/en/copyright.html (terms "compatible with the Creative Commons Attribution License 4.0").
 - **Attribution:** "Himawari-8/9 AHI data: Japan Meteorological Agency (JMA), via NOAA Open Data Dissemination (NODD); processed imagery, not original JMA data".
 - **Access and format (corrected):** `s3://noaa-himawari9/AHI-L1b-FLDK/YYYY/MM/DD/HHMM/HS_H09_YYYYMMDD_HHMM_Bnn_FLDK_Rxx_Sss10.DAT.bz2` (HTTPS `https://noaa-himawari9.s3.amazonaws.com/<key>`); Himawari-8 in `noaa-himawari8` (2015-07 → 2022-12, with gaps in the listing). **L1b is HSD binary (bzip2), not NetCDF**; NetCDF exists only in the L2 ISatSS tiles. No "Ash RGB" product is in the bucket: the ash RGB is built from bands B11, B13, B15. A 2.5-minute Target Area (`AHI-L1b-Target/`, 1,000 × 1,000 km, "normally centered on active volcanoes within the Tokyo VAAC domain") exists from 2022.
@@ -140,7 +140,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 - **Verdict:** open (CC BY 4.0 since 2025-07-02).
 - **Quote:** the ADS catalogue JSON for `cams-global-reanalysis-eac4` lists licence `CC-BY-4.0` — https://ads.atmosphere.copernicus.eu/api/catalogue/v1/collections/cams-global-reanalysis-eac4; ECMWF: "on Wednesday 2nd July 2025" the licence in "the Climate Data Store (CDS), Atmosphere Data Store (ADS) and the CEMS Early Warning Data Store (EWDS)" "will be replaced with the Creative Commons Attribution License (CC-BY)" — https://forum.ecmwf.int/t/cc-by-licence-to-replace-licence-to-use-copernicus-products-on-02-july-2025/13464. "One must agree to the Terms of Use of a dataset before downloading any data out of it." — https://ads.atmosphere.copernicus.eu/how-to-api.
 - **Attribution:** "Contains modified Copernicus Atmosphere Monitoring Service information [Year]; CAMS global reanalysis EAC4, ECMWF, doi:10.24381/d58bbf47".
-- **Access:** `cdsapi` with a personal access token (**new free ECMWF account: Kurt's action if this source is built**); 0.75°, 3-hourly, 2003 → 2025-12; total column SO2 and AOD at 550 nm. Philippine box ≈ 2.5 MB per month for ten variables **[U]**.
+- **Access:** `cdsapi` with a personal access token (**needs a free ECMWF account if this source is built**); 0.75°, 3-hourly, 2003 → 2025-12; total column SO2 and AOD at 550 nm. Philippine box ≈ 2.5 MB per month for ten variables **[U]**.
 
 ### ERA5 winds (as in Replay)
 
@@ -161,7 +161,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Sentinel-1 InSAR (COMET LiCSAR)
 
-- **Verdict:** open-with-conditions (derived works of Copernicus Sentinel data; acknowledgement required). Quote: products are "Derived Works of Copernicus data"; acknowledgement "LiCSAR contains modified Copernicus Sentinel data [year]" — https://comet.nerc.ac.uk/comet-lics-portal/ (research/volcanoes.md). The COMET Volcano Portal's *images* are CC BY-NC 4.0 and are linked, not embedded. The portal's LiCSBAS JSON files carry no licence of their own; **Kurt decided on 2026-10-22 (DECISIONS L1a) to treat the portal's CC BY-NC 4.0 notice as covering them, without emailing COMET.** Attribution for derived series and the velocity layer: "Deformation: COMET LiCSBAS (COMET Volcano Portal, https://comet.nerc.ac.uk/comet-volcano-portal/), processed by COMET; LiCSAR contains modified Copernicus Sentinel data [years]. Licence: CC BY-NC 4.0 (https://creativecommons.org/licenses/by-nc/4.0/); changes made: reduced to a summit series and a mean velocity per frame." Plumes is non-commercial (as GVP already requires). Access as in [sources-draft.yaml](sources-draft.yaml) (`licsar-taal-032d`; milestone 2).
+- **Verdict:** open-with-conditions (derived works of Copernicus Sentinel data; acknowledgement required). Quote: products are "Derived Works of Copernicus data"; acknowledgement "LiCSAR contains modified Copernicus Sentinel data [year]" — https://comet.nerc.ac.uk/comet-lics-portal/ (research/volcanoes.md). The COMET Volcano Portal's *images* are CC BY-NC 4.0 and are linked, not embedded. The portal's LiCSBAS JSON files carry no licence of their own; **decided 2026-10-22 (DECISIONS L1a): the portal's CC BY-NC 4.0 notice is treated as covering them, without emailing COMET.** Attribution: see `comet-licsbas` below. Plumes is non-commercial (as GVP already requires). Access as in [sources-draft.yaml](sources-draft.yaml) (`licsar-taal-032d`; milestone 2).
 
 ### COMET Volcano Portal LiCSBAS series (`comet-licsbas`, M2)
 
@@ -177,7 +177,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Landsat thermal band (crater-lake temperature)
 
-- **Verdict:** open (as above). Band `ST_B10` (surface temperature, K, scale 0.00341802, offset 149; masked on L2SR scenes), 16-day per satellite. The Taal main-crater lake is about 1.2 km across, so a few dozen 30 m pixels per scene; the lake disappeared in January 2020 and the series says so.
+- **Verdict:** open (as above). Band `ST_B10` (surface temperature, K, scale 0.00341802, offset 149; masked on L2SR scenes), 16-day per satellite. The Taal main-crater lake is about 1.2 km across (a few dozen 30 m pixels per scene); it disappeared in January 2020, and the series marks the gap.
 
 ### Sentinel-1 SAR change detection
 
@@ -220,7 +220,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### NDRRMC situation reports
 
-- **Verdict:** open (government work) but **ndrrmc.gov.ph answers 403 to every scripted request**; the ReliefWeb mirror's terms allow personal non-commercial use only. Treat as a hand-collected source: PDFs fetched once by hand, archived privately, figures shown with the citation.
+- **Verdict:** open (government work) but **ndrrmc.gov.ph answers 403 to every scripted request**; the ReliefWeb mirror's terms allow personal non-commercial use only. Handled as a hand-collected source: PDFs are fetched once by hand and archived privately; figures are shown with the citation.
 - **Quote (mirror):** "ReliefWeb grants permission to Users to visit the Space and to download and copy the information, documents and materials (collectively, "Materials") from the Space for the User's personal, non-commercial use, without any right to resell or redistribute them or to compile or create derivative works therefrom" — https://reliefweb.int/terms-conditions.
 - **Attribution:** "NDRRMC Update: Situational Report No. N re Taal Volcano Eruption, <date>".
 - **Access:** official PDFs under `https://ndrrmc.gov.ph/attachments/article/<id>/<file>.pdf` (pattern seen in a GDACS link, not verified); mirrors on ReliefWeb and the AHA Centre ADINet (Kanlaon 2024). 1–5 MB per PDF **[U]**.
@@ -253,7 +253,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 - **OpenAQ verdict:** open-with-conditions; free API key; per-provider licences; **Philippine coverage for Taal 2020 unverified** (likely the US Embassy Manila PM2.5 feed and low-cost sensors; no EMB reference monitors found).
 - **Quote:** "Attribution to OpenAQ as the source data is also required when using OpenAQ services for accessing the data."; "OpenAQ users must therefore review and comply with any terms published by data providers." — https://docs.openaq.org/about/terms. Rate limits "60 / minute", "2,000 / hour" — https://docs.openaq.org/using-the-api/rate-limits.
-- **Access:** `https://api.openaq.org/v3/locations?iso=PH` (401 without a key; **free registration is Kurt's action if built**), `/v3/sensors/{id}/days`.
+- **Access:** `https://api.openaq.org/v3/locations?iso=PH` (401 without a key; **needs free registration if built**), `/v3/sensors/{id}/days`.
 - **MODIS MAIAC AOD verdict:** open. Quote: "MODIS data and products acquired through the LP DAAC have no restrictions on subsequent use, sale, or redistribution." — https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MCD19A2_GRANULES. Access: `MODIS/061/MCD19A2_GRANULES` (1 km, daily, 2000-02-24 → ; bands `Optical_Depth_047`, `Optical_Depth_055`, `AOD_QA`). Attribution doi:10.5067/MODIS/MCD19A2.061.
 
 ### OpenSky Network
@@ -288,17 +288,17 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 - **Verdict:** open (US public domain). Quote: use constraints "none", access constraints "none" — https://data.usgs.gov/datacatalog/metadata/USGS.5aa40a33e4b0b1c392eaaef4.xml (Philippines Region item); licence http://www.usa.gov/publicdomain/label/1.0/ on the Manila Trench item.
 - **Attribution:** "Hayes, G., 2018, Slab2 - A Comprehensive Subduction Zone Geometry Model, U.S. Geological Survey data release, https://doi.org/10.5066/F7PV6JNV".
-- **Access:** ScienceBase https://www.sciencebase.gov/catalog/item/5aa1b00ee4b0b1c392e86467 (**blocked scripted fetches with a Cloudflare challenge; the file list was not read**, check by hand); NetCDF grids per region (depth, dip, strike, thickness, uncertainty; region codes likely `phi`, `man`, `cot`, `sul` **[U]**), a few MB each **[U]**. No auth.
+- **Access:** ScienceBase https://www.sciencebase.gov/catalog/item/5aa1b00ee4b0b1c392e86467 (scripted fetches hit a Cloudflare challenge; file list to check by hand); NetCDF grids per region (depth, dip, strike, thickness, uncertainty; region codes likely `phi`, `man`, `cot`, `sul` **[U]**), a few MB each **[U]**. No auth.
 
 ### LaMEVE (VOGRIPA)
 
-- **Verdict:** **noncommercial-only / permission needed** (changed from "to verify"). Quote: "All text, images and other content on this website is copyright of VOGRIPA unless explicitly stated otherwise."; "You may only download or copy it for personal, non-commercial use."; "You are required to seek written permission from VOGRIPA for any other use or purpose." — https://vogripa.org/view/controller.cfc?method=terms. No bulk export: "The database is searchable via a spatial tool and or a series of attributes, the results of which can be downloaded into a spreadsheet format." — https://vogripa.org/view/controller.cfc?method=lameve.
-- **Design consequence:** not used without written permission; the same facts (magnitude of large Philippine eruptions) come from GVP (VEI) and NCEI. If a later milestone wants LaMEVE, Kurt writes to the webmaster named on the terms page (Q25).
+- **Verdict:** **noncommercial-only / permission needed**. Quote: "All text, images and other content on this website is copyright of VOGRIPA unless explicitly stated otherwise."; "You may only download or copy it for personal, non-commercial use."; "You are required to seek written permission from VOGRIPA for any other use or purpose." — https://vogripa.org/view/controller.cfc?method=terms. No bulk export: "The database is searchable via a spatial tool and or a series of attributes, the results of which can be downloaded into a spreadsheet format." — https://vogripa.org/view/controller.cfc?method=lameve.
+- **Design consequence:** not used without written permission; the same facts (magnitude of large Philippine eruptions) come from GVP (VEI) and NCEI. Permission, if later wanted, goes to the webmaster named on the terms page (Q25).
 - **Attribution if permitted:** "LaMEVE database (version #), VOGRIPA"; Crosweller et al. 2012, J. Appl. Volcanol. 1:4, doi:10.1186/2191-5040-1-4.
 
 ### GloSSAC stratospheric aerosol
 
-- **Verdict:** open (NASA; `FreeAndOpenData: true`, access constraints "WORLD" — https://cmr.earthdata.nasa.gov/search/collections.umm_json?concept_id=C3880704181-LARC_CLOUD). Attribution: "NASA/LARC/SD/ASDC, GloSSAC V2.22, doi:10.5067/GLOSSAC-L3-V2.22; Kovilakam et al. 2020, ESSD 12, doi:10.5194/essd-12-2607-2020". Access: one NetCDF, `https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/GloSSAC/GloSSAC_2.22/GloSSAC_V2.22.nc` (518.05 MB, from CMR; 1979–2023, monthly zonal means). **Auth: Earthdata login.** A V2.24 readme exists; check whether it supersedes V2.22.
+- **Verdict:** open (NASA; `FreeAndOpenData: true`, access constraints "WORLD" — https://cmr.earthdata.nasa.gov/search/collections.umm_json?concept_id=C3880704181-LARC_CLOUD). Attribution: "NASA/LARC/SD/ASDC, GloSSAC V2.22, doi:10.5067/GLOSSAC-L3-V2.22; Kovilakam et al. 2020, ESSD 12, doi:10.5194/essd-12-2607-2020". Access: one NetCDF, `https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/GloSSAC/GloSSAC_2.22/GloSSAC_V2.22.nc` (518.05 MB, from CMR; 1979–2023, monthly zonal means). **Auth: Earthdata login.** Open: whether the V2.24 readme supersedes V2.22.
 
 ### eVolv2k ice-core sulphate
 
@@ -318,7 +318,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### DAHITI / Hydroweb altimetry
 
-- **DAHITI verdict:** open-with-conditions, licence ambiguous (the badge is CC BY-NC 3.0, the text says "Attribution 3.0 Unported"); registration. Quote: "All products are available free of charge for the user community after a short registration process." — https://dahiti.dgfi.tum.de/en/; the terms page /en/terms-of-use/ returns 404 (**not fetched**; the registration form shows the terms). Taal Lake **is** a target (DAHITI-ID 41711, water level 2019-02-03 → 2025-10-21, **15 data points**), too sparse for more than a marker. Citation: Schwatke et al. 2015, HESS 19, doi:10.5194/hess-19-4345-2015. **Registration is Kurt's action if built.**
+- **DAHITI verdict:** open-with-conditions, licence ambiguous (the badge is CC BY-NC 3.0, the text says "Attribution 3.0 Unported"); registration. Quote: "All products are available free of charge for the user community after a short registration process." — https://dahiti.dgfi.tum.de/en/; the terms page /en/terms-of-use/ returns 404 (the registration form shows the terms). Taal Lake **is** a target (DAHITI-ID 41711, water level 2019-02-03 → 2025-10-21, **15 data points**), too sparse for more than a marker. Citation: Schwatke et al. 2015, HESS 19, doi:10.5194/hess-19-4345-2015. Registration needed if built.
 - **Hydroweb.next verdict:** open (ETALAB 2.0). Quote: "Hydroweb Datat are distributed with an ETALAB V2.0 license" — https://www.theia-land.fr/blog/product/water-levels-of-rivers-and-lakes-hydroweb/. Taal **not confirmed** in the 399 operational lakes; a Theia account is needed to download. Low priority.
 
 ### JRC Global Surface Water
@@ -327,7 +327,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Sentinel-3 OLCI
 
-- **Verdict:** open (Sentinel notice). `COPERNICUS/S3/OLCI` is **Level-1B radiance only** (21 bands, 300 m, 2016-10-18 → ); chlorophyll and turbidity proxies would have to be derived in Earth Engine. Low priority.
+- **Verdict:** open (Sentinel notice). `COPERNICUS/S3/OLCI` is **Level-1B radiance only** (21 bands, 300 m, 2016-10-18 → ); chlorophyll and turbidity proxies need deriving in Earth Engine. Low priority.
 
 ### HydroSHEDS
 
@@ -335,7 +335,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Copernicus GloFAS
 
-- **Verdict:** open-with-conditions (CEMS-FLOODS licence; account and licence acceptance). Quote: "users are granted free access to the data of CEMS EFAS & GloFAS" for "(a) reproduction; (b) distribution; (c) communication to the public; (d) adaptation, modification and combination with other data and information" — https://ewds.climate.copernicus.eu/licences/cems-floods. Attribution: "Contains modified Copernicus Emergency Management Service information [Year]"; doi:10.24381/cds.a4fdd6b9. Access: `cems-glofas-historical` on the Early Warning Data Store (0.05°, daily, 1979 → ; `cdsapi` ≥ 0.7.7 with a token; **account is Kurt's action if built**). A 60 km box-year ≈ 0.2–0.5 MB **[U]**.
+- **Verdict:** open-with-conditions (CEMS-FLOODS licence; account and licence acceptance). Quote: "users are granted free access to the data of CEMS EFAS & GloFAS" for "(a) reproduction; (b) distribution; (c) communication to the public; (d) adaptation, modification and combination with other data and information" — https://ewds.climate.copernicus.eu/licences/cems-floods. Attribution: "Contains modified Copernicus Emergency Management Service information [Year]"; doi:10.24381/cds.a4fdd6b9. Access: `cems-glofas-historical` on the Early Warning Data Store (0.05°, daily, 1979 → ; `cdsapi` ≥ 0.7.7 with a token; account needed if built). A 60 km box-year ≈ 0.2–0.5 MB **[U]**.
 
 ### NASA SMAP
 
@@ -382,7 +382,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### ReliefWeb API and GLIDE numbers
 
-- **ReliefWeb verdict:** open-with-conditions and **gated since 2025-11-01** ("From 1 November 2025, you need to use a pre-approved appname."; "The maximum number of calls allowed per day is 1000." — https://apidoc.reliefweb.int/); report files are link-only under the terms quoted above. Metadata (title, date, source, link) is shown; files are not re-served. Requesting an appname is Kurt's action if built.
+- **ReliefWeb verdict:** open-with-conditions and **gated since 2025-11-01** ("From 1 November 2025, you need to use a pre-approved appname."; "The maximum number of calls allowed per day is 1000." — https://apidoc.reliefweb.int/); report files are link-only under the terms quoted above. Metadata (title, date, source, link) is shown; files are not re-served. An appname is needed if built.
 - **GLIDE verdict:** open (no terms on the site). Access: `https://www.glidenumber.net/glide/jsonglideset.jsp?level1=PHL&events=VO` (23 records, 17,896 bytes, no auth), e.g. VO-2020-000002-PHL (Taal), VO-2024-000222-PHL (Kanlaon). Attribution "GLIDE number <id> (ADRC, glidenumber.net)".
 
 ### OurAirports
@@ -403,11 +403,11 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### IOC Sea Level Station Monitoring Facility
 
-- **Verdict:** noncommercial-only; registration. Quote: "Data and products available on this web-site may not be used for any commercial purposes." and "The data presented under this service has not undergone any quality control and data is provided as received." — https://www.ioc-sealevelmonitoring.org/disclaimer.php; "Users are required to register for this service." — https://www.ioc-sealevelmonitoring.org/service.php. Attribution: "Sea level station monitoring facility. Accessed at https://www.ioc-sealevelmonitoring.org on <date> at VLIZ", doi:10.14284/482. Access: `service.php?query=data&code=<station>&timestart=…&timestop=…&format=json` (v1) or the v2 API with a key; Philippine stations `luba`, `curri`, `lega`, `mani`, `subi`, `davo`. **Registration is Kurt's action if built.** 2–3 MB per station-month at 1 minute **[U]**.
+- **Verdict:** noncommercial-only; registration. Quote: "Data and products available on this web-site may not be used for any commercial purposes." and "The data presented under this service has not undergone any quality control and data is provided as received." — https://www.ioc-sealevelmonitoring.org/disclaimer.php; "Users are required to register for this service." — https://www.ioc-sealevelmonitoring.org/service.php. Attribution: "Sea level station monitoring facility. Accessed at https://www.ioc-sealevelmonitoring.org on <date> at VLIZ", doi:10.14284/482. Access: `service.php?query=data&code=<station>&timestart=…&timestop=…&format=json` (v1) or the v2 API with a key; Philippine stations `luba`, `curri`, `lega`, `mani`, `subi`, `davo`. Registration needed if built. 2–3 MB per station-month at 1 minute **[U]**.
 
 ### Copernicus Marine (CMEMS) ocean colour
 
-- **Verdict:** open (Copernicus Marine licence; free account). Quote: "This Licence is granted free of charge." (§2.1); derivative works carry "Generated using E.U. Copernicus Marine Service Information" (§2.4a) — https://marine.copernicus.eu/user-corner/service-commitments-and-licence. Access: `copernicusmarine subset --dataset-id …` on OCEANCOLOUR_GLO_BGC_L4_MY_009_104 (4 km, 1997-09 → , daily/monthly CHL; doi:10.48670/moi-00281). **Account is Kurt's action if built.** 50–100 kB per box-month **[U]**.
+- **Verdict:** open (Copernicus Marine licence; free account). Quote: "This Licence is granted free of charge." (§2.1); derivative works carry "Generated using E.U. Copernicus Marine Service Information" (§2.4a) — https://marine.copernicus.eu/user-corner/service-commitments-and-licence. Access: `copernicusmarine subset --dataset-id …` on OCEANCOLOUR_GLO_BGC_L4_MY_009_104 (4 km, 1997-09 → , daily/monthly CHL; doi:10.48670/moi-00281). Account needed if built. 50–100 kB per box-month **[U]**.
 
 ### NOAA OISST v2.1
 
@@ -419,7 +419,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Global Fishing Watch
 
-- **Verdict:** noncommercial-only (CC BY-NC 4.0); API token issued to organisations. Quote: "The Services are available for noncommercial use only in accordance with the CC BY-NC 4.0 license."; "50,000 requests per day" — https://globalfishingwatch.org/our-apis/documentation/docs/license-rate-limits; "You may not scrape the Site to extract data." — https://globalfishingwatch.org/terms-of-use/. Applicants "represent that you are applying on behalf of an organization or entity". Attribution: "Powered by Global Fishing Watch." with a link. **Design consequence:** low priority; an individual portfolio may not qualify for a token; decide at M3 (Q25).
+- **Verdict:** noncommercial-only (CC BY-NC 4.0); API token issued to organisations. Quote: "The Services are available for noncommercial use only in accordance with the CC BY-NC 4.0 license."; "50,000 requests per day" — https://globalfishingwatch.org/our-apis/documentation/docs/license-rate-limits; "You may not scrape the Site to extract data." — https://globalfishingwatch.org/terms-of-use/. Applicants "represent that you are applying on behalf of an organization or entity". Attribution: "Powered by Global Fishing Watch." with a link. **Design consequence:** low priority; token eligibility for an individual project is unclear; decide at M3 (Q25).
 
 ---
 
@@ -435,7 +435,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### IASI SO2 (AERIS / EUMETSAT)
 
-- **Verdict:** open-with-conditions. Quote: for minor use "Please notify the Principal Investigator, send a copy of the manuscript before publication" and for substantial use "Please contact the principal investigator to offer co-authorship to the team." — https://iasi.aeris-data.fr/data-use-policy/. Attribution: "IASI is a joint mission of EUMETSAT and the Centre National d'Etudes Spatiales (CNES, France)"; Clarisse et al. 2026, ESSD 18, doi:10.5194/essd-18-6667-2026; data DOIs 10.25326/868–870. Access: THREDDS https://thredds-su.ipsl.fr/thredds/catalog/catalog-iasi-l2.html (daily global L2 NetCDF, tens to hundreds of MB each **[U]**; 2007 → ). **Design consequence:** a cross-check series only; the PI is notified before it goes live (a courtesy, not a licence condition for a website).
+- **Verdict:** open-with-conditions. Quote: for minor use "Please notify the Principal Investigator, send a copy of the manuscript before publication" and for substantial use "Please contact the principal investigator to offer co-authorship to the team." — https://iasi.aeris-data.fr/data-use-policy/. Attribution: "IASI is a joint mission of EUMETSAT and the Centre National d'Etudes Spatiales (CNES, France)"; Clarisse et al. 2026, ESSD 18, doi:10.5194/essd-18-6667-2026; data DOIs 10.25326/868–870. Access: THREDDS https://thredds-su.ipsl.fr/thredds/catalog/catalog-iasi-l2.html (daily global L2 NetCDF, tens to hundreds of MB each **[U]**; 2007 → ). **Design consequence:** a cross-check series only; the PI is notified before it goes live (a courtesy; the data policy does not require it for a website).
 
 ### NOAA IGRA radiosondes
 
@@ -444,15 +444,15 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 ### NOAA Integrated Surface Database (hourly)
 
 - **Verdict:** open-with-conditions. Quote: "IMPORTANT NOTE:  The non-U.S. data in ISD are subject to WMO Resolution 40 restrictions, and cannot be redistributed to other users or customers." — https://noaa-isd-pds.s3.amazonaws.com/readme.txt. Attribution: "NOAA National Centers for Environmental Information (2001): Global Surface Hourly"; Smith, Lott, Vose 2011, doi:10.1175/2011BAMS3015.1. Access: `https://www.ncei.noaa.gov/data/global-hourly/access/<YYYY>/<USAF><WBAN>.csv` (Legazpi 98444099999 1.33 MB, Tanay 98433099999 1.28 MB, Laoag 98223099999 4.56 MB for 2024, HEAD). No auth.
-- **Design consequence:** only derived pressure-jump indicators are shown; the raw Philippine station files are never put in a public release (the private archive is fine under archiving standard §6).
+- **Design consequence:** public releases show only derived pressure-jump indicators, never the raw Philippine station files (the private archive is allowed under archiving standard §6).
 
 ### Infrasound channels on FDSN
 
-- See EarthScope in pass 2 (same services and terms).
+- Same services and terms as EarthScope (pass 2).
 
 ### WWLLN lightning network
 
-- **Verdict:** **paid / unusable.** Quote: "WWLLN archival data are copyrighted by the University of Washington and are available at nominal cost." and "Archival data are available for sale from August 15, 2004 to the present." and "Our site hosts receive a free monthly subscription." — https://wwlln.net/. No free path short of hosting a sensor. Alternatives checked: GOES GLM does not see the Philippines; ISS LIS (NASA GHRC, free, 2017-03-01 → 2023-11-16, doi:10.5067/LIS/ISSLIS/DATA109) only on overpasses; GLD360 and ENTLN are commercial. **Dropped**; the volcanic-lightning story point cites the literature instead.
+- **Verdict:** **paid / unusable.** Quote: "WWLLN archival data are copyrighted by the University of Washington and are available at nominal cost." and "Archival data are available for sale from August 15, 2004 to the present." and "Our site hosts receive a free monthly subscription." — https://wwlln.net/. The only free route is hosting a sensor. Alternatives: GOES GLM does not see the Philippines; ISS LIS (NASA GHRC, free, 2017-03-01 → 2023-11-16, doi:10.5067/LIS/ISSLIS/DATA109) only on overpasses; GLD360 and ENTLN are commercial. **Dropped**; the volcanic-lightning story cites the literature.
 
 ---
 
@@ -460,11 +460,11 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ### Library of Congress Chronicling America
 
-- **Verdict:** open (pre-1931 newspapers treated as public domain; the user assesses rights). The collection rights page was **not fetched** (403; check https://www.loc.gov/collections/chronicling-america/about-this-collection/rights-and-access/ by hand). Quote: "Beginning in 2025, the Chronicling America collection is accessible exclusively via the loc.gov API." — https://www.loc.gov/apis/additional-apis/chronicling-america-api/; "This API is accessible to the public with no API key or authentication required, however, rate limiting is enforced." — https://guides.loc.gov/chronicling-america/additional-features; 20 requests per minute for JSON — https://www.loc.gov/apis/json-and-yaml/working-within-limits/. Access: `https://www.loc.gov/collections/chronicling-america/?q=<terms>&dates=1911/1911&fo=json`. No auth; a descriptive User-Agent.
+- **Verdict:** open (pre-1931 newspapers treated as public domain, pending a rights check). The rights page returned 403 (re-check by hand: https://www.loc.gov/collections/chronicling-america/about-this-collection/rights-and-access/). Quote: "Beginning in 2025, the Chronicling America collection is accessible exclusively via the loc.gov API." — https://www.loc.gov/apis/additional-apis/chronicling-america-api/; "This API is accessible to the public with no API key or authentication required, however, rate limiting is enforced." — https://guides.loc.gov/chronicling-america/additional-features; 20 requests per minute for JSON — https://www.loc.gov/apis/json-and-yaml/working-within-limits/. Access: `https://www.loc.gov/collections/chronicling-america/?q=<terms>&dates=1911/1911&fo=json`. No auth; send a descriptive User-Agent.
 
 ### USGS declassified satellite imagery (1960s–80s)
 
-- **Verdict:** open (public domain) for frames already scanned; **a scanning fee of "$30.00 per frame"** for unscanned ones (https://www.usgs.gov/centers/eros/science/usgs-eros-archive-declassified-data-declassified-satellite-imagery-1). Attribution: "USGS EROS, Declassified Satellite Imagery-1, doi:10.5066/F78P5XZM". Access: EarthExplorer (free EROS login, **Kurt's action if built**); Corona frames about 80 MB at 14 µm. **Only already-scanned frames are used.**
+- **Verdict:** open (public domain) for frames already scanned; **a scanning fee of "$30.00 per frame"** for unscanned ones (https://www.usgs.gov/centers/eros/science/usgs-eros-archive-declassified-data-declassified-satellite-imagery-1). Attribution: "USGS EROS, Declassified Satellite Imagery-1, doi:10.5066/F78P5XZM". Access: EarthExplorer (free EROS login, set up by hand if built); Corona frames about 80 MB at 14 µm. **Only already-scanned frames are used.**
 
 ### Wikimedia Commons historical photos
 
@@ -494,7 +494,7 @@ Landsat C2 L2 (with the TM and ETM+ collections from 2000 and the thermal band),
 
 ## Summary table
 
-Verdicts in canvas order; "registry id" points into [sources-draft.yaml](sources-draft.yaml); "M" is the milestone decided on 2026-10-21 (DECISIONS.md Q30, Q31; [DATA-PLAN.md](DATA-PLAN.md) §9); "out (Q30)" marks a source outside the 24+1 set, kept here as evidence and history. "Changed" marks a verdict or fact that differs from the canvas.
+Verdicts in canvas order; "registry id" points into [sources-draft.yaml](sources-draft.yaml); "M" is the milestone decided on 2026-10-21 (DECISIONS.md Q30, Q31; [DATA-PLAN.md](DATA-PLAN.md) §9); "out (Q30)" marks a source outside the 24+1 set, kept as a record. "Changed" marks a verdict or fact that differs from the canvas.
 
 | # | Canvas row | Verdict | Auth | Registry id(s) | M | Changed |
 |---|---|---|---|---|---|---|

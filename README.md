@@ -6,7 +6,7 @@ A past record; DOST-PHIVOLCS is the authority on alert levels and advisories.
 
 Project page: [krtmtthw.dev/projects/plumes](https://krtmtthw.dev/projects/plumes/)
 
-**Where it stands (2026-11-06):** the map, 24 volcano timelines and 21 generated stories are live on data version 9. Each data version is published at https://krtmtthw.dev/plumes/data/latest.json, with a files-only hosting mirror on Hugging Face (`permission-alluring/plumes`, not a dataset release). The planning trail is in [docs/README.md](docs/README.md).
+Status on 2026-11-06: the map, 24 volcano timelines and 21 generated stories are live on data version 9. Each data version is published at https://krtmtthw.dev/plumes/data/latest.json, with a files-only hosting mirror on Hugging Face (`permission-alluring/plumes`, not a dataset release). The planning trail is in [docs/README.md](docs/README.md).
 
 ## What it shows
 
@@ -21,7 +21,7 @@ Project page: [krtmtthw.dev/projects/plumes](https://krtmtthw.dev/projects/plume
 - Sentinel-2, Landsat and Sentinel-1 before/after imagery
 - ERA5 winds
 
-24 sources, queried in place where possible; licences in [docs/LICENCES.md](docs/LICENCES.md).
+The 24 sources are queried in place where possible. Licences are in [docs/LICENCES.md](docs/LICENCES.md).
 
 ## Architecture
 
@@ -40,9 +40,13 @@ Static read models built by a Python pipeline, plus a read-only Java 17 Spring B
 
 Source snapshots are kept in a private archive, the last fallback when an upstream is unavailable.
 
-Start with [docs/README.md](docs/README.md).
+Conventions shared with my other projects:
 
-Conventions shared with my other projects: every external source goes through a registry with fallbacks and a private snapshot archive (`archivekit`); the UI uses the Akari design system; everything runs on free tiers; architecture is decided and recorded before code; targeted tests run locally and the full suites run in CI.
+- every external source goes through a registry with fallbacks and a private snapshot archive (`archivekit`)
+- the UI uses the Akari design system
+- everything runs on free tiers
+- architecture is decided and recorded before code
+- targeted tests run locally; the full suites run in CI
 
 ## License
 

@@ -2,9 +2,9 @@
 
 Status: built. Stories are generated from data and publish automatically once the generator's checks pass (ST15, which supersedes ST1's manual review). The plan below is kept as the specification.
 
-Written 2026-10-22. **Kurt answered the 11 open questions the same day** (DECISIONS.md ST1–ST11, listed at the end of this plan); the plan below is updated to match. Kurt's direction (2026-10-22): Plumes stories are **generated from data**, never hand-written and never AI-written. Fixed English and Japanese sentence templates are filled with sourced figures. A sentence appears only when its data exists. The order is **first more story data (Part A), then the standard format (Part B)**. Plumes stays a retrospective record, never a hazard or warning service (Q1, Q14).
+Written 2026-10-22; the 11 open questions were decided the same day (DECISIONS.md ST1–ST11, listed at the end) and the plan matches them. Stories are **generated from data**, never hand-written or AI-written: fixed English and Japanese templates filled with sourced figures, and a sentence appears only when its data exists. Order: **story data first (Part A), then the standard format (Part B)**. Plumes stays a retrospective record, never a hazard or warning service (Q1, Q14).
 
-Inputs read: [DECISIONS.md](DECISIONS.md) (Q1–Q31, S1–S8, B1–B18, L1–L9, T1), [DATA-PLAN.md](DATA-PLAN.md), [LAYERS-PLAN.md](LAYERS-PLAN.md) (planned and rejected layers: not proposed again here without a new reason), [LICENCES.md](LICENCES.md), `pipeline/sources.yaml`, `story_taal()` in `pipeline/plumes/readmodels.py`, `contracts/schemas/story.schema.json`, and the live data version v2 (`https://krtmtthw.dev/plumes/data/v2/`: the manifest, the 24 volcano files and `story/taal-2020.json`). **[U]** marks a value that was not measured. Probes were limited to small read-only requests made on 2026-10-22; they are listed in §A6.
+Inputs read: [DECISIONS.md](DECISIONS.md) (Q1–Q31, S1–S8, B1–B18, L1–L9, T1), [DATA-PLAN.md](DATA-PLAN.md), [LAYERS-PLAN.md](LAYERS-PLAN.md) (its planned and rejected layers are not re-proposed without a new reason), [LICENCES.md](LICENCES.md), `pipeline/sources.yaml`, `story_taal()` in `pipeline/plumes/readmodels.py`, `contracts/schemas/story.schema.json`, and the live data version v2 (`https://krtmtthw.dev/plumes/data/v2/`: the manifest, the 24 volcano files and `story/taal-2020.json`). **[U]** marks an unmeasured value. Probes: small read-only requests on 2026-10-22 (§A6).
 
 ---
 
@@ -22,13 +22,13 @@ The v2 volcano files hold **241 episodes**: 231 GVP eruptions and 10 PHIVOLCS al
 | 2010–2017 | 10 | adds Tokyo VAAC (from 2010) and VIIRS (from 2012); bulletins only from 2017-09 |
 | 2018–2026 | 24 | every M1 series: bulletins and LAVA, VAAC, TROPOMI, thermal, USGS, GVP, MSVOLSO2L4; DROMIC for Taal 2020 only |
 
-Every episode since 2000 belongs to one of five volcanoes: Mayon 23, Kanlaon 11, Bulusan 9, Taal 7 and Pinatubo 1. GVP lists no eruption since 2000 at the other 19. Their stories can only be deep-time cards (§B1).
+All episodes since 2000 are at five volcanoes: Mayon 23, Kanlaon 11, Bulusan 9, Taal 7, Pinatubo 1. The other 19 have no GVP eruption since 2000, so they get deep-time cards only (§B1).
 
-Many GVP eruptions and alert windows describe the same event; Taal 2020, for example, is both `gvp-22344` and `alert-2020-01-12`. Merging the overlapping pairs gives **42 events since 2000**.
+Overlapping GVP eruptions and alert windows describe one event (Taal 2020 is both `gvp-22344` and `alert-2020-01-12`); merged, there are **42 events since 2000**.
 
 ### A2. How "story-worthy" is measured
 
-A story has four steps: **before** (the 90 days before the start), **onset** (the first 7 days), **course** (from day 8 to the end; empty for short episodes) and **after** (the 90 days after the end; an open-ended GVP episode is taken to end 30 days after its start). The step structure is justified in §B2.
+Four steps (justified in §B2): **before** (90 days before the start), **onset** (first 7 days), **course** (day 8 to the end; empty for short episodes) and **after** (90 days after the end; an open-ended GVP episode ends 30 days after its start).
 
 A **fact family** is one kind of sourced fact that can fill a template:
 - alert level (bulletins);
@@ -41,7 +41,7 @@ A **fact family** is one kind of sourced fact that can fill a template:
 - GVP VEI;
 - MSVOLSO2L4 SO₂ mass.
 
-The shortlist adds these families:
+The shortlist adds:
 - GVP Weekly Report figures;
 - HazEL impacts;
 - DROMIC for more events;
@@ -49,19 +49,19 @@ The shortlist adds these families:
 - Tokyo VAAC 2006–2009;
 - COMET deformation.
 
-Context that is always present does not count: population, imagery and winds. (Population is not a story sentence at all: ST13.)
+Always-present context does not count: population, imagery and winds. (Population is not a story sentence at all: ST13.)
 
 - **Story-worthy:** at least 4 fact families, with at least one sentence in each of before, onset and after.
 - **Rich:** at least 6 families, at least 2 of them event records (alert, bulletin numbers, VAAC, DROMIC, GVP Weekly, HazEL).
 
-The score was computed from the v2 files with a throwaway script; it is not committed, because this PR is docs only. The method is above, so it can be rerun. The shortlist columns are **simulated** from the probes:
+The score was computed from the v2 files with an uncommitted script (this PR is docs only); the method above reproduces it. Shortlist columns are **simulated** from the probes:
 - a GVP Weekly Report counts when its week overlaps a step;
 - ~~OMI SO₂ counts for every step from 2004-10~~ (dropped 2026-10-23);
 - DROMIC counts when an event post's date falls in the onset or course;
 - HazEL counts when the GVP number and year match;
 - COMET counts for the before and after steps from 2016 at its 18 volcanoes.
 
-These are upper bounds **[U]**. The real yield depends on how many figures can actually be extracted.
+These are upper bounds **[U]**; the real yield depends on how many figures can be extracted.
 
 ### A3. Coverage: story-worthy episodes, current sources vs. the shortlist
 
@@ -76,29 +76,24 @@ These are upper bounds **[U]**. The real yield depends on how many figures can a
 | Merged events since 2000 | 42 | 18 | **35** | — |
 
 What moves the numbers:
-- The **GVP Weekly Reports** overlap 50 of the 51 episodes since 2000. The exception is Mayon 2000-07-16, because the reports start in November 2000.
+- The **GVP Weekly Reports** overlap 50 of the 51 episodes since 2000; they start in November 2000, so they miss Mayon 2000-07-16.
 - ~~**OMI SO₂** reaches 43 of them~~ (dropped 2026-10-23).
 - **COMET** reaches 29.
 - **DROMIC** beyond Taal 2020 reaches 15.
 
-Seven episodes since 2000 stay below the bar even with the shortlist: Mayon 2000, 2002, 2003 (two), 2004, Bulusan 2010 and Kanlaon 2003. They are short events with a weekly-report mention but no before or after record; they get a one-paragraph reading instead (§B1).
+Seven episodes since 2000 stay below the bar even with the shortlist: Mayon 2000, 2002, 2003 (two), 2004, Bulusan 2010 and Kanlaon 2003. These short events have a weekly-report mention but no before or after record, so each gets a one-paragraph reading (§B1).
 
-Pre-2000 episodes cannot become four-step stories from any open source found:
-- 150 of the 190 have a full start date;
-- 160 have a VEI;
-- 32 match a HazEL record with deaths, damage or houses destroyed.
-
-That is enough for a deep-time card, not for a stepped story.
+No open source found supports a four-step story for a pre-2000 episode. Of the 190, 150 have a full start date, 160 a VEI and 32 match a HazEL record with deaths, damage or houses destroyed: enough for a deep-time card only.
 
 ### A4. Candidates
 
-Effort: S = under 2 days, M = 2–5 days, L = more than a week. "Story step" names the step the source feeds. Licences follow LICENCES.md; any new wording is quoted with its link.
+Effort: S = under 2 days, M = 2–5 days, L = over a week. The step a source feeds is in brackets. Licences follow LICENCES.md; new licence wording is quoted with its link.
 
 | # | Candidate | Facts it adds (step) | Episode coverage | Access | Licence (derived figures) | Size / free tier | Archivable (DATA-ARCHIVING.md) | Effort | Verdict |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | **Smithsonian/USGS Weekly Volcanic Activity Reports** (GVP) | PHIVOLCS-cited figures before 2017-09: alert changes with dates, SO₂ t/d, plume heights, evacuee counts citing DROMIC or NDRRMC, lake and crater observations (before, onset, course, after) | 50 of 51 episodes since 2000. Report counts in the Wayback snapshots (Dec 2025 – Feb 2026): Mayon 187 (2001–2026), Kanlaon 120, Taal 114, Bulusan 100, Pinatubo 9 | Per-volcano page `https://volcano.si.edu/volcano.cfm?vn=<n>&vtab=Weekly`. **On 2026-10-22 volcano.si.edu answered 403 ("Smithsonian site temporarily unavailable") to every scripted request**; the GVP WFS still worked. Wayback snapshots, e.g. `http://web.archive.org/web/20260212045835/https://volcano.si.edu/volcano.cfm?vn=273070&vtab=Weekly`, load with no login | Smithsonian terms: non-commercial with citation, already accepted for `gvp-eruptions-ph` (LICENCES.md; the terms page itself stays **[U]**, Q27). Plumes takes typed numbers and dates only, never prose, each linked to its report | About 3.3 MB of HTML for the five volcanoes; no Earth Engine | `update-input`: crawled pages bundled and adopted (B8 path). Links: volcano.si.edu (primary), Wayback (fallback), archive | M | **Shortlist #1** |
 | 2 | **DSWD DROMIC, generalised** (registered; the M2 promise in `sources.yaml`) | People affected, people inside and outside evacuation centres, with report number and date (course, after) | 16 event posts found by the site search: Mayon 2018, 2022, 2023, 2026; Taal 2020, 2021, 2022 (two), 2026; Kanlaon 2022, 2024 (two), 2026 (two); Bulusan 2022, 2025. Reaches 15 episodes since 2000 | No login. Event posts list their files: Kanlaon 2024-12 has 271 PDF and 1 docx; Mayon 2023 has 88 PDF; Bulusan 2022 has 45 PDF and 17 docx; Taal 2021 has 22 docx. **The Mayon 2018 post links no files in its HTML [U where they are]** | Open, government work (LICENCES.md) | About 2.4 MB a report; about 1 GB for all events **[U]**; Actions only | As now: `update-input`, files adopted as releases | M–L (PDF tables) | **Shortlist #2** |
-| 3 | ~~**OMI SO₂ `OMSO2e`**~~ **dropped by Kurt 2026-10-23** (DECISIONS L-OMI) | An SO₂ baseline and peak before TROPOMI (before, onset) | 43 episodes, 2004-10 → 2018 | Harmony, Earthdata token minted in CI | NASA open | No Earth Engine; 10–20 Actions minutes | Already planned | S (with M2) | **Shortlist #3** (already in M2) |
+| 3 | ~~**OMI SO₂ `OMSO2e`**~~ **dropped 2026-10-23** (DECISIONS L-OMI) | An SO₂ baseline and peak before TROPOMI (before, onset) | 43 episodes, 2004-10 → 2018 | Harmony, Earthdata token minted in CI | NASA open | No Earth Engine; 10–20 Actions minutes | Already planned | S (with M2) | **Shortlist #3** (already in M2) |
 | 4 | **NOAA NCEI HazEL** (LICENCES.md; LAYERS-PLAN M2 rank 8) | Deaths, houses destroyed, damage in US$ millions (after) | 50 Philippine records. 8 since 2000: Mayon 2006, 2013, 2018; Bulusan 2006, 2011; Taal 2020; Kanlaon 2024 (two). 32 pre-2000 episodes match | `https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/volcanoes?country=PHILIPPINES` (one page, 25 kB; needs a browser User-Agent) | Open: "Access to this dataset is unrestricted." | Under 100 kB | `file`; archivekit snapshot | S | **Shortlist #4** (already in M2) |
 | 5 | **Before/after imagery, generalised** (registered: `s2-sr-harmonized`, `landsat-c2-l2`) | One before and one after scene per event (before, after) | Every event since 2000 where a clear scene exists. Landsat 5/7/8/9 from 2000; Sentinel-2 from 2017-03-28 | Earth Engine thumbnails, as `taal-s2.json` | Copernicus notice; US public domain | About 0.05 EECU-h for 42 events **[U]**; 3 × 640 px JPEG ≈ 150 kB an event | `remote-dataset` (Earth Engine, plus STAC as second link) | S–M | **Shortlist #5** |
 | 6 | **COMET LiCSBAS deformation** (L2, planned M2) | Line-of-sight change across the event (before, after) | 29 episodes (2016 →, at the five volcanoes; 18 volcanoes in all) | As LAYERS-PLAN §3 | CC BY-NC 4.0 with attribution (L1a) | As planned | As planned | — (M2) | **Shortlist #6** (reuse, no new work) |
@@ -128,7 +123,6 @@ Effort: S = under 2 days, M = 2–5 days, L = more than a week. "Story step" nam
 
 ### A6. Probes made (2026-10-22, read-only)
 
-These requests were made:
 - the GVP WFS GetCapabilities (no eruption-events layer; `E3WebApp_Emissions` returns a server error);
 - `volcano.si.edu` (403 on every page);
 - seven Wayback snapshots of GVP volcano pages (0.36–1.3 MB each);
@@ -140,7 +134,7 @@ These requests were made:
 - Tokyo VAAC yearly lists 2003–2009;
 - `ndrrmc.gov.ph` (403).
 
-Nothing was archived and no data job was run.
+Nothing was archived; no data job ran.
 
 ---
 
@@ -155,16 +149,14 @@ Nothing was archived and no data job was run.
    - **Reading** (story-worthy fails, but at least 2 families): one paragraph on the volcano page. This is today's `readings` model, built from the same templates.
    - **Deep-time card** (before 2000): GVP dates with their uncertainty, VEI, and HazEL impacts where they match. No steps.
 4. **Order of generation:** by score (families), then VEI, then most recent first. Kanlaon 2024 comes first (Q29, M1.1).
-5. **Overrides** are data, never prose. A small `pipeline/stories/overrides.yaml` may pin an event's span or step boundaries (Taal keeps 1 December 2019 → 31 March 2020) or a scene id. (The population-ring pin went with POP-RING, ST13.) Each override carries a reason line.
+5. **Overrides** are data, never prose: `pipeline/stories/overrides.yaml` may pin an event's span or step boundaries (Taal keeps 1 December 2019 → 31 March 2020) or a scene id, each with a reason line. (The population-ring pin went with POP-RING, ST13.)
 
 ### B2. Step structure: before → onset → course → after
 
-The brief suggested before → escalation → peak → aftermath. This plan proposes **before → onset → course → after**, with the peak as a highlighted figure inside a step, not a step of its own. The reasons:
-- **"Peak" differs by series.** The SO₂ peak, the alert peak and the ash-height peak fall on different days; Taal's SO₂ peaked on 13 January, a day after the alert. A peak step would have to pick one series and hide the others.
-- **"Escalation" is a forecast-shaped word.** In the record, escalation is simply the alert changes inside "before" and "onset". Naming it a step invites a trend reading (Q1).
-- **Fixed windows can be tested.** The windows (−90 d, first 7 d, the rest, +90 d) make the absent-data rule mechanical.
-
-The steps:
+Steps are **before → onset → course → after** (the brief suggested before → escalation → peak → aftermath). The peak is a highlighted figure inside a step:
+- **Peaks differ by series.** SO₂, alert and ash-height peaks fall on different days (Taal's SO₂ peaked on 13 January, a day after the alert); a peak step would hide all series but one.
+- **"Escalation" reads as a forecast.** Alert changes already sit in "before" and "onset"; a separate step invites a trend reading (Q1).
+- **Fixed windows are testable.** −90 d, first 7 d, the rest, +90 d make the absent-data rule mechanical.
 
 | Step | Window | Typical families |
 |---|---|---|
@@ -173,20 +165,13 @@ The steps:
 | course | start + 7 d → end (dropped if empty) | alert changes, DROMIC peak inside evacuation centres, weekly-report figures |
 | after | end + 1 d → end + 90 d | alert lowered, DROMIC totals, HazEL impacts, deformation, before/after images |
 
-Step titles are templated: EN "Before" / JA 「噴火前」 (for unrest without an eruption, 「活動活発化の前」), and EN "12–13 January 2020" / JA 「2020年1月12〜13日」 for date-titled steps, as Taal's are today.
+Step titles are templated: EN "Before" / JA 「噴火前」 (unrest without an eruption: 「活動活発化の前」); date-titled steps use EN "12–13 January 2020" / JA 「2020年1月12〜13日」, as Taal's do today.
 
 ### B3. Template catalogue (EN + JA pairs)
 
-The catalogue is a file (`pipeline/stories/templates.yaml`), versioned. Each entry has:
-- `id`;
-- `step`;
-- `needs`: the series and fields that must all resolve;
-- `when`: a condition on the data;
-- `en` and `ja` with typed placeholders;
-- the `figures` it emits;
-- `source` ids for the attribution.
+The catalogue (`pipeline/stories/templates.yaml`, versioned) has one entry per template: `id`, `step`, `needs` (series and fields that must all resolve), `when` (a data condition), `en` and `ja` with typed placeholders, the `figures` it emits, and `source` ids for attribution.
 
-Placeholders are typed (`date`, `range`, `week`, `int`, `num1`, `fl`, `level`, `km`, `name`). **No free text from any source ever enters a sentence:** weekly-report prose is parsed to typed values, and the prose itself is never quoted.
+Placeholders are typed (`date`, `range`, `week`, `int`, `num1`, `fl`, `level`, `km`, `name`). **No free text from a source enters a sentence:** weekly-report prose is parsed to typed values and never quoted.
 
 **Wording rules** (a generated step renders as a list, one line per sentence, ST12; Japanese stays in the plain form, ST14)
 - Dates: EN "12 January 2020", JA 「2020年1月12日」. Ranges: EN "1 to 11 January 2020", JA 「2020年1月1日から11日まで」. Weeks: EN "15–21 January 2020", JA 「2020年1月15日〜21日」. No ISO dates in text. Bulletin times: EN "7:30 PM", JA 「午後7時30分」.
@@ -199,7 +184,7 @@ Placeholders are typed (`date`, `range`, `week`, `int`, `num1`, `fl`, `level`, `
   - DROMIC: EN "according to DSWD DROMIC Report #{k}" / JA 「DSWD DROMIC報告第{k}号によると」
   - Other sources are named as the subject ("Tokyo VAAC observed…", "The USGS catalogue lists…", "GVP records…").
 - Plural forms: EN "1 earthquake" / "{n} earthquakes"; JA needs no plural (「{n}回」).
-- Voice: past tense, a record of what an instrument or agency reported. No adjectives of magnitude ("major", "massive", 大規模), no causal links between series, no comparison with today. Rain sentences never share a sentence with an eruption, ash or lahar fact and never use causal words (EN because, caused, triggered, led to, due to, after which; JA ため, により, 原因, 引き起こ, 誘発); the checks in §B6 reject them.
+- Voice: past tense, recording what an instrument or agency reported. No magnitude adjectives ("major", "massive", 大規模), no causal links between series, no comparison with today. Rain never shares a sentence with an eruption, ash or lahar fact and never uses causal words (EN because, caused, triggered, led to, due to, after which; JA ため, により, 原因, 引き起こ, 誘発); the §B6 checks reject them.
 
 **Catalogue (first version; the Taal ones reproduce today's reviewed text)**
 
@@ -235,13 +220,13 @@ Placeholders are typed (`date`, `range`, `week`, `int`, `num1`, `fl`, `level`, `
 | RAIN-WETTEST | course, after | as above, and the step has at least one day of 1 mm or more | The wettest day in this period was {date}, with {x} mm. | この期間で最も雨が多かったのは{date}で、{x} mmだった。 |
 | IMAGE-CAPTION | before, after | a chosen scene (§B5) | {sensor}, {date} | {sensor}、{date} |
 
-Today's Taal "crater" step text ("the main crater lake on Volcano Island drained during the eruption") is a hand-written observation. **Kurt chose (ST4)** to source it from the weekly report for 15–21 January 2020 ("Satellite images showed that the Main Crater lake was gone"): the extractor gets a `lake_gone` rule, and the step renders WEEKLY-LAKE-GONE beside the Sentinel-2 captions. The reviewed text therefore changes once, and Kurt reviews it again.
+Today's Taal "crater" step text ("the main crater lake on Volcano Island drained during the eruption") is hand-written. Decided (ST4): source it from the weekly report for 15–21 January 2020 ("Satellite images showed that the Main Crater lake was gone"). The extractor gets a `lake_gone` rule and the step renders WEEKLY-LAKE-GONE beside the Sentinel-2 captions. The reviewed text changes once and is reviewed again.
 
 ### B4. The absent-data rule and its "why" sentences
 
 - A template renders only when **every** placeholder resolves to a value with a source id, plus a URL for PHIVOLCS, VAAC, DROMIC and the weekly reports (Q5 ii).
 - **A zero is not an absence.** "No earthquake within 30 km" is a fact sentence when the series covers those dates. A "why" sentence explains a missing record, never a zero.
-- If a step has no fact sentence, it shows one fixed "why" line per missing family. These are the same reasons as the volcano page (B18), so both pages agree. If no step but "after" has anything, the event is not a story (§B1).
+- A step with no fact sentence shows one fixed "why" line per missing family, the same reasons as the volcano page (B18). If only "after" has anything, the event is not a story (§B1).
 
 | Why id | EN | JA |
 |---|---|---|
@@ -252,7 +237,7 @@ Today's Taal "crater" step text ("the main crater lake on Volcano Island drained
 | WHY-NO-CLEAR-SCENE | No cloud-free Landsat or Sentinel-2 scene was found within 90 days. | 90日以内に雲のないLandsatまたはSentinel-2の画像が見つからなかった。 |
 | WHY-NOT-COVERED | {source} does not cover {volcano}. | {source}は{volcano}を対象としていない。 |
 
-**Rain (ST9):** RAIN-TOTAL and RAIN-WETTEST appear in every step where IMERG has every day, whether or not a lahar was reported. They are context, so they do not count towards the story-worthy score. They are always their own sentences, last in the step, never joined to an eruption, ash or lahar fact, and never phrased as a cause. Rain is never shown as a threshold or beside a channel (L6), so it cannot read as a lahar warning. If a lahar is reported, that is its own sentence from its own source.
+**Rain (ST9):** RAIN-TOTAL and RAIN-WETTEST appear in every step where IMERG has every day, lahar or not. They are context and do not count towards the story-worthy score. They come last in the step, under §B3's voice rule. Rain is never shown as a threshold or beside a channel (L6), so it cannot read as a lahar warning. A reported lahar gets its own sentence from its own source.
 
 ### B5. Images per step (chosen by rule, not by hand)
 
@@ -261,7 +246,7 @@ Today's Taal "crater" step text ("the main crater lake on Volcano Island drained
 - **Clear:** under 10 % cloud inside a 5 km box around the summit (QA band / SCL). Ties go to the scene closest to the step boundary.
 - **Pairs only:** both images exist or neither is shown, with WHY-NO-CLEAR-SCENE.
 - **Format:** true colour, 640 px JPEG (as `assets/taal-s2-*.jpg`). The caption comes from IMAGE-CAPTION. The credit follows the source ("Contains modified Copernicus Sentinel data {year}"; Landsat: "Landsat imagery courtesy of the U.S. Geological Survey").
-- A reviewer may pin a different scene id in `overrides.yaml`, with a reason (a cloud the mask missed, for example). The rule still says what was chosen.
+- A reviewer may pin a different scene id in `overrides.yaml` with a reason (e.g. a cloud the mask missed); the rule still records what it chose.
 
 ### B6. Review flow (draft → reviewed)
 
@@ -271,28 +256,28 @@ Today's Taal "crater" step text ("the main crater lake on Volcano Island drained
 2. `pipeline/stories/review.yaml` records reviews:
    - one entry per story and step, holding the SHA-256 of the step's rendered `en` + `ja` + figures, the reviewer and the date;
    - a step is `reviewed` only while its hash matches;
-   - new data that changes a number turns the step back into a draft, which is the point.
-3. A review page is built by the Data workflow as a CI artifact, not published: one HTML file listing every draft step with its figures, each figure's source link, and the template id behind each sentence. Kurt reviews a batch, and an agent's PR adds the hashes to `review.yaml`. Today's Taal 2020 story is migrated by recording the current hashes (T1, B15), so it stays reviewed.
-4. Checks: the version check fails the build if any of these appear:
+   - new data that changes a number turns the step back into a draft.
+3. The Data workflow builds an unpublished review page as a CI artifact: one HTML file listing every draft step with its figures, each figure's source link and the template id behind each sentence. A reviewer approves a batch and a PR adds the hashes to `review.yaml`. Today's Taal 2020 story migrates by recording its current hashes (T1, B15), so it stays reviewed.
+4. Checks: the version check fails the build on any of:
    - **safety or advice words** in rendered text, EN: should, must, avoid, stay away, safe, unsafe, danger, dangerous, warning, risk, hazard, expect, likely, forecast, predict, will erupt; JA: 危険, 安全, 注意して, 避難してください, 警告, 予測, 予想, 恐れ, 可能性, 見込み. The fixed summary disclaimer ("not a hazard assessment" / 「ハザード評価ではない」) is the only allowed exception, matched exactly;
-   - **an unsourced number:** every digit run in a sentence must come from a placeholder whose value has a source id. The check re-renders the sentence with the placeholders masked and expects no digits left, except fixed template constants such as "30 km", "15 km", "7 days" and "FL", which are declared in the template;
-   - **EN and JA disagree:** the same multiset of placeholder values in both languages, and every figure's value appears in its step's text;
+   - **an unsourced number:** every digit run must come from a placeholder with a source id; the check re-renders the sentence with placeholders masked and expects no digits except template-declared constants such as "30 km", "15 km", "7 days" and "FL";
+   - **EN and JA disagree:** both must hold the same multiset of placeholder values, and every figure's value must appear in its step's text;
    - **half-width brackets, English words or ISO dates in Japanese** (`ja_leftovers()`, extended to the step titles and the why lines);
    - **free text from a source:** no placeholder of type `text` exists, so the check is structural;
    - **causal words in a rain sentence** (the list in §B3's voice rule);
    - **a step with neither a sentence nor a why line.**
-5. **Drafts on the site (ST1):** the site shows only stories whose steps are all reviewed. Drafts stay in the data files, marked `draft`, for the review page; the web app filters on the story's derived `status`.
+5. **Drafts on the site (ST1):** the site shows only stories with every step reviewed. Drafts stay in the data files, marked `draft`, for the review page; the web app filters on the story's derived `status`.
 
 ### B7. Schema changes vs. `story.schema.json`
 
-All changes are additive; v2 files stay valid. They land in one contract PR, approved by Kurt before it is built, like L3a.
+All changes are additive, so v2 files stay valid. They land in one contract PR, approved before it is built, like L3a.
 
 | Where | Change |
 |---|---|
 | story | `generator: { name, version, catalogueVersion }`; `episodeIds: [string]`; `score: { families: int, steps: int, tier: "story" \| "reading" }`; `status` (derived: `reviewed` only when every step is) |
 | step | `kind: "before" \| "onset" \| "course" \| "after"` (the `id` stays free, so Taal's `eruption` and `people` ids stay valid); `sentences: [{ template, text: localText, figures: [int], sources: [sourceId] }]` (`text` stays the joined sentences, so the web app needs no change at first); `absent: [{ why, text: localText }]` |
 | asset | `role: "before" \| "after"`, so the page can pair images without parsing captions |
-| figure (common.schema.json) | optional `reportedBy` (e.g. `"PHIVOLCS"` when the source is `gvp-weekly-reports`), so second-hand figures say whose number it is |
+| figure (common.schema.json) | optional `reportedBy` (e.g. `"PHIVOLCS"` when the source is `gvp-weekly-reports`), so second-hand figures name who reported them |
 | new `stories.schema.json` | `<version>/stories.json`: an index of `{ id, volcanoId, title, span, episodeIds, score, status }` for every generated story and reading. The overview links reviewed stories from it |
 | registry | new source ids: `gvp-weekly-reports`; `noaa-hazel` (planned M2); DROMIC links per event |
 
@@ -300,56 +285,58 @@ All changes are additive; v2 files stay valid. They land in one contract PR, app
 
 1. Move the helpers `date_en`, `date_ja`, `fl_gloss`, `neg`, `share_txt`, `ja_leftovers` and `wp_slug_meta` unchanged into `pipeline/plumes/stories/text.py`.
 2. Express each Taal sentence as a catalogue template: ALERT-HELD, SO2-BASELINE (Taal's December median plus the 1–11 January range is a two-clause variant), EQ-QUIET, ALERT-RAISED with the bulletin time, VAAC-MAX, GVP-VEI, and DROMIC-AFFECTED. (Today's "WorldPop … within 14 km" sentence has no template: POP-RING was dropped, ST13.)
-3. Add a golden test: the generic generator, run on v2 data with Taal's overrides, renders `taal-2020` **byte for byte** like today's reviewed story, apart from the crater-step change Kurt chose (ST4, §B3) and the new additive fields. When the test passes, `story_taal()` is deleted and `build()` calls `generate_stories()`.
-4. The Taal reading on the volcano page is generated the same way. Its "within hours" phrase is not data-derived, so it becomes ALERT-RAISED's wording, after Kurt's review.
+3. Add a golden test: the generic generator, run on v2 data with Taal's overrides, matches today's reviewed `taal-2020` **byte for byte**, apart from the ST4 crater-step change (§B3) and the new additive fields. When the test passes, `story_taal()` is deleted and `build()` calls `generate_stories()`.
+4. The Taal reading on the volcano page is generated the same way. Its "within hours" phrase is not data-derived, so it becomes ALERT-RAISED's wording after review.
 
 ### B9. Where the shared format lives
 
-- **Planned, not written now (Kurt, 2026-10-22):** a workspace-level `STORY-FORMAT.md`, a short standard like DATA-ARCHIVING.md (step model, template-entry fields, wording rules, review-hash rule, checks). Until then this plan is the specification. The JSON schema stays in Plumes' `contracts/`.
-- **Code:** the code stays in `plumes/pipeline/plumes/stories/` with no Plumes imports in the core (renderer, checks, review hashing); the series adapters are Plumes-specific.
-- **When a second project wants stories** (Replay's storms are the obvious one), the core moves to a new private package **`abrycta/story-kit`** (ST7), not into `data-archive-kit`.
+- **Planned (decided 2026-10-22):** a workspace-level `STORY-FORMAT.md`, a short standard like DATA-ARCHIVING.md (step model, template-entry fields, wording rules, review-hash rule, checks). Until then this plan is the specification. The JSON schema stays in Plumes' `contracts/`.
+- **Code:** stays in `plumes/pipeline/plumes/stories/` with no Plumes imports in the core (renderer, checks, review hashing); the series adapters are Plumes-specific.
+- **When a second project wants stories** (e.g. Replay's storms), the core moves to a new private package **`abrycta/story-kit`** (ST7), not into `data-archive-kit`.
 
 ### B10. Implementation order and effort
 
 | # | Step | Effort | Depends on |
 |---|---|---|---|
-| 1 | Contract PR (§B7), approved by Kurt | S | this plan |
+| 1 | Contract PR (§B7), approved before build | S | this plan |
 | 2 | Generator core: catalogue loader, typed renderer, checks (§B6.4), review hashes; Taal golden port (§B8) | M (3–4 days) | 1 |
 | 3 | Event merge, scoring, tiers, `stories.json`, why lines | S | 2 |
 | 4 | Review page (CI artifact) and `review.yaml` flow | S | 2 |
 | 5 | Imagery rule generalised (§B5) | S–M | 2 |
-| 6 | Kanlaon 2024 as the first generated story; Kurt reviews (Q29) | S | 2–5 |
+| 6 | Kanlaon 2024 as the first generated story, reviewed (Q29) | S | 2–5 |
 | 7 | Sources: HazEL (already in the M2 order; OMI SO₂ dropped 2026-10-23); Tokyo VAAC 2006–2009 | S each | — |
 | 8 | GVP Weekly Reports crawler and extractor (typed patterns, each with a test from a real sentence) | M | ST2: Wayback snapshots as the primary link while volcano.si.edu refuses scripts |
 | 9 | DROMIC generalised to the 16 events (docx and PDF tables; `pdfplumber` allowed, ST11) | M–L | — |
-| 10 | Generate all story-worthy events (44 episodes, 35 events); Kurt reviews in batches of about 5 | S per batch | 3–9 |
+| 10 | Generate all story-worthy events (44 episodes, 35 events); review in batches of about 5 | S per batch | 3–9 |
 
-Steps 7–9 can run beside 2–6. Step 10 is the only step that needs Kurt's time repeatedly.
+Steps 7–9 can run beside 2–6. Only step 10 needs repeated review.
 
 ---
 
 ## Kurt's answers (2026-10-22, recorded as ST1–ST11 in DECISIONS.md)
 
-All 11 questions are resolved. Where the answer differs from the recommendation, the plan above has been changed.
+All 11 are resolved and reflected in the plan above. Only ST9 differs from the recommendation.
 
-1. ~~Drafts on the site~~ **Resolved (ST1):** hidden until every step is reviewed (as recommended).
-2. ~~GVP Weekly Reports~~ **Resolved (ST2):** crawl them from Wayback snapshots; PHIVOLCS figures quoted in them are allowed, attributed "as reported by PHIVOLCS, via Smithsonian/USGS" (the attribution wording changed from the draft; §B3).
-3. ~~Steps~~ **Resolved (ST3):** before → onset → course → after (as recommended).
-4. ~~Taal crater step~~ **Resolved (ST4):** the "lake drained" line is sourced from the weekly report (`lake_gone`, WEEKLY-LAKE-GONE).
-5. ~~Thresholds and tiers~~ **Resolved (ST5):** at least 4 fact kinds covering before, onset and after; deep-time cards for pre-2000 events (as recommended).
-6. ~~Events~~ **Resolved (ST6):** each GVP eruption merges with its overlapping alert window into one story (as recommended).
-7. ~~Shared format~~ **Resolved (ST7):** shared code goes to a new `abrycta/story-kit` when a second project needs it. `STORY-FORMAT.md` stays a planned item, not written now (§B9).
-8. ~~ReliefWeb~~ **Resolved (ST8):** left out for now (as recommended).
-9. ~~Rain~~ **Resolved (ST9), differs from the recommendation:** rain is shown **whenever data exists**, not only beside a reported lahar, worded as context without implying a cause (RAIN-TOTAL, RAIN-WETTEST; §B4 and the checks in §B6).
-10. ~~GDACS~~ **Resolved (ST10):** not shown at all.
-11. ~~DROMIC PDFs~~ **Resolved (ST11):** `pdfplumber` is allowed in the pipeline.
+| # | Question | Decision |
+|---|---|---|
+| ST1 | Drafts on the site | Hidden until every step is reviewed |
+| ST2 | GVP Weekly Reports | Crawled from Wayback snapshots; PHIVOLCS figures in them allowed, attributed "as reported by PHIVOLCS, via Smithsonian/USGS" (wording changed from the draft; §B3) |
+| ST3 | Steps | before → onset → course → after |
+| ST4 | Taal crater step | "Lake drained" line sourced from the weekly report (`lake_gone`, WEEKLY-LAKE-GONE) |
+| ST5 | Thresholds and tiers | At least 4 fact kinds covering before, onset and after; deep-time cards for pre-2000 events |
+| ST6 | Events | Each GVP eruption merges with its overlapping alert window into one story |
+| ST7 | Shared format | Shared code moves to a new `abrycta/story-kit` when a second project needs it; `STORY-FORMAT.md` stays planned (§B9) |
+| ST8 | ReliefWeb | Left out for now |
+| ST9 | Rain | Shown **whenever data exists**, not only beside a reported lahar; worded as context with no implied cause (RAIN-TOTAL, RAIN-WETTEST; §B4, checks in §B6) |
+| ST10 | GDACS | Not shown |
+| ST11 | DROMIC PDFs | `pdfplumber` allowed in the pipeline |
 
 ## Not verified
 
-- **volcano.si.edu was unreachable to scripts on 2026-10-22** (403, "temporarily unavailable"). The weekly-report counts come from Wayback snapshots of December 2025 to February 2026.
+- **volcano.si.edu refused scripts on 2026-10-22** (403, "temporarily unavailable"); weekly-report counts come from Wayback snapshots, Dec 2025 – Feb 2026.
 - The Smithsonian terms page is still **[U]** (Q27).
 - The Wayback CDX API was down, so the coverage of PHIVOLCS bulletins before 2017 is unknown.
 - The shortlist coverage is simulated by overlap (§A2), not by extracted figures.
 - The Mayon 2018 DROMIC files were not found.
 - The DROMIC total size, the imagery EECU cost and the parsing of pre-2010 VAAC files are estimates.
-- The FAA NOTAM archive statement is from documentation memory, not a probe.
+- The FAA NOTAM archive statement rests on documentation, not a probe.
