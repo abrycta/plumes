@@ -187,7 +187,7 @@ Fit with DATA-ARCHIVING.md: every satellite source is open and can be mirrored a
 
 ---
 
-## 8. Technical showcase (beyond a night-lights poverty map and a typhoon replay)
+## 8. Technical scope (beyond a night-lights poverty map and a typhoon replay)
 
 1. **Raster time-series animation**: monthly NO2/AI/AOD mosaics scrubbed on a map (WebGL colour ramps, synchronous calendar scrubber), with the 2020 ECQ dip and the Kalimantan haze pulses visible.
 2. **Coverage-aware calendar heatmaps**: per city, a day x year grid where cell colour is the column value and opacity is cloud validity (a visualised honesty metric, rarely seen in AQ dashboards).
@@ -216,7 +216,7 @@ Fit with DATA-ARCHIVING.md: every satellite source is open and can be mirrored a
 | Volume / free-tier feasibility | 5 | GEE reductions fit the 150 EECU-h Community tier; tables are tens of MB; 600 monthly mosaics stay far under Pages limits; HF hosts the raw archive. |
 | Scientific honesty | 3 | Honest presentation is possible and even a differentiator (coverage maps, column-not-concentration), but every layer is a proxy or model and local validation data is scarce. |
 | Public interest / portfolio appeal | 4 | Taal vog school closures, the 2023 smog scare, the 2026 Kalimantan haze, the 2020 lockdown: recurring, Philippine-specific, map-and-time-series friendly. |
-| Technical showcase | 4 | Raster animation, calendar heatmaps, multi-sensor fusion, in-browser Parquet, provenance pipeline; validation panel is the one piece that may be thin. |
+| Technical scope | 4 | Raster animation, calendar heatmaps, multi-sensor fusion, in-browser Parquet, provenance pipeline; validation panel is the one piece that may be thin. |
 | Risk (5 = low) | 3 | Resemblance to AQI dashboards, thin ground truth and the health-claim trap are all manageable but real; SNPP end-of-life and GEOS-CF v1 cut-off need handling. |
 
 **Top three risks**: (1) ground-station data cannot be obtained or redistributed, leaving validation anecdotal; (2) the product reads as yet another AQI map unless coverage and units are foregrounded; (3) over-claiming health or exposure from columns and modelled PM2.5.

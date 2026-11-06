@@ -24,7 +24,7 @@ Status: 2026-10-21. This is a proposal for Kurt (OPEN-QUESTIONS.md **Q31**). Not
 - **Earth Engine quota [U]:** the three (a) picks on Earth Engine add about **1–2 EECU-hours to the backfill and under 0.1 a week**. The roadmap backfill goes from about 8–10 to about 10–12 EECU-hours, still far under the Plumes cap of 50 a month (10 per run). `OMSO2e` and `MSVOLSO2L4` use NASA, not Earth Engine.
 - **Archive size [U]:** about **+3–5 MB** (daily OMI rows for 24 volcanoes, the MSVOLSO2L4 file, yearly building counts, the image request records). The archive stays under 100 MB.
 - **Login:** `OMSO2e` and `MSVOLSO2L4` need the **Earthdata login**, which the 20 had removed. CI already mints short-lived tokens from it for Lights (`EARTHDATA_USERNAME`/`EARTHDATA_PASSWORD`). The three Earth Engine picks use the existing service account.
-- **Not checked, because a permission was denied:** a test read of `MSVOLSO2L4` and `MSAQSO2L4` with the Earthdata token was refused by the session's permission check. So two things are still open: **which Philippine eruptions MSVOLSO2L4 lists**, and **which Philippine volcanoes MSAQSO2L4 lists as degassing sources**. Both are spike checks.
+- **Not checked yet:** a test read of `MSVOLSO2L4` and `MSAQSO2L4` with the Earthdata token was waiting on approval. So two things are still open: **which Philippine eruptions MSVOLSO2L4 lists**, and **which Philippine volcanoes MSAQSO2L4 lists as degassing sources**. Both are spike checks.
 
 ## Method (reproducible)
 
@@ -117,7 +117,7 @@ Status: 2026-10-21. This is a proposal for Kurt (OPEN-QUESTIONS.md **Q31**). Not
 **Hold the (b) list.** B6 (ARIA GUNW) is the recommended route when the M2 InSAR crop (Q8) starts. B9 moves to (a) if the spike shows Philippine sources in it.
 
 **Spike checks to add** (SPIKE-PLAN.md, if Q31 is accepted):
-1. Read MSVOLSO2L4 and MSAQSO2L4 and list their Philippine rows. This needs the Earthdata token, whose use was denied in this session.
+1. Read MSVOLSO2L4 and MSAQSO2L4 and list their Philippine rows. This needs approval to use the Earthdata token.
 2. Run one Harmony HOSS subset of `OMSO2e` for Taal, January 2020, and compare it with TROPOMI.
 3. Make one Sentinel-1 log-ratio thumbnail for Taal, 2020-01-06 against 2020-01-18.
 4. Read the 2016 and 2023 building counts inside Taal's 14 km ring.

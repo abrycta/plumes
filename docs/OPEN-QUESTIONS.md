@@ -53,7 +53,7 @@ The 11 questions at the end of [STORIES-PLAN.md](STORIES-PLAN.md) were answered 
 
 1. Request a free FIRMS MAP_KEY at `https://firms.modaps.eosdis.nasa.gov/api/map_key/` (email) and save it in the Keychain as `firms-map-key` (Q28; spike item 19 waits for it).
 2. Re-read by hand the Smithsonian GVP terms (https://www.si.edu/termsofuse, https://volcano.si.edu/gvp_termsofuse.cfm), which blocked scripts on 2026-10-21; GVP is at M1 (Q25, Q27).
-3. Allow the spike to read NASA files with the Earthdata token (spike items 23 and 24: MSVOLSO2L4, MSAQSO2L4, OMSO2e); the read was refused by the session's permission check on 2026-10-21.
+3. Allow the spike to read NASA files with the Earthdata token (spike items 23 and 24: MSVOLSO2L4, MSAQSO2L4, OMSO2e); it was not yet approved on 2026-10-21.
 4. Give the go-ahead for the throwaway free-plan Render service and Neon project of spike items 13–15 (Q20, Q21), deleted after the measurement.
 5. When the repo exists: create the second Earth Engine service account and save its key as `earth-engine-sa-key-plumes` (Q22); add it (or the `lgu-lights` key), the FIRMS MAP_KEY and the Earthdata login as GitHub secrets.
 

@@ -1,8 +1,31 @@
 # Plumes (噴煙)
 
-The next big-data map of the Philippines in the spirit of [Lights](https://lights.krtmtthw.dev): many public sources, a national map with a time series, honest uncertainty beside official figures, plain-language explanations, English and Japanese.
+Plumes puts satellite SO₂ and heat, earthquakes and PHIVOLCS bulletins for 24 Philippine volcanoes on one timeline, since 2000. It is in English and Japanese.
 
-**Status (2026-10-22):** milestone 1 in progress; data version **v1** is published at https://krtmtthw.dev/plumes/data/latest.json (mirror: huggingface.co/datasets/permission-alluring/plumes). Planning (Q1–Q31) and the spike (S1–S8, [docs/SPIKE-RESULTS.md](docs/SPIKE-RESULTS.md)) are done. The project is **Plumes: a retrospective record of the 24 active Philippine volcanoes** (a past record and visualisation only, never a hazard service; no dataset redistributed; DOST-PHIVOLCS named as the authority on every view): **24 sources, queried in place where possible** (25 with Google Open Buildings Temporal at M1.1): Smithsonian eruption history, the daily figures in DOST-PHIVOLCS's public bulletins as dated linked markers, Sentinel-5P and OMI SO2 (from 2004) with NASA's per-eruption SO2 masses, MODIS/VIIRS thermal anomalies and radiative power, USGS earthquakes, Tokyo VAAC plume heights, DSWD evacuee counts, exposure rings, Sentinel-2, Landsat and Sentinel-1 before/after imagery, ERA5 winds, and the Lights link (night lights and poverty) at M1.1 ([docs/DECISIONS.md](docs/DECISIONS.md) Q30–Q31, [docs/LICENCES.md](docs/LICENCES.md), [docs/sources-draft.yaml](docs/sources-draft.yaml)). Architecture: static read models plus a read-only Java 17 API on PostGIS from milestone 1, React front end ([docs/DECISIONS.md](docs/DECISIONS.md)). Open actions are in [docs/OPEN-QUESTIONS.md](docs/OPEN-QUESTIONS.md).
+A past record; DOST-PHIVOLCS is the authority on alert levels and advisories.
+
+Project page: [krtmtthw.dev/projects/plumes](https://krtmtthw.dev/projects/plumes/)
+
+**Where it stands (2026-11-06):** the map, 24 volcano timelines and 21 generated stories are live on data version 9. Each data version is published at https://krtmtthw.dev/plumes/data/latest.json, with a files-only hosting mirror on Hugging Face (`permission-alluring/plumes`, not a dataset release). The planning trail is in [docs/README.md](docs/README.md).
+
+## What it shows
+
+- Smithsonian GVP eruption history
+- DOST-PHIVOLCS bulletin figures as dated, linked markers
+- Sentinel-5P and OMI SO₂ (OMI from 2004), with NASA's per-eruption SO₂ masses
+- MODIS and VIIRS thermal anomalies and radiative power
+- USGS earthquakes
+- Tokyo VAAC plume heights
+- DSWD evacuee counts
+- Exposure rings (people living nearby)
+- Sentinel-2, Landsat and Sentinel-1 before/after imagery
+- ERA5 winds
+
+24 sources, queried in place where possible; licences in [docs/LICENCES.md](docs/LICENCES.md).
+
+## Architecture
+
+Static read models built by a Python pipeline, plus a read-only Java 17 Spring Boot API on PostGIS (GraalVM native image) and a React front end; see [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Layout
 
@@ -13,10 +36,10 @@ The next big-data map of the Philippines in the spirit of [Lights](https://light
 | [`web/`](web/README.md) | React 19 + Akari + MapLibre front end |
 | [`api/`](api/README.md) | read-only Java 17 Spring Boot API on PostGIS (GraalVM native image) |
 | `docs/` | planning, decisions, licences |
-| `spike/` | the measurement spike (throwaway; outputs gitignored) |
+| `spike/` | the one-day measurement spike that sized Earth Engine cost, file sizes and API cold start before the build (outputs gitignored) |
 
-The private archive of source snapshots is `abrycta/plumes-archive`.
+Source snapshots are kept in a private archive, the last fallback when an upstream is unavailable.
 
 Start with [docs/WORKFLOW.md](docs/WORKFLOW.md), then [docs/README.md](docs/README.md).
 
-Rules shared with my other portfolio projects: `archivekit` for every external source, the Akari design system, free tiers only, secrets in the Keychain, a project page and share card, architecture decided before code, targeted tests locally and the full suites in CI.
+Conventions shared with my other projects: every external source goes through a registry with fallbacks and a private snapshot archive (`archivekit`); the UI uses the Akari design system; everything runs on free tiers; architecture is decided and recorded before code; targeted tests run locally and the full suites run in CI.

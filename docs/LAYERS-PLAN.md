@@ -1,6 +1,8 @@
 # Layers plan: what to add after data v1
 
-Status: 2026-10-22. **Final plan: Kurt answered the nine questions the same day** (§5; recorded as L1–L9 in [DECISIONS.md](DECISIONS.md)). Nothing here is built, registered or run yet; M2 starts when the checklist in §8 is complete. Kurt asked: "plan on what layers to add based on freely available data."
+Status: M2 in progress. Built so far: the NOAA-20 VIIRS thermal series (step 1), the deep-time strip with HazEL impacts (step 3), the national monthly SO₂ map (step 8) and the COMET deformation series with the `deformation-velocity` layer (step 9). The plan below is kept as written on 2026-10-22.
+
+Written 2026-10-22. **Final plan: Kurt answered the nine questions the same day** (§5; recorded as L1–L9 in [DECISIONS.md](DECISIONS.md)). M2 was to start when the checklist in §8 was complete. Kurt asked: "plan on what layers to add based on freely available data."
 
 How this was checked:
 - Earth Engine STAC records for every Earth Engine candidate (IDs, dates, licence field), read on 2026-10-22.
@@ -163,7 +165,7 @@ The nine questions this plan asked, as answered by Kurt; recorded as L1–L9 in 
 | L9 | `MSAQSO2L4` read | **Allowed and done** (below) |
 | L1a | COMET licence (revised) | **No email.** Treat the portal's CC BY-NC 4.0 notice as covering the LiCSBAS data; publish with attribution and the CC BY-NC notice |
 | L3a | Contract change | **Approved**: `deformation-velocity` as in §3.1, built at M2 step 9 |
-| L9a | `h5py` | **Agents may install `h5py`** in the plumes environment, for the `MSAQSO2L4` values at M3 |
+| L9a | `h5py` | **`h5py` may be installed** in the plumes environment, for the `MSAQSO2L4` values at M3 |
 
 **L9 result, 2026-10-22.** CMR lists one granule, `MSAQSO2L4_2005-2025_v02-00_20260814.nc` (1.7 MB, 2005-01-01 → 2025-12-31). Read once with the Earthdata token; nothing else downloaded. It lists **7 Philippine sources: the volcanoes Mayon ("the Philippines' most active volcano"), Bulusan, Kanlaon and "Taai"** (presumably Taal, spelt so in the file) **[U]**, and the power plants Sual, Masinloc and Mariveles. Read from the file's name, country and comment strings; the per-year emission values were not read, because installing a netCDF reader was refused in that session. **Kurt has since allowed agents to install `h5py` in the plumes environment** (L9a, 2026-10-22), so the M3 step reads the per-year values with it; nothing is run now. Item 14 is therefore an M3 layer for four volcanoes; the power plants are not shown (not volcanic).
 

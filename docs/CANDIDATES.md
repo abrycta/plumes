@@ -8,7 +8,7 @@ Kurt's idea, volcanoes, is candidate 1. Ideas already rejected in `../../big-dat
 
 ## 0. Verdict at a glance
 
-| # | Candidate | Data and licences | Free-tier fit | Honesty | Interest and portfolio | Technical showcase | Risk (5 = low) | Total |
+| # | Candidate | Data and licences | Free-tier fit | Honesty | Interest and portfolio | Technical scope | Risk (5 = low) | Total |
 |---|---|---|---|---|---|---|---|---|
 | 1 | **Philippine volcanoes: a retrospective multi-sensor record** | 3 | 4 | 3 | 5 | 5 | 3 | **23** |
 | 2 | Land subsidence and flooding from Sentinel-1 InSAR | 3 | 3 | 4 | 5 | 5 | 2 | 22 |
@@ -47,7 +47,7 @@ A national map of the 24 PHIVOLCS-listed active volcanoes with, for each, a mult
 
 **Public interest and portfolio.** Taal's January 2020 eruption drew 1,374,478 English Wikipedia page views in a month; Kanlaon's 2024–2025 eruptions 160k–180k in peak months; Kanlaon erupted again on 2026-10-10 and is in an eruptive phase today. No public product combines the PHIVOLCS ground series with satellite SO2, thermal and deformation in one retrospective per-volcano view. To a recruiter: "a multi-sensor, 20-year record of every active Philippine volcano, with official figures beside independent satellite measurements and the uncertainty of each". Score 5.
 
-**Technical showcase.** Earth Engine pipelines over daily rasters (S5P, MODIS, VIIRS, WorldPop rings), WFS and FDSN ingestion, bulletin text parsing with tests, event-driven time series (episodes, baselines, anomalies), map plus synchronised multi-series charts, optional InSAR. Different from Lights (annual panel, regression) and Typhoon Replay (hourly replay of one storm). Score 5.
+**Technical scope.** Earth Engine pipelines over daily rasters (S5P, MODIS, VIIRS, WorldPop rings), WFS and FDSN ingestion, bulletin text parsing with tests, event-driven time series (episodes, baselines, anomalies), map plus synchronised multi-series charts, optional InSAR. Different from Lights (annual panel, regression) and Typhoon Replay (hourly replay of one storm). Score 5.
 
 **Risks and mitigations.**
 1. *Being read as a live hazard source.* Kanlaon is erupting now. Mitigation: a dated snapshot ("data through <date>") on every view, no current alert badge (history only, "as reported by PHIVOLCS on <date>"), a persistent banner naming DOST-PHIVOLCS as the sole authority with a link to its bulletins, no live feeds, no push notifications, no "is it safe" language. This is a product rule, written into the scope.
@@ -67,7 +67,7 @@ A ground-motion map of Philippine cities from Sentinel-1 interferometry (Metro M
 
 **Honesty.** InSAR caveats are well understood and showable (reference point, line of sight, standard deviation per pixel, coherence); the worst subsidence is in fishpond terrain where C-band decorrelates. Score 4.
 
-**Interest and showcase.** "Bulacan is sinking", the new Manila airport, reclamation and flooding are live national stories; no public national subsidence map exists. Technically the strongest: time-series inversion, uncertainty maps, ascending/descending decomposition, exposure analytics. Scores 5 and 5.
+**Interest and technical scope.** "Bulacan is sinking", the new Manila airport, reclamation and flooding are live national stories; no public national subsidence map exists. Technically the strongest: time-series inversion, uncertainty maps, ascending/descending decomposition, exposure analytics. Scores 5 and 5.
 
 **Risks.** CopPhil's Ground Motion Monitoring Service (EU/ESA with PhilSA; page live, flyer May 2026, status unknown) may release an official national velocity product; data-path fragility (LiCSAR migration, HyP3 expiry); over-claiming rates that Philippine researchers would challenge. Score 2: the compute path and an outside pre-emption are both outside Kurt's control.
 
@@ -77,7 +77,7 @@ NO2, SO2, CO, aerosol and modelled PM2.5 over the Philippines, 2018 →, per pro
 
 **Sources.** All six Sentinel-5P L3 collections on Earth Engine (NO2 and CO from 2018-06-28, SO2 and HCHO from 2018-12-05), 1.1 km, open with attribution; MAIAC AOD (1 km, 2000 →, no restrictions); CAMS (CC BY); WUSTL satellite PM2.5 (CC BY 4.0, 0.01°, 1998–2023); FIRMS. Ground stations are the weak link: DENR-EMB has 134 stations but its site returned 403, a 2021 FOI request for station locations was denied, and history reaches the public as PDFs and Facebook posts; OpenAQ needs a key and its Philippine coverage is unverified; IQAir and WAQI are proprietary.
 
-**Fit, honesty, interest, showcase.** Free-tier fit is excellent (5). Honesty is hard: columns are not surface concentrations, tropical cloud removes a large share of days, satellite PM2.5 is uncalibrated locally (3). Interest is real but the result resembles existing AQI dashboards (3). Showcase: raster animation, calendar heatmaps, multi-sensor fusion (4). Risk 3: thin ground truth and the health-claim trap.
+**Fit, honesty, interest, technical scope.** Free-tier fit is excellent (5). Honesty is hard: columns are not surface concentrations, tropical cloud removes a large share of days, satellite PM2.5 is uncalibrated locally (3). Interest is real but the result resembles existing AQI dashboards (3). Technical scope: raster animation, calendar heatmaps, multi-sensor fusion (4). Risk 3: thin ground truth and the health-claim trap.
 
 ## 4. Coastal ecosystems: mangrove and coral change
 
@@ -85,7 +85,7 @@ Mangrove extent 1985–2025 and coral reef habitat per municipality, with heat s
 
 **Sources.** Global Mangrove Watch v4.1 (Zenodo, CC BY 4.0, annual 1985–2025 at 10 m, F1 0.93 for extent but change classes about 60 % accurate and early years infilled; the Philippines at 3,038 km² in 2025); PSA Mangrove Accounts (CC BY); Allen Coral Atlas habitat maps (CC BY 4.0 on Earth Engine, 24,219 km² of Philippine reef ecosystem; habitat, not health); NOAA Coral Reef Watch 5 km (public domain, 1985 →, via ERDDAP); UNEP-WCMC reefs and WDPA are no-redistribution and are excluded; Clark Labs pond maps carry a contradictory non-commercial clause; NAMRIA national maps are not downloadable (FOI denied). Fisherfolk poverty 27.4 % in 2023 (PSA, CC BY).
 
-**Fit, honesty, interest, showcase.** Fit 4 (GB-scale subsets; CRW box subsets about 2.6 GB per variable). Honesty 3 (change classes, infill, DHW is not observed bleaching). Interest 4 (planting drives, Boracay, Verde Island Passage, Haiyan, the 2024 bleaching). Showcase 3: it is largely a re-display of two excellent global products with a municipal synthesis; little new computation. Risk 3.
+**Fit, honesty, interest, technical scope.** Fit 4 (GB-scale subsets; CRW box subsets about 2.6 GB per variable). Honesty 3 (change classes, infill, DHW is not observed bleaching). Interest 4 (planting drives, Boracay, Verde Island Passage, Haiyan, the 2024 bleaching). Technical scope 3: it is largely a re-display of two excellent global products with a municipal synthesis; little new computation. Risk 3.
 
 ## 5. Rice and drought
 
@@ -93,7 +93,7 @@ Palay area, production and prices per province beside satellite rice phenology a
 
 **Sources.** PSA OpenSTAT (CC BY; the PX-Web JSON API answered plain curl with no Cloudflare challenge, unlike psa.gov.ph) has palay production and area by province and quarter 1987–2026, monthly retail rice prices by province 2018 →, farmgate prices, stocks; the province is the floor (no municipal series). PRiSM (IRRI/PhilRice Sentinel-1 rice monitoring) publishes nothing; PAGASA station data forbids redistribution; NESEA-Rice10 (CC BY 4.0) gives 10 m rice maps 2017–2019; CHIRPS, ERA5-Land, SMAP, MODIS NDVI, NOAA VHI, ONI are open; SPEIbase is ODbL. Sentinel-1's record is discontinuous (S1B lost in 2021, S1A retired mid-2026).
 
-**Fit, honesty, interest, showcase.** Fit 3: national 10 m Sentinel-1 phenology would far exceed 150 EECU-hours a month, so the SAR layer must be 100 m zonal statistics plus showcase provinces [U]. Honesty 3: area and phenology anomalies are defensible, yields are not, and 2024 mixes El Niño with typhoons. Interest 5: rice inflation peaked at 24.4 % in March 2024, with price caps, a tariff cut, an import ban and a strong El Niño forecast for late 2026. Showcase 4, with the caveat that if scope is cut to "annual index versus statistic per LGU" it duplicates Lights. Risk 3.
+**Fit, honesty, interest, technical scope.** Fit 3: national 10 m Sentinel-1 phenology would far exceed 150 EECU-hours a month, so the SAR layer must be 100 m zonal statistics plus sample provinces [U]. Honesty 3: area and phenology anomalies are defensible, yields are not, and 2024 mixes El Niño with typhoons. Interest 5: rice inflation peaked at 24.4 % in March 2024, with price caps, a tariff cut, an import ban and a strong El Niño forecast for late 2026. Technical scope 4, with the caveat that if scope is cut to "annual index versus statistic per LGU" it duplicates Lights. Risk 3.
 
 ## 6. Earthquakes, faults and shaking exposure
 
@@ -101,7 +101,7 @@ A century-long seismicity explorer with faults, the "Big One" scenario, ShakeMap
 
 **Sources.** USGS ComCat (public domain; 27,334 events in the box since 1900, 631 at M ≥ 6; about 5 MB of CSV; pre-1970 rows are mostly ISC-GEM imports, so the century series is honest only above about M5.5); ISC Bulletin (citation required, 24 months behind); PHIVOLCS HTML tables (2018 → via monthly pages per these notes, 2016 → per the volcano notes; no API, no licence); GEM Global Active Faults (CC BY-SA 4.0, share-alike); GEM hazard map (CC BY-NC-SA); USGS ShakeMap (public domain, about 0.3 MB light products per event); PHIVOLCS fault shapefiles are not public (KMZ only, FOI denied); HazardHunterPH all rights reserved; NCEI tsunami database (113 Philippine events since 1627); WorldPop, GHSL, building footprints, COD-AB. The 2025 Cebu (M6.9, 2025-09-30) and Davao Oriental (M7.4, 2025-10-10) earthquakes are verified in both catalogues, with PHIVOLCS and USGS differing on depth.
 
-**Fit, honesty, interest, showcase.** Fit 5 (no Earth Engine, everything under 100 MB). Honesty 4 (magnitude types, completeness, three different death tolls for the same MMEIRS scenario make a good exhibit). Interest 4 ("Big One" drills all through 2026, the 2025 disasters; crowded with authoritative maps). Showcase 3: point and raster batch work, no satellite component; it reads as a USGS re-skin unless stacked shaking and catalogue reconciliation lead. Risk 3: real-time misuse (PHIVOLCS fact-checked a fake prediction map in September 2026), PHIVOLCS terms, share-alike mixing.
+**Fit, honesty, interest, technical scope.** Fit 5 (no Earth Engine, everything under 100 MB). Honesty 4 (magnitude types, completeness, three different death tolls for the same MMEIRS scenario make a good exhibit). Interest 4 ("Big One" drills all through 2026, the 2025 disasters; crowded with authoritative maps). Technical scope 3: point and raster batch work, no satellite component; it reads as a USGS re-skin unless stacked shaking and catalogue reconciliation lead. Risk 3: real-time misuse (PHIVOLCS fact-checked a fake prediction map in September 2026), PHIVOLCS terms, share-alike mixing.
 
 ## 7. What the comparison says
 
@@ -120,6 +120,6 @@ A century-long seismicity explorer with faults, the "Big One" scenario, ShakeMap
 
 What it absorbs from the others: the earthquake catalogue (6) becomes the "earthquakes within 30 km" series per volcano and a national seismicity layer; the InSAR method (2) becomes a later milestone at Taal, where LiCSAR has 374 epochs and the 2020 eruption is bracketed by pairs; the SO2 column work (3) is the same Earth Engine collection, so the national SO2 map is a by-product.
 
-Runner-up for a safer build: **6, earthquakes** (fastest to ship, no Earth Engine, best honesty exhibit, weakest showcase). Runner-up for a bolder build: **2, subsidence** (strongest showcase and story, heaviest compute, exposed to CopPhil).
+Runner-up for a safer build: **6, earthquakes** (fastest to ship, no Earth Engine, best honesty exhibit, narrowest technical scope). Runner-up for a bolder build: **2, subsidence** (widest technical scope and story, heaviest compute, exposed to CopPhil).
 
 Q1 in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md) asks Kurt to choose. The rest of the planning documents ([RESEARCH.md](RESEARCH.md), [DATA-PLAN.md](DATA-PLAN.md), [ARCHITECTURE-OPTIONS.md](ARCHITECTURE-OPTIONS.md), [SPIKE-PLAN.md](SPIKE-PLAN.md), [sources-draft.yaml](sources-draft.yaml)) are written for candidate 1, with enough on 2 and 6 in `research/` that switching costs a day, not a week.
