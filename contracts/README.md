@@ -1,6 +1,6 @@
 # Read-model contracts
 
-The files the pipeline publishes and the front end and the Java API read. **The JSON Schemas in `schemas/` are the source of truth**; `ts/readmodels.ts` mirrors them for the web app, and the pipeline validates every published file against them (`pipeline/plumes/contracts.py`) before `latest.json` is flipped.
+Files the pipeline publishes for the front end and the Java API. **The JSON Schemas in `schemas/` are the source of truth**; `ts/readmodels.ts` mirrors them for the web app, and the pipeline validates every published file against them (`pipeline/plumes/contracts.py`) before `latest.json` is flipped.
 
 ## Layout of a data version
 
@@ -17,7 +17,7 @@ v3/deeptime.json             GVP eruptions of the 24 volcanoes with NCEI HazEL i
 v3/assets/…                  before/after thumbnails
 ```
 
-Published base URL: `https://krtmtthw.dev/plumes/data/` (GitHub Pages, range requests and CORS verified); fallback `https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/`. Clients read `latest.json`, then fetch everything relative to `base`. In published versions the thermal layer is one PMTiles file per year (`layers/thermal/{year}.pmtiles`, source layer `thermal`, filter on `month`); the fixture uses GeoJSON. Versions are immutable; rollback is a pointer flip. Hosting: GitHub Pages (primary) with the Hugging Face files-only mirror `permission-alluring/plumes` as fallback; `latest.json.mirrors` lists the base URLs.
+Published base URL: `https://krtmtthw.dev/plumes/data/` (GitHub Pages, primary; range requests and CORS verified). Fallback: the Hugging Face files-only mirror `permission-alluring/plumes` at `https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/`; `latest.json.mirrors` lists the base URLs. Clients read `latest.json`, then fetch everything relative to `base`. Versions are immutable; rollback is a pointer flip. In published versions the thermal layer is one PMTiles file per year (`layers/thermal/{year}.pmtiles`, source layer `thermal`, filter on `month`); the fixture uses GeoJSON.
 
 ## Conventions
 
@@ -26,7 +26,7 @@ Published base URL: `https://krtmtthw.dev/plumes/data/` (GitHub Pages, range req
 - **Event series** (`events.<id>`): sparse rows, the first column a date, the rest as named in `cols` with units in `units`. `start` is when the instrument could first report: an empty stretch after `start` means "nothing detected", before it "not observed".
 - **Tables** (`bulletins`, `advisories`, `displacement`): column arrays named by `cols`; **the last column is always the source URL** (DECISIONS Q5 ii: every PHIVOLCS, VAAC and DROMIC figure links to its page).
 - **Text** is `{en, ja}`. Readings and story steps carry `status: "draft"` until both languages have been reviewed.
-- **Safety:** nothing is "current". Alert levels are labelled "as reported by PHIVOLCS on <date>", and the record ends at `dataAsOf` (Q14). No reading forecasts.
+- **Safety:** nothing is "current". Alert levels are labelled "as reported by PHIVOLCS on <date>", and the record ends at `dataAsOf` (Q14). Readings never forecast.
 - **Provenance:** every file has `provenance.sources[]` with the registry id, attribution and licence; `fromArchive: true` means the app shows "data as of <snapshotDate>".
 
 ## Series ids (M1)

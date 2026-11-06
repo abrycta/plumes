@@ -1,30 +1,27 @@
 # More query-in-place sources from NASA and Earth Engine
 
-**Decided 2026-10-21:** Kurt accepted (b): A1–A4 now (24 sources) and A5 at M1.1 (25) (DECISIONS.md Q31); the (b) list is held. The text below is kept as the proposal it was.
+**Decided 2026-10-21** (Q31, [DECISIONS.md](DECISIONS.md)): option (b): A1–A4 now (24 sources), A5 at M1.1 (25); the (b) list is held. The rest of this note is the original proposal, measured against the 20 in [NO-DOWNLOAD-ALTERNATIVES.md](NO-DOWNLOAD-ALTERNATIVES.md).
 
-Status: 2026-10-21. This is a proposal for Kurt (**Q31**). Nothing is decided. [DECISIONS.md](DECISIONS.md) and the 20 in [NO-DOWNLOAD-ALTERNATIVES.md](NO-DOWNLOAD-ALTERNATIVES.md) are unchanged. Kurt's request: "can you query nasa and earth engine for more sources?" Every fact below comes from a catalogue query run on 2026-10-21, not from memory. **[U]** marks an estimate, and "unverified" marks what the catalogues could not confirm.
+Every fact comes from catalogue queries run on 2026-10-21. **[U]** marks an estimate; "unverified" marks what the catalogues could not confirm.
 
 ## Summary
 
 - **Searched:**
-  - NASA CMR: 25 keyword searches over the bounding box 116,4,127,21 with a 2000–2026 time window and `has_granules=true`. They returned **2,999 collections**. Of these, **1,081** start by 2016, run to at least 2022, and have cloud hosting or a Harmony service.
+  - NASA CMR: 25 keyword searches over the bounding box 116,4,127,21 with a 2000–2026 time window and `has_granules=true`. They returned **2,999 collections**; **1,081** start by 2016, run to at least 2022, and have cloud hosting or a Harmony service.
   - GIBS: the WMTS capabilities document (the layer ids and their time domains).
   - The Earth Engine STAC catalogue: **1,164 collections** in 133 provider catalogues.
   - The Earth Engine community catalogue: 4,398 rows.
-- **Assessed:** 30 candidates that would be new beside the 20 and the existing plan.
-  - (a) strong: **5**;
-  - (b) nice to have: **9**;
-  - (c) not useful: **16**.
+- **Assessed:** 30 candidates new beside the 20 and the existing plan: **5** (a) strong, **9** (b) nice to have, **16** (c) not useful.
 - **Top (a) picks:**
   1. **OMI SO₂, daily L3 (`OMSO2e`), through Harmony subsetting:** pushes the SO₂ track back from 2018-12 to **2004-10**.
   2. **MEaSUREs volcanic SO₂ database (`MSVOLSO2L4`):** SO₂ mass per eruption, 1978 to 2026-05, in one 185 kB file.
   3. **Landsat Collection 2 L2 on Earth Engine (TM, ETM+, OLI, OLI-2):** before/after images and crater-lake temperature from **2000**, where Sentinel-2 only starts in 2017.
   4. **Sentinel-1 GRD on Earth Engine:** radar before/after that sees through the January 2020 ash and cloud.
   5. **Google Open Buildings 2.5D Temporal on Earth Engine:** buildings inside each ring for every year 2016–2023 (exposure and recovery).
-- **Earth Engine quota [U]:** the three (a) picks on Earth Engine add about **1–2 EECU-hours to the backfill and under 0.1 a week**. The roadmap backfill goes from about 8–10 to about 10–12 EECU-hours, still far under the Plumes cap of 50 a month (10 per run). `OMSO2e` and `MSVOLSO2L4` use NASA, not Earth Engine.
+- **Earth Engine quota [U]:** the three (a) picks on Earth Engine add about **1–2 EECU-hours to the backfill and under 0.1 a week**. The roadmap backfill goes from about 8–10 to about 10–12 EECU-hours, under the Plumes cap of 50 a month (10 per run). `OMSO2e` and `MSVOLSO2L4` use NASA, not Earth Engine.
 - **Archive size [U]:** about **+3–5 MB** (daily OMI rows for 24 volcanoes, the MSVOLSO2L4 file, yearly building counts, the image request records). The archive stays under 100 MB.
 - **Login:** `OMSO2e` and `MSVOLSO2L4` need the **Earthdata login**, which the 20 had removed. CI already mints short-lived tokens from it for Lights (`EARTHDATA_USERNAME`/`EARTHDATA_PASSWORD`). The three Earth Engine picks use the existing service account.
-- **Not checked yet:** a test read of `MSVOLSO2L4` and `MSAQSO2L4` with the Earthdata token was waiting on approval. So two things are still open: **which Philippine eruptions MSVOLSO2L4 lists**, and **which Philippine volcanoes MSAQSO2L4 lists as degassing sources**. Both are spike checks.
+- **Not checked yet (spike checks):** a test read of `MSVOLSO2L4` and `MSAQSO2L4` with the Earthdata token awaits approval, so two questions are open: **which Philippine eruptions MSVOLSO2L4 lists** and **which Philippine volcanoes MSAQSO2L4 lists as degassing sources**.
 
 ## Method (reproducible)
 
@@ -36,29 +33,26 @@ Status: 2026-10-21. This is a proposal for Kurt (**Q31**). Nothing is decided. [
 - **GIBS:** `wmts/epsg4326/best/1.0.0/WMTSCapabilities.xml`, reading each layer's `<Dimension>` time values.
 - **Earth Engine:**
   - `catalog.json`, then each provider catalogue, then each collection's STAC record: `license`, `extent`, `gsd`, `deprecated` and the terms link.
-  - Records outside the Philippine box were dropped, as were records that end before 2018.
+  - Records outside the Philippine box or ending before 2018 were dropped.
   - Then `community_datasets.csv` from awesome-gee-community-datasets.
-  - No Earth Engine API call was made, and no compute was used.
+  - No Earth Engine API call or compute was used.
 - **Licence terms in this note:**
   - "EOSDIS open": CMR `UseConstraints` points to the EOSDIS data use policy (NASA open data, no restriction, citation requested).
-  - "STAC proprietary": Earth Engine's flag for "see the provider's terms". It is not a restriction in itself, and the provider's terms are named in each row.
+  - "STAC proprietary": Earth Engine's flag for "see the provider's terms", not a restriction in itself; each row names the provider's terms.
 
 ## (a) Strong additions
 
 | # | Dataset and access route | Dates, resolution | Licence (catalogue record) | Auth | Feeds | Cost per volcano [U] |
 |---|---|---|---|---|---|---|
 | A1 | **OMI/Aura SO₂ daily L3 best pixel, `OMSO2e` v003** (GES DISC, cloud-hosted). Services in CMR: "Harmony OPeNDAP SubSetter (HOSS) Geographic", "Harmony OPeNDAP URL Service (HOUSe)", "OPeNDAP", "CloudGiovanniTimeSeries", "CloudGiovanniAveragingService". Route: a Harmony request per volcano box and date range, or Giovanni's area-averaged time series. GIBS also has `OMI_SO2_{Planetary_Boundary_Layer,Lower_Troposphere,Middle_Troposphere,Upper_Troposphere_and_Stratosphere}` tiles from 2004-10 / 2005-01 to now, for a map backdrop | 2004-10-01 → now (CMR); 0.25° daily; v004 also exists with HOSS (7,884 granules) | EOSDIS open ("EOSDIS data use and citation guidance") | Earthdata login (bearer token) | **The SO₂ track before TROPOMI**: Mayon 2006, 2009 and 2014, Bulusan 2006–2017, Kanlaon 2006–2016, and Taal 2020 cross-checked against TROPOMI. The track's start moves from 2018-12 to 2004-10 | no Earth Engine cost. One Harmony job per volcano box over 22 years: a few MB returned, about 8,000 daily rows per volcano, under 0.3 MB of rows |
-| A2 | **MEaSUREs Multi-Satellite Volcanic SO₂ L4, `MSVOLSO2L4` v4** (GES DISC, cloud-hosted). One text granule `MSVOLSO2L4_v04-00-2026m0513.txt`, **0.18 MB**. No service is needed: the whole database is smaller than one crawled bulletin page bundle | 1978-10-31 → 2026-05-13; one row per eruption (SO₂ mass, plume altitude) | EOSDIS open | Earthdata login | **The eruptions band**: SO₂ mass beside VEI for each GVP eruption, the same for all 24 volcanoes. A satellite fact for the eruptions before TROPOMI, and a plume altitude next to the Tokyo VAAC heights | none; 0.18 MB, re-read once a year. **Unverified:** which Philippine eruptions it lists (the read was denied, see the summary) |
+| A2 | **MEaSUREs Multi-Satellite Volcanic SO₂ L4, `MSVOLSO2L4` v4** (GES DISC, cloud-hosted). One text granule `MSVOLSO2L4_v04-00-2026m0513.txt`, **0.18 MB**; no service needed | 1978-10-31 → 2026-05-13; one row per eruption (SO₂ mass, plume altitude) | EOSDIS open | Earthdata login | **The eruptions band**: SO₂ mass beside VEI for each GVP eruption, the same for all 24 volcanoes. A satellite fact for the eruptions before TROPOMI, and a plume altitude next to the Tokyo VAAC heights | none; 0.18 MB, re-read once a year. **Unverified:** which Philippine eruptions it lists (the read was denied, see the summary) |
 | A3 | **Landsat Collection 2 Level-2 on Earth Engine:** `LANDSAT/LT05/C02/T1_L2` (1984-03 → 2012-05), `LANDSAT/LE07/C02/T1_L2` (1999-05 → 2024-01), `LANDSAT/LC08/C02/T1_L2` (2013-03 →), `LANDSAT/LC09/C02/T1_L2` (2021-10 →). `getThumbURL` composites and an `ST_B10`/`ST_B6` reduction over each crater lake | 2000 → now; 30 m optical; thermal 100 m (OLI) / 120 m (TM) / 60 m (ETM+), resampled to 30 m | STAC "proprietary"; the terms link points to USGS: Landsat data are U.S. public domain | the existing Earth Engine service account | **Before/after imagery** for every event since 2000, where Sentinel-2 starts in 2017 (Mayon 2000/2006/2009/2014/2018, Bulusan, Kanlaon, Pinatubo's lake). Also **the Taal main crater lake's surface temperature** before it drained on 2020-01-12, and its return | thumbnails: under 0.01 EECU-h each, about 10 per volcano. Lake temperature: about 700 scenes × a few hundred pixels ≈ 0.02–0.05 EECU-h for Taal, about 0.5 for every lake volcano |
-| A4 | **Sentinel-1 GRD on Earth Engine, `COPERNICUS/S1_GRD`** (IW, VV+VH, 10 m), as before/after backscatter and log-ratio change thumbnails | 2014-10 → now; repeats every 12 days (6 days in 2016–2021) | STAC "proprietary": the Copernicus Sentinel Data Legal Notice, already accepted for S5P and S2 | service account | **Before/after through cloud and ash**: the Taal Volcano Island ash blanket and the new crater on the first clear radar pass after 2020-01-12, when Sentinel-2 was clouded over. Also the Kanlaon 2024 deposits and the Mayon 2018 flows | under 0.01 EECU-h per thumbnail; about 0.05 per event. **The 20 had cut it** as a "second view"; it is listed again because it is the only view that sees through the cloud |
+| A4 | **Sentinel-1 GRD on Earth Engine, `COPERNICUS/S1_GRD`** (IW, VV+VH, 10 m), as before/after backscatter and log-ratio change thumbnails | 2014-10 → now; repeats every 12 days (6 days in 2016–2021) | STAC "proprietary": the Copernicus Sentinel Data Legal Notice, already accepted for S5P and S2 | service account | **Before/after through cloud and ash**: the Taal Volcano Island ash blanket and the new crater on the first clear radar pass after 2020-01-12, when Sentinel-2 was clouded over. Also the Kanlaon 2024 deposits and the Mayon 2018 flows | under 0.01 EECU-h per thumbnail; about 0.05 per event. **Cut in the 20** as a "second view"; back because only radar sees through the cloud |
 | A5 | **Google Open Buildings 2.5D Temporal, `GOOGLE/Research/open-buildings-temporal/v1`** (EE; covers "South-East Asia" according to the STAC description) | 2016-06-30 → 2023-06-30, annual; effective 4 m (building presence, fractional counts, heights) | **CC BY 4.0** (STAC `license`) | service account | **Exposure and recovery**: buildings inside the 7 / 14 km rings for each year. Shows the Taal Volcano Island settlements before the 2020 eruption, their decline and any return, and growth near Mayon and Kanlaon. It adds a building view to WorldPop's people count and leads into the Lights link | about 8 yearly images × a 14 km ring at 4 m ≈ 0.05–0.1 EECU-h per volcano; about 1–2 for all 24 (backfill once; the data ends in 2023) |
 
-**Why these five, tied to the product:**
-- The **SO₂ track** is the one series the 24-volcano map and the volcano pages show for every volcano. TROPOMI alone makes it start in 2018, which contradicts the "2000 to now" claim (Q7). A1 and A2 fix that, A1 per day and A2 per eruption.
-- For the **Taal 2020 story**:
-  - A4 makes step 5 (before/after) work in the eruption week itself, not on the first cloud-free Sentinel-2 day;
-  - A3 adds the crater lake's pre-2020 temperature and the 2000+ images for the other volcanoes' pages;
-  - A5 makes the exposure and recovery steps a visible change over time rather than one population number.
+**Why these five:**
+- The **SO₂ track** is the one series the 24-volcano map and volcano pages show for every volcano. TROPOMI alone starts it in 2018, against the "2000 to now" claim (Q7); A1 (daily) and A2 (per eruption) fix that.
+- In the **Taal 2020 story**, A4 makes step 5 (before/after) work in the eruption week instead of the first cloud-free Sentinel-2 day, A3 adds the crater lake's pre-2020 temperature and 2000+ images for other volcanoes' pages, and A5 shows exposure and recovery as change over time instead of one population number.
 
 ## (b) Nice to have
 
@@ -103,21 +97,21 @@ Status: 2026-10-21. This is a proposal for Kurt (**Q31**). Nothing is decided. [
 | Earth Engine weekly | under 0.5 | under 0.6 (only A3 and A4 receive new scenes) | under 0.8 |
 | Private archive | about 70–80 MB | **about 75–85 MB** (OMI rows about 7 MB at most uncompressed, MSVOLSO2L4 0.18 MB, building counts and image request records under 1 MB) | about 90 MB (ARIA crops excluded; M2) |
 | Data version on GitHub Pages | about 250 MB (M1) | about 255–260 MB (about 20 extra thumbnails per volcano at 50–100 kB) | about 265 MB |
-| Registrations | FIRMS MAP_KEY only | **plus the Earthdata login** (Kurt has it; CI tokens are already minted for Lights) | the same |
+| Registrations | FIRMS MAP_KEY only | **plus the Earthdata login** (account exists; CI already mints tokens for Lights) | the same |
 | Source count | 20 | **25** (OMI SO₂, MSVOLSO2L4, Landsat, S1 GRD, Open Buildings) | up to 34 |
 
 ## Recommendation
 
 **Add A1–A4 now (24 sources) and A5 at M1.1 with the Lights link.**
-- A1 (OMI SO₂) and A2 (MSVOLSO2L4) are the only way the SO₂ track honours "2000 to now" without a bulk download.
-- A3 (Landsat) and A4 (Sentinel-1) make before/after work for pre-2017 events and for the eruption week itself.
-- A5 (Open Buildings) is a recovery and exposure layer, so it belongs with Black Marble and the Lights poverty join.
-- The cost is a return of the Earthdata login, about 2 EECU-hours of backfill and about 5 MB of archive.
+- A1 (OMI SO₂) and A2 (MSVOLSO2L4): the only way to cover SO₂ from 2000 without a bulk download.
+- A3 (Landsat) and A4 (Sentinel-1): before/after images for pre-2017 events and the eruption week.
+- A5 (Open Buildings): a recovery and exposure layer, so it ships with Black Marble and the Lights poverty join.
+- Cost: the Earthdata login, about 2 EECU-hours of backfill and about 5 MB of archive.
 
-**Hold the (b) list.** B6 (ARIA GUNW) is the recommended route when the M2 InSAR crop (Q8) starts. B9 moves to (a) if the spike shows Philippine sources in it.
+**Hold the (b) list.** B6 (ARIA GUNW) is the route for the M2 InSAR crop (Q8). B9 moves to (a) if the spike finds Philippine sources.
 
 **Spike checks to add** (if Q31 is accepted):
-1. Read MSVOLSO2L4 and MSAQSO2L4 and list their Philippine rows. This needs approval to use the Earthdata token.
-2. Run one Harmony HOSS subset of `OMSO2e` for Taal, January 2020, and compare it with TROPOMI.
+1. List the Philippine rows in MSVOLSO2L4 and MSAQSO2L4 (needs approval for the Earthdata token).
+2. Run one Harmony HOSS subset of `OMSO2e` for Taal, January 2020, and compare with TROPOMI.
 3. Make one Sentinel-1 log-ratio thumbnail for Taal, 2020-01-06 against 2020-01-18.
 4. Read the 2016 and 2023 building counts inside Taal's 14 km ring.

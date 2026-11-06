@@ -14,19 +14,19 @@ The Plumes front end: Vite + React 19 + TypeScript, `@abrycta/akari` (Header, Pa
 
 ## Embed (`/embed`)
 
-`embed.html` (served at `/embed`; `src/embed/`) is the live picture krtmtthw.dev frames on its Plumes project page (workspace rules 6b, 6c; `LIVE-EMBEDS-PLAN.md`). The national map with thermal detections and earthquakes steps month by month through the year up to the most recent eruption GVP records, over a two-line caption. Two layouts by the frame's width: the desktop frame (1280×800, scaled down by the parent; larger type and markers) and compact (≤ 1100 px, the slot's real size; 14/12 px caption, phones get small unlabelled markers). No Header, controls, attribution box or links; the frame is inert and the map non-interactive, so touches scroll the parent. `?pr=` caps the canvas pixel ratio (≤ 2), `?paused=1` starts it still; `parent-bridge.ts` posts `akari:embed-ready` and accepts `akari:embed-pause` / `-resume` / `akari:theme` only from `https://krtmtthw.dev`. Reduced motion stays on the eruption month. `_headers` detaches `X-Frame-Options` and the CSP for `/embed` only and sets `frame-ancestors https://krtmtthw.dev`.
+`embed.html` (served at `/embed`; `src/embed/`) is the live picture krtmtthw.dev frames on its Plumes project page (workspace rules 6b, 6c; `LIVE-EMBEDS-PLAN.md`). The national map of thermal detections and earthquakes steps month by month through the year up to the latest eruption in GVP, over a two-line caption. Two layouts by the frame's width: the desktop frame (1280×800, scaled down by the parent; larger type and markers) and compact (≤ 1100 px, the slot's real size; 14/12 px caption, phones get small unlabelled markers). No Header, controls, attribution box or links; the frame is inert and the map non-interactive, so touches scroll the parent. `?pr=` caps the canvas pixel ratio (≤ 2), `?paused=1` starts it still; `parent-bridge.ts` posts `akari:embed-ready` and accepts `akari:embed-pause` / `-resume` / `akari:theme` only from `https://krtmtthw.dev`. Reduced motion stays on the eruption month. `_headers` detaches `X-Frame-Options` and the CSP for `/embed` only and sets `frame-ancestors https://krtmtthw.dev`.
 
 ## Data
 
 Data contract: [`../contracts/`](../contracts/README.md). Types come straight from `../contracts/ts/readmodels.ts` (alias `@contracts/*`); never copy them.
 
-`public/config.json` names the data base URL and fallbacks (no rebuild to switch): the published versions at `https://krtmtthw.dev/plumes/data/` (GitHub Pages), then the Hugging Face mirror. The app reads `latest.json` there, then every file relative to the version's `base`, falling back to `latest.mirrors`. Tests and offline development use the contract fixtures instead: with `PLUMES_FIXTURES=1` (set by `playwright.config.ts`), `scripts/vite-fixture-data.ts` serves `../contracts/fixtures/data` at `/data/` and a `config.json` pointing there; the build never contains them.
+`public/config.json` names the data base URL and fallbacks (no rebuild to switch): the published versions at `https://krtmtthw.dev/plumes/data/` (GitHub Pages), then the Hugging Face mirror. The app reads `latest.json` there, then every file relative to the version's `base`, falling back to `latest.mirrors`. Tests and offline development use the contract fixtures: with `PLUMES_FIXTURES=1` (set by `playwright.config.ts`), `scripts/vite-fixture-data.ts` serves `../contracts/fixtures/data` at `/data/` and a `config.json` pointing there. The build never includes them.
 
 `src/content/sources.json` (the About page's licence table) is generated from `../docs/sources-draft.yaml`: `npm run sources`.
 
 ## Safety rules in code (RESEARCH.md §9)
 
-- `SafetyBanner` is a layout element in `Shell`, on every route, not dismissable.
+- `SafetyBanner` is part of the `Shell` layout, so it shows on every route and cannot be dismissed.
 - `DataThrough` on every chart and map; alert levels only as "as reported by PHIVOLCS on <date>" markers (`data/tracks.ts`); every track carries its instrument wording (`INSTRUMENTS`) and coverage.
 - `src/lib/safety.test.ts` scans the source for present-status and forecasting words (EN and JA); `e2e/safety.spec.ts` checks every rendered route in both languages.
 - Heavy media: `lib/richMedia.ts` loads MapLibre only with ≥768px, a hovering fine pointer and no Save-Data; otherwise the static SVG map (`map/StaticMap.tsx`).

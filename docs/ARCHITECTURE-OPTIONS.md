@@ -1,22 +1,22 @@
 # Architecture options
 
-Status: decided 2026-10-21 (option B, see the box below) and built at milestone 1; this page records the options as proposed.
+Status: decided 2026-10-21 (Option B, see the box below), built at milestone 1. This page records the options as proposed.
 
-Written 2026-10-21 as the proposal for the recommended candidate (volcanoes; [CANDIDATES.md](CANDIDATES.md)). Versions and limits were checked on the day ([`research/platform-limits.md`](research/platform-limits.md)); **[U]** marks estimates. Kurt's standing preference applies: a widely recognised, named pattern, customised for this project, with the "standard → our variant" mapping written down ([architecture preference](../../CLAUDE.md) §7).
+Written 2026-10-21 for the chosen candidate (volcanoes; [CANDIDATES.md](CANDIDATES.md)). Versions and limits checked that day ([`research/platform-limits.md`](research/platform-limits.md)); **[U]** marks estimates. Each option is a named pattern, customised, with the "standard → our variant" mapping written down ([architecture preference](../../CLAUDE.md) §7).
 
-Constraints: free tiers only; Akari for the UI; `archivekit` for every external source; static-first (the live app never depends on an upstream or on a sleeping server); English and Japanese; the safety rules in [RESEARCH.md](RESEARCH.md) §9 are part of the product, not of the UI layer alone; no heavy local computation (the pipeline runs in GitHub Actions and Earth Engine).
+Constraints: free tiers only; Akari for the UI; `archivekit` for every external source; static-first (the live app never depends on an upstream or on a sleeping server); English and Japanese; the safety rules in [RESEARCH.md](RESEARCH.md) §9 apply to the whole product, beyond the UI layer; no heavy local computation (the pipeline runs in GitHub Actions and Earth Engine).
 
-> **Decided 2026-10-21 (Q3, Q4 in [DECISIONS.md](DECISIONS.md)): Option B from the start.** The static read models of option A carry the map and the per-volcano views; the read-only Java 17 Spring Boot (MyBatis) API on PostGIS is part of milestone 1, behind a same-origin Cloudflare Pages function with mandatory edge caching, on Render free beside Replay's service and on its own Neon free project. The front end is React 19 (Vite, Akari, MapLibre). No Rust. The text below is kept as written history: §2 still says "milestone 2 or 3" for the API, which is superseded; the free-tier constraints that follow from the decision are in [DATA-PLAN.md](DATA-PLAN.md) §8.
+> **Decided 2026-10-21 (Q3, Q4 in [DECISIONS.md](DECISIONS.md)): Option B from the start.** The static read models of option A carry the map and the per-volcano views; the read-only Java 17 Spring Boot (MyBatis) API on PostGIS is part of milestone 1, behind a same-origin Cloudflare Pages function with mandatory edge caching, on Render free beside Replay's service and on its own Neon free project. The front end is React 19 (Vite, Akari, MapLibre). No Rust. The "milestone 2 or 3" for the API below is superseded; the resulting free-tier constraints are in [DATA-PLAN.md](DATA-PLAN.md) §8.
 
 ## 0. Recommendation at a glance
 
-**Option A, "static read models": Jamstack delivery of CQRS-style materialised read models built by a Python pipeline in GitHub Actions (Earth Engine for rasters), a React + Akari + MapLibre front end, and client-side recompute in a Web Worker.** No server at milestone 1. Option B adds a Java read API over PostGIS (Neon, Render free) as a later "Under the hood" milestone, because the domain (dated events in space) is relational and Java is Kurt's day job; the static site never depends on it. Option C (a Rust core with CLI, WASM and Worker adapters, Lights' architecture) is rejected for this project: the browser-side maths is light, so a shared compiled core would be a repeat of Lights without a measured need.
+**Option A, "static read models": Jamstack delivery of CQRS-style materialised read models built by a Python pipeline in GitHub Actions (Earth Engine for rasters), a React + Akari + MapLibre front end, and client-side recompute in a Web Worker.** No server at milestone 1. Option B adds a Java read API over PostGIS (Neon, Render free) as a later "Under the hood" milestone, because the domain (dated events in space) is relational and it adds Java 17; the static site never depends on it. Option C (Lights' Rust core with CLI, WASM and Worker adapters) is rejected: the browser maths is light, so a shared compiled core would repeat Lights without a measured need.
 
 | | A: static read models | B: A + Java read API (milestone 2+) | C: Rust core, three adapters |
 |---|---|---|---|
 | Named pattern | Jamstack + Materialised View (the read side of CQRS); pipeline as an ETL batch layer | A plus Hexagonal (ports and adapters) Spring Boot service, read-only | Hexagonal Rust core + CQRS read models + Jamstack (Lights) |
 | Runtime cost | $0, cannot bill | $0 while within Render free; overages would bill (card on file), so edge caching is mandatory | $0 |
-| What it demonstrates | Earth Engine pipelines, multi-sensor fusion, provenance, honest UI, bilingual | plus Java 17/Spring on PostGIS with spatial-temporal queries and OpenAPI | plus Rust/WASM parity |
+| What it demonstrates | Earth Engine pipelines, multi-sensor fusion, provenance, limits shown in the UI, bilingual | plus Java 17/Spring on PostGIS with spatial-temporal queries and OpenAPI | plus Rust/WASM parity |
 | Risk | low | Render sleep, bandwidth | a repeat of Lights; toolchain time |
 | Verdict | **build first** | **plan as milestone 2 or 3** | not here |
 
@@ -24,12 +24,12 @@ Constraints: free tiers only; Akari for the UI; `archivekit` for every external 
 
 1. **Ingest** about a dozen sources of four shapes: rasters on Earth Engine (TROPOMI, MODIS/VIIRS fire, WorldPop, GHSL, WorldCover, DEM), tabular files (MIROVA CSV, USGS CSV, GVP WFS CSV, GEM GeoJSON, COD-AB), crawled HTML (PHIVOLCS bulletins and earthquake tables), and later InSAR GeoTIFFs.
 2. **Reduce** rasters to per-volcano daily series and national monthly mosaics; **parse** bulletins into dated fields; **join** everything on (volcano, date).
-3. **Derive** honest summaries: episodes (eruption windows from GVP, alert windows from bulletins), baselines and anomalies per series, coverage fractions, exposure rings; plain-language readings in English and Japanese.
+3. **Derive** summaries: episodes (eruption windows from GVP, alert windows from bulletins), baselines and anomalies per series, coverage fractions, exposure rings; plain-language readings in English and Japanese.
 4. **Publish** immutable data versions (tables, tiles, JSON), with provenance and "data as of".
 5. **Serve** a map of 24 volcanoes, a per-volcano multi-series view with a time scrubber, a national layer by month, and the methods/about pages, in two languages, with the safety banner, from a CDN.
 6. **Recompute** small things interactively (ring radius 10/20/30 km, hotspot confidence threshold, baseline window) from pre-aggregated bins, in the browser.
 
-None of this needs a request-time server. The interactive recompute works on per-day, per-annulus bins (6 annuli × 2,900 days × a few fields per volcano), which is thousands of numbers, not millions.
+None of this needs a request-time server. The recompute runs on per-day, per-annulus bins (6 annuli × 2,900 days × a few fields per volcano): thousands of numbers per volcano.
 
 ## 2. Option A (recommended): static read models
 
@@ -103,7 +103,7 @@ Hexagonal (ports and adapters) Spring Boot service, read-only, over a PostGIS sc
 
 ### 3.2 Why it earns its place
 
-The domain is dated events in space: joins across catalogues, windows around eruptions, nearest-volcano queries. That is what PostGIS and a relational model do well, and it mirrors Kurt's day job (Java 17, MyBatis) in a way the Python pipeline does not. It is deferred because visitors never need it and Render's sleep and overage rules make it an extra, not a dependency.
+The domain is dated events in space (joins across catalogues, windows around eruptions, nearest-volcano queries), which suits PostGIS and a relational model. It also shows Java 17 with MyBatis, which the Python pipeline does not. Proposed as deferred because visitors never need it and Render's sleep and overage rules make it optional.
 
 ### 3.3 Cost and risk
 
@@ -111,9 +111,9 @@ Render free sleeps after 15 minutes; bandwidth overages would bill because a car
 
 ## 4. Option C: Rust core with CLI, WASM and Worker adapters (not recommended here)
 
-Lights' Architecture B: a `no_std`-friendly Rust crate holding the derived-series maths (baselines, anomaly scores, episode detection, ring aggregation), driven by a CLI in CI, a WASM build in the browser and a Cloudflare Worker API, with bit-identical results in all three.
+Lights' Architecture B: a `no_std`-friendly Rust crate for the derived-series maths (baselines, anomaly scores, episode detection, ring aggregation), driven by a CLI in CI, WASM in the browser and a Cloudflare Worker API, bit-identical in all three.
 
-Why not: the browser-side maths here is a sum over a few thousand bins and a running median; it does not need a compiled core to be fast or to match CI (a shared TypeScript module tested against the pipeline's fixtures is enough). Building the same three-adapter design a second time would show nothing new and cost toolchain time. If a later milestone adds heavy client-side work (for example interactive InSAR time-series inversion over a cropped frame), Rust/WASM becomes the right tool and this option is reopened.
+Rejected: the browser maths is a sum over a few thousand bins and a running median, so a shared TypeScript module tested against the pipeline's fixtures is enough, and a second three-adapter design would repeat Lights at extra toolchain cost. Reopen if a milestone adds heavy client-side work (e.g. interactive InSAR time-series inversion over a cropped frame).
 
 ## 5. Front end (common to A and B)
 
