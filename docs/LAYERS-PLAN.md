@@ -154,7 +154,7 @@ The nine questions this plan asked, as answered by Kurt; recorded as L1–L9 in 
 
 | # | Question | Answer |
 |---|---|---|
-| L1 | COMET licence | ~~Email COMET first~~. **Superseded the same day by L1a: no email.** The portal's CC BY-NC 4.0 notice is treated as covering the LiCSBAS data; Plumes publishes the derived files with attribution to COMET plus "LiCSAR contains modified Copernicus Sentinel data [years]", and the notice "CC BY-NC 4.0" with a link to the licence. The draft [research/comet-licence-email.md](research/comet-licence-email.md) is kept, marked "not sent" |
+| L1 | COMET licence | ~~Email COMET first~~. **Superseded the same day by L1a: no email.** The portal's CC BY-NC 4.0 notice is treated as covering the LiCSBAS data; Plumes publishes the derived files with attribution to COMET plus "LiCSAR contains modified Copernicus Sentinel data [years]", and the notice "CC BY-NC 4.0" with a link to the licence. |
 | L2 | Replace Q8's plan? | **Yes:** COMET LiCSBAS series for all 18 covered volcanoes at M2. Q8's Taal-only crop (preferably by ARIA GUNW) is superseded |
 | L3 | Deformation display | **Both:** a LOS chart per volcano and a `deformation-velocity` map layer (§3.1) |
 | L4 | Rain route | **IMERG on Earth Engine**, one month measured first |

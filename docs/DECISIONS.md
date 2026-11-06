@@ -1,6 +1,6 @@
 # Decisions
 
-The log for this project: Kurt's answers to [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md), then spike addenda (S1, S2, …) and build notes (B1, B2, …). Never rewritten, only appended. Each entry has a date, the decision and the reason where one was given.
+The log for this project: Kurt's answers to the planning questions Q1–Q31, then spike addenda (S1, S2, …) and build notes (B1, B2, …). Never rewritten, only appended. Each entry has a date, the decision and the reason where one was given.
 
 ## 2026-10-21: Q1 and Q2
 
@@ -13,7 +13,7 @@ The design canvas Kurt approved the same day (overview map, volcano page, Taal J
 
 ## 2026-10-21: Q3 to Q18
 
-Answers that differ from the defaults in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md) are marked **(not the default)**.
+Answers that differ from the recommended defaults are marked **(not the default)**.
 
 | # | Decision | Reason given |
 |---|---|---|
@@ -32,9 +32,9 @@ Answers that differ from the defaults in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md) 
 | Q15 | **No published dataset (not the default):** no public Hugging Face dataset, no Zenodo DOI. Files on Hugging Face exist purely as hosting and fallback for the app. See [DATA-PLAN.md](DATA-PLAN.md) §5 for the private-versus-public repo question this raises. | Kurt's choice |
 | Q16 | English and Japanese; no Filipino. | default |
 | Q17 | The milestone-1 scope of ARCHITECTURE-OPTIONS.md §6, plus the Java API (Q3). | default plus Q3 |
-| Q18 | A one-day measurement spike before building ([SPIKE-PLAN.md](SPIKE-PLAN.md)). | default |
+| Q18 | A one-day measurement spike before building. | default |
 
-Consequences recorded the same day: the action items for a new Earth Engine project and for the PHIVOLCS email are removed from OPEN-QUESTIONS.md; ARCHITECTURE-OPTIONS.md keeps the three options as written history with the choice marked; the Java slice gets its own spike items; the milestone plan and the source cut are in [DATA-PLAN.md](DATA-PLAN.md) §9.
+Consequences recorded the same day: the action items for a new Earth Engine project and for the PHIVOLCS email are dropped; ARCHITECTURE-OPTIONS.md keeps the three options as written history with the choice marked; the Java slice gets its own spike items; the milestone plan and the source cut are in [DATA-PLAN.md](DATA-PLAN.md) §9.
 
 ## 2026-10-21: Q19 to Q31
 
@@ -56,11 +56,11 @@ Kurt, the same day: **"go ahead with everything."** That accepts the recommendat
 | Q28 | **Only M1's registrations: the FIRMS MAP_KEY** (Keychain `firms-map-key`), Kurt's action. **The Earthdata login returns** for A1 and A2 (the login exists; CI already mints short-lived tokens from it for Lights). OpenAQ, ReliefWeb, OpenAlex, ECMWF, Copernicus Marine, IOC, DAHITI and EROS fall away. The second Earth Engine service account is Q22 | Q30, Q31 |
 | Q29 | **Taal January 2020 at M1, Kanlaon 2024 at M1.1** on the same machinery | recommendation |
 
-Consequences recorded the same day: DATA-PLAN.md (§0–§2, §4, §7, §9–§11), LICENCES.md (out-of-scope marks; entries for OMSO2e and Open Buildings Temporal), SPIKE-PLAN.md (items 6 and MIROVA's half of 9 removed, item 17 corrected to Tokyo VAAC and DROMIC docx, items 19–27 added), [sources-draft.yaml](sources-draft.yaml) (the chosen set marked `# chosen: true`, two entries added: `omi-omso2e`, `open-buildings-temporal`) and both READMEs are aligned with the 24+1 set. Out-of-scope sources stay in the registry and the licence ledger as history. For the InSAR crop at M2 (Q8, unchanged), the ARIA S1 GUNW range read (NASA-EE-CANDIDATES.md B6) is noted as the preferred route; it is not a source until M2 starts. Still Kurt's: the FIRMS MAP_KEY, the GVP terms re-read, permission for the spike to read NASA files with the Earthdata token, and the go-ahead for the throwaway Render service and Neon project of spike items 13–15.
+Consequences recorded the same day: DATA-PLAN.md (§0–§2, §4, §7, §9–§11), LICENCES.md (out-of-scope marks; entries for OMSO2e and Open Buildings Temporal), the spike plan (items 6 and MIROVA's half of 9 removed, item 17 corrected to Tokyo VAAC and DROMIC docx, items 19–27 added), [sources-draft.yaml](sources-draft.yaml) (the chosen set marked `# chosen: true`, two entries added: `omi-omso2e`, `open-buildings-temporal`) and both READMEs are aligned with the 24+1 set. Out-of-scope sources stay in the registry and the licence ledger as history. For the InSAR crop at M2 (Q8, unchanged), the ARIA S1 GUNW range read (NASA-EE-CANDIDATES.md B6) is noted as the preferred route; it is not a source until M2 starts. Still Kurt's: the FIRMS MAP_KEY, the GVP terms re-read, permission for the spike to read NASA files with the Earthdata token, and the go-ahead for the throwaway Render service and Neon project of spike items 13–15.
 
 ## 2026-10-22: spike addenda S1 to S8
 
-From [SPIKE-RESULTS.md](SPIKE-RESULTS.md) Runs 1 and 2. These change the plan where a measurement now exists; they are recommendations recorded from the spike, and the ones marked **(Kurt)** need his choice.
+From the spike's Runs 1 and 2. These change the plan where a measurement now exists; they are recommendations recorded from the spike, and the ones marked **(Kurt)** need his choice.
 
 | # | Change | Measurement behind it |
 |---|---|---|
@@ -83,7 +83,7 @@ Kurt approved M1 on 2026-10-22: the repos `abrycta/plumes` (public) and `abrycta
 | B2 | The LAVA leaf certificate expires **2026-11-19**; the pinned GlobalSign "RSA OV SSL CA 2018" intermediate (valid to 2028-11-21) must be replaced if the renewed leaf has another issuer | `plumes/http.py`, `plumes/certs/` |
 | B3 | **COD-AB:** the registry entry now describes the range read (the zip is 928,515,157 bytes; 7 requests, 121,632 bytes for `phl_admin3.dbf`); the zip is never downloaded or archived, the extracted table is adopted | `plumes/codab.py` |
 | B4 | **Earth Engine:** many concurrent `reduceRegions` are refused ("Too many concurrent aggregations"), so a month is one aggregation: the daily S5P means are stacked as bands and reduced once over all 24 × 5 rings. Measured: **87 EECU-s per month for SO₂** (24 volcanoes, rings 5/10/15/30 km plus the 50 km box) and **64 EECU-s per month for fire** (MOD14A1, VNP14A1, FIRMS; 5/10/15 km). Full backfill about 2.3 + 5.5 EECU-h, run as three runs under the 10 EECU-h per-run cap. Per-run accounting reads the EE profiler; the ledger `ee-usage.json` is published with each version | `plumes/ee_series.py`, `plumes/ee_budget.py` |
-| B5 | **FIRMS `type` coding:** 0 presumed vegetation fire, **1 active volcano**, 2 other static land source, 3 offshore (SPIKE-RESULTS Run 1 wrote "2 = active volcano"; the Taal rows carry 1). The FIRMS area API answers each 5-day call with a CSV without a trailing newline, so responses are split on the header | `plumes/firms.py` |
+| B5 | **FIRMS `type` coding:** 0 presumed vegetation fire, **1 active volcano**, 2 other static land source, 3 offshore (the spike's Run 1 wrote "2 = active volcano"; the Taal rows carry 1). The FIRMS area API answers each 5-day call with a CSV without a trailing newline, so responses are split on the header | `plumes/firms.py` |
 | B6 | **ERA5:** the story needs one grid point, so the reader fetches one Blosc block per level instead of a ±2° window (Taal 11–15 Jan 2020, 6-hourly, four levels: 243 requests, 84 MB). The S4 check passes: the block reader equals a full numcodecs decode of the same chunk | `plumes/era5.py --verify` |
 | B7 | **GitHub Pages** for the data files serves at `https://krtmtthw.dev/plumes/data/`, because the user site carries the apex custom domain; no DNS record changes, and the project page stays at `/projects/plumes/`. The Hugging Face mirror is `permission-alluring/plumes` (a dataset repo used only as a files mirror, README says so, no licence tag) | `plumes/publish.py` |
 | B8 | **Crawled bundles and query results** are adopted into `abrycta/plumes-archive` by `plumes/adopt.py` (the kit's tag and asset layout: `<id>-<date>`, `<id>.tar.zst`, `SHA256SUMS`, `manifest.json`; draft first); the four `file` sources were snapshotted by `archivekit snapshot` itself. A kit-level `collection` kind stays the Q13 follow-up | — |
@@ -107,11 +107,11 @@ Kurt approved the same day: the site and the API switch from the fixtures to the
 
 ## 2026-10-22: layers plan L1 to L9
 
-Kurt's answers to the nine questions of [LAYERS-PLAN.md](LAYERS-PLAN.md) §5 (written as L1–L9 there; they were not in OPEN-QUESTIONS.md). The plan's build order (§7) and its "ready to start" checklist (§8) follow from them.
+Kurt's answers to the nine questions of [LAYERS-PLAN.md](LAYERS-PLAN.md) §5 (written as L1–L9 there). The plan's build order (§7) and its "ready to start" checklist (§8) follow from them.
 
 | # | Decision | Note |
 |---|---|---|
-| L1 | **Email COMET before publishing any COMET-derived data.** The draft is [research/comet-licence-email.md](research/comet-licence-email.md); Kurt sends it. No COMET file is published until the reply is recorded here | The portal's CC BY-NC 4.0 covers its images; the JSON files carry no licence of their own |
+| L1 | **Email COMET before publishing any COMET-derived data.** Kurt sends the email. No COMET file is published until the reply is recorded here | The portal's CC BY-NC 4.0 covers its images; the JSON files carry no licence of their own |
 | L2 | **COMET LiCSBAS series for all 18 covered volcanoes at M2. This supersedes Q8's Taal-only crop** and the ARIA S1 GUNW route noted in "Q19 to Q31" | ARIA GUNW covers only Taal, Pinatubo and Banahaw and ends 2025-09-15 |
 | L3 | **Deformation: a LOS chart per volcano and a velocity map layer**, new layer id `deformation-velocity` (contract change in `contracts/schemas/layers.schema.json` and `contracts/ts/readmodels.ts`, approved by Kurt before it is built; spec in LAYERS-PLAN.md §3.1) | the per-volcano series needs no contract change |
 | L4 | **IMERG rain on Earth Engine**, one month measured before the backfill | simplest route; 1–3 EECU-h estimated |
@@ -125,7 +125,7 @@ Kurt's answers to the nine questions of [LAYERS-PLAN.md](LAYERS-PLAN.md) §5 (wr
 
 | # | Decision | Note |
 |---|---|---|
-| L1a | **Supersedes L1: no email to COMET.** The COMET Volcano Portal's CC BY-NC 4.0 notice is treated as covering the LiCSBAS data; Plumes publishes the derived series and velocity layer with attribution to COMET, the LiCSAR Copernicus acknowledgement and the CC BY-NC 4.0 notice (wording in LICENCES.md). The draft [research/comet-licence-email.md](research/comet-licence-email.md) is kept, marked "not sent — decided 2026-10-22" | Kurt's choice |
+| L1a | **Supersedes L1: no email to COMET.** The COMET Volcano Portal's CC BY-NC 4.0 notice is treated as covering the LiCSBAS data; Plumes publishes the derived series and velocity layer with attribution to COMET, the LiCSAR Copernicus acknowledgement and the CC BY-NC 4.0 notice (wording in LICENCES.md). | Kurt's choice |
 | L3a | **The `deformation-velocity` contract change is approved** as specified in LAYERS-PLAN.md §3.1 (`layers.schema.json` enum, `LayerId`, `{frame}`, `frames`). It is built with M2 step 9, not now | Kurt's approval |
 | L9a | **`h5py` may be installed in the plumes environment**, for reading the `MSAQSO2L4` per-year values at M3. Nothing is run now | the earlier install was waiting on this approval |
 | L10 | **The `deformation-velocity` coherence floor is 0.2** (LAYERS-PLAN §3.1), not the planned 0.3, which left a speckled map | canary 2026-10-22, Taal 032D: 1,983 of 8,811 COMET-valid pixels kept at 0.2, 1,230 at 0.3 |
@@ -135,7 +135,7 @@ Kurt's answers to the nine questions of [LAYERS-PLAN.md](LAYERS-PLAN.md) §5 (wr
 
 ## 2026-10-22: stories plan ST1 to ST11; phone embed P1
 
-Kurt's answers to the 11 open questions of [STORIES-PLAN.md](STORIES-PLAN.md) (written there as questions 1–11; they were not in OPEN-QUESTIONS.md). Stories are generated from data with fixed EN/JA templates; nothing is built yet. Answers that differ from the plan's recommendation are marked **(not the default)**.
+Kurt's answers to the 11 open questions of [STORIES-PLAN.md](STORIES-PLAN.md) (written there as questions 1–11). Stories are generated from data with fixed EN/JA templates; nothing is built yet. Answers that differ from the plan's recommendation are marked **(not the default)**.
 
 | # | Decision | Note |
 |---|---|---|

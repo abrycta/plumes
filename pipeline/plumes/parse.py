@@ -1,6 +1,6 @@
 """Parsers for crawled pages: PHIVOLCS WordPress prose bulletins, PHIVOLCS-LAVA bulletins, Tokyo VAAC advisories.
 
-Ported from the spike (spike/crawl/parse.py; parse rates in SPIKE-RESULTS Run 2). Every parser returns None for a
+Ported from the spike (parse rates in DECISIONS S1–S8). Every parser returns None for a
 field it cannot find; a missing value is never guessed.
 """
 

@@ -3,7 +3,6 @@
 # Dependabot security updates).
 # Majors of react, react-dom, vite and maplibre-gl are upgraded by hand; @abrycta/* (Akari) only through the
 # per-release upgrade PR (rule 16).
-# spike/ is planning code: security updates only (open-pull-requests-limit 0 turns version updates off).
 version: 2
 registries:
   # @abrycta/akari comes from GitHub Packages. Dependabot secret DEPENDABOT_PACKAGES_TOKEN: a classic
@@ -85,26 +84,6 @@ updates:
         applies-to: version-updates
         update-types: [minor, patch]
       docker-security:
-        applies-to: security-updates
-        patterns: ["*"]
-
-  - package-ecosystem: uv
-    directories: ["/spike"]
-    schedule:
-      { interval: weekly, day: monday, time: "06:00", timezone: Asia/Manila }
-    open-pull-requests-limit: 0
-    groups:
-      spike-uv-security:
-        applies-to: security-updates
-        patterns: ["*"]
-
-  - package-ecosystem: maven
-    directories: ["/spike/java"]
-    schedule:
-      { interval: weekly, day: monday, time: "06:00", timezone: Asia/Manila }
-    open-pull-requests-limit: 0
-    groups:
-      spike-maven-security:
         applies-to: security-updates
         patterns: ["*"]
 

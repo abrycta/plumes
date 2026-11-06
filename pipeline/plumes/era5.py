@@ -1,4 +1,4 @@
-"""ERA5 pressure-level winds at one grid point, read from ARCO-ERA5 by HTTP range (DECISIONS S4; spike era5_range.py).
+"""ERA5 pressure-level winds at one grid point, read from ARCO-ERA5 by HTTP range (DECISIONS S4).
 
 An ARCO chunk is one hour x 37 levels x the globe (117 MB per variable-hour). The reader range-reads the Blosc header,
 then only the compressed block(s) holding the wanted level's latitude row, and decodes them (LZ4 + byte-unshuffle).
