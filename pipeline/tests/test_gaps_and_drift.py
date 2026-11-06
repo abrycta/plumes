@@ -1,4 +1,4 @@
-"""Audit 2026-10-23 fixes: delta windows that survive gaps (M7), revisable facts warn (M6), GVP drift is not a reject (L1)."""
+"""Delta crawl windows that survive gaps, warning-only checks for revisable facts, and GVP drift that warns instead of rejecting."""
 
 import datetime as dt
 
