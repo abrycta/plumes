@@ -1,0 +1,51 @@
+name: Branch cleanup
+# Weekly: delete remote branches whose pull request is merged (and that have no commits since), or that are 0 commits
+# ahead of the default branch. Never touched: the default branch, gh-pages, dependabot/*, changeset-release/*,
+# protected branches and any branch with an open pull request. workflow_dispatch with dry_run lists what it would delete.
+on:
+  schedule: [{ cron: "23 4 * * 1" }]   # Mondays 12:23 PHT
+  workflow_dispatch:
+    inputs:
+      dry_run: { description: "List the branches without deleting them", type: boolean, default: false }
+permissions: { contents: write, pull-requests: read }
+concurrency: { group: branch-cleanup, cancel-in-progress: false }
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - name: Delete merged and empty branches
+        run: |
+          set -euo pipefail
+          default=$(gh api "repos/$REPO" --jq .default_branch)
+          open=$(gh pr list -R "$REPO" --state open --limit 1000 --json headRefName --jq '.[].headRefName')
+          echo "| Branch | Action |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          gh api --paginate "repos/$REPO/branches?per_page=100" --jq '.[] | [.name, .commit.sha, .protected] | @tsv' |
+          while IFS=$'\t' read -r branch sha protected; do
+            case "$branch" in
+              "$default" | gh-pages | dependabot/* | changeset-release/*) continue ;;
+            esac
+            [ "$protected" = "true" ] && continue
+            grep -qxF -- "$branch" <<< "$open" && continue
+            reason=""
+            # merged: a merged PR from this branch whose head is the branch's current tip (nothing pushed since)
+            if [ -n "$(gh pr list -R "$REPO" --state merged --head "$branch" --limit 100 --json headRefOid \
+                  --jq ".[] | select(.headRefOid == \"$sha\") | .headRefOid")" ]; then
+              reason="PR merged"
+            elif [ "$(gh api "repos/$REPO/compare/$default...$sha" --jq .ahead_by)" = "0" ]; then
+              reason="0 commits ahead of $default"
+            fi
+            [ -z "$reason" ] && continue
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "| \`$branch\` | would delete ($reason) |" >> "$GITHUB_STEP_SUMMARY"
+            elif gh api -X DELETE "repos/$REPO/git/refs/heads/$branch" --silent; then
+              echo "| \`$branch\` | deleted ($reason) |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning title=Branch not deleted::$branch ($reason)"
+            fi
+          done
