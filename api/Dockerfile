@@ -4,7 +4,7 @@
 #   docker build -f api/Dockerfile -t plumes-api .
 # Stages: Maven + GraalVM CE (JDK 25; the code targets Java 17) -> native executable -> distroless runtime.
 
-FROM maven:3.9.11-eclipse-temurin-25 AS maven
+FROM maven:3.9-eclipse-temurin-26 AS maven
 
 FROM ghcr.io/graalvm/native-image-community:25 AS build
 COPY --from=maven /usr/share/maven /usr/share/maven
