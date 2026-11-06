@@ -126,7 +126,7 @@ Copernicus Sentinel data licence, mirrored at `https://ads.atmosphere.copernicus
 
 ### 4.1 MIROVA (verified by probe)
 
-`https://www.mirovaweb.it/NRT/` (University of Turin, contact diego.coppola@unito.it). Volcano list (`/NRT/volcanoes.php`) has 176 volcanoes; Philippine entries: Kanlaon (272020), Mayon (273030), Taal (273070), Pinatubo (273083); **Bulusan and Hibok-Hibok are not listed.** Kanlaon page (`/NRT/volcanoDetails_MOD.php?volcano_id=272020`): sensors MODIS, VIIRS750, VIIRS375, Combined MIR; "Log VRP", "Linear VRP", "Max Distance", "Google Earth (.kmz)"; "The Volcanic Radiative Power (VRP) is calculated using the MIR-method with a lower detection limit of about 1 MW. Data are processed in Near Real Time, that is within 1-4 hours from image acquisition." No CSV link on the page.
+`https://www.mirovaweb.it/NRT/` (University of Turin). Volcano list (`/NRT/volcanoes.php`) has 176 volcanoes; Philippine entries: Kanlaon (272020), Mayon (273030), Taal (273070), Pinatubo (273083); **Bulusan and Hibok-Hibok are not listed.** Kanlaon page (`/NRT/volcanoDetails_MOD.php?volcano_id=272020`): sensors MODIS, VIIRS750, VIIRS375, Combined MIR; "Log VRP", "Linear VRP", "Max Distance", "Google Earth (.kmz)"; "The Volcanic Radiative Power (VRP) is calculated using the MIR-method with a lower detection limit of about 1 MW. Data are processed in Near Real Time, that is within 1-4 hours from image acquisition." No CSV link on the page.
 
 Site terms (`/NRT/credits.php`), verbatim: "All original content on this website ... is property of MIROVA and is released under the following conditions: Free to copy, share, and quote for non-commercial purposes with appropriate attribution to MIROVA. Not permitted to alter, transform, or use for commercial purposes without explicit permission." Disclaimer: "All data and content on the MIROVA website are provided 'as is.'"
 
@@ -281,7 +281,7 @@ Recommended framing:
 | Volume / free-tier feasibility | 4 | Everything except InSAR is MB-scale; GEE zonal stats are cheap; USGS 27k events; InSAR must be linked or cropped (tens of GB per frame). |
 | Scientific honesty | 3 | TROPOMI gives columns not flux and only since 2018; FIRMS cannot separate fires from lava without SP `type`; tropical atmosphere degrades InSAR; a "20-year multi-sensor" claim needs careful caveats and era-dependent sources. |
 | Public interest and portfolio appeal | 5 | Taal Jan 2020: 1.37 M Wikipedia views in a month; Kanlaon 2024–26 sustained 60k–180k monthly peaks and an ongoing eruption; strong national relevance. |
-| Technical showcase | 5 | GEE pipelines (S5P, MODIS/VIIRS, WorldPop rings), WFS/FDSN ingestion, bulletin NLP parsing, InSAR products, map plus multi-series time-series UI. |
+| Technical scope | 5 | GEE pipelines (S5P, MODIS/VIIRS, WorldPop rings), WFS/FDSN ingestion, bulletin NLP parsing, InSAR products, map plus multi-series time-series UI. |
 | Risk (5 = low) | 3 | A volcano site can be mistaken for a live hazard service during a crisis; PHIVOLCS reuse terms are unwritten (RA 8293 covers non-profit use, but "for profit" needs approval); scraping ~15k bulletins and re-serving numbers invites attribution and accuracy disputes. |
 
 **Top three risks**

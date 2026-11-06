@@ -179,7 +179,7 @@ Verdict: comfortably within free tiers if the CRW archive is reduced to the PH b
 
 ---
 
-## 8. Technical showcase (beyond night-lights poverty and typhoon replay)
+## 8. Technical scope (beyond night-lights poverty and typhoon replay)
 
 - **Change-detection cartography:** GMW 4.1 change-class stacks by baseline (1985/1990/2000/2010) → "year of loss / year of gain" rasters coloured by decade; Murray 2022 as an independent second opinion rendered as agreement/disagreement.
 - **Swipe comparisons:** 1985 vs 2025 extent; GMW vs ESA WorldCover 2021 vs Clark Labs ponds; before/after Haiyan (2013) for Eastern Samar/Leyte.
@@ -210,7 +210,7 @@ Verdict: comfortably within free tiers if the CRW archive is reduced to the PH b
 | Volume / free-tier feasibility | 4 | PH subsets are GB-scale; CRW must be box-subset via ERDDAP; PMTiles need splitting or R2; GEE 150 EECU-h/month suffices |
 | Scientific honesty | 3 | Extent is solid (F1 0.93) but change classes ~60 %, early years infilled, DHW ≠ bleaching, ACA habitat ≠ coral health; honest framing is possible but demanding |
 | Public interest / portfolio appeal | 4 | Mangrove planting drives, fishpond reversion, Boracay, VIP, Haiyan, 2024 bleaching, fisherfolk poverty are live Philippine stories |
-| Technical showcase | 4 | Change-detection, swipes, 41-year LGU series, raster→vector→PMTiles, DHW animation, uncertainty UI |
+| Technical scope | 4 | Change-detection, swipes, 41-year LGU series, raster→vector→PMTiles, DHW animation, uncertainty UI |
 | Risk (5 = low) | 3 | Main hazards are re-display of GMW/ACA and licence traps; both are avoidable by design but need discipline |
 
 **Top three risks**

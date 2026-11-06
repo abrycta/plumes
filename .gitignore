@@ -1,4 +1,4 @@
-# planning phase
+# build outputs, caches and local data
 spike/out/
 spike/**/out/
 .env*
@@ -15,3 +15,16 @@ pipeline/snapshots/
 # Local secrets: wrangler's .dev.vars; .env examples stay tracked
 !.env*.example
 .dev.vars*
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Python and test caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage/

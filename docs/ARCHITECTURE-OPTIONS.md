@@ -1,6 +1,8 @@
 # Architecture options
 
-Status: 2026-10-21, proposal for the recommended candidate (volcanoes; [CANDIDATES.md](CANDIDATES.md)). Nothing is implemented. Versions and limits were checked on the day ([`research/platform-limits.md`](research/platform-limits.md)); **[U]** marks estimates. Kurt's standing preference applies: a widely recognised, named pattern, customised for this project, with the "standard → our variant" mapping written down ([architecture preference](../../CLAUDE.md) §7).
+Status: decided 2026-10-21 (option B, see the box below) and built at milestone 1; this page records the options as proposed.
+
+Written 2026-10-21 as the proposal for the recommended candidate (volcanoes; [CANDIDATES.md](CANDIDATES.md)). Versions and limits were checked on the day ([`research/platform-limits.md`](research/platform-limits.md)); **[U]** marks estimates. Kurt's standing preference applies: a widely recognised, named pattern, customised for this project, with the "standard → our variant" mapping written down ([architecture preference](../../CLAUDE.md) §7).
 
 Constraints: free tiers only; Akari for the UI; `archivekit` for every external source; static-first (the live app never depends on an upstream or on a sleeping server); English and Japanese; the safety rules in [RESEARCH.md](RESEARCH.md) §9 are part of the product, not of the UI layer alone; no heavy local computation (the pipeline runs in GitHub Actions and Earth Engine).
 
@@ -14,7 +16,7 @@ Constraints: free tiers only; Akari for the UI; `archivekit` for every external 
 |---|---|---|---|
 | Named pattern | Jamstack + Materialised View (the read side of CQRS); pipeline as an ETL batch layer | A plus Hexagonal (ports and adapters) Spring Boot service, read-only | Hexagonal Rust core + CQRS read models + Jamstack (Lights) |
 | Runtime cost | $0, cannot bill | $0 while within Render free; overages would bill (card on file), so edge caching is mandatory | $0 |
-| Shows off | Earth Engine pipelines, multi-sensor fusion, provenance, honest UI, bilingual | plus Java 17/Spring on PostGIS with spatial-temporal queries and OpenAPI | plus Rust/WASM parity |
+| What it demonstrates | Earth Engine pipelines, multi-sensor fusion, provenance, honest UI, bilingual | plus Java 17/Spring on PostGIS with spatial-temporal queries and OpenAPI | plus Rust/WASM parity |
 | Risk | low | Render sleep, bandwidth | a repeat of Lights; toolchain time |
 | Verdict | **build first** | **plan as milestone 2 or 3** | not here |
 
@@ -101,7 +103,7 @@ Hexagonal (ports and adapters) Spring Boot service, read-only, over a PostGIS sc
 
 ### 3.2 Why it earns its place
 
-The domain is dated events in space: joins across catalogues, windows around eruptions, nearest-volcano queries. That is what PostGIS and a relational model do well, and it mirrors Kurt's day job (Java 17, MyBatis) in a way the Python pipeline does not. It is deferred because visitors never need it and Render's sleep and overage rules make it a showcase, not a dependency.
+The domain is dated events in space: joins across catalogues, windows around eruptions, nearest-volcano queries. That is what PostGIS and a relational model do well, and it mirrors Kurt's day job (Java 17, MyBatis) in a way the Python pipeline does not. It is deferred because visitors never need it and Render's sleep and overage rules make it an extra, not a dependency.
 
 ### 3.3 Cost and risk
 

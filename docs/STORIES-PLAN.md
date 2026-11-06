@@ -1,6 +1,8 @@
 # Stories plan: more story data first, then a standard story format
 
-Status: 2026-10-22. **Kurt answered the 11 open questions the same day** (DECISIONS.md ST1–ST11, listed at the end of this plan); the plan below is updated to match. Nothing is built. Kurt's direction (2026-10-22): Plumes stories are **generated from data**, never hand-written and never AI-written. Fixed English and Japanese sentence templates are filled with sourced figures. A sentence appears only when its data exists. A story stays a draft until it is reviewed. The order is **first more story data (Part A), then the standard format (Part B)**. Plumes stays a retrospective record, never a hazard or warning service (Q1, Q14).
+Status: built. Stories are generated from data and publish automatically once the generator's checks pass (ST15, which supersedes ST1's manual review). The plan below is kept as the specification.
+
+Written 2026-10-22. **Kurt answered the 11 open questions the same day** (DECISIONS.md ST1–ST11, listed at the end of this plan); the plan below is updated to match. Kurt's direction (2026-10-22): Plumes stories are **generated from data**, never hand-written and never AI-written. Fixed English and Japanese sentence templates are filled with sourced figures. A sentence appears only when its data exists. The order is **first more story data (Part A), then the standard format (Part B)**. Plumes stays a retrospective record, never a hazard or warning service (Q1, Q14).
 
 Inputs read: [DECISIONS.md](DECISIONS.md) (Q1–Q31, S1–S8, B1–B18, L1–L9, T1), [DATA-PLAN.md](DATA-PLAN.md), [LAYERS-PLAN.md](LAYERS-PLAN.md) (planned and rejected layers: not proposed again here without a new reason), [LICENCES.md](LICENCES.md), `pipeline/sources.yaml`, `story_taal()` in `pipeline/plumes/readmodels.py`, `contracts/schemas/story.schema.json`, and the live data version v2 (`https://krtmtthw.dev/plumes/data/v2/`: the manifest, the 24 volcano files and `story/taal-2020.json`). **[U]** marks a value that was not measured. Probes were limited to small read-only requests made on 2026-10-22; they are listed in §A6.
 
@@ -303,7 +305,7 @@ All changes are additive; v2 files stay valid. They land in one contract PR, app
 
 ### B9. Where the shared format lives
 
-- **Planned, not written now (Kurt, 2026-10-22):** a workspace-level `/Users/kurt/portfolio/STORY-FORMAT.md`, a short standard like DATA-ARCHIVING.md (step model, template-entry fields, wording rules, review-hash rule, checks). Until then this plan is the specification. The JSON schema stays in Plumes' `contracts/`.
+- **Planned, not written now (Kurt, 2026-10-22):** a workspace-level `STORY-FORMAT.md`, a short standard like DATA-ARCHIVING.md (step model, template-entry fields, wording rules, review-hash rule, checks). Until then this plan is the specification. The JSON schema stays in Plumes' `contracts/`.
 - **Code:** the code stays in `plumes/pipeline/plumes/stories/` with no Plumes imports in the core (renderer, checks, review hashing); the series adapters are Plumes-specific.
 - **When a second project wants stories** (Replay's storms are the obvious one), the core moves to a new private package **`abrycta/story-kit`** (ST7), not into `data-archive-kit`.
 

@@ -36,7 +36,7 @@ Each candidate gets the same treatment in `CANDIDATES.md`:
 - data volume and free-tier fit: GitHub Actions minutes (public repo: free; private archive repo: 2,000 min/month shared), Earth Engine noncommercial EECU-hours, Cloudflare Pages 25 MiB per file and 20,000 files, Hugging Face datasets, Neon free storage, browser payload budgets;
 - scientific honesty: what the data can and cannot say, the uncertainty, what safe claims look like, and (for hazards) the authority framing;
 - public interest in the Philippines and how the project reads in a portfolio (to a recruiter, in two sentences);
-- technical showcase: what it demonstrates that Lights and Typhoon Replay do not;
+- technical scope: what it demonstrates that Lights and Typhoon Replay do not;
 - risks, with mitigations;
 - scores 1–5 on each axis with a one-line reason, plus an overall recommendation.
 

@@ -38,7 +38,7 @@ Note that track 69 (which I had guessed) is over Ecuador/Peru, and the 142A fram
 EGMS covers 30 countries: EU-27 (minus none listed), Iceland, Norway, UK; "no non-European territory is listed" (https://land.copernicus.eu/en/faq/products/european-ground-motion-service/which-areas-and-regions-are-covered-by-the-data).
 
 ### 1.3 CopPhil Ground Motion Monitoring Service (EU Global Gateway + PhilSA), a potential national product
-A page at https://copphil.philsa.gov.ph/ground-motion-monitoring-service/ (fetched 2026-10-21) describes an EGMS-style service for the Philippines: Sentinel-1 SBAS and PSI, "consistent coverage across most of the Philippines", three products (Basic LOS velocities asc/desc with per-point reliability relative to a local reference; Calibrated against GNSS; Ortho E-W/Up-Down). Implemented by ESA under EU Global Gateway, © CopPhil 2026; flyer dated May 2026. **Status, launch date, download access and licence are not stated** (the flyer PDF text is not extractable) **[U]**. This is the biggest strategic uncertainty: if CopPhil publishes open velocity points nationally, the project's "process it yourself" angle collapses into "visualise CopPhil's product", which is still a good showcase but a different one.
+A page at https://copphil.philsa.gov.ph/ground-motion-monitoring-service/ (fetched 2026-10-21) describes an EGMS-style service for the Philippines: Sentinel-1 SBAS and PSI, "consistent coverage across most of the Philippines", three products (Basic LOS velocities asc/desc with per-point reliability relative to a local reference; Calibrated against GNSS; Ortho E-W/Up-Down). Implemented by ESA under EU Global Gateway, © CopPhil 2026; flyer dated May 2026. **Status, launch date, download access and licence are not stated** (the flyer PDF text is not extractable) **[U]**. This is the biggest strategic uncertainty: if CopPhil publishes open velocity points nationally, the project's "process it yourself" angle collapses into "visualise CopPhil's product", which is still a good project but a different one.
 
 ### 1.4 Global coastal-subsidence datasets
 - **Tay et al. 2022, Nature Sustainability** ("Sea-level rise from land subsidence in major coastal cities", 48 cities, Sentinel-1 ~2014–2020, ARIA/ISCE/MintPy; https://doi.org/10.1038/s41893-022-00947-z; abstract via Semantic Scholar). Replication data on DR-NTU Dataverse, DOI 10.21979/N9/GPVX0F, **CC BY-NC 4.0**, 50 files / 821 MB, shapefiles per city, including **`Manila_TD032.zip` (2.3 MB)** (https://researchdata.ntu.edu.sg/dataset.xhtml?persistentId=doi:10.21979/N9/GPVX0F). Manila's rate is in the paper's city table; not read here **[U]**. NC licence means it can be shown and cited but a commercial reuse would be out; fine for a portfolio.
@@ -179,7 +179,7 @@ Fit with the archiving standard: raw LiCSAR/HyP3 copies (tens of GB) belong in t
 
 ---
 
-## 10. Technical showcase (beyond night-lights and typhoon replay)
+## 10. Technical scope (beyond night-lights and typhoon replay)
 
 - Running a real geodetic time-series inversion (LiCSBAS SBAS, GACOS correction, loop-closure checks, reference selection, asc/desc decomposition) and reproducing it in CI with provenance.
 - Serving **per-pixel uncertainty** (vel ± vstd) and time series on the map: click a point → 2014–2026 displacement curve with error band, compared against the published rates table.
@@ -198,7 +198,7 @@ Fit with the archiving standard: raw LiCSAR/HyP3 copies (tens of GB) belong in t
 | Volume / free-tier feasibility | **3** | SLC processing is out (1.5 TB); the LiCSAR+LiCSBAS route is ~60–70 GB download then a few GB working set, workable but needs staging outside a 6-h Actions job; HyP3 works but expires in 14 days and its free tier is funding-dependent. |
 | Scientific honesty | **4** | The caveats are well understood and can be surfaced (reference, LOS, vstd, coherence); risk is in the Pampanga fishpond zone where C-band decorrelates exactly where subsidence is worst. |
 | Public interest / portfolio appeal | **5** | "Bulacan sinking 11 cm/yr", NMIA flooding debate, reclamation, CAMANAVA; no public national subsidence map exists; CopPhil may change that. |
-| Technical showcase | **5** | Geodetic time-series inversion + uncertainty maps + raster time series + exposure analytics, well beyond raster-overlay apps. |
+| Technical scope | **5** | Geodetic time-series inversion + uncertainty maps + raster time series + exposure analytics, well beyond raster-overlay apps. |
 | Risk (5 = low) | **3** | CopPhil GMS could release an official national product and reframe the project; LiCSAR storage migration broke interferogram paths during probing; HyP3 free tier uncertain; reputational risk if rates are over-claimed. |
 
 **Top three risks**

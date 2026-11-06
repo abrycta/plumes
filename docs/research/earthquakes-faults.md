@@ -147,7 +147,7 @@ Three copyleft regimes (CC BY-SA, CC BY-NC-SA, ODbL) coexist; the `sources.yaml`
 
 ---
 
-## 9. Technical showcase
+## 9. Technical scope
 
 - What makes it more than a point map: (1) **ShakeMap stacking**: sum the per-event MMI/PGA CoverageJSON or grids for all M ≥ 6 events since 1900 (Atlas + real-time, ≈ 600 events, probe) into "maximum observed shaking per cell" and "number of times ≥ MMI VI" layers; this is an empirical, honest counterpart to the GEM probabilistic map and does not exist for the Philippines publicly. (2) **Exposure computation**: intersect those layers (and the GEM PGA layer) with WorldPop/GHSL/building footprints to give people and buildings per shaking class per province, with the uncertainty from completeness carried through. (3) **Dual-catalogue reconciliation**: match PHIVOLCS and USGS/ISC solutions per event, show depth/magnitude/location offsets as distributions (the 23 km vs 59 km case), a thing no viewer does. (4) Tile pipeline: PMTiles for 200k points + fault lines + rasters, served statically.
 - It is still point data with modest volumes; the "big" part is the raster stacking and footprint aggregation, both batch jobs, not a streaming or satellite pipeline.
@@ -173,7 +173,7 @@ Three copyleft regimes (CC BY-SA, CC BY-NC-SA, ODbL) coexist; the `sources.yaml`
 | Volume / free-tier feasibility | 5 | 27k USGS + ~200k PHIVOLCS rows, ≈ 70 MB of light ShakeMap products, < 1 MB faults; fits Pages/Neon free; no GEE. |
 | Scientific honesty | 4 | Rich, verifiable uncertainty (magnitude types, completeness, depth disagreements, three death-toll figures for one scenario) that can be shown; the "no prediction" line is clear and well documented by PHIVOLCS/USGS. |
 | Public interest / portfolio appeal | 4 | "Big One" drills and plans throughout 2026, the 2025 Cebu and Davao Oriental disasters; but the topic is crowded with authoritative maps. |
-| Technical showcase | 3 | ShakeMap stacking, exposure aggregation and catalogue reconciliation are real work, but it is point/raster batch processing with no satellite or streaming component. |
+| Technical scope | 3 | ShakeMap stacking, exposure aggregation and catalogue reconciliation are real work, but it is point/raster batch processing with no satellite or streaming component. |
 | Risk (5 = low) | 3 | Real-time misuse, PHIVOLCS terms and copyleft mixing are all avoidable but need discipline from day one. |
 
 **Top three risks:** (1) being read as a USGS/PHIVOLCS clone unless the stacked-shaking and reconciliation views lead; (2) the real-time trap and the fake-prediction climate (a viral fake risk map was fact-checked in Sept 2026); (3) PHIVOLCS data rights: no licence, FOI denials for shapefiles, bulletins only since 2018, so the PHIVOLCS half of the archive is a scrape that could be challenged.
