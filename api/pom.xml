@@ -20,7 +20,7 @@
     <java.version>17</java.version>
     <maven.compiler.release>17</maven.compiler.release>
     <mybatis-spring-boot.version>4.1.0</mybatis-spring-boot.version>
-    <json-schema-validator.version>1.5.9</json-schema-validator.version>
+    <json-schema-validator.version>3.0.9</json-schema-validator.version>
     <!-- The read-model schemas and fixtures (owned by contracts/). -->
     <plumes.contracts>${project.basedir}/../contracts</plumes.contracts>
   </properties>
