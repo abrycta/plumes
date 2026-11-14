@@ -192,6 +192,20 @@
    "label": "fire 2013-01..2026-10",
    "eecu_s": 52.3,
    "calls": 2
+  },
+  {
+   "id": "bfdb4da09e90",
+   "date": "2026-11-14",
+   "label": "so2 ..2026-10",
+   "eecu_s": 0.0,
+   "calls": 0
+  },
+  {
+   "id": "f10fdaf8bc2e",
+   "date": "2026-11-14",
+   "label": "fire 2013-01..2026-10",
+   "eecu_s": 0.0,
+   "calls": 0
   }
  ]
 }
