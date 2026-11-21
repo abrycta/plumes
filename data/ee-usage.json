@@ -206,6 +206,20 @@
    "label": "fire 2013-01..2026-10",
    "eecu_s": 0.0,
    "calls": 0
+  },
+  {
+   "id": "771edcd432f1",
+   "date": "2026-11-21",
+   "label": "so2 ..2026-10",
+   "eecu_s": 0.0,
+   "calls": 0
+  },
+  {
+   "id": "ac8af9bdadbc",
+   "date": "2026-11-21",
+   "label": "fire 2013-01..2026-10",
+   "eecu_s": 0.0,
+   "calls": 0
   }
  ]
 }

@@ -1,11 +1,11 @@
 {
  "schemaVersion": "1",
  "kind": "latest",
- "current": "v11",
- "base": "v11/",
- "dataAsOf": "2026-11-14",
- "generatedAt": "2026-11-14T22:13:05Z",
- "previous": "v10",
+ "current": "v12",
+ "base": "v12/",
+ "dataAsOf": "2026-11-21",
+ "generatedAt": "2026-11-21T22:59:56Z",
+ "previous": "v11",
  "mirrors": [
   "https://krtmtthw.dev/plumes/data/",
   "https://huggingface.co/datasets/permission-alluring/plumes/resolve/main/"
